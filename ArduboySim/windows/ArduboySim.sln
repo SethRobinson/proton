@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "winArduboySim", "winArduboySim.vcproj", "{B4AF0729-C4C8-470F-A075-2D37021ACC6D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug GL|Win32 = Debug GL|Win32
+		Release GL|Win32 = Release GL|Win32
+		SDL Debug GL|Win32 = SDL Debug GL|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Debug GL|Win32.ActiveCfg = Debug GL|Win32
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Debug GL|Win32.Build.0 = Debug GL|Win32
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Release GL|Win32.ActiveCfg = Release GL|Win32
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Release GL|Win32.Build.0 = Release GL|Win32
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.SDL Debug GL|Win32.ActiveCfg = SDL Debug GL|Win32
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.SDL Debug GL|Win32.Build.0 = SDL Debug GL|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

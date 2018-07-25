@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="rtsimpleapp" default="help">
+
+  <property name="PACKAGE_NAME" value="com.rtsoft.rtsimpleapp" />
+  <property name="SMALL_PACKAGE_NAME" value="rtsimpleapp" />
+  <property name="PACKAGE_NAME_WITH_UNDERSCORES" value="com_rtsoft_rtsimpleapp" />
+
+
+  <!-- The local.properties file is created and updated by the 'android' tool.
+         It contains the path to the SDK. It should *NOT* be checked into
+         Version Control Systems. -->
+  <loadproperties srcFile="local.properties" />
+
+  <!-- The ant.properties file can be created by you. It is only edited by the
+         'android' tool to add properties to it.
+         This is the place to change some Ant specific build properties.
+         Here are some properties you may want to change/update:
+
+         source.dir
+             The name of the source directory. Default is 'src'.
+         out.dir
+             The name of the output directory. Default is 'bin'.
+
+         For other overridable properties, look at the beginning of the rules
+         files in the SDK, at tools/ant/build.xml
+
+         Properties related to the SDK location or the project target should
+         be updated using the 'android' tool with the 'update' action.
+
+         This file is an integral part of the build system for your
+         application and should be checked into Version Control Systems.
+
+         -->
+  <property file="ant.properties" />
+
+  <!-- The project.properties file is created and updated by the 'android'
+         tool, as well as ADT.
+
+         This contains project specific properties such as project target, and library
+         dependencies. Lower level build properties are stored in ant.properties
+         (or in .classpath for Eclipse projects).
+
+         This file is an integral part of the build system for your
+         application and should be checked into Version Control Systems. -->
+  <loadproperties srcFile="project.properties" />
+
+  <!-- quick check on sdk.dir -->
+  <fail
+          message="sdk.dir is missing. Make sure to generate local.properties using 'android update project'"
+          unless="sdk.dir"
+    />
+
+
+  <!-- extension targets. Uncomment the ones where you want to do custom work
+     in between standard targets -->
+  <!--
+    <target name="-pre-build">
+    </target>
+    <target name="-pre-compile">
+    </target>
+
+    /* This is typically used for code obfuscation.
+       Compiled code location: ${out.classes.absolute.dir}
+       If this is not done in place, override ${out.dex.input.absolute.dir} */
+    <target name="-post-compile">
+    </target>
+-->
+
+  <!--
+Well, I'm stuck into my C++ ways and can't figure out decent ways to share source while still including/not including different java libraries and dynamically setting package names.
+
+I give up, I'm going to preprocess all the source files with this ant task. -Seth
+-->
+  <taskdef resource="javapp-defs.xml" classpath="../../shared/android/util/javapp.jar" />
+
+
+  <target name="preprocess">
+    <javapp destdir="temp_final_src" verbose="true" prefix="//#">
+      <fileset dir="temp_src" includes="**/*.java" />
+    </javapp>
+  </target>
+
+  <target name="preprocess_cpp">
+    <javapp destdir="temp_final_cpp_src" verbose="true" prefix="//JAVAPP#">
+      <fileset dir="../../shared/android/v2_src/cpp" includes="**/*.cpp" />
+    </javapp>
+  </target>
+
+
+  <!--
+Here is where Seth setups a customized packaging so we can tell it to not compress certain filetypes.
+
+-->
+  <target name="-package-resources" depends="-crunch">
+    <!-- only package resources if *not* a library project -->
+    <do-only-if-not-library elseText="Library project: do not package resources..." >
+      <aapt executable="${aapt}"
+              command="package"
+              versioncode="${version.code}"
+              versionname="${version.name}"
+              debug="${build.is.packaging.debug}"
+              manifest="AndroidManifest.xml"
+              assets="${asset.absolute.dir}"
+              androidjar="${project.target.android.jar}"
+              apkfolder="${out.absolute.dir}"
+              nocrunch="${build.packaging.nocrunch}"
+              resourcefilename="${resource.package.file.name}"
+              resourcefilter="${aapt.resource.filter}"
+              libraryRFileRefid="project.library.bin.r.file.path"
+              libraryResFolderPathRefid="project.libraries.res"
+              libraryPackagesRefid="project.libraries.package"
+              previousBuildType="${build.last.target}"
+              buildType="${build.target}">
+        <res path="${out.res.absolute.dir}" />
+        <res path="${resource.absolute.dir}" />
+        <!-- <nocompress /> forces no compression on any files in assets or res/raw -->
+        <!-- <nocompress extension="xml" /> forces no compression on specific file extensions in assets and res/raw -->
+
+        <nocompress extension="rtfont" />
+        <nocompress extension="rttex" />
+        <nocompress extension="wav" />
+      </aapt>
+    </do-only-if-not-library>
+  </target>
+
+
+
+  <!-- Compiles this project's .java files into .class files. -->
+  <target name="-compile" depends="-build-setup, -pre-build, -code-gen, -pre-compile">
+    <do-only-if-manifest-hasCode elseText="hasCode = false. Skipping...">
+      <!-- If android rules are used for a test project, its classpath should include
+                 tested project's location -->
+      <condition property="extensible.classpath"
+              value="${tested.project.absolute.dir}/bin/classes"
+              else=".">
+        <isset property="tested.project.absolute.dir" />
+      </condition>
+      <condition property="extensible.libs.classpath"
+              value="${tested.project.absolute.dir}/${jar.libs.dir}"
+              else="${jar.libs.dir}">
+        <isset property="tested.project.absolute.dir" />
+      </condition>
+      <path id="project.javac.classpath">
+        <path refid="tested.project.classpath" />
+        <path refid="project.all.jars.path" />
+      </path>
+      <javac encoding="${java.encoding}"
+              source="${java.source}" target="${java.target}"
+              debug="true" extdirs=""
+              destdir="${out.classes.absolute.dir}"
+              verbose="${verbose}"
+              classpath="${extensible.classpath}"
+              bootclasspathref="project.target.class.path"
+              classpathref="project.javac.classpath"
+              >
+        <src path="${source.absolute.dir}" />
+        <!--  <src path="../../shared/android/src" /> -->
+        <src path="${gen.absolute.dir}" />
+        <classpath>
+          <fileset dir="${extensible.libs.classpath}" includes="*.jar" />
+        </classpath>
+      </javac>
+      <!-- if the project is a library then we generate a jar file -->
+      <if condition="${project.is.library}">
+        <then>
+          <echo>Creating library output jar file...</echo>
+          <property name="out.library.jar.file" location="${out.absolute.dir}/classes.jar" />
+          <if>
+            <condition>
+              <length string="${android.package.excludes}" trim="true" when="greater" length="0" />
+            </condition>
+            <then>
+              <echo>Custom jar packaging exclusion: ${android.package.excludes}</echo>
+            </then>
+          </if>
+          <jar destfile="${out.library.jar.file}">
+            <fileset dir="${out.classes.absolute.dir}" excludes="**/R.class **/R$*.class"/>
+            <fileset dir="${source.absolute.dir}" excludes="**/*.java ${android.package.excludes}" />
+          </jar>
+        </then>
+      </if>
+
+      <!-- if the project is instrumented, intrument the classes -->
+      <if condition="${build.is.instrumented}">
+        <then>
+          <echo>Instrumenting classes from ${out.absolute.dir}/classes...</echo>
+          <!-- It only instruments class files, not any external libs -->
+          <emma enabled="true">
+            <instr verbosity="${verbosity}"
+                   mode="overwrite"
+                   instrpath="${out.absolute.dir}/classes"
+                   outdir="${out.absolute.dir}/classes">
+            </instr>
+            <!-- TODO: exclusion filters on R*.class and allowing custom exclusion from
+                             user defined file -->
+          </emma>
+        </then>
+      </if>
+    </do-only-if-manifest-hasCode>
+  </target>
+
+
+
+
+  <!-- Import the actual build file.
+
+         To customize existing targets, there are two options:
+         - Customize only one target:
+             - copy/paste the target into this file, *before* the
+               <import> task.
+             - customize it to your needs.
+         - Customize the whole content of build.xml
+             - copy/paste the content of the rules files (minus the top node)
+               into this file, replacing the <import> task.
+             - customize to your needs.
+
+         ***********************
+         ****** IMPORTANT ******
+         ***********************
+         In all cases you must update the value of version-tag below to read 'custom' instead of an integer,
+         in order to avoid having your file be overridden by tools such as "android update project"
+    -->
+  <!-- version-tag: 1 -->
+  <import file="${sdk.dir}/tools/ant/build.xml" />
+
+</project>

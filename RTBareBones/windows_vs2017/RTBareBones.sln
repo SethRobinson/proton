@@ -1,0 +1,68 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2043
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "winRTBareBones", "winRTBareBones.vcxproj", "{B4AF0729-C4C8-470F-A075-2D37021ACC6D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug Mesa GL|Win32 = Debug Mesa GL|Win32
+		Debug Mesa GL|x64 = Debug Mesa GL|x64
+		Debug WebOS|Win32 = Debug WebOS|Win32
+		Debug WebOS|x64 = Debug WebOS|x64
+		Debug_GL|Win32 = Debug_GL|Win32
+		Debug_GL|x64 = Debug_GL|x64
+		Debug_GLES|Win32 = Debug_GLES|Win32
+		Debug_GLES|x64 = Debug_GLES|x64
+		Flash GLES Debug Test|Win32 = Flash GLES Debug Test|Win32
+		Flash GLES Debug Test|x64 = Flash GLES Debug Test|x64
+		Release_GL|Win32 = Release_GL|Win32
+		Release_GL|x64 = Release_GL|x64
+		Release_GLES|Win32 = Release_GLES|Win32
+		Release_GLES|x64 = Release_GLES|x64
+		SDL2_Debug_GL|Win32 = SDL2_Debug_GL|Win32
+		SDL2_Debug_GL|x64 = SDL2_Debug_GL|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Debug Mesa GL|Win32.ActiveCfg = Debug Mesa GL|Win32
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Debug Mesa GL|Win32.Build.0 = Debug Mesa GL|Win32
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Debug Mesa GL|x64.ActiveCfg = Debug Mesa GL|x64
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Debug Mesa GL|x64.Build.0 = Debug Mesa GL|x64
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Debug WebOS|Win32.ActiveCfg = Debug WebOS|Win32
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Debug WebOS|Win32.Build.0 = Debug WebOS|Win32
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Debug WebOS|x64.ActiveCfg = Debug WebOS|x64
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Debug WebOS|x64.Build.0 = Debug WebOS|x64
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Debug_GL|Win32.ActiveCfg = Debug GL|Win32
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Debug_GL|Win32.Build.0 = Debug GL|Win32
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Debug_GL|x64.ActiveCfg = Debug GL|x64
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Debug_GL|x64.Build.0 = Debug GL|x64
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Debug_GLES|Win32.ActiveCfg = Common Debug|Win32
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Debug_GLES|Win32.Build.0 = Common Debug|Win32
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Debug_GLES|x64.ActiveCfg = Common Debug|x64
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Debug_GLES|x64.Build.0 = Common Debug|x64
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Debug_GLES|x64.Build.2 = Software GL|x64
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Flash GLES Debug Test|Win32.ActiveCfg = Flash GLES Debug Test|Win32
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Flash GLES Debug Test|Win32.Build.0 = Flash GLES Debug Test|Win32
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Flash GLES Debug Test|x64.ActiveCfg = Flash GLES Debug Test|x64
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Flash GLES Debug Test|x64.Build.0 = Flash GLES Debug Test|x64
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Release_GL|Win32.ActiveCfg = Release GL|Win32
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Release_GL|Win32.Build.0 = Release GL|Win32
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Release_GL|x64.ActiveCfg = Release GL|x64
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Release_GL|x64.Build.0 = Release GL|x64
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Release_GLES|Win32.ActiveCfg = Common Release|Win32
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Release_GLES|Win32.Build.0 = Common Release|Win32
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Release_GLES|x64.ActiveCfg = Common Release|x64
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.Release_GLES|x64.Build.0 = Common Release|x64
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.SDL2_Debug_GL|Win32.ActiveCfg = SDL2 Debug GL|Win32
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.SDL2_Debug_GL|Win32.Build.0 = SDL2 Debug GL|Win32
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.SDL2_Debug_GL|x64.ActiveCfg = SDL2 Debug GL|x64
+		{B4AF0729-C4C8-470F-A075-2D37021ACC6D}.SDL2_Debug_GL|x64.Build.0 = SDL2 Debug GL|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AF527F02-3EB6-48B0-8146-4834EA870BA2}
+	EndGlobalSection
+EndGlobal

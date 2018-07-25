@@ -1,0 +1,18 @@
+v0.8:
+
+- fixed position bug: now returns milliseconds instead of current sample number
+
+
+v0.7:
+
+- Dropped backwards compatibility to be able to stop() sounds
+
+Fixed:
+- Issue 3: Returned SoundChannel position is always 0
+- Issue 4: start time validation always fails
+- Issue X: Can't stop sounds using SoundChannel
+
+
+v0.6:
+
+-Small but important bugfix: 'soundtransform must not be null' error

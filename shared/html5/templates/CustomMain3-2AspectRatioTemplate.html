@@ -1,0 +1,129 @@
+<!-- This unity webgl template is based on "A better Unity WebGL template" by greggman: https://github.com/greggman/better-unity-webgl-template -->
+<!-- Also based on code by John Sharp: https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-7-get-naked-owl/  -->
+<!-- Tweaks by Seth A. Robinson (rtsoft.com) - note, this is sort of a mess because I haven't fully intregrated the unity/emscripten stuff at this time.  It works though -->
+
+<script>
+   var appName = "RTTemplateName";	
+</script>
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+    <meta charset="utf-8">
+    <title>RTTemplateName</title>
+      <style>
+      html {
+        box-sizing: border-box;
+      }
+      *, *:before, *:after {
+        box-sizing: inherit;
+      }
+      body {
+        margin: 0;
+        background: #444;
+      }
+      #gameContainer {
+        width: 50vw;
+        height: 100vh;
+      }
+      canvas.emscripten {
+         width: 100vw; 
+		    height: 66.66vw; /* height:width ratio = 9/16 = .5625  */
+		    #background: black;
+		    max-height: 100vh;
+		    max-width: 150.00vh; /* 16/9 = 1.778 */
+		    margin: auto;
+		    position: absolute;
+		    top:0;bottom:0; /* vertical center */
+		    left:0;right:0; /* horizontal center */
+        display: block;
+      }
+
+      .logo {
+          display: block;
+          width: max-width: 100vw;
+          height: max-height: 70vh;
+          z-index: -1;
+      }
+
+      .progress {
+          margin: 1.5em;
+          border: 1px solid white;
+          width: 50vw;
+          display: none;
+      }
+      .progress .full {
+          margin: 2px;
+          background: white;
+          height: 1em;
+          transform-origin: top left;
+      }
+
+      #loader {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        pointer-events:none;
+        
+      }
+
+			.loadingtext {
+ 				 color: white;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .spinner,
+      .spinner:after {
+        border-radius: 50%;
+        width: 5em;
+        height: 5em;
+      }
+      .spinner {
+        margin: 10px;
+        font-size: 10px;
+        position: relative;
+        text-indent: -9999em;
+        border-top: 1.1em solid rgba(255, 255, 255, 0.2);
+        border-right: 1.1em solid rgba(255, 255, 255, 0.2);
+        border-bottom: 1.1em solid rgba(255, 255, 255, 0.2);
+        border-left: 1.1em solid #ffffff;
+        transform: translateZ(0);
+        animation: spinner-spin 1.1s infinite linear;
+        
+      }
+      @keyframes spinner-spin 
+      {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      
+    </style>
+  </head>
+
+  <body>
+    <div id="gameContainer">
+    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+    </div>
+    <div id="loader">
+      <img class="logo" src="WebLoaderData/logo.png">
+      <div class="spinner"></div>
+       <div class="loadingtext">Setting up...</div>
+     
+      <div class="progress"><div class="full"></div></div>
+    </div>
+
+ <script src="WebLoaderData/RTLoader.js"> </script>
+  </body>
+ 
+</html>

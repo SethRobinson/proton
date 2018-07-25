@@ -1,0 +1,7 @@
+//
+// Prefix header for all source files of the 'RTSimpleApp' target in the 'RTSimpleApp' project
+//
+
+#ifdef __OBJC__
+    #import <Cocoa/Cocoa.h>
+#endif

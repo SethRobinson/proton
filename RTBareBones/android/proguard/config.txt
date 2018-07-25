@@ -1,0 +1,74 @@
+-optimizationpasses 2 
+-dontusemixedcaseclassnames 
+-dontskipnonpubliclibraryclasses 
+-dontpreverify 
+-verbose 
+-dump class_files.txt 
+-printseeds seeds.txt 
+-printusage unused.txt 
+-printmapping mapping.txt 
+
+# The -optimizations option disables some arithmetic simplifications that Dalvik 1.0 and 1.5 can't handle. 
+-optimizations !code/simplification/arithmetic 
+
+-dontoptimize
+-dontshrink
+
+-keep public class * extends android.app.Activity 
+-keep public class * extends android.app.Application 
+-keep public class * extends android.app.Service 
+-keep public class * extends android.content.BroadcastReceiver 
+-keep public class * extends android.content.ContentProvider 
+
+-keep public class * extends View { 
+public <init>(android.content.Context); 
+public <init>(android.content.Context, android.util.AttributeSet); 
+public <init>(android.content.Context, android.util.AttributeSet, int); 
+public void set*(...); 
+} 
+
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+-keep class com.rtsoft.shared.SharedActivity {
+    static void show_keyboard();
+    static void hide_keyboard();
+    static void force_quit() ;
+    static java.lang.String get_docdir() ;
+    static java.lang.String get_region() ;
+    static java.lang.String get_clipboard() ;
+    static java.lang.String get_udid() ;
+    static java.lang.String get_apkFileName() ;
+    static java.lang.String get_externaldir();
+    static void vibrate(int) ;
+    static void music_play(java.lang.String) ;
+    static void music_stop() ;
+    static void music_set_volume(float);
+    static boolean music_is_playing();
+    static void music_set_pos(int);
+    static int music_get_pos();
+    static int sound_load(java.lang.String) ;
+    static int sound_play(int, float, float, int, int, float) ;
+    static int sound_set_vol(int, float, float);
+    static int sound_set_rate(int, float);
+    static void sound_init();
+    static void sound_destroy();
+    static void sound_kill(int) ;
+    static void sound_stop(int) ;
+    static void LaunchURL(java.lang.String) ;
+    static void create_dir_recursively(java.lang.String , java.lang.String);
+}
+
+-keep class com.rtsoft.shared.ShardActivity.AppRenderer {
+
+}
+
+
+-keep public class com.android.vending.licensing.ILicensingService
+

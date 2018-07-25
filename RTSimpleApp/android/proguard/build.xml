@@ -1,0 +1,37 @@
+<!-- ================================================= -->
+<!-- Obfuscation with ProGuard -->
+<!-- ================================================= -->
+
+<property name="proguard-dir" value="proguard"/>
+<property name="unoptimized" value="${proguard-dir}/unoptimized.jar"/>
+<property name="optimized" value="${proguard-dir}/optimized.jar"/>
+
+<target name="optimize" unless="nooptimize">
+    <jar basedir="${out.classes.dir}" destfile="${unoptimized}"/>
+    
+    <java jar="${proguard-dir}/proguard.jar" fork="true" failonerror="true">
+        <jvmarg value="-Dmaximum.inlined.code.length=16"/>
+        <arg value="@${proguard-dir}/config.txt"/>      
+        <arg value="-injars ${unoptimized}"/>
+        <arg value="-outjars ${optimized}"/>
+        <arg value="-libraryjars ${android.jar}"/>
+    </java>     
+    
+    <!-- Delete source pre-optimized jar -->     
+    <delete file="${unoptimized}" />
+    
+    <!-- Unzip target optimization jar to original output, and delete optimized.jar -->
+    <delete dir="${out.classes.dir}"/>
+    <mkdir dir="${out.classes.dir}"/>
+    <unzip src="${proguard-dir}/optimized.jar" dest="${out.classes.dir}"/>
+    
+    <!-- Delete optimized jar (now unzipped into bin directory) -->
+    <delete file="${optimized}" />
+    
+</target>
+
+<!-- Converts this project's .class files into .dex files -->
+<target name="-dex" depends="compile,optimize">
+    <dex-helper />
+</target>
+

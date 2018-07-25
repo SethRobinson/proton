@@ -1,0 +1,91 @@
+JavaPP is a macro processor that runs in the Java VM and resembles the
+C preprocessor in syntax and functionality.  The core text processing is
+implemented in python and jython is used for running in the Java VM.
+
+
+ Grammar
+================================
+
+Properties
+-----------------
+
+    #define prop property value
+    #undefine prop
+    ${prop}
+
+Properties can be defined when the processor is executed (see Ant task
+description) or during processing using #define.  Properties can also
+be removed during processing using #undefine.
+
+Property substitution is performed on the text ${prop} and an error is
+raised when 'prop' is not defined.
+
+When defining a property, all text following the property identifier
+is considered the value.  For example:
+
+  #define var1 "some string of text"
+
+will cause subsequent substitution to contain the double quote characters
+and is NOT the same as...
+
+  #define var1 some string of text
+
+Conditions
+-----------------
+
+    #if expression [and|or expression]
+    [#elif expression [and|or expression]]
+    [#else]
+    #endif
+
+Conditions can be nested.  Expressions are combined using the
+'and', 'or' operators.
+
+Expressions
+-----------------
+
+    operand <operator> operand | [!]defined(prop)
+
+Expressions contain an operator and two operands.  The supported
+operators are '==', '!=', '<=', '<', '>=', '>'.  The operand can
+be either string literal (surrounded with double quotes), number
+(integer or decimal), or property substitution in the form ${prop}.
+
+The special expression 'defined(prop)' is supported for testing
+if a given property has been defined.  The alternate syntax
+'!defined(prop)' can be used to test if a property is not defined.
+
+
+ Ant task
+================================
+To use the ant task, put the javapp.jar file where ant can find it
+(eg: ANT_HOME/lib) and add the taskdef to your build script:
+
+<taskdef resource="javapp-defs.xml" />
+
+Or put javapp.jar into your project and specify the classpath in the taskdef:
+
+<taskdef resource="javapp-def.xml" classpath="javapp.jar" />
+
+Attributes
+-----------------
+
+srcfile    - input file, either srcfile or nested fileset is required
+destfile   - output file, only allowed when srcfile is set
+destdir    - destination directory, required for nested source filesets
+prefix     - change the macro prefix, default is '#'
+inheritall - inherit all properties from the project, default is true
+verbose    - show verbose output, default is false
+
+Elements
+-----------------
+
+<property> - append key/value pairs to the processors environment
+<fileset>  - zero or more filesets of source files
+
+
+ ToDo
+================================
+On the list of things to do is:
+ * the #include directive
+ * custom macros written in python

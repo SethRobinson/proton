@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+<title>LinearParticle: Getting Started</title>
+<link href="doxygen.css" rel="stylesheet" type="text/css">
+<link href="tabs.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+/*<![CDATA[*/
+span.c6 {color: #008000}
+span.c5 {font-family: Courier New;}
+i.c4 {color: #808080}
+span.c3 {color: #000000}
+span.c2 {color: #800000}
+span.c1 {color: #000000; font-family: Courier New;}
+/*]]>*/
+</style>
+
+</head><body>
+
+<div class="tabs">
+  <ul>
+    <li><a href="index.html"><span>Main Page</span></a></li>
+    <li><a href="annotated.html"><span>Classes</span></a></li>
+    <li><a href="hierarchy.html"><span>Hierarchy</span></a></li>
+    <li><a href="functions.html"><span>Functions</span></a></li>
+    <li><a href="getting_started.html"><span>Getting started</span></a></li>    
+  </ul>
+</div>
+
+
+
+
+<h1>Getting Started with LinearParticle</h1>
+
+<br/>
+
+This page explains how to get started with LinearParticle. To have a particle effect, at least one <b>L_Particle</b> object and
+one <b>L_ParticleEffect</b> ( <b>L_DroppingEffect</b>, <b>L_ShootingEffect</b> or <b>L_ExplosionEffect</b> ) object have to be created.<br/><br/>
+
+The following shows the simple initialization with a dropping effect and basic particle setting.
+<table style="text-align: left; background-color: rgb(233, 233, 255); width: 650px;" border="0" cellpadding="10" cellspacing="0">
+    <tr><td>
+        <span class="c5"><i class="c4">/* initialize LinearParticle, this is the first thing you need to do before using LinearParticle. */</i></span><br />
+        <span class="c1">L_ParticleSystem::init();</span><br />
+        </span><br />
+        <span class="c5"><i class="c4">// create surface</i></span><br />
+        <span class="c1">CL_Surface surface(</span><span class="c2">"image.png"</span><span class="c3">);</span><br />
+        <span class="c1">surface.set_alignment(origin_center);<br />
+        </span><br />
+        <span class="c5"><i class="c4">// create a sample of particle with life of 5000</i></span><br />
+        <span class="c1">L_Particle particle(&amp;surface,</span><span class="c6">5000</span><span class="c3">);<br />
+        </span><br />
+        <span class="c5"><i class="c4">// create dropping effect with dropping period of 16</i></span><br />
+        <span class="c1">L_DroppingEffect effect(</span><span class="c6">0</span><span class="c3">,</span><span class="c6">0</span><span class="c3">,</span><span class="c6">16</span><span class="c3">);<br />
+        </span><br />
+        <span class="c5"><i class="c4">// add the particle to dropper effect</i></span><br />
+        <span class="c1">effect.add(&amp;particle);<br />
+        </span><br />
+        <span class="c5"><i class="c4">// initialize particle effect</i></span><br />
+        <span class="c1">effect.initialize();</span>
+    </td></tr>
+</table>
+<br/><br/>
+
+
+After the effect has been initialized, three basic member functions <b>L_ParticleEffect::trigger()</b>,
+<b>L_ParticleEffect::run(int)</b> and <b>L_ParticleEffect::draw(int=0,int=0)</b> are needed to be called in
+order to run and draw the effect. L_ParticleEffect::set_position(int,int) is used to change the position of particle emission, if you change
+the position continuously every frame, you might get a trailing effect.
+The following is the code that in main loop.
+<table style="text-align: left; background-color: rgb(233, 233, 255); width: 650px;" border="0" cellpadding="10" cellspacing="0">
+    <tr><td>
+        <span class="c1">CL_Display::clear(CL_Color(</span><span class="c2">0</span><span class="c3">,</span><span class="c2">0</span><span class="c3">,</span><span class="c2">0</span><span class="c3">));<br />
+        <br />
+        </span><br />
+        <span class="c5"><i class="c4">// Call L_ParticleEffect::tirgger() to trigger emission of particles</i></span><br />
+        <span class="c1">effect.trigger();<br />
+        </span><br />
+        <span class="c5"><i class="c4">// set position of the dropping point</i></span><br />
+        <span class="c1">effect.set_position(x_pos, y_pos);<br />
+        </span><br />
+        <span class="c5"><i class="c4">/* pass frame time to L_ParticleEffect::run(int) for time based system,</i></span><br />
+        <span class="c5"><i class="c4"> a constant number would be a reference time unit for frame based system. */</i></span><br />
+        <span class="c1">effect.run(</span><span class="c2">16</span><span class="c3">);<br />
+        </span><br />
+        <span class="c5"><i class="c4">// draw dropping effect</i></span><br />
+        <span class="c1">effect.draw();<br />
+        <br />
+        </span><br />
+        <span class="c1">CL_Display::flip();</span><br />
+        <span class="c1">CL_System::keep_alive();</span>
+    </td></tr>
+</table><br/><br/>
+
+
+When you are no longer using LinearParticle, deinitialize it to free resources hold by LinearParticle.
+<table style="text-align: left; background-color: rgb(233, 233, 255); width: 650px;" border="0" cellpadding="10" cellspacing="0">
+    <tr><td>
+        <span class="c5"><i class="c4">// deinitialize LinearParticle</i></span><br />
+        <span class="c1">L_ParticleSystem::deinit();<br />
+        </span>
+    </td></tr>
+</table>
+
+
+<br/><br/>
+No fancy effect with this example for getting started, it's recommended to check with the source code of examples that come with LinearParticle to learn using other features. 
+
+<table>
+<tr>
+    <td> 
+        
+    </td>
+</tr>
+</table>
+
+
+<br/><hr size="2"><small>
+<a href="http://www.galaxist.net"><img src="logo_s.png" alt="logo" border=0></a>
+<a href="http://www.galaxist.net">LinearParticle</a> Documentation &copy; 2006-2007 by Wong Chin Foo.<br/> 
+Generated on 6 Mar 2007 by&nbsp;<a href="http://www.doxygen.org/index.html">doxygen</a> 1.4.6-NO</small>
+</body>
+</html>

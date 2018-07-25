@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RTBareBones</string>
+       <!-- License checking status messages -->
+    <string name="check_license">Check license</string>
+    <string name="checking_license">Checking license...</string>
+    <string name="dont_allow">Don\'t allow the user access</string>
+    <string name="allow">Allow the user access</string>
+    <string name="application_error">Application error: %1$s</string>
+    
+    <!-- Unlicensed dialog messages -->
+    <string name="unlicensed_dialog_title">Application not licensed</string>
+    <string name="unlicensed_dialog_body">This application is not licensed.  Please purchase it from Android Market.
+        
+        Tip: if you have purchased this application, press &quot;Retry&quot; a few times.  It may take a minute to connect to the licensing server.  If that does not work, try rebooting your phone.</string>
+    <string name="buy_button">Buy app</string>
+    <string name="quit_button">Exit</string>
+</resources>
+
+

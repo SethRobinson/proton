@@ -1,0 +1,1 @@
+New versions of Tapjoy now are a .jar file, not source like before.  So if you want to use the one, put the .jar in this dir, and modify your build_prepare.bat to copy this .jar into your lib dir, like the others of this type.

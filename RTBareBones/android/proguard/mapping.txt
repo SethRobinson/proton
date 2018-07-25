@@ -1,0 +1,332 @@
+com.android.vending.licensing.AESObfuscator -> com.android.vending.licensing.a:
+    java.lang.String UTF8 -> a
+    java.lang.String KEYGEN_ALGORITHM -> b
+    java.lang.String CIPHER_ALGORITHM -> c
+    byte[] IV -> d
+    java.lang.String header -> e
+    javax.crypto.Cipher mEncryptor -> f
+    javax.crypto.Cipher mDecryptor -> g
+    java.lang.String obfuscate(java.lang.String) -> a
+    java.lang.String unobfuscate(java.lang.String) -> b
+com.android.vending.licensing.DeviceLimiter -> com.android.vending.licensing.b:
+    com.android.vending.licensing.Policy$LicenseResponse isDeviceAllowed(java.lang.String) -> a
+com.android.vending.licensing.ILicenseResultListener -> com.android.vending.licensing.c:
+    void verifyLicense(int,java.lang.String,java.lang.String) -> a
+com.android.vending.licensing.ILicenseResultListener$Stub -> com.android.vending.licensing.d:
+    java.lang.String DESCRIPTOR -> b
+    int TRANSACTION_verifyLicense -> a
+    com.android.vending.licensing.ILicenseResultListener asInterface(android.os.IBinder) -> a
+    android.os.IBinder asBinder() -> asBinder
+    boolean onTransact(int,android.os.Parcel,android.os.Parcel,int) -> onTransact
+com.android.vending.licensing.ILicenseResultListener$Stub$Proxy -> com.android.vending.licensing.e:
+    android.os.IBinder mRemote -> a
+    android.os.IBinder asBinder() -> asBinder
+    java.lang.String getInterfaceDescriptor() -> a
+    void verifyLicense(int,java.lang.String,java.lang.String) -> a
+com.android.vending.licensing.ILicensingService -> com.android.vending.licensing.ILicensingService:
+    void checkLicense(long,java.lang.String,com.android.vending.licensing.ILicenseResultListener) -> a
+com.android.vending.licensing.ILicensingService$Stub -> com.android.vending.licensing.f:
+    java.lang.String DESCRIPTOR -> b
+    int TRANSACTION_checkLicense -> a
+    com.android.vending.licensing.ILicensingService asInterface(android.os.IBinder) -> a
+    android.os.IBinder asBinder() -> asBinder
+    boolean onTransact(int,android.os.Parcel,android.os.Parcel,int) -> onTransact
+com.android.vending.licensing.ILicensingService$Stub$Proxy -> com.android.vending.licensing.g:
+    android.os.IBinder mRemote -> a
+    android.os.IBinder asBinder() -> asBinder
+    java.lang.String getInterfaceDescriptor() -> a
+    void checkLicense(long,java.lang.String,com.android.vending.licensing.ILicenseResultListener) -> a
+com.android.vending.licensing.LicenseChecker -> com.android.vending.licensing.h:
+    java.lang.String TAG -> a
+    java.lang.String KEY_FACTORY_ALGORITHM -> b
+    int TIMEOUT_MS -> c
+    java.security.SecureRandom RANDOM -> d
+    com.android.vending.licensing.ILicensingService mService -> e
+    java.security.PublicKey mPublicKey -> f
+    android.content.Context mContext -> g
+    com.android.vending.licensing.Policy mPolicy -> h
+    android.os.Handler mHandler -> i
+    java.lang.String mPackageName -> j
+    java.lang.String mVersionCode -> k
+    java.util.Set mChecksInProgress -> l
+    java.util.Queue mPendingChecks -> m
+    java.security.PublicKey generatePublicKey(java.lang.String) -> a
+    void checkAccess(com.android.vending.licensing.LicenseCheckerCallback) -> a
+    void runChecks() -> b
+    void finishCheck(com.android.vending.licensing.LicenseValidator) -> a
+    void onServiceConnected(android.content.ComponentName,android.os.IBinder) -> onServiceConnected
+    void onServiceDisconnected(android.content.ComponentName) -> onServiceDisconnected
+    void handleServiceConnectionError(com.android.vending.licensing.LicenseValidator) -> b
+    void cleanupService() -> c
+    void onDestroy() -> a
+    int generateNonce() -> d
+    java.lang.String getVersionCode(android.content.Context,java.lang.String) -> a
+    void access$100(com.android.vending.licensing.LicenseChecker,com.android.vending.licensing.LicenseValidator) -> a
+    void access$200(com.android.vending.licensing.LicenseChecker,com.android.vending.licensing.LicenseValidator) -> b
+    java.util.Set access$300(com.android.vending.licensing.LicenseChecker) -> a
+    java.security.PublicKey access$500(com.android.vending.licensing.LicenseChecker) -> b
+    android.os.Handler access$600(com.android.vending.licensing.LicenseChecker) -> c
+com.android.vending.licensing.LicenseChecker$ResultListener -> com.android.vending.licensing.i:
+    com.android.vending.licensing.LicenseValidator mValidator -> c
+    java.lang.Runnable mOnTimeout -> d
+    com.android.vending.licensing.LicenseChecker this$0 -> b
+    void verifyLicense(int,java.lang.String,java.lang.String) -> a
+    void startTimeout() -> a
+    void clearTimeout() -> b
+    com.android.vending.licensing.LicenseValidator access$000(com.android.vending.licensing.LicenseChecker$ResultListener) -> a
+    void access$400(com.android.vending.licensing.LicenseChecker$ResultListener) -> b
+com.android.vending.licensing.LicenseChecker$ResultListener$1 -> com.android.vending.licensing.j:
+    com.android.vending.licensing.LicenseChecker val$this$0 -> a
+    com.android.vending.licensing.LicenseChecker$ResultListener this$1 -> b
+    void run() -> run
+com.android.vending.licensing.LicenseChecker$ResultListener$2 -> com.android.vending.licensing.k:
+    int val$responseCode -> a
+    java.lang.String val$signedData -> b
+    java.lang.String val$signature -> c
+    com.android.vending.licensing.LicenseChecker$ResultListener this$1 -> d
+    void run() -> run
+com.android.vending.licensing.LicenseCheckerCallback -> com.android.vending.licensing.l:
+    void allow() -> a
+    void dontAllow() -> b
+    void applicationError(com.android.vending.licensing.LicenseCheckerCallback$ApplicationErrorCode) -> a
+com.android.vending.licensing.LicenseCheckerCallback$ApplicationErrorCode -> com.android.vending.licensing.m:
+    com.android.vending.licensing.LicenseCheckerCallback$ApplicationErrorCode INVALID_PACKAGE_NAME -> a
+    com.android.vending.licensing.LicenseCheckerCallback$ApplicationErrorCode NON_MATCHING_UID -> b
+    com.android.vending.licensing.LicenseCheckerCallback$ApplicationErrorCode NOT_MARKET_MANAGED -> c
+    com.android.vending.licensing.LicenseCheckerCallback$ApplicationErrorCode CHECK_IN_PROGRESS -> d
+    com.android.vending.licensing.LicenseCheckerCallback$ApplicationErrorCode INVALID_PUBLIC_KEY -> e
+    com.android.vending.licensing.LicenseCheckerCallback$ApplicationErrorCode MISSING_PERMISSION -> f
+    com.android.vending.licensing.LicenseCheckerCallback$ApplicationErrorCode[] $VALUES -> g
+    com.android.vending.licensing.LicenseCheckerCallback$ApplicationErrorCode[] values() -> values
+    com.android.vending.licensing.LicenseCheckerCallback$ApplicationErrorCode valueOf(java.lang.String) -> valueOf
+com.android.vending.licensing.LicenseValidator -> com.android.vending.licensing.n:
+    java.lang.String TAG -> a
+    int LICENSED -> b
+    int NOT_LICENSED -> c
+    int LICENSED_OLD_KEY -> d
+    int ERROR_NOT_MARKET_MANAGED -> e
+    int ERROR_SERVER_FAILURE -> f
+    int ERROR_OVER_QUOTA -> g
+    int ERROR_CONTACTING_SERVER -> h
+    int ERROR_INVALID_PACKAGE_NAME -> i
+    int ERROR_NON_MATCHING_UID -> j
+    com.android.vending.licensing.Policy mPolicy -> k
+    com.android.vending.licensing.LicenseCheckerCallback mCallback -> l
+    int mNonce -> m
+    java.lang.String mPackageName -> n
+    java.lang.String mVersionCode -> o
+    com.android.vending.licensing.DeviceLimiter mDeviceLimiter -> p
+    java.lang.String SIGNATURE_ALGORITHM -> q
+    com.android.vending.licensing.LicenseCheckerCallback getCallback() -> a
+    int getNonce() -> b
+    java.lang.String getPackageName() -> c
+    void verify(java.security.PublicKey,int,java.lang.String,java.lang.String) -> a
+    void handleResponse(com.android.vending.licensing.Policy$LicenseResponse,com.android.vending.licensing.ResponseData) -> a
+    void handleApplicationError(com.android.vending.licensing.LicenseCheckerCallback$ApplicationErrorCode) -> a
+    void handleInvalidResponse() -> d
+com.android.vending.licensing.NullDeviceLimiter -> com.android.vending.licensing.o:
+    com.android.vending.licensing.Policy$LicenseResponse isDeviceAllowed(java.lang.String) -> a
+com.android.vending.licensing.Obfuscator -> com.android.vending.licensing.p:
+    java.lang.String obfuscate(java.lang.String) -> a
+    java.lang.String unobfuscate(java.lang.String) -> b
+com.android.vending.licensing.Policy -> com.android.vending.licensing.q:
+    void processServerResponse(com.android.vending.licensing.Policy$LicenseResponse,com.android.vending.licensing.ResponseData) -> a
+    boolean allowAccess() -> a
+com.android.vending.licensing.Policy$LicenseResponse -> com.android.vending.licensing.r:
+    com.android.vending.licensing.Policy$LicenseResponse LICENSED -> a
+    com.android.vending.licensing.Policy$LicenseResponse NOT_LICENSED -> b
+    com.android.vending.licensing.Policy$LicenseResponse RETRY -> c
+    com.android.vending.licensing.Policy$LicenseResponse[] $VALUES -> d
+    com.android.vending.licensing.Policy$LicenseResponse[] values() -> values
+    com.android.vending.licensing.Policy$LicenseResponse valueOf(java.lang.String) -> valueOf
+com.android.vending.licensing.PreferenceObfuscator -> com.android.vending.licensing.s:
+    java.lang.String TAG -> a
+    android.content.SharedPreferences mPreferences -> b
+    com.android.vending.licensing.Obfuscator mObfuscator -> c
+    android.content.SharedPreferences$Editor mEditor -> d
+    void putString(java.lang.String,java.lang.String) -> a
+    java.lang.String getString(java.lang.String,java.lang.String) -> b
+    void commit() -> a
+com.android.vending.licensing.ResponseData -> com.android.vending.licensing.t:
+    int responseCode -> a
+    int nonce -> b
+    java.lang.String packageName -> c
+    java.lang.String versionCode -> d
+    java.lang.String userId -> e
+    long timestamp -> f
+    java.lang.String extra -> g
+    com.android.vending.licensing.ResponseData parse(java.lang.String) -> a
+    java.lang.String toString() -> toString
+com.android.vending.licensing.ServerManagedPolicy -> com.android.vending.licensing.u:
+    java.lang.String TAG -> a
+    java.lang.String PREFS_FILE -> b
+    java.lang.String PREF_LAST_RESPONSE -> c
+    java.lang.String PREF_VALIDITY_TIMESTAMP -> d
+    java.lang.String PREF_RETRY_UNTIL -> e
+    java.lang.String PREF_MAX_RETRIES -> f
+    java.lang.String PREF_RETRY_COUNT -> g
+    java.lang.String DEFAULT_VALIDITY_TIMESTAMP -> h
+    java.lang.String DEFAULT_RETRY_UNTIL -> i
+    java.lang.String DEFAULT_MAX_RETRIES -> j
+    java.lang.String DEFAULT_RETRY_COUNT -> k
+    long MILLIS_PER_MINUTE -> l
+    long mValidityTimestamp -> m
+    long mRetryUntil -> n
+    long mMaxRetries -> o
+    long mRetryCount -> p
+    long mLastResponseTime -> q
+    com.android.vending.licensing.Policy$LicenseResponse mLastResponse -> r
+    com.android.vending.licensing.PreferenceObfuscator mPreferences -> s
+    void processServerResponse(com.android.vending.licensing.Policy$LicenseResponse,com.android.vending.licensing.ResponseData) -> a
+    void setLastResponse(com.android.vending.licensing.Policy$LicenseResponse) -> a
+    void setRetryCount(long) -> a
+    long getRetryCount() -> b
+    void setValidityTimestamp(java.lang.String) -> a
+    long getValidityTimestamp() -> c
+    void setRetryUntil(java.lang.String) -> b
+    long getRetryUntil() -> d
+    void setMaxRetries(java.lang.String) -> c
+    long getMaxRetries() -> e
+    boolean allowAccess() -> a
+    java.util.Map decodeExtras(java.lang.String) -> d
+com.android.vending.licensing.StrictPolicy -> com.android.vending.licensing.v:
+    java.lang.String TAG -> a
+    com.android.vending.licensing.Policy$LicenseResponse mLastResponse -> b
+    com.android.vending.licensing.PreferenceObfuscator mPreferences -> c
+    void processServerResponse(com.android.vending.licensing.Policy$LicenseResponse,com.android.vending.licensing.ResponseData) -> a
+    boolean allowAccess() -> a
+com.android.vending.licensing.ValidationException -> com.android.vending.licensing.w:
+    long serialVersionUID -> a
+com.android.vending.licensing.util.Base64 -> com.android.vending.licensing.a.a:
+    boolean ENCODE -> a
+    boolean DECODE -> b
+    byte EQUALS_SIGN -> d
+    byte NEW_LINE -> e
+    byte[] ALPHABET -> f
+    byte[] WEBSAFE_ALPHABET -> g
+    byte[] DECODABET -> h
+    byte[] WEBSAFE_DECODABET -> i
+    byte WHITE_SPACE_ENC -> j
+    byte EQUALS_SIGN_ENC -> k
+    boolean $assertionsDisabled -> c
+    byte[] encode3to4(byte[],int,int,byte[],int,byte[]) -> a
+    java.lang.String encode(byte[]) -> a
+    java.lang.String encodeWebSafe(byte[],boolean) -> a
+    java.lang.String encode(byte[],int,int,byte[],boolean) -> a
+    byte[] encode(byte[],int,int,byte[],int) -> a
+    int decode4to3(byte[],int,byte[],int,byte[]) -> a
+    byte[] decode(java.lang.String) -> a
+    byte[] decodeWebSafe(java.lang.String) -> b
+    byte[] decode(byte[]) -> b
+    byte[] decodeWebSafe(byte[]) -> c
+    byte[] decode(byte[],int,int) -> a
+    byte[] decodeWebSafe(byte[],int,int) -> b
+    byte[] decode(byte[],int,int,byte[]) -> a
+com.android.vending.licensing.util.Base64DecoderException -> com.android.vending.licensing.a.b:
+    long serialVersionUID -> a
+com.rtsoft.rtdscroll.AppGLSurfaceView -> com.rtsoft.rtdscroll.AppGLSurfaceView:
+    com.rtsoft.rtdscroll.AppRenderer mRenderer -> a
+    com.rtsoft.rtdscroll.Main app -> b
+    void onPause() -> onPause
+    void onResume() -> onResume
+    boolean onTouchEvent(android.view.MotionEvent) -> onTouchEvent
+    void nativePause() -> nativePause
+    void nativeResume() -> nativeResume
+    void nativeOnTouch(int,float,float,int) -> nativeOnTouch
+com.rtsoft.rtdscroll.AppRenderer -> com.rtsoft.rtdscroll.AppRenderer:
+    int MESSAGE_NONE -> a
+    int MESSAGE_OPEN_TEXT_BOX -> b
+    int MESSAGE_CLOSE_TEXT_BOX -> c
+    int MESSAGE_CHECK_CONNECTION -> d
+    int MESSAGE_SET_FPS_LIMIT -> e
+    int MESSAGE_SET_ACCELEROMETER_UPDATE_HZ -> f
+    int MESSAGE_FINISH_APP -> g
+    com.rtsoft.rtdscroll.Main app -> h
+    void onSurfaceCreated(javax.microedition.khronos.opengles.GL10,javax.microedition.khronos.egl.EGLConfig) -> onSurfaceCreated
+    void onSurfaceChanged(javax.microedition.khronos.opengles.GL10,int,int) -> onSurfaceChanged
+    void onDrawFrame(javax.microedition.khronos.opengles.GL10) -> onDrawFrame
+    void nativeInit() -> nativeInit
+    void nativeResize(int,int) -> nativeResize
+    void nativeUpdate() -> nativeUpdate
+    void nativeRender() -> nativeRender
+    void nativeDone() -> nativeDone
+    int nativeOSMessageGet() -> nativeOSMessageGet
+    float nativeGetLastOSMessageX() -> nativeGetLastOSMessageX
+com.rtsoft.rtdscroll.Main -> com.rtsoft.rtdscroll.Main:
+    com.rtsoft.rtdscroll.Main app -> a
+    java.lang.String PackageName -> b
+    java.lang.String dllname -> c
+    float accelHzSave -> g
+    android.hardware.Sensor sensor -> h
+    android.hardware.SensorManager sensorManager -> i
+    boolean is_demo -> j
+    java.lang.String BASE64_PUBLIC_KEY -> k
+    byte[] SALT -> l
+    com.android.vending.licensing.LicenseCheckerCallback mLicenseCheckerCallback -> m
+    com.android.vending.licensing.LicenseChecker mChecker -> n
+    int VIRTUAL_KEY_BACK -> d
+    android.media.MediaPlayer _music -> e
+    android.media.SoundPool _sounds -> f
+    android.opengl.GLSurfaceView mGLView -> o
+    android.app.Dialog onCreateDialog(int) -> onCreateDialog
+    void doCheck() -> a
+    void license_init() -> b
+    void onCreate(android.os.Bundle) -> onCreate
+    void onPause() -> onPause
+    void onResume() -> onResume
+    java.lang.String get_docdir() -> get_docdir
+    java.lang.String get_apkFileName() -> get_apkFileName
+    java.lang.String get_region() -> get_region
+    void onSensorChanged(android.hardware.SensorEvent) -> onSensorChanged
+    void onAccuracyChanged(android.hardware.Sensor,int) -> onAccuracyChanged
+    void setup_accel(float) -> a
+    void LaunchURL(java.lang.String) -> LaunchURL
+    void toggle_keyboard(boolean) -> a
+    boolean onKeyDown(int,android.view.KeyEvent) -> onKeyDown
+    boolean onKeyUp(int,android.view.KeyEvent) -> onKeyUp
+    void music_play(java.lang.String) -> music_play
+    void music_stop() -> music_stop
+    void music_set_volume(float) -> music_set_volume
+    int music_get_pos() -> music_get_pos
+    boolean music_is_playing() -> music_is_playing
+    void music_set_pos(int) -> music_set_pos
+    int sound_load(java.lang.String) -> sound_load
+    int sound_play(int,float,float,int,int,float) -> sound_play
+    void sound_kill(int) -> sound_kill
+    void sound_stop(int) -> sound_stop
+    void nativeOnKey(int,int,int) -> nativeOnKey
+    void nativeLaunchURL() -> nativeLaunchURL
+    void nativeOnAccelerometerUpdate(float,float,float) -> nativeOnAccelerometerUpdate
+    boolean access$002(com.rtsoft.rtdscroll.Main,boolean) -> a
+    void access$100(com.rtsoft.rtdscroll.Main) -> a
+com.rtsoft.rtdscroll.Main$1 -> com.rtsoft.rtdscroll.a:
+    com.rtsoft.rtdscroll.Main this$0 -> a
+    void onClick(android.content.DialogInterface,int) -> onClick
+com.rtsoft.rtdscroll.Main$2 -> com.rtsoft.rtdscroll.b:
+    com.rtsoft.rtdscroll.Main this$0 -> a
+    void onClick(android.content.DialogInterface,int) -> onClick
+com.rtsoft.rtdscroll.Main$3 -> com.rtsoft.rtdscroll.c:
+    com.rtsoft.rtdscroll.Main this$0 -> a
+    void onClick(android.content.DialogInterface,int) -> onClick
+com.rtsoft.rtdscroll.Main$MyLicenseCheckerCallback -> com.rtsoft.rtdscroll.d:
+    com.rtsoft.rtdscroll.Main this$0 -> a
+    void allow() -> a
+    void dontAllow() -> b
+    void applicationError(com.android.vending.licensing.LicenseCheckerCallback$ApplicationErrorCode) -> a
+com.rtsoft.rtdscroll.R -> com.rtsoft.rtdscroll.e:
+com.rtsoft.rtdscroll.R$attr -> com.rtsoft.rtdscroll.f:
+com.rtsoft.rtdscroll.R$drawable -> com.rtsoft.rtdscroll.g:
+    int icon -> a
+com.rtsoft.rtdscroll.R$layout -> com.rtsoft.rtdscroll.h:
+    int main -> a
+com.rtsoft.rtdscroll.R$string -> com.rtsoft.rtdscroll.i:
+    int allow -> a
+    int app_name -> b
+    int application_error -> c
+    int buy_button -> d
+    int check_license -> e
+    int checking_license -> f
+    int dont_allow -> g
+    int quit_button -> h
+    int unlicensed_dialog_body -> i
+    int unlicensed_dialog_title -> j
