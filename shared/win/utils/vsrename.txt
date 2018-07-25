@@ -1,0 +1,3 @@
+VSRename by Nick Albers.
+
+https://www.codeproject.com/Articles/1198/Visual-Studio-Project-Renamer
