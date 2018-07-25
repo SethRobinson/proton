@@ -1,22 +1,19 @@
 #include "PlatformPrecomp.h"
 #include "OpenCVManager.h"
-//#include "util/libdecoderqr/decodeqr.h"
-#include "util/zbar/zbar.h"
+#include <zbar.h>
+#include <iconv.h>
 
 #ifdef WINAPI
 //don't ask me why, but VC2017 needs this cast to compile
 #define RT_ICONV_CAST (const char**)
-#include "util/libiconv/iconv.h"
 #else
 #define RT_ICONV_CAST
-#include <iconv.h>
 #endif
 
 #if defined(RT_USE_LIBRASPICAM)
 using namespace raspicam;
 #endif
 
-using namespace cv;
 using namespace zbar;
 
 OpenCVManager::OpenCVManager()
@@ -68,11 +65,10 @@ string FixQRBinaryDataEncoding(string input)
 	return temp;
 }
 
-
+#if defined(RT_USE_LIBRASPICAM)
 // Find and decode barcodes and QR codes
 void decodeSoftSurface(vector<QRCodeInfo>&decodedObjects, SoftSurface *pSoftSurface)
 {
-
 
 	// Create zbar scanner
 	ImageScanner scanner;
@@ -81,7 +77,7 @@ void decodeSoftSurface(vector<QRCodeInfo>&decodedObjects, SoftSurface *pSoftSurf
 	scanner.set_config(ZBAR_QRCODE, ZBAR_CFG_ENABLE, 1);
 
 	//load data directly from the SoftSurface
-	Image image(pSoftSurface->GetWidth(), pSoftSurface->GetHeight(), "RGB3", (uchar *)pSoftSurface->GetPixelData(), pSoftSurface->GetWidth() * pSoftSurface->GetHeight()*3);
+	Image image(pSoftSurface->GetWidth(), pSoftSurface->GetHeight(), "RGB3", (byte *)pSoftSurface->GetPixelData(), pSoftSurface->GetWidth() * pSoftSurface->GetHeight()*3);
 
 
 	Image convertedImage = image.convert(*(unsigned int*)"Y800");
@@ -115,7 +111,7 @@ void decodeSoftSurface(vector<QRCodeInfo>&decodedObjects, SoftSurface *pSoftSurf
 		decodedObjects.push_back(obj);
 	}
 }
-
+#else
 // Find and decode barcodes and QR codes
 void decode(Mat &im, vector<QRCodeInfo>&decodedObjects)
 {
@@ -161,6 +157,7 @@ void decode(Mat &im, vector<QRCodeInfo>&decodedObjects)
 		decodedObjects.push_back(obj);
 	}
 }
+#endif
 
 void OpenCVManager::DecodeQRCode()
 {
@@ -193,7 +190,6 @@ bool OpenCVManager::InitCamera(int deviceID)
 	}
 #endif
 	
-
 
 #ifdef RT_USE_LIBRASPICAM
 	

@@ -42,12 +42,12 @@ if (m_openCV.ReadFromCamera())
 #endif
 
 #if defined(RT_USE_LIBRASPICAM)
-
+//Um, honestly, we don't even need to use OpenCV if we're just grabbing stuff from a camera.  Use raspicam instead..
 #include <raspicam/raspicam.h>
-#endif
-
-
+#else
 #include <opencv2/opencv.hpp>
+using namespace cv;
+#endif
 
 #include "Renderer/SoftSurface.h"
 
