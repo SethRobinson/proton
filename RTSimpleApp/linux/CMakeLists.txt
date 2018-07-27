@@ -1,11 +1,13 @@
 cmake_minimum_required(VERSION 2.6)
 
+ENABLE_LANGUAGE(C)
+
 #if(ISRASPBERRYPIE)
 OPTION(RASPBERRYPI_GLES11 "Compile for Raspberry PI GLES" ON)
 #endif(ISRASPBERRYPIE)
 
 set(CMAKE_BUILD_TYPE "Release") #use Release or Debug
-project(rtsimpleapp)
+project(RTSimpleApp)
 
 include(../../shared/linux/Proton.cmake)
 
@@ -15,10 +17,6 @@ proton_include_all_components()
 proton_use_jpeg_support()
 proton_use_sdl_audio()
 proton_use_linearparticles()
-
-
-Find_Package (SDL_mixer REQUIRED)
-set(APP SDL_mixer::SDL_mixer)
 
 set(APP "../source")
 include_directories("${APP}")

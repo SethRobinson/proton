@@ -25,7 +25,9 @@ void DrawFilledRect(CL_Vec2f vPos, CL_Vec2f vSize, uint32 color);
 void DrawFilledBitmapRect(const CL_Rectf &r, uint32 middleColor, uint32 borderColor, SurfaceAnim *pSurf, bool bFillMiddleCloserToEdges = false );
 void DrawFilledBitmapRect(rtRect &r, uint32 middleColor, uint32 borderColor, SurfaceAnim *pSurf, bool bFillMiddleCloserToEdges = false );
 void DrawLine( GLuint rgba, float ax, float ay, float bx, float by, float lineWidth = 2.0f);
+
 void DrawSurface2D( Surface* pSurf, GLint *pDestCoords, GLint *pSrcRect, unsigned int color);
+
 void SetupOrtho();
 void PrepareForGL();
 void transform_point(GLfloat out[4], const GLfloat m[16], const GLfloat in[4]);

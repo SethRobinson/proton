@@ -30,8 +30,6 @@ add_definitions(-DC_GL_MODE)
 endif(RASPBERRYPI_GLES11)
 
 
-
-
 set(PROTON_SHARED "${PROTON_ROOT}/shared")
 set(PROTON_AD "${PROTON_SHARED}/Ad")
 set(PROTON_AUDIO "${PROTON_SHARED}/Audio")
@@ -66,8 +64,7 @@ include_directories("${PROTON_SHARED}/ClanLib-2.0/Sources")
 include_directories("/usr/local/include/SDL2")
 
 
-
-set(PROTON_SOURCES "${PROTON_SHARED}/BaseApp.cpp" "${PROTON_SHARED}/PlatformSetup.cpp" "${PROTON_SHARED}/linux/LinuxUtils.cpp" "${PROTON_SHARED}/SDL/SDL2Main.cpp" "${PROTON_UTIL}/VideoModeSelector.cpp" "${PROTON_UTIL}/PassThroughPointerEventHandler.cpp" "${PROTON_UTIL}/TouchDeviceEmulatorPointerEventHandler.cpp"
+set(PROTON_SOURCES_BASIC "${PROTON_SHARED}/BaseApp.cpp" "${PROTON_SHARED}/PlatformSetup.cpp" "${PROTON_SHARED}/linux/LinuxUtils.cpp" "${PROTON_SHARED}/SDL/SDL2Main.cpp" "${PROTON_UTIL}/VideoModeSelector.cpp" "${PROTON_UTIL}/PassThroughPointerEventHandler.cpp" "${PROTON_UTIL}/TouchDeviceEmulatorPointerEventHandler.cpp"
 	"${PROTON_UTIL}/Variant.cpp" "${PROTON_SHARED}/Manager/VariantDB.cpp"
 	"${PROTON_AUDIO}/AudioManager.cpp"
 	"${PROTON_FILESYSTEM}/FileManager.cpp" "${PROTON_FILESYSTEM}/StreamingInstance.cpp" "${PROTON_FILESYSTEM}/StreamingInstanceFile.cpp"
@@ -82,6 +79,17 @@ set(PROTON_SOURCES "${PROTON_SHARED}/BaseApp.cpp" "${PROTON_SHARED}/PlatformSetu
 )
 
 
+#a simplified version fit for console utilities, that don't really need GL stuff or BaseApp
+set(PROTON_SOURCES_CONSOLE "${PROTON_SHARED}/PlatformSetup.cpp" "${PROTON_SHARED}/linux/LinuxUtils.cpp" 
+	"${PROTON_UTIL}/Variant.cpp" "${PROTON_SHARED}/Manager/VariantDB.cpp"
+	"${PROTON_FILESYSTEM}/FileManager.cpp" "${PROTON_FILESYSTEM}/StreamingInstance.cpp" "${PROTON_FILESYSTEM}/StreamingInstanceFile.cpp"
+	"${PROTON_MATH}/rtRect.cpp" 
+	"${PROTON_RENDERER}/SoftSurface.cpp" 
+	"${PROTON_UTIL}/MathUtils.cpp" "${PROTON_UTIL}/TextScanner.cpp" "${PROTON_UTIL}/CRandom.cpp" "${PROTON_UTIL}/MiscUtils.cpp" "${PROTON_UTIL}/ResourceUtils.cpp"
+	"${PROTON_BOOSTSIGNALS}/connection.cpp" "${PROTON_BOOSTSIGNALS}/named_slot_map.cpp" "${PROTON_BOOSTSIGNALS}/signal_base.cpp" "${PROTON_BOOSTSIGNALS}/slot.cpp" "${PROTON_BOOSTSIGNALS}/trackable.cpp"
+	"${PROTON_CLANMATH}/angle.cpp" "${PROTON_CLANMATH}/mat3.cpp" "${PROTON_CLANMATH}/mat4.cpp" "${PROTON_CLANMATH}/rect.cpp" "${PROTON_CLANMATH}/vec2.cpp" "${PROTON_CLANMATH}/vec3.cpp" "${PROTON_CLANMATH}/vec4.cpp"
+)
+
 # Includes a specific list of Components to the project. The names of
 # the Components are the base names of the files without the .cpp extension.
 #
@@ -93,8 +101,6 @@ macro(proton_include_components)
 	endforeach(comp)
 endmacro(proton_include_components)
 
-# TouchDeviceEmulatorPointerEventHandler needs these components
-proton_include_components(RectRenderComponent FocusRenderComponent)
 
 # Makes the project to include all the Components.
 # Additionally includes the EntityUtils helpers.
@@ -138,6 +144,13 @@ macro(proton_use_jpeg_support)
 	list(APPEND PROTON_SOURCES "${PROTON_RENDERER}/JPGSurfaceLoader.cpp")
 	_proton_include_jpeg_sources()
 endmacro(proton_use_jpeg_support)
+
+# Enables PNG support in the project. Defines RT_PNG_SUPPORT and includes
+# the files needed to load PNG images.
+macro(proton_use_png_support)
+	add_definitions(-DRT_PNG_SUPPORT)
+	_proton_include_png_sources()
+endmacro(proton_use_png_support)
 
 #seth removed, want to use SDL2 mixer but many make installs don't have a macro for it yet
 
@@ -258,6 +271,11 @@ endmacro(proton_include_testing)
 # Example:
 # proton_set_sources(mysource1.cpp mysource2.cpp)
 function(proton_set_sources)
+	list(APPEND PROTON_SOURCES ${PROTON_SOURCES_BASIC})
+	
+	# TouchDeviceEmulatorPointerEventHandler needs these components
+	proton_include_components(RectRenderComponent FocusRenderComponent)
+
 	list(REMOVE_DUPLICATES PROTON_SOURCES)
 	add_executable(${PROJECT_NAME} ${ARGV} ${PROTON_SOURCES})
 	
@@ -269,27 +287,16 @@ function(proton_set_sources)
 		endif(ZLIB_FOUND)
 	endif(NOT PROTON_USE_INTERNAL_ZLIB)
 	
+	
+
 #	find_package(SDL REQUIRED)
 #	if(SDL_FOUND)
 #		include_directories(${SDL_INCLUDE_DIR})
 #		target_link_libraries(${PROJECT_NAME} ${SDL_LIBRARY})
 #	endif(SDL_FOUND)
-	
-	if(PROTON_USE_SDL_AUDIO)
-		
-		if(RASPBERRYPI_GLES11)
-		#cmake doens't seem to have anything for sdl2_mixer finding, so just add it manually for the pi
+
+if(PROTON_USE_SDL_AUDIO)
 		target_link_libraries(${PROJECT_NAME} SDL2_mixer)
-		else(RASPBERRYPI_GLES11)
-			#old way
-			find_package(SDL_mixer REQUIRED)
-			if(SDLMIXER_FOUND)
-				include_directories(${SDLMIXER_INCLUDE_DIR})
-				target_link_libraries(${PROJECT_NAME} ${SDLMIXER_LIBRARY})
-			else(SDLMIXER_FOUND)
-				message(FATAL_ERROR "Couldn't find SDL_mixer. Make sure the SDL_mixer development headers are installed.")
-			endif(SDLMIXER_FOUND)
-		endif(RASPBERRYPI_GLES11)
 endif(PROTON_USE_SDL_AUDIO)
 
 
@@ -320,3 +327,30 @@ endif(RASPBERRYPI_GLES11)
 
 target_link_libraries(${PROJECT_NAME} rt)
 endfunction(proton_set_sources)
+
+
+#simplified version
+function(proton_set_sources_console)
+	
+	#use these instead
+	list(APPEND PROTON_SOURCES ${PROTON_SOURCES_CONSOLE})
+	
+	list(REMOVE_DUPLICATES PROTON_SOURCES)
+	add_executable(${PROJECT_NAME} ${ARGV} ${PROTON_SOURCES})
+	
+	if(NOT PROTON_USE_INTERNAL_ZLIB)
+		find_package(ZLIB REQUIRED)
+		if(ZLIB_FOUND)
+			include_directories(${ZLIB_INCLUDE_DIRS})
+			target_link_libraries(${PROJECT_NAME} ${ZLIB_LIBRARIES})
+		endif(ZLIB_FOUND)
+	endif(NOT PROTON_USE_INTERNAL_ZLIB)
+
+
+if(RASPBERRYPI_GLES11)
+target_link_libraries(${PROJECT_NAME} pthread bcm_host)
+endif(RASPBERRYPI_GLES11)
+
+target_link_libraries(${PROJECT_NAME} rt)
+endfunction(proton_set_sources_console)
+

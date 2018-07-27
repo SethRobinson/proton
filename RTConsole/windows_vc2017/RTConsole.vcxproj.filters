@@ -1,0 +1,267 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\flash">
+      <UniqueIdentifier>{bc701750-b022-4223-b438-7271061ff724}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\linux">
+      <UniqueIdentifier>{a4b82ca0-e86d-4d7b-a6c2-01415027e818}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\html5">
+      <UniqueIdentifier>{25b204f2-bf40-4219-9d2a-92c6ee41ac06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shared">
+      <UniqueIdentifier>{eefcd300-767a-494e-9f21-8bc6c0d8af6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shared\FileSystem">
+      <UniqueIdentifier>{e8b06327-b433-413f-9e8b-a0a3edf91877}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shared\Manager">
+      <UniqueIdentifier>{82163ff3-cef7-42bc-8bb9-6d69534cd320}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shared\Util">
+      <UniqueIdentifier>{bb798cf4-6cb5-4cd9-a499-1766356e6395}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shared\Util\Boost">
+      <UniqueIdentifier>{f5aaf45b-2690-4666-8bb6-21b8a1c13d3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shared\Clanlib">
+      <UniqueIdentifier>{7a4742e7-0885-4b53-960e-219cbd344682}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shared\win">
+      <UniqueIdentifier>{2589c22b-3d4c-46b6-b671-f37bd256a72c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shared\flash">
+      <UniqueIdentifier>{4dfaadd5-f37d-4e19-a2b0-e66b78df6138}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shared\flash\app">
+      <UniqueIdentifier>{3bb17d38-2955-4440-99cc-7574dd3f78e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shared\flash\app\cpp">
+      <UniqueIdentifier>{3e6d91b2-bc28-4dff-8331-a2b244c844e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shared\flash\app\flash">
+      <UniqueIdentifier>{ac2bbcdb-be26-4ed2-858f-407595b6e4e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shared\flash\app\flash\RTConsoleVersion">
+      <UniqueIdentifier>{245742eb-aa4f-4287-915d-0ddc8ee6d3e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shared\flash\app\temp">
+      <UniqueIdentifier>{4860620e-dfe0-4871-8096-e3ec7b2c1c49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shared\HTML5">
+      <UniqueIdentifier>{5a6c3973-ab78-4e75-8415-33a6f9b88229}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\source\App.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\PlatformPrecomp.cpp">
+      <Filter>shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\PlatformSetup.cpp">
+      <Filter>shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\FileSystem\FileManager.cpp">
+      <Filter>shared\FileSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\FileSystem\FileSystem.cpp">
+      <Filter>shared\FileSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\FileSystem\StreamingInstance.cpp">
+      <Filter>shared\FileSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\FileSystem\StreamingInstanceFile.cpp">
+      <Filter>shared\FileSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\Manager\VariantDB.cpp">
+      <Filter>shared\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\util\CRandom.cpp">
+      <Filter>shared\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\util\MathUtils.cpp">
+      <Filter>shared\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\util\MiscUtils.cpp">
+      <Filter>shared\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\util\ResourceUtils.cpp">
+      <Filter>shared\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\util\TextScanner.cpp">
+      <Filter>shared\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\util\Variant.cpp">
+      <Filter>shared\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\util\boost\libs\signals\src\connection.cpp">
+      <Filter>shared\Util\Boost</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\util\boost\libs\signals\src\named_slot_map.cpp">
+      <Filter>shared\Util\Boost</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\util\boost\libs\signals\src\signal_base.cpp">
+      <Filter>shared\Util\Boost</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\util\boost\libs\signals\src\slot.cpp">
+      <Filter>shared\Util\Boost</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\util\boost\libs\signals\src\trackable.cpp">
+      <Filter>shared\Util\Boost</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\ClanLib-2.0\Sources\Core\Math\angle.cpp">
+      <Filter>shared\Clanlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\ClanLib-2.0\Sources\Core\Math\vec2.cpp">
+      <Filter>shared\Clanlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\ClanLib-2.0\Sources\Core\Math\vec3.cpp">
+      <Filter>shared\Clanlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\win\WinUtils.cpp">
+      <Filter>shared\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\flash\FlashUtils.cpp">
+      <Filter>shared\flash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\flash\app\cpp\main.cpp">
+      <Filter>shared\flash\app\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\html5\HTML5Main.cpp">
+      <Filter>shared\HTML5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\html5\HTML5Utils.cpp">
+      <Filter>shared\HTML5</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\source\App.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\main.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\PlatformEnums.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\PlatformPrecomp.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\PlatformSetup.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\FileSystem\FileManager.h">
+      <Filter>shared\FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\FileSystem\FileSystem.h">
+      <Filter>shared\FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\FileSystem\StreamingInstance.h">
+      <Filter>shared\FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\FileSystem\StreamingInstanceFile.h">
+      <Filter>shared\FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\Manager\VariantDB.h">
+      <Filter>shared\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\util\CRandom.h">
+      <Filter>shared\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\util\MathUtils.h">
+      <Filter>shared\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\util\MiscUtils.h">
+      <Filter>shared\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\util\ResourceUtils.h">
+      <Filter>shared\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\util\TextScanner.h">
+      <Filter>shared\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\util\Variant.h">
+      <Filter>shared\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\win\PlatformSetupWin.h">
+      <Filter>shared\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\win\WinUtils.h">
+      <Filter>shared\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\flash\FlashUtils.h">
+      <Filter>shared\flash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\flash\PlatformSetupFlash.h">
+      <Filter>shared\flash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\flash\GLES\egl.h">
+      <Filter>shared\flash\app\temp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\flash\GLES\gl.h">
+      <Filter>shared\flash\app\temp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\flash\GLES\glext.h">
+      <Filter>shared\flash\app\temp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\flash\GLES\glplatform.h">
+      <Filter>shared\flash\app\temp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\html5\HTML5Utils.h">
+      <Filter>shared\HTML5</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\html5\PlatformSetupHTML5.h">
+      <Filter>shared\HTML5</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\linux\PlatformSetupLinux.h">
+      <Filter>Source Files\linux</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\flash\app_info_setup.bat">
+      <Filter>Source Files\flash</Filter>
+    </None>
+    <None Include="..\flash\build.sh">
+      <Filter>Source Files\flash</Filter>
+    </None>
+    <None Include="..\flash\build_prepare.bat">
+      <Filter>Source Files\flash</Filter>
+    </None>
+    <None Include="..\flash\BuildDebug.bat">
+      <Filter>Source Files\flash</Filter>
+    </None>
+    <None Include="..\flash\BuildRelease.bat">
+      <Filter>Source Files\flash</Filter>
+    </None>
+    <None Include="..\flash\Makefile">
+      <Filter>Source Files\flash</Filter>
+    </None>
+    <None Include="..\linux\linux_compile.sh">
+      <Filter>Source Files\linux</Filter>
+    </None>
+    <None Include="..\..\shared\flash\Makefile.common">
+      <Filter>shared\flash</Filter>
+    </None>
+    <None Include="..\..\shared\flash\app\flash\Console.as">
+      <Filter>shared\flash\app\flash</Filter>
+    </None>
+    <None Include="..\..\shared\flash\app\flash\RTConsoleVersion\Console.as">
+      <Filter>shared\flash\app\flash\RTConsoleVersion</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\linux\CMakeLists.txt">
+      <Filter>Source Files\linux</Filter>
+    </Text>
+    <Text Include="..\Project Readme.txt" />
+  </ItemGroup>
+</Project>

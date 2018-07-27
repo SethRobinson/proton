@@ -1,7 +1,5 @@
 #include "PlatformPrecomp.h"
-
 //NOTE:  Much of this code is from the tiltodemo sample from the Palm WebBOS PDK
-
 
 #define NUM_CHANNELS 64
 
@@ -10,7 +8,6 @@
 
 //0 is a valid channel in SDL audio, but 0 is a bad audio handle the rest of Proton, this hack gets around it
 #define C_CHANNEL_OFFSET_SO_ZERO_ISNT_USED 1
-
 
 class SoundObject
 {
@@ -61,16 +58,7 @@ AudioHandle AudioManagerSDL::Play( const string fileName )
 	assert(!"huh?");
 	return AUDIO_HANDLE_BLANK;
 }
-
-#ifdef PLATFORM_HTML5
-//Actually I guess we could support SDL2 if we wanted with emscripten, just haven't tried it
-#include <SDL/SDL.h>
-#else
-#include <SDL2/SDL.h>
-#endif
-
-
-
+ 
 bool AudioManagerSDL::Init()
 {
 
@@ -89,9 +77,17 @@ bool AudioManagerSDL::Init()
 	
 #ifndef RT_USE_SDL1_MIXER
 	//emscripten doesn't handle this
-	if (SDL_AudioInit("directsound") != 0)
+	
+	string audioDriverToRequest = "directsound";
+
+#ifdef RT_LINUX
+	audioDriverToRequest = "alsa";
+#endif
+	
+	if (SDL_AudioInit(audioDriverToRequest.c_str()) != 0)
 	{
 		LogMsg("Error setting audio driver: %s", SDL_GetError());
+		return false;
 	}
 #endif
 	
@@ -699,4 +695,3 @@ void AudioManagerSDL::Resume()
 
 }
 
-#endif

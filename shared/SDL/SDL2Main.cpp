@@ -769,7 +769,7 @@ int SDL_main(int argc, char *argv[])
 	SDL_JoystickEventState(SDL_IGNORE);
 	
 	//SetupScreenInfo(GetPrimaryGLX(), GetPrimaryGLY(), ORIENTATION_PORTRAIT);
-	
+	SDL_ShowCursor(true);
 	if (!GetBaseApp()->Init())
 	{
 		LogError("Couldn't initialize game. Yeah.\n\nDid everything unzip right?");

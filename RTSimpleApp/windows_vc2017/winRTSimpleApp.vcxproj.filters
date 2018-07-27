@@ -167,9 +167,6 @@
     <Filter Include="shared\SDL">
       <UniqueIdentifier>{5e0bdd69-8cce-4432-9497-9d5766ce09e3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\linux">
-      <UniqueIdentifier>{9f5de3d0-7c32-4744-825d-b4eae996be1a}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\App.cpp">

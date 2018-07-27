@@ -291,7 +291,7 @@ string DataToByteHexDisplay(string data, int maxNumCharsToShow)
 	string hexData = "Hex data: ";
 
 	char temp[255];
-	for (int i = 0; i < maxNumCharsToShow && i < data.length(); i++)
+	for (int i = 0; i < maxNumCharsToShow && i < (int)data.length(); i++)
 	{
 		sprintf(temp, "%hhx,", data[i]);
 		hexData += (string(temp) + " ");

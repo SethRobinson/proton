@@ -2,10 +2,15 @@
 #include "SoftSurface.h"
 #include "FileSystem/FileManager.h"
 #include "bitmap.h"
+#include "util/MiscUtils.h"
+
+#if !defined _CONSOLE && !defined GLAPI
 #include "BaseApp.h" //only needed for the memory statistics counter
+#endif
+
 #include "JPGSurfaceLoader.h"
 #include "stdio.h"
-
+#include "util/RTFileFormat.h"
 
 SoftSurface::SoftSurface()
 {
@@ -28,12 +33,17 @@ SoftSurface::~SoftSurface()
 
 void SoftSurface::Kill()
 {
+#if !defined _CONSOLE && !defined GLAPI
 	if (m_pPixels && IsBaseAppInitted())
 	{
 		GetBaseApp()->ModMemUsed(-m_memUsed);
 		m_memUsed = 0;
-
 	}
+#else
+	m_memUsed = 0;
+#endif
+
+
 	SAFE_DELETE_ARRAY(m_pPixels);
 	m_surfaceType = SURFACE_NONE;
 	SetUsesAlpha(false);
@@ -590,7 +600,7 @@ void ReadDataFromInputStream(png_structp png_ptr, png_bytep outBytes,
 	}
 	else
 	{
-		length = byteCountToRead;
+		length = (int)byteCountToRead;
 	}
 	memcpy(outBytes, inputStream.first, length);
 	inputStream.first += length;
@@ -684,7 +694,7 @@ bool SoftSurface::LoadPNGTexture(byte *pMem, int inputSize, bool bApplyCheckerBo
 		{
 			m_surfaceType = SURFACE_RGBA;
 			CheckDinkColorKey();
-			for (unsigned int y = 0; y < m_height; y++)
+			for (int y = 0; y < m_height; y++)
 			{
 				for (int x = 0; x < m_width; x++)
 				{
@@ -705,7 +715,7 @@ bool SoftSurface::LoadPNGTexture(byte *pMem, int inputSize, bool bApplyCheckerBo
 		{
 			m_surfaceType = SURFACE_RGBA;
 			CheckDinkColorKey();
-			for (unsigned int y = 0; y < m_height; y++)
+			for (int y = 0; y < m_height; y++)
 			{
 				for (int x = 0; x < m_width; x++)
 				{
@@ -726,7 +736,7 @@ bool SoftSurface::LoadPNGTexture(byte *pMem, int inputSize, bool bApplyCheckerBo
 		{
 			m_surfaceType = SURFACE_RGBA;
 			CheckDinkColorKey();
-			for (unsigned int y = 0; y < m_height; y++)
+			for (int y = 0; y < m_height; y++)
 			{
 				for (int x = 0; x < m_width; x++)
 				{
@@ -1262,6 +1272,7 @@ bool SoftSurface::LoadBMPTexture(byte *pMem)
 	return true;
 }
 
+
 #define GL_RGBA8 0x8058
 bool SoftSurface::LoadRTTexture(byte *pMem)
 {
@@ -1401,7 +1412,10 @@ void SoftSurface::IncreaseMemCounter(int mem)
 {
 	assert(!m_memUsed);
 	m_memUsed = mem;
+
+#ifndef _CONSOLE
 	GetBaseApp()->ModMemUsed(m_memUsed);
+#endif
 }
 
 
@@ -1803,6 +1817,25 @@ void SoftSurface::BlitRGBFromRGBA( int dstX, int dstY, SoftSurface *pSrc, int sr
 }
 
 
+void SoftSurface::BlitRGBAFromRGB(int dstX, int dstY, SoftSurface *pSrc, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/)
+{
+
+	byte *pDestImage = GetPointerToPixel(dstX, dstY);
+	byte *pSrcImage = pSrc->GetPointerToPixel(srcX, srcY);
+
+	int bytesPerPixelSource = pSrc->GetBytesPerPixel();
+
+	for (int y = 0; y < srcHeight; y++)
+	{
+		for (int x = 0; x < srcWidth; x++)
+		{
+			this->SetPixel(x, y, pSrc->GetPixel(x, y));
+		}
+		
+	}
+
+}
+
 void SoftSurface::BlitRGBFromRGB( int dstX, int dstY, SoftSurface *pSrc, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/ )
 {
 
@@ -1914,6 +1947,7 @@ void SoftSurface::FlipY()
 	delete [] pTmp;
 }
 
+#ifndef _CONSOLE
 void SoftSurface::BlitFromScreen(int dstX, int dstY, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/)
 {
 	//LogMsg("Blitting from screen");
@@ -1987,6 +2021,7 @@ void SoftSurface::BlitFromScreenFixed(int dstX, int dstY, int srcX /*= 0*/, int 
 	//FlipY();
 	SetUsesAlpha(false);
 }
+#endif
 
 void SoftSurface::Blit( int dstX, int dstY, SoftSurface *pSrc, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/ )
 {
@@ -2028,6 +2063,11 @@ void SoftSurface::Blit( int dstX, int dstY, SoftSurface *pSrc, int srcX /*= 0*/,
 			BlitRGBAFromRGBA(dstX, dstY, pSrc, srcX, srcY, srcWidth, srcHeight);
 			return;
 		}
+		if (pSrc->GetSurfaceType() == SURFACE_RGB)
+		{
+			BlitRGBAFromRGB(dstX, dstY, pSrc, srcX, srcY, srcWidth, srcHeight);
+			return;
+		}
 	} else if (GetSurfaceType() == SURFACE_PALETTE_8BIT)
 	{
 		if (pSrc->GetSurfaceType() == SURFACE_PALETTE_8BIT)
@@ -2060,6 +2100,7 @@ void SoftSurface::Blit( int dstX, int dstY, SoftSurface *pSrc, int srcX /*= 0*/,
 
 }
 
+#ifndef _CONSOLE
 Surface * SoftSurface::CreateGLTexture()
 {
 	Surface *pSurf = new Surface;
@@ -2098,6 +2139,7 @@ Surface * SoftSurface::CreateGLTexture()
 	pSurf->SetUsesAlpha(GetUsesAlpha());
 	return pSurf;
 }
+#endif
 
 bool SoftSurface::IsPaletteTheSame( glColorBytes *palette, int colorCount)
 {
@@ -2301,7 +2343,10 @@ void SoftSurface::Scale( int newX, int newY )
 	
 	int oldMem = m_memUsed;
 	m_memUsed = m_width*m_height*m_bytesPerPixel;
+
+#ifndef _CONSOLE
 	GetBaseApp()->ModMemUsed(m_memUsed - oldMem); //adjust for our memory counter
+#endif
 
 }
 
@@ -2376,5 +2421,5 @@ float SoftSurface::GetAverageComplexityFromRect(const CL_Vec2i vAreaPos, const C
 			glColorLast = glColor;
 		}
 	}
-	return (double)totalComplexity / (double)pixelsToLookAt;
+	return (float)((double)totalComplexity / (double)pixelsToLookAt);
 }

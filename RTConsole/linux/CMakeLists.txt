@@ -1,7 +1,10 @@
 #this particular CMakeLists.txt does it all here, but more advanced samples do it in a more elegant way, check RTBareBones for that example
 
 cmake_minimum_required (VERSION 2.6)
-project (rtconsole)
+
+ENABLE_LANGUAGE(C)
+
+project (RTConsole)
 # additional compiler flags -DSIMPLE_PROFILING_ACTIVE
 add_definitions(-D_CONSOLE -DHAS_SOCKLEN_T -DBOOST_ALL_NO_LIB -DC_NO_ZLIB -DRTLINUX)
 
@@ -21,7 +24,7 @@ include_directories(../../shared/util/boost ../../shared/ClanLib-2.0/Sources)
 include_directories(/usr/include/mysql)
 
 
-add_executable(rtconsole 
+add_executable(RTConsole 
 ../source/main.cpp
 ../source/App.cpp
 
@@ -54,4 +57,4 @@ add_executable(rtconsole
  )
 
 link_directories(/usr/lib/mysql) 
-target_link_libraries(rtconsole rt)
+target_link_libraries(RTConsole rt)

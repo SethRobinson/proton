@@ -10,7 +10,13 @@
 #ifndef SoftSurface_h__
 #define SoftSurface_h__
 
-#include "RenderBatcher.h"
+//#include "RenderBatcher.h"
+
+#ifdef _CONSOLE
+#include "Renderer/GL/gl.h"
+#include "Surface.h"
+#endif
+
 
 #ifdef RT_PNG_SUPPORT
 #include "../../Irrlicht/source/Irrlicht/libpng/png.h"
@@ -195,7 +201,8 @@ private:
 	
 	bool LoadRTTexture(byte *pMem);
 	void BlitRGBFromRGBA( int dstX, int dstY, SoftSurface *pSrc, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/ );
-	void BlitRGBFromRGB( int dstX, int dstY, SoftSurface *pSrc, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/ );
+	void BlitRGBAFromRGB(int dstX, int dstY, SoftSurface *pSrc, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/);
+	void BlitRGBFromRGB(int dstX, int dstY, SoftSurface *pSrc, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/);
 
 	eSurfaceType m_surfaceType;
 	int m_width, m_height;

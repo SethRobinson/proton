@@ -6,7 +6,7 @@
 
 #ifdef _CONSOLE
 #if !defined GLAPI
-	typedef float GLdouble;
+#include "Renderer/GL/gl.h"
 	#endif
 #endif
 struct rtPlane

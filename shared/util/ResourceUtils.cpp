@@ -280,7 +280,7 @@ bool CompressFile(string fName)
 
 
 
-byte * CompressMemoryToRTPack(byte *pSourceMem, unsigned int sourceByteSize, unsigned int *pCompressedSizeOut)
+byte * CompressMemoryToRTPack(unsigned char *pSourceMem, unsigned int sourceByteSize, unsigned int *pCompressedSizeOut)
 {
 	*pCompressedSizeOut = 0;
 #ifdef _DEBUG
@@ -295,7 +295,7 @@ byte * CompressMemoryToRTPack(byte *pSourceMem, unsigned int sourceByteSize, uns
 #ifdef C_NO_ZLIB
 
 	assert(!"ZLIB disabled with C_NO_ZLIB flag, no can do, sir");
-	return false;
+	return NULL;
 #else
 	int compressedSize;
 	byte *pCompressedFile = zlibDeflateToMemory(pSourceMem, sourceByteSize, &compressedSize);
@@ -313,9 +313,10 @@ byte * CompressMemoryToRTPack(byte *pSourceMem, unsigned int sourceByteSize, uns
 	memcpy(pDest+ headerSize, pCompressedFile, compressedSize);
 	pDest[headerSize + compressedSize] = 0; //add the null at the end
 	SAFE_DELETE_ARRAY(pCompressedFile);
+	*pCompressedSizeOut = compressedSize + headerSize;
+
 #endif
 
-	*pCompressedSizeOut = compressedSize+headerSize;
 
 
 	return pDest;
