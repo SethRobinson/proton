@@ -19,7 +19,7 @@ Deprecated platforms no longer actively supported:  Flash, BBX, WebOS
 Some things written with Proton:
 
 * [Growtopia](https://www.growtopiagame.com) - 2D MMO, a good example of using Proton's GUI for many screen sizes.
-* [Dungeon Scroll](https://www.rtsoft.com/pages/dscroll_mobile.php) - A word game.  ([HTML5 version](https://www.dungeonscroll.com))
+* [Dungeon Scroll](https://www.rtsoft.com/pages/dscroll_mobile.php) - A word game.  ([HTML5 version](http://www.dungeonscroll.com))
 * [Dink Smallwood](https://www.rtsoft.com/pages/dink.php) - Good example of porting old code to Proton to add touch controls and multiplatform support. Open source.
 * [Mind Wall](https://www.codedojo.com/?p=138) - 3D puzzle game
 * [Tanked](https://www.rtsoft.com/pages/tanked.php) - 3D multiplayer tank combat game including four player split screen support as well as internet match making.
