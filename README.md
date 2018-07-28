@@ -23,7 +23,7 @@ Some things written with Proton:
 * [Dink Smallwood](https://www.rtsoft.com/pages/dink.php) - Good example of porting old code to Proton to add touch controls and multiplatform support. Open source. [HTML5 version](https://www.rtsoft.com/web/dink)
 * [Mind Wall](https://www.codedojo.com/?p=138) - 3D puzzle game
 * [Tanked](https://www.rtsoft.com/pages/tanked.php) - 3D multiplayer tank combat game including four player split screen support as well as internet match making.
-* Arduboy Simulator - Allows you to write and debug [Arduboy](arduboy.com) apps with MSVC as well as output HTML5 playable versions (included with [Proton SDK](https://www.arduboy.com) [HTML5 Example game](http://www.rtsoft.com/arduman.html)
+* Arduboy Simulator - Allows you to write and debug [Arduboy](arduboy.com) apps with MSVC as well as output HTML5 playable versions (included with [Proton SDK](https://www.arduboy.com)) [HTML5 Example game](http://www.rtsoft.com/arduman.html)
 
 Credits and links
 - [Proton SDK wiki/tutorial site](https://www.protonsdk.com)
