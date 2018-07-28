@@ -32,3 +32,7 @@ Credits and links
 - [Clanlib team](https://github.com/sphair/ClanLib/blob/master/CREDITS) (Some math functions were taken from Clanlib)
 - Dan Walma (contributions to SoftSurface)
 - Fatalfeel's [Proton SDK forks](https://github.com/fatalfeel) for GLES 2 support and Cocos2D integration
+
+# Want to contribute?
+
+Feel free to submit a pull request! At this point the goal is that all changes be *non-breaking* to existing projects.
