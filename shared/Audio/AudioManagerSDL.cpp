@@ -63,8 +63,10 @@ bool AudioManagerSDL::Init()
 {
 
 	//SDL_Init(SDL_INIT_AUDIO);
-
+#ifndef PLATFORM_HTML5
+	//Emscripten's fake ass SDL audio doesn't like this
 	SDL_InitSubSystem(SDL_INIT_AUDIO);
+#endif
 
 	
 	int i;
