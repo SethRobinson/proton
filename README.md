@@ -6,7 +6,7 @@ License: [BSD style with attribution required](https://github.com/SethRobinson/p
 
 Seth's GL/GLES messy multi-platform C++ game SDK.  Can output to **Windows**, **Linux** (including the **Raspberry Pi**), **HTML5**, **OS X**,  **iOS**, **Android**
 
-A component based toolbox of useful things built up over the last ten years.  Instead of a giant .lib you link to only the .cpp files used are directly added to your project when possible to simplify multiplatform support as well as keep code size down.
+A component based toolbox of useful things built up over the last ten years.  Instead of a giant .lib you link only the .cpp files used when possible to simplify multiplatform support as well as keep code size down.
 
 
 
