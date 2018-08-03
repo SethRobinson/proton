@@ -923,3 +923,8 @@ void ForceVideoUpdate()
 	LogMsg("Did SDL_GL_SwapWindow");
 }
 
+void SystemSleep(int sleepMS)
+{
+	SDL_Delay(sleepMS);
+}
+

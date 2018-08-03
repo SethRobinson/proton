@@ -1,5 +1,5 @@
 :make sure you set the IP of your rasperry in SetupVars.bat!
-call SetupVars.bat
+call base_setup.bat
 :To test if your ssh is setup to logon without a password, do the below first
 :ssh -v pi@%RASPBERRYIP%
 

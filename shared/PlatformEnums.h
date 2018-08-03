@@ -163,8 +163,8 @@ std::string GetNetworkType(); //returns current network type, eg: wifi, mobile. 
 bool IsDesktop();
 bool HasVibration();
 std::string GetDeviceID(); //returns a string that is probably unique to the device
-void ForceVideoUpdate(); //force an early gl flip or whatever, sometimes useful.  Not implemented on ever platform
-
+void ForceVideoUpdate(); //force an early gl flip or whatever, sometimes useful.  Not implemented on every platform
+void SystemSleep(int sleepMS); //sleep or utime or SDL_Delay, depending on platform.  Not implemented on every platform
 std::string GetDateAndTimeAsString(); //only supported on linux and win
 void GetDateAndTime(int *monthOut, int *dayOut, int *yearOut, int *hourOut, int *minOut, int *secOut); 
 

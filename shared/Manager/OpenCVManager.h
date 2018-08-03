@@ -105,6 +105,7 @@ private:
 	vector<QRCodeInfo> m_decodedObjects;
 	CL_Vec2i m_lastCaptureSizeSet;
 	int m_lastFPSSet;
+	int m_originalDeviceID;
 
 };
 

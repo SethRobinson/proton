@@ -3,7 +3,7 @@
 #include "Manager/MessageManager.h"
 #include "util/MiscUtils.h"
 
-#include "App.h"
+#include "BaseApp.h"
 
 RandomAudioPlayerComponent::RandomAudioPlayerComponent() {
 	SetName("RandomAudioPlayer");

@@ -44,7 +44,7 @@ bool g_winAllowWindowResize = true;
 bool g_bMouseIsInsideArea = true;
 vector<VideoModeEntry> g_videoModes;
 void AddVideoMode(string name, int x, int y, ePlatformID platformID, eOrientationMode forceOrientation = ORIENTATION_DONT_CARE);
-void SetVideoModeByName(string name);
+void SetVideoModeByName(string name); 
 bool InitVideo(int width, int height, bool bFullscreen, float aspectRatio);
 
 #ifdef RT_RUNS_IN_BACKGROUND
@@ -160,6 +160,11 @@ void SetPrimaryScreenSize(int width, int height)
 void AddVideoMode(string name, int x, int y, ePlatformID platformID, eOrientationMode forceOrientation)
 {
 	g_videoModes.push_back(VideoModeEntry(name, x, y, platformID, forceOrientation));
+}
+
+void SystemSleep(int sleepMS)
+{
+	Sleep(sleepMS);
 }
 
 void SetVideoModeByName(string name)

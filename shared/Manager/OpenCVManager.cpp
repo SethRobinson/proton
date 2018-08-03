@@ -21,6 +21,7 @@ OpenCVManager::OpenCVManager()
 	m_lastCaptureSizeSet = CL_Vec2i(0, 0);
 	m_frameTimer = 0;
 	m_lastFPSSet = 0;
+	m_originalDeviceID = -1;
 }
 
 OpenCVManager::~OpenCVManager()
@@ -170,6 +171,7 @@ void OpenCVManager::DecodeQRCode()
 #else
 
 	//decodeSoftSurface(m_decodedObjects, &m_surface);
+	if (m_frame.rows > 0)
 	decode(m_frame, m_decodedObjects);
 #endif
 
@@ -182,6 +184,10 @@ void OpenCVManager::DecodeQRCode()
 
 bool OpenCVManager::InitCamera(int deviceID)
 {
+
+	m_originalDeviceID = deviceID;
+
+
 #ifdef WINAPI
 	if (deviceID == -1)
 	{
@@ -205,11 +211,6 @@ bool OpenCVManager::InitCamera(int deviceID)
 	
 #else
 
-	if (!m_capture.open(deviceID))
-	{
-		LogMsg("Can't open camera");
-		return false;
-	}
 
 	if (m_lastCaptureSizeSet.x != 0 && m_lastCaptureSizeSet.y != 0)
 		SetCaptureSize(m_lastCaptureSizeSet.x, m_lastCaptureSizeSet.y);
@@ -218,47 +219,77 @@ bool OpenCVManager::InitCamera(int deviceID)
 	{
 		SetCaptureFPS(m_lastFPSSet);
 	}
-	//OpenCV needs this set now, but raspicam needs it set BEFORE the open.  This way the raspicam way will work with both APIs.
+	
+	if (!m_capture.open(deviceID))
+	{
+		LogMsg("Can't open camera");
+		return false;
+	}
 #endif
 
 	LogMsg("Camera initialized. (Opened device %d)", deviceID);
 
 	//To see what your cam can do on a raspberry pi do: v4l2-ctl -d 0 --list-formats-ext 
+	
 
 	
 	//m_capture.set(CV_CAP_PROP_FOURCC, CV_FOURCC('M', 'J', 'P', 'G'));
 
 	
-
-
+	
 	return true;
 }
 
 
 void OpenCVManager::SetCaptureFPS(int fps)
 {
+	bool bDoFullInit = false;
+
+	if (m_capture.isOpened())
+	{
+		bDoFullInit = true;
+		m_capture.release();
+	}
+
 #ifdef RT_USE_LIBRASPICAM
+	
+	/*
 	if (m_capture.isOpened())
 	{
 		if (GetBaseApp()->IsInitted())
 		LogMsg("Can't set capture size, you have to do it before you do Init with libraspicam!");
 		return;
 	}
+	*/
 
 	m_capture.setFrameRate(fps);
 #else
+
+
 	if (!m_capture.set(CV_CAP_PROP_FPS, fps))
 	{
 		if (GetBaseApp()->IsInitted())
 		LogMsg("Error setting cam FPS");
 	}
 
+	m_frame = cv::Mat();
+
+
 //	int reportedFPS = m_capture.get(CV_CAP_PROP_FPS);
 //	LogMsg("Cam reported FPS is %d", reportedFPS);
 #endif
 
+	
 	m_lastFPSSetInMS = (int)(1000.0f / (float)fps);
 	m_lastFPSSet = fps;
+
+	LogMsg("Setting cam fps to %d", m_lastFPSSet);
+
+	if (bDoFullInit)
+	{
+		LogMsg("Re-initting cam due to FPS change");
+		InitCamera(m_originalDeviceID);
+	}
 }
 
 void OpenCVManager::SetCaptureSize(int width, int height)
@@ -310,7 +341,7 @@ bool OpenCVManager::ReadFromCamera()
 		LogMsg("Reinitted soft surface. I hope it's now %d bytes.", m_capture.getImageTypeSize(raspicam::RASPICAM_FORMAT_RGB));
 	}
 
-	LogMsg("Grabbing pic of %d by %d", m_capture.getWidth(), m_capture.getHeight() );
+	LogMsg("Grabbing pic of %d by %d", m_capture.getWidth(), m_capture.getHeight());
 	//unsigned char *pData = new unsigned char[Camera.getImageTypeSize(raspicam::RASPICAM_FORMAT_RGB)];
 	m_capture.retrieve(m_surface.GetPixelData());//get camera image
 
@@ -327,6 +358,7 @@ bool OpenCVManager::ReadFromCamera()
 
 #else
 	m_capture >> m_frame;
+	LogMsg("Grabbing pic of %d by %d", (int) m_capture.get(cv::CAP_PROP_FRAME_WIDTH), (int)m_capture.get(cv::CAP_PROP_FRAME_HEIGHT));
 
 #endif
 
