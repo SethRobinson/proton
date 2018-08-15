@@ -12,6 +12,7 @@
 
 #include "util/QR-Code-generator/cpp/BitBuffer.hpp"
 #include "util/QR-Code-generator/cpp/QrCode.hpp"
+using qrcodegen::QrCode;
 
 //To use this class, you need to add the following cpp files:  BitBUffer.cpp, QrCode.cpp, QrSegment.cpp
 class QRGenerateManager
@@ -20,9 +21,9 @@ public:
 	QRGenerateManager();
 	virtual ~QRGenerateManager();
 
-	vector<string> MakeQRWithText(string msg, string optionalHTMLFileName = "");
+	vector<string> MakeQRWithText(string msg, string optionalHTMLFileName = "", QrCode::Ecc errCorLvl = QrCode::Ecc::LOW);
+	vector<string> MakeQRWithData(string msg, string optionalHTMLFileName = "", QrCode::Ecc errCorLvl = QrCode::Ecc::LOW);
 
-	vector<string> MakeQRWithData(string msg, string optionalHTMLFileName);
 private:
 	vector<string> PrintAndWriteHTMLIfNeeded(const qrcodegen::QrCode qr, string optionalHTMLFileName = "");
 };

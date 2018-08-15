@@ -73,10 +73,8 @@ vector<string> QRGenerateManager::PrintAndWriteHTMLIfNeeded(const QrCode qr, str
 	return printQr(qr);
 }
 
-vector<string> QRGenerateManager::MakeQRWithText(string msg, string optionalHTMLFileName)
+vector<string> QRGenerateManager::MakeQRWithText(string msg, string optionalHTMLFileName, QrCode::Ecc errCorLvl)
 {
-	const QrCode::Ecc errCorLvl = QrCode::Ecc::LOW;  // Error correction level
-
 	try {
 		const QrCode qr = QrCode::encodeText(msg.c_str(), errCorLvl);
 		return PrintAndWriteHTMLIfNeeded(qr, optionalHTMLFileName);
@@ -88,10 +86,9 @@ vector<string> QRGenerateManager::MakeQRWithText(string msg, string optionalHTML
 	return vector<string>();
 }
 
-vector<string> QRGenerateManager::MakeQRWithData(string msg, string optionalHTMLFileName)
+vector<string> QRGenerateManager::MakeQRWithData(string msg, string optionalHTMLFileName, QrCode::Ecc errCorLvl)
 {
 	const std::vector<uint8_t> vecData(msg.begin(), msg.end());
-	const QrCode::Ecc errCorLvl = QrCode::Ecc::LOW;  // Error correction level
 	const QrCode qr = QrCode::encodeBinary(vecData, errCorLvl);
 	return PrintAndWriteHTMLIfNeeded(qr, optionalHTMLFileName);
 
