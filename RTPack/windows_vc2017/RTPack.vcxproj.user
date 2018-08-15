@@ -10,7 +10,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug RT_NO_PVR|Win32'">
     <LocalDebuggerCommand>$(TargetPath)</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-pvrt8888  -o jpg -ultra_compress 90 interface\bkgd_stone.png</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-pvrt8888  -ultra_compress 90 interface\bkgd_stone.png</LocalDebuggerCommandArguments>
     <LocalDebuggerWorkingDirectory>..\bin</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug WebOS|Win32'">

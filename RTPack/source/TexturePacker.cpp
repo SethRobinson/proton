@@ -372,7 +372,7 @@ void WriteTextureWithoutPVR(string pathAndFileName, SoftSurface * texture, int n
 		if (lastHeight == 0) lastHeight = 1;
 		if (lastWidth == 0) lastWidth = 1;
 	}
-	LogMsg("Wrote out ")
+	LogMsg("Wrote out image %s.  (original size: %d x %d)", pathAndFileName.c_str(), originalWidth, originalHeight);
 	fclose(pFileOut);
 }
 
