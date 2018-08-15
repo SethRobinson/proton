@@ -47,8 +47,8 @@ process_directory_images() {
 		TEXTURE_CONVERSION_OPTS=$(cat texture_conversion_flags.txt)
 		if [ -z "$TEXTURE_CONVERSION_OPTS" ]; then
 			echo "Texture conversion flags are empty."
-			echo "Hmm, $1 doesn't have a exture_conversion_flags.txt file in the dir, so using default parms of -8888 -ultracompress 90"
-			TEXTURE_CONVERSION_OPTS="-8888 -ultracompress 90"
+			echo "Hmm, $1 doesn't have a texture_conversion_flags.txt file in the dir, so using default parms of -8888"
+			TEXTURE_CONVERSION_OPTS="-8888"
 		fi
 		
 		for IMG in `find . -depth \( -name '*.jpg' -o -name '*.bmp' -o -name '*.png' \) -print`; do

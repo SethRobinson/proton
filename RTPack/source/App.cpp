@@ -91,7 +91,7 @@ void ShowHelp()
 	LogMsg("");
 	LogMsg("More options/flags for making textures:\n");
 	LogMsg("RTPack -8888 <image file> (Creates raw rgba 32 bit .rttex, or 24 bit if no alpha");
-	LogMsg("RTPack -8888 -ultra_compress 90 <image file> (Writes .rttex with good compression when there isn't alpha)");
+	LogMsg("RTPack -8888 -ultra_compress 90 <image file> (Writes .rttex with jpg compression when there isn't alpha)");
 	
 	
 #ifndef RT_NO_PVR
@@ -208,9 +208,6 @@ bool App::Update()
 		}
 
 #ifndef RT_NO_PVR
-	
-
-
 	if (g_mainHarness.ParmExists("-pvrtc4"))
 	{
 		GetApp()->SetPixelType(pvrtexlib::OGL_PVRTC4);

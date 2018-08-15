@@ -105,7 +105,7 @@ void ClearPixelBuffer(SoftSurface* pPixelBuffer, glColorBytes color)
 bool ImageCanBeUltraCompressed(bool bUsesTransparency, int width, int height)
 {
 	//later, we may wish to limit using this to only larger sizes etc, that's why I pass in size now
-
+	 
 	if (!bUsesTransparency && GetApp()->GetUltraCompressQuality() != 0)
 	{
 		return true;
@@ -230,7 +230,7 @@ const ::uint32 ETC_MIN_TEXHEIGHT = 4;
 
 #ifdef RT_NO_PVR
 
-void WriteTextureWithoutPVR(string pathAndFileName, SoftSurface * texture, int nNumMipLevels, bool bUsesTransparency, int originalWidth, int originalHeight)
+void WriteTextureWithoutPVR(string pathAndFileName, SoftSurface * texture, int nNumMipLevels, bool bUsesTransparency, int originalWidth, int originalHeight, bool bFlipped)
 {
 
 	FILE* pFileOut = NULL;
@@ -272,11 +272,7 @@ void WriteTextureWithoutPVR(string pathAndFileName, SoftSurface * texture, int n
 	}
 	else if (texture->GetSurfaceType() == SoftSurface::SURFACE_RGB)
 	{
-		bytesPerPixel = 4;
-		rtTexHeader.format = GL_UNSIGNED_BYTE;
-
 		//candidate to be converted to JPG?
-
 		bytesPerPixel = 3;
 		rtTexHeader.format = GL_UNSIGNED_BYTE;
 
@@ -286,6 +282,7 @@ void WriteTextureWithoutPVR(string pathAndFileName, SoftSurface * texture, int n
 			rtTexHeader.format = RT_FORMAT_EMBEDDED_FILE; //game will check the header to know it's actually a jpg or whatever
 			GetApp()->SetPixelTypeText("Ultra compress RGB bit");
 			rtTexHeader.bAlreadyCompressed = 1;
+			LogMsg("Performing ultra compress, no alpha data detected.  (JPG format selected internally)");
 		}
 	}
 	else
@@ -362,6 +359,9 @@ void WriteTextureWithoutPVR(string pathAndFileName, SoftSurface * texture, int n
 			mipHeader.dataSize = CompressedImageSize;
 			//LogMsg("MIP %d: %d X %d", mipHeader.mipLevel, mipHeader.width,  mipHeader.height);
 			fwrite(&mipHeader, 1, sizeof(rttex_mip_header), pFileOut);
+			
+			if (bFlipped)
+				texture->FlipY();
 			fwrite(texture->GetPixelData() + dataOffset, sizeof(unsigned char), texture->GetWidth()*texture->GetHeight()*texture->GetBytesPerPixel(), pFileOut);
 		}
 
@@ -372,7 +372,7 @@ void WriteTextureWithoutPVR(string pathAndFileName, SoftSurface * texture, int n
 		if (lastHeight == 0) lastHeight = 1;
 		if (lastWidth == 0) lastWidth = 1;
 	}
-	LogMsg("Wrote out image %s.  (original size: %d x %d)", pathAndFileName.c_str(), originalWidth, originalHeight);
+	LogMsg("Wrote out image %s.  (original size: %d x %d) Flipped %d", pathAndFileName.c_str(), originalWidth, originalHeight, int(bFlipped));
 	fclose(pFileOut);
 }
 
@@ -603,7 +603,7 @@ bool TexturePacker::ProcessTexture(string fName)
 	}
 
 #ifdef RT_NO_PVR
-	pixBuff.FlipY(); //needed because I guess the PVR stuff flips it?
+	//pixBuff.FlipY(); //needed because I guess the PVR stuff flips it?
 #endif
 
 
@@ -824,7 +824,7 @@ bool TexturePacker::ProcessTexture(string fName)
 	//implementation without PVR stuff.  We won't make MIP maps or use any fancy texture types
 
 
-	WriteTextureWithoutPVR(fileName, &finalBuff, nNumMipLevels, m_bUsesTransparency, originalX, originalY);
+	WriteTextureWithoutPVR(fileName, &finalBuff, nNumMipLevels, m_bUsesTransparency, originalX, originalY, bFlipped);
 	
 #else
 

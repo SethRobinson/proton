@@ -3,14 +3,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LocalDebuggerCommand>$(TargetPath)</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>
-    </LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-8888 -ultracompress 90 -o jpg interface\bg_local.png</LocalDebuggerCommandArguments>
     <LocalDebuggerWorkingDirectory>..\bin</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug RT_NO_PVR|Win32'">
     <LocalDebuggerCommand>$(TargetPath)</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-pvrt8888  -ultra_compress 90 interface\bkgd_stone.png</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-8888  -ultra_compress 90 -o jpg interface\bg_local.png</LocalDebuggerCommandArguments>
     <LocalDebuggerWorkingDirectory>..\bin</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug WebOS|Win32'">
@@ -34,6 +33,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug RT_NO_PVR|x64'">
     <LocalDebuggerCommand>$(TargetPath)</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>-8888  -ultra_compress 90 -o jpg interface\bg_local.png</LocalDebuggerCommandArguments>
+    <LocalDebuggerWorkingDirectory>..\bin</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug WebOS|x64'">
     <LocalDebuggerCommand>$(TargetPath)</LocalDebuggerCommand>
