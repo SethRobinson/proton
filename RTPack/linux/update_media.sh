@@ -2,7 +2,7 @@
 
 PACK_EXE=$(cd `dirname $0`/../bin/; pwd)/RTPack
 
-if [[ ! -x ${PACK_EXE} ]];
+if [ ! -x ${PACK_EXE} ];
 then
 	echo "Missing RTPack tool (from ${PACK_EXE})"
 	echo "Go into /RTPack/linux and run "sh compile_linux.sh" to build the tool first!"
@@ -41,11 +41,11 @@ process_directory_images() {
 	
 	echo Processing $1
 	
-	if [[ -d "$1" ]];
+	if [ -d "$1" ];
 	then
 		cd "$1"
 		TEXTURE_CONVERSION_OPTS=$(cat texture_conversion_flags.txt)
-		if [[ -z "$TEXTURE_CONVERSION_OPTS" ]]; then
+		if [ -z "$TEXTURE_CONVERSION_OPTS" ]; then
 			echo "Texture conversion flags are empty."
 			echo "Hmm, $1 doesn't have a exture_conversion_flags.txt file in the dir, so ignoring it.  (make one and put in -8888 -ultracompress 90 or something.)"
 			cd - > /dev/null
@@ -55,7 +55,7 @@ process_directory_images() {
 		echo "Doign image scan"
 		for IMG in `find . -depth \( -name '*.jpg' -o -name '*.bmp' -o -name '*.png' \) -print`; do
 			RTTEX=`echo $IMG | sed -e 's/\.\(jpg\|bmp\|png\)$/.rttex/'`
-			if [[ "$IMG" -nt "$RTTEX" ]]; then
+			if [ "$IMG" -nt "$RTTEX" ]; then
 				$PACK_EXE $TEXTURE_CONVERSION_OPTS "$IMG"
 				$PACK_EXE "$RTTEX"
 			fi
@@ -73,7 +73,7 @@ rm -f interface/font_*.rttex
 echo Copy the stuff we care about
 
 copy_media_to_bin() {
-	if [[ -d "$1" ]];
+	if [ -d "$1" ];
 	then
 		sed -e 's/^\..*$/*&/g' "$2" | rsync -v --update --delete --delete-excluded --recursive --exclude-from=- "$1" ../bin
 	fi
