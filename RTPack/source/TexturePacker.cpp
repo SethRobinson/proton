@@ -372,7 +372,7 @@ void WriteTextureWithoutPVR(string pathAndFileName, SoftSurface * texture, int n
 		if (lastHeight == 0) lastHeight = 1;
 		if (lastWidth == 0) lastWidth = 1;
 	}
-
+	LogMsg("Wrote out ")
 	fclose(pFileOut);
 }
 
@@ -657,11 +657,14 @@ bool TexturePacker::ProcessTexture(string fName)
 			//Not a power of two.  Let's remedy that little problem...
 			finalRect.right = GetLowestPowerOf2(finalRect.right);
 			finalRect.bottom = GetLowestPowerOf2(finalRect.bottom);
+			
+			/*
 			if (finalRect.right > 1024 || finalRect.bottom > 1024)
 			{
 				LogError("Unless something changed with our limitations, this texture is too big for the HW.");
 				//return false;
 			}
+			*/
 
 			if (!GetApp()->GetStretchImage())
 			{

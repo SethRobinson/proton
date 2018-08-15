@@ -47,19 +47,17 @@ process_directory_images() {
 		TEXTURE_CONVERSION_OPTS=$(cat texture_conversion_flags.txt)
 		if [ -z "$TEXTURE_CONVERSION_OPTS" ]; then
 			echo "Texture conversion flags are empty."
-			echo "Hmm, $1 doesn't have a exture_conversion_flags.txt file in the dir, so ignoring it.  (make one and put in -8888 -ultracompress 90 or something.)"
-			cd - > /dev/null
-			return;
+			echo "Hmm, $1 doesn't have a exture_conversion_flags.txt file in the dir, so using default parms of -8888 -ultracompress 90"
+			TEXTURE_CONVERSION_OPTS="-8888 -ultracompress 90"
 		fi
 		
-		echo "Doign image scan"
 		for IMG in `find . -depth \( -name '*.jpg' -o -name '*.bmp' -o -name '*.png' \) -print`; do
 			RTTEX=`echo $IMG | sed -e 's/\.\(jpg\|bmp\|png\)$/.rttex/'`
-			if [ "$IMG" -nt "$RTTEX" ]; then
+			#if [ "$IMG" -nt "$RTTEX" ]; then
 				$PACK_EXE $TEXTURE_CONVERSION_OPTS "$IMG"
 				$PACK_EXE "$RTTEX"
-			fi
-		done
+			#fi
+		done 
 		cd - > /dev/null
 	fi
 }
