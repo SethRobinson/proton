@@ -304,9 +304,9 @@ if(RASPBERRYPI_GLES11)
 #note: GLESv2 has the v1.1 and v2 libraries on rasberry pi, you don't use GLESv1_CM!
 target_link_libraries(${PROJECT_NAME} pthread bcm_host SDL2)
 
-find_library(PI_GLSTUFF GLESv2)
+find_library(PI_GLSTUFF libbrcmGLESv22)
 
-if (PI_GLSTUFF)
+if (NOT PI_GLSTUFF)
 	target_link_libraries(${PROJECT_NAME} GLESv2 EGL)
 else()
 	#raspian stretch has renamed these files:
