@@ -49,8 +49,6 @@ App::~App()
 {
 }
 
-
-
 bool App::Init()
 {
 	
@@ -66,8 +64,6 @@ bool App::Init()
 		//SetLockedLandscape( true); //if we don't allow portrait mode for this game
 		//SetManualRotationMode(true); //don't use manual, it may be faster (33% on a 3GS) but we want iOS's smooth rotations
 	}
-
-
 
 	LogMsg("The Save path is %s", GetSavePath().c_str());
 	LogMsg("Region string is %s", GetRegionString().c_str());
@@ -160,7 +156,6 @@ void App::OnArcadeInput(VariantList *pVList)
 			LogMsg("OnArcadeInput> Bad value of %d", keyInfo);
 	}
 	
-
 	string keyName = "unknown";
 
 	switch (vKey)
@@ -186,6 +181,12 @@ void App::OnArcadeInput(VariantList *pVList)
 	LogMsg("Arcade input: Hit %d (%s) (%s)", vKey, keyName.c_str(), pressed.c_str());
 }
 
+void AppInputRawKeyboard(VariantList *pVList)
+{
+	char key = (char) pVList->Get(0).GetUINT32();
+	bool bDown = pVList->Get(1).GetUINT32() != 0;
+	LogMsg("Raw key %c (%d)",key, (int)bDown);
+}
 
 void AppInput(VariantList *pVList)
 {
@@ -212,8 +213,17 @@ void AppInput(VariantList *pVList)
 	case MESSAGE_TYPE_GUI_CLICK_MOVE:
 		LogMsg("Touch move: X: %.2f YL %.2f (Finger %d)", pt.x, pt.y, fingerID);
 		break;
+
+	case MESSAGE_TYPE_GUI_CLICK_MOVE_RAW:
+		//LogMsg("Touch raw move: X: %.2f YL %.2f (Finger %d)", pt.x, pt.y, fingerID);
+		break;
 	case MESSAGE_TYPE_GUI_CLICK_END:
 		LogMsg("Touch end: X: %.2f YL %.2f (Finger %d)", pt.x, pt.y, fingerID);
+		break;
+
+	case MESSAGE_TYPE_GUI_CHAR:
+		char key = (char)pVList->Get(2).GetUINT32();
+		LogMsg("Hit key %c (%d)", key, (int)key);
 		break;
 	}	
 }
@@ -262,6 +272,13 @@ void App::Update()
 		//send them to the log.  (Each device has a way to view a debug log in real-time)
 		GetBaseApp()->m_sig_input.connect(&AppInput);
 
+		//this one gives raw up and down of keyboard events, where the one above only gives
+		//MESSAGE_TYPE_GUI_CHAR which is just the down and includes keyboard repeats from
+		//holding the key
+		//GetBaseApp()->m_sig_raw_keyboard.connect(&AppInputRawKeyboard);
+		
+		
+		
 		/*
 		//file handling test, if TextScanner.h is included at the top..
 
@@ -301,15 +318,13 @@ void App::Draw()
 	//after our 2d rect call above, we need to prepare for raw GL again. (it keeps it in ortho mode if we don't for speed)
 	PrepareForGL();
 	RenderSpinningTriangle();
-//	RenderGLTriangle();
+	//RenderGLTriangle();
 	//let's blit a bmp, but first load it if needed
 
-	
 	if (!m_surf.IsLoaded())
 	{
 		m_surf.LoadFile("interface/test.bmp");
 	}
-
 
 	m_surf.Bind();
 

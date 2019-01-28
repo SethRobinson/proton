@@ -5,21 +5,17 @@ ENABLE_LANGUAGE(C)
 include(CheckIncludeFile)
 CHECK_INCLUDE_FILE(/opt/vc/include/bcm_host.h ISRASPBERRYPIE)
 
-#if(ISRASPBERRYPIE)
+if(ISRASPBERRYPIE)
 OPTION(RASPBERRYPI_GLES11 "Compile for Raspberry PI GLES" ON)
-#endif(ISRASPBERRYPIE)
+add_definitions(-DRT_RASPBERRY)
+endif(ISRASPBERRYPIE)
 
-#OPTION(RASPBERRYPI_OPENGL "Compile for Rasperry PI OpenGL" ON)
-
+add_definitions(-DRT_LINUX)
 
 set(CMAKE_BUILD_TYPE "Release") #use Release or Debug
 
-#for raspberry directory
-#link_directories("/usr/lib/arm-linux-gnueabihf")
-
 project(RTBareBones)
 include(../../shared/linux/Proton.cmake)
-#include(../source)
 
 proton_include_components(FocusInputComponent)
 proton_include_components(CustomInputComponent ArcadeInputComponent)

@@ -2,16 +2,20 @@ cmake_minimum_required(VERSION 2.6)
 
 ENABLE_LANGUAGE(C)
 
-#if(ISRASPBERRYPIE)
+include(CheckIncludeFile)
+CHECK_INCLUDE_FILE(/opt/vc/include/bcm_host.h ISRASPBERRYPIE)
+
+if(ISRASPBERRYPIE)
 OPTION(RASPBERRYPI_GLES11 "Compile for Raspberry PI GLES" ON)
-#endif(ISRASPBERRYPIE)
+add_definitions(-DRT_RASPBERRY)
+endif(ISRASPBERRYPIE)
+
+add_definitions(-DRT_LINUX)
 
 set(CMAKE_BUILD_TYPE "Release") #use Release or Debug
 project(RTSimpleApp)
 
 include(../../shared/linux/Proton.cmake)
-
-add_definitions(-DRT_LINUX -RT_RASPBERRY)
 
 proton_include_all_components()
 proton_use_jpeg_support()
