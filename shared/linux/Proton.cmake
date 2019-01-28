@@ -7,6 +7,7 @@ string(REPLACE "/shared/linux/Proton.cmake" "" PROTON_ROOT "${CMAKE_CURRENT_LIST
 
 #for raspberry pi's gles1
 if(RASPBERRYPI_GLES11)
+message(STATUS "Adding Raspi dirs")
 	link_directories("/opt/vc/lib")
 	
 	#this is for SDL_mixer
@@ -304,13 +305,18 @@ if(RASPBERRYPI_GLES11)
 #note: GLESv2 has the v1.1 and v2 libraries on rasberry pi, you don't use GLESv1_CM!
 target_link_libraries(${PROJECT_NAME} pthread bcm_host SDL2)
 
-find_library(PI_GLSTUFF libbrcmGLESv22)
+find_library(PI_GLSTUFF brcmGLESv2 /opt/vc/lib)
 
-if (NOT PI_GLSTUFF)
-	target_link_libraries(${PROJECT_NAME} GLESv2 EGL)
-else()
+if (PI_GLSTUFF)
 	#raspian stretch has renamed these files:
-	target_link_libraries(${PROJECT_NAME} libbrcmGLESv2.so libbrcmEGL.so)
+message(STATUS "Linking with libbrecmGLESv2 because we found 'em.  Using Raspbian stretch or newer probably")
+	target_link_libraries(${PROJECT_NAME} brcmGLESv2.so brcmEGL.so)
+
+else()
+
+message(STATUS "Linking with GLESv2 and EGL for non-desktop raspbian because lib brcmGLESv2 can't be found")
+target_link_libraries(${PROJECT_NAME} GLESv2 EGL)
+
 endif()
 
 
