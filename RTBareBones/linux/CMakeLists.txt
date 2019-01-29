@@ -3,10 +3,12 @@ cmake_minimum_required(VERSION 2.6)
 ENABLE_LANGUAGE(C)
 
 include(CheckIncludeFile)
-CHECK_INCLUDE_FILE(/opt/vc/include/bcm_host.h ISRASPBERRYPIE)
+set (CMAKE_REQUIRED_INCLUDES "/opt/vc/include")
+CHECK_INCLUDE_FILE(bcm_host.h ISRASPBERRYPIE)
 
 if(ISRASPBERRYPIE)
 OPTION(RASPBERRYPI_GLES11 "Compile for Raspberry PI GLES" ON)
+message(STATUS "Detected as PI")
 add_definitions(-DRT_RASPBERRY)
 endif(ISRASPBERRYPIE)
 

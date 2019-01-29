@@ -1023,8 +1023,6 @@ enum eAndroidActions
 void AppOnTouch( JNIEnv*  env, jobject jobj,jint action, jfloat x, jfloat y, jint finger)
 {
 	//LogMsg("Got action %d, %.2f %.2f", action, x, y);
-
-	
 	eMessageType messageType = MESSAGE_TYPE_UNKNOWN;
 
 	switch (action)

@@ -278,7 +278,6 @@ void App::Update()
 		//GetBaseApp()->m_sig_raw_keyboard.connect(&AppInputRawKeyboard);
 		
 		
-		
 		/*
 		//file handling test, if TextScanner.h is included at the top..
 
