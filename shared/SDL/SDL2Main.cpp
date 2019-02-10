@@ -360,7 +360,12 @@ bool InitGLESContextWithEGL()
 
 bool InitSDL()
 {
+#ifdef RT_CONSOLE_SDL
+	return true; //we want SDL input or whatever, but want to compile without OpenGL right now
+#endif
+	
 	LogMsg("initting SDL");
+	
 	if (!initSDL_GLES())
 	{
 		LogMsg("Error initting SDL: %s", SDL_GetError());

@@ -187,7 +187,6 @@ void BobEntityStop(Entity *pEnt)
 {
 	if (!pEnt) return;
 	pEnt->RemoveComponentByName("ic_bob");
-
 }
 
 void OneTimeBobEntity(Entity *pEnt, float bobAmount, int delayBeforeBob, int durationMS)

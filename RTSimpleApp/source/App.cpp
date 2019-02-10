@@ -321,8 +321,6 @@ const char * GetBundleName()
 	return bundleName;
 }
 
-
-
 bool App::OnPreInitVideo()
 {
 	//only called for desktop systems

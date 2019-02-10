@@ -138,8 +138,6 @@ bool AudioManagerSDL::Init()
 	assert(ret == 0);
 #else
 
-	
-
 	if ( Mix_OpenAudio(rate, format, channels, bufferSize) == -1 )
 	{
 		// we had an error opening the audio

@@ -121,7 +121,6 @@ bool BaseApp::Init()
 		GetAudioManager()->Init();
 	}
 	m_gameTimer.Reset(); //another one
-
 	return true;
 }
 
@@ -132,6 +131,7 @@ void DrawConsole()
 
 void BaseApp::Draw()
 {
+
 #ifdef _DEBUG
 //LogMsg("**********FRAME START");
 #endif

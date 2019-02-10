@@ -340,6 +340,10 @@ CL_Rectf RotateGUIRect(CL_Rectf vRect, CL_Rectf inputRect, float angle, CL_Vec2f
 	return CL_Rectf(vTopLeft, *(CL_Sizef*)&(vTemp));
 }
 
+CL_Vec2f LerpVector(const CL_Vec2f &vOriginal, const CL_Vec2f &vTarget, float f_percent)
+{
+	return (vOriginal - ((vOriginal - vTarget)*f_percent));
+}
 
 CL_Vec3f LerpVector(const CL_Vec3f &vOriginal, const CL_Vec3f &vTarget, float f_percent)
 {
