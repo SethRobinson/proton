@@ -19,13 +19,111 @@ int g_fakePrimaryScreenSizeY = 0;
 int g_originalScreenSizeX = 0;
 int g_originalScreenSizeY = 0;
 float g_deviceDiagonalSizeInInches = 0;
-
-
 float g_protonPixelScaleFactor = 1.0f; //only used by iOS
 
 eOrientationMode g_forcedOrientation = ORIENTATION_DONT_CARE;
 int g_orientation = ORIENTATION_PORTRAIT;
 bool g_lockedLandscape = false;
+
+float g_forceAspectRatio = 0; //default is 0, unused
+CL_Vec2f g_forceAspectPixelOffsets = CL_Vec2f(0,0);
+CL_Vec2f g_forceAspectSquishModifer = CL_Vec2f(1.0f, 1.0f);
+CL_Vec2f g_forceAspectContentSize = CL_Vec2f(0,0);
+CL_Vec2f g_forceAspectPrimaryScreenRatio = CL_Vec2f(0, 0);
+
+CL_Vec2f GetForceAspectContentSize()
+{
+	return g_forceAspectContentSize;
+}
+
+CL_Vec2f GetForceAspectPixelOffsets()
+{
+	return g_forceAspectPixelOffsets;
+}
+
+CL_Vec2f GetForceAspectSquishModifer()
+{
+	return g_forceAspectSquishModifer;
+}
+CL_Vec2f GetForceAspectPrimaryScreenRatio()
+{
+	return g_forceAspectPrimaryScreenRatio;
+}
+
+void RecomputeAspectRatioStuff()
+{
+
+
+	bool bNeedsAspectRatioStuff = true;
+
+	if (GetScreenSizeXf() == 0 || GetForceAspectRatio() == 0)
+	{
+		bNeedsAspectRatioStuff = false;
+	}
+
+
+	//ASPECTSTUFF
+
+    if (!bNeedsAspectRatioStuff)
+	{
+		//not using it
+		g_forceAspectPixelOffsets = CL_Vec2f(0, 0);
+		g_forceAspectSquishModifer = CL_Vec2f(1.0f, 1.0f);
+		g_forceAspectContentSize = CL_Vec2f(0, 0);
+		g_forceAspectPrimaryScreenRatio = CL_Vec2f(1,1);
+
+		return;
+	}
+	
+	float baseAspect = (float)GetPrimaryGLX() / (float)GetPrimaryGLY();
+	float fakeAspect = GetScreenSizeXf() / GetScreenSizeYf();
+	g_forceAspectRatio = (fakeAspect / baseAspect);
+
+	if (g_forceAspectRatio >= 1.0f)
+	{
+		
+		g_forceAspectContentSize.x = (float)GetScreenSizeX();
+		g_forceAspectContentSize.y = (float)GetScreenSizeYf()/g_forceAspectRatio;
+
+		g_forceAspectSquishModifer.y = (g_forceAspectContentSize.y) / (float)GetScreenSizeYf();
+		g_forceAspectSquishModifer.x = 1.0f;
+		g_forceAspectPixelOffsets.y = (float)GetPrimaryGLY() - ((float)GetPrimaryGLY()/g_forceAspectRatio);
+		g_forceAspectPixelOffsets.y /= 2.0f;
+		g_forceAspectPixelOffsets.x = 0;
+		float rawDrawAreaY = ((float)GetPrimaryGLY()) - (g_forceAspectPixelOffsets.y * 2);
+		g_forceAspectPrimaryScreenRatio.y = GetScreenSizeYf() / rawDrawAreaY;
+
+		g_forceAspectPrimaryScreenRatio.x = 1.0f;
+
+		return;
+	}
+
+	g_forceAspectContentSize.y = (float)GetScreenSizeYf();
+	g_forceAspectContentSize.x = (float)GetScreenSizeXf()*g_forceAspectRatio;
+
+	g_forceAspectSquishModifer.x = (g_forceAspectContentSize.x) / (float)GetScreenSizeXf();
+	g_forceAspectSquishModifer.y = 1.0f;
+	g_forceAspectPixelOffsets.x = (float)GetPrimaryGLX()-((float)GetPrimaryGLX()*g_forceAspectRatio);
+	g_forceAspectPixelOffsets.x /= 2.0f;
+	g_forceAspectPixelOffsets.y = 0;
+
+	float rawDrawAreaX = ((float)GetPrimaryGLX()) - (g_forceAspectPixelOffsets.x * 2);
+	g_forceAspectPrimaryScreenRatio.x = GetScreenSizeXf() / rawDrawAreaX;
+
+	g_forceAspectPrimaryScreenRatio.y = 1.0f;
+
+#ifdef _DEBUG
+// 	LogMsg("Computing aspect ratio of %.2f.  Pixel offset: %.2f, then squished: %.2f, of original %d", g_forceAspectRatio,
+// 		g_forceAspectPixelOffsets.x, g_forceAspectSquishModifer.x, GetPrimaryGLX());
+#endif
+
+}
+
+
+float GetForceAspectRatio() 
+{
+	return g_forceAspectRatio;
+}
 
 eOrientationMode GetForcedOrientation() {return g_forcedOrientation;}
 void SetForcedOrientation(eOrientationMode orientation) {g_forcedOrientation = orientation;}
@@ -345,11 +443,18 @@ void RenderTexturedRectangle(float RectSize)
 }
 
 
-void SetupFakePrimaryScreenSize(int x, int y)
+void SetupFakePrimaryScreenSize(int x, int y, bool bEnforceAspectRatio)
 {
 	g_fakePrimaryScreenSizeX = x;
 	g_fakePrimaryScreenSizeY = y;
-	
+	if (bEnforceAspectRatio)
+	{
+		g_forceAspectRatio = 1.0; //will force it to be recomputed elsewhere
+	}
+	else
+	{
+		g_forceAspectRatio = 0.0f;
+	}
 	//recompute it
 	SetupScreenInfo(GetScreenSizeX(), GetScreenSizeY(), GetOrientation());
 };
@@ -417,7 +522,7 @@ void RedoFakeScreenSize()
 
 	if (g_undoFakeScreenSizeX)
 	{
-		SetupFakePrimaryScreenSize(g_undoFakeScreenSizeX, g_undoFakeScreenSizeY);
+		SetupFakePrimaryScreenSize(g_undoFakeScreenSizeX, g_undoFakeScreenSizeY, GetForceAspectRatio() != 0);
 		SetupScreenInfo(GetOriginalScreenSizeX(), GetOriginalScreenSizeY(), GetOrientation());
 
 		g_undoFakeScreenSizeX = 0;
@@ -615,6 +720,8 @@ void SetupScreenInfo(int x, int y, int orientation)
 
 		}
 
+		RecomputeAspectRatioStuff();
+
 		NotifyOSOfOrientationPreference(eOrientationMode(orientation));
 		if (IsBaseAppInitted())
 		{
@@ -642,10 +749,12 @@ void ConvertCoordinatesIfRequired(double &xPos, double &yPos)
 
 void ConvertCoordinatesIfRequired(float &xPos, float &yPos)
 {
-//	LogMsg("Before converting, coords are %d, %d", int(xPos), int(yPos));	
+	//LogMsg("Before converting, coords are %d, %d", int(xPos), int(yPos));	
 
 	xPos *= GetProtonPixelScaleFactor();
 	yPos *= GetProtonPixelScaleFactor();
+
+	
 
 	if (GetBaseApp()->GetManualRotationMode())
 	{
@@ -689,11 +798,32 @@ void ConvertCoordinatesIfRequired(float &xPos, float &yPos)
             }
         }
 		
-		xPos = (float(xPos) * (GetScreenSizeXf()/OriginalX));
-		yPos = (float(yPos) * (GetScreenSizeYf()/OriginalY));
+		//MOUSECOORDS
+		if (GetForceAspectRatio() != 0)
+		{
+			if (GetForceAspectRatio() > 1.0f)
+			{
+				yPos -= GetForceAspectPixelOffsets().y;
+				yPos *= GetForceAspectPrimaryScreenRatio().y;
+				xPos = (float(xPos) * (GetScreenSizeXf() / OriginalX));
+
+			}
+			else
+			{
+				xPos -= GetForceAspectPixelOffsets().x;
+				xPos *= GetForceAspectPrimaryScreenRatio().x;
+				yPos = (float(yPos) * (GetScreenSizeYf() / OriginalY));
+			}
+		}
+		else
+		{
+			xPos = (float(xPos) * (GetScreenSizeXf() / OriginalX));
+			yPos = (float(yPos) * (GetScreenSizeYf() / OriginalY));
+		}
+
 	}
 	
-//	LogMsg("Converted coords to %d, %d", int(xPos), int(yPos));
+	//LogMsg("Converted coords to %d, %d", int(xPos), int(yPos));
 }
 
 bool g_needsOrthoModeSet = true;

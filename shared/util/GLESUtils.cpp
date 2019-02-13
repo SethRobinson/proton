@@ -6,6 +6,7 @@
 float g_renderOrthoRenderSizeX;
 float g_renderOrthoRenderSizeY;
 
+
 void  GenerateFillRect( GLuint rgba, float x, float y, float w, float h );
 
 void gluLookAt(GLfloat eyex, GLfloat eyey, GLfloat eyez,
@@ -578,6 +579,10 @@ void SetupOrtho()
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
+
+	glScalef(GetForceAspectSquishModifer().x, GetForceAspectSquishModifer().y, 1.0f);
+
+
 	glEnable(GL_TEXTURE_2D);
 	glEnableClientState(GL_VERTEX_ARRAY);	
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);	
@@ -612,18 +617,24 @@ void SetupOrtho()
 
     CHECK_GL_ERROR();
 
-	glOrthof( 0,  tempX, tempY, 0,  -1, 1 );		
+	glOrthof(0,  tempX, tempY, 0,  -1, 1 );
 	
 	CHECK_GL_ERROR();
+
+
 
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
+	
+	
+	
 	//disable depth testing and depth writing
 	glDisable(GL_DEPTH_TEST);
 	glDepthMask(GL_FALSE);
 	SetOrthoModeFlag();
 	CHECK_GL_ERROR();
+
 }
 
 void PrepareForGL()

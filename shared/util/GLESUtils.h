@@ -46,4 +46,6 @@ float GetOrthoRenderSizeXf();
 float GetOrthoRenderSizeYf();
 void SetExtraScreenRotationDegrees(float degrees); // a way to add an additional rotation, I needed it for 4 player splitscreen with Irrlicht
 float OrientationToDegrees(int orientation);
+
+
 #endif // GLESUtils_h__

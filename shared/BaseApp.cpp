@@ -16,6 +16,7 @@ RenderBatcher g_globalBatcher;
 bool g_isLoggerInitted = false;
 bool g_isBaseAppInitted = false;
 bool g_bUseBorderlessFullscreenOnWindows = true; //extern and change yourself if needed, done this way to stay compatible with old stuff.  (true was old default behavior)
+bool g_defaultSmoothing = true;
 
 bool IsBaseAppInitted()
 {
@@ -121,6 +122,15 @@ bool BaseApp::Init()
 		GetAudioManager()->Init();
 	}
 	m_gameTimer.Reset(); //another one
+	
+#ifdef PLATFORM_ANDROID
+	LogMsg("Killing keyboard at launch because sometimes it openes by itself");
+	OSMessage o;
+	o.m_type = OSMessage::MESSAGE_CLOSE_TEXT_BOX;
+	AddOSMessage(o);
+
+#endif
+	
 	return true;
 }
 
@@ -191,6 +201,22 @@ void BaseApp::Draw()
 
 	SetupOrtho();
 	g_globalBatcher.Flush();
+	if (GetForceAspectRatio() != 0)
+	{
+		if (GetForceAspectRatio() > 1.0f)
+		{
+			//need to draw bars on top and bottom
+			DrawFilledRect(0, -(GetScreenSizeYf()), GetScreenSizeXf(), GetScreenSizeYf(), MAKE_RGBA(0, 0, 0, 255));
+			DrawFilledRect(0, GetScreenSizeYf()-1, GetScreenSizeXf(), GetScreenSizeYf()*3, MAKE_RGBA(0, 0, 0, 255));
+		}
+		else
+		{
+			//need to draw bars on left/right
+			DrawFilledRect(-(GetScreenSizeXf()), 0, GetScreenSizeXf(), GetScreenSizeYf(), MAKE_RGBA(0, 0, 0, 255));
+			DrawFilledRect(GetScreenSizeXf()-1, 0, GetScreenSizeXf(), GetScreenSizeYf(), MAKE_RGBA(0, 0, 0, 255));
+		}
+	}
+
 }
 
 #ifdef RT_RUN_STATIC_UPDATE
@@ -526,6 +552,7 @@ void BaseApp::SetManualRotationMode( bool bRotation )
 	m_bManualRotation = bRotation;
 }
 
+
 void BaseApp::OnMemoryWarning()
 {
 	LogMsg("Got memory warning");
@@ -765,3 +792,11 @@ void TouchTrackInfo::SetWasPreHandled( bool bNew, Entity *pEntity /*= NULL*/ )
 	m_pEntityThatPreHandledIt = pEntity;
 }
 
+bool GetDefaultSmoothing()
+{
+	return g_defaultSmoothing;
+}
+void SetDefaultSmoothing(bool bNew)
+{
+	g_defaultSmoothing = bNew;
+}

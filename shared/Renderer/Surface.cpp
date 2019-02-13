@@ -32,7 +32,7 @@ Surface::Surface( string fName, eTextureType type )
 
 void Surface::SetDefaults()
 {
-	m_bSmoothing = true;
+	m_bSmoothing = GetDefaultSmoothing();
 	m_texWidth = 0;
 	m_texHeight = 0;
 	m_memUsed = 0;

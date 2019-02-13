@@ -137,7 +137,7 @@ CL_Vec2f iPhoneMap2X( CL_Vec2f vPos );
 CL_Vec2f iPhoneMap2X( float x, float y );
 void InitBaseScreenSizeFromPrimary(); //to be called after GetPrimaryGLY() is valid (Only needed on iOS?)
 
-void SetupFakePrimaryScreenSize(int x, int y);
+void SetupFakePrimaryScreenSize(int x, int y, bool bEnforceAspectRatio = false);
 int GetFakePrimaryScreenSizeX();
 int GetFakePrimaryScreenSizeY();
 int GetOriginalScreenSizeY();
@@ -147,6 +147,11 @@ void RedoFakeScreenSize();
 bool IsTabletSize();
 rtRectf ConvertFakeScreenRectToReal(rtRectf r);
 rtRectf ConvertFakeScreenRectToReal(rtRectf r, float aspectRatioModX, float aspectRatioModY);
+CL_Vec2f GetForceAspectContentSize();
+CL_Vec2f GetForceAspectPixelOffsets();
+CL_Vec2f GetForceAspectSquishModifer();
+
+float GetForceAspectRatio();
 eOrientationMode GetForcedOrientation();
 void SetForcedOrientation(eOrientationMode orientation);
 bool NeedToUseFakeScreenSize(); //true if using a fake (stretched to device) screen and it's a different size than our primary screen

@@ -439,6 +439,7 @@ ResourceManager * GetResourceManager();
 unsigned int GetTick(eTimingSystem timingSystem = GetBaseApp()->GetActiveTimingSystem()); //faster to write
 eTimingSystem GetTiming();
 extern RenderBatcher g_globalBatcher; //can be used by anyone
-
+bool GetDefaultSmoothing(); //default antialising on or off
+void SetDefaultSmoothing(bool bNew);
 
 #endif // BaseApp_h__
