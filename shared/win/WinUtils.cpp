@@ -112,11 +112,30 @@ void FireAchievement(std::string achievement)
 {
 }
 
+void LaunchURLW(uint16 *url)
+{
+	//LogMsg("Launching %s", url.c_str());
+	//weird double cast to get away from MSVC warning
+	int result = (int)(LONG_PTR)ShellExecuteW(NULL, L"open", (WCHAR*) url, NULL, NULL, SW_SHOWNORMAL);
+
+	if ((result < 32) && (result != 2))
+	{
+		//big fat error.
+
+		std::string s;
+		s = std::string("Windows doesn't know how to open that ") +
+			std::string("\n\nYou need to use file explorer and associate this file type with something first.");
+
+		MessageBox(GetForegroundWindow(), s.c_str(), "Oops", MB_ICONSTOP);
+	}
+
+}
+
 void LaunchURL(string url)
 {
 	//LogMsg("Launching %s", url.c_str());
 	//weird double cast to get away from MSVC warning
-	int result = (int)(LONG_PTR)ShellExecute(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
+	int result = (int)(LONG_PTR)ShellExecute(NULL,"open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
 
 	if ( (result < 32) && (result != 2))
 	{
@@ -168,6 +187,24 @@ void SetClipboardText(std::string text)
 
 }
 
+void SetClipboardTextW(uint16 *text, int charCount)
+{
+	if (OpenClipboard(NULL))
+	{
+		HGLOBAL clipbuffer;
+		char * buffer;
+		EmptyClipboard();
+		int sizeWithZeroAtEnd = (charCount * 2) + 2;
+		clipbuffer = GlobalAlloc(GMEM_DDESHARE, sizeWithZeroAtEnd);
+		buffer = (char*)GlobalLock(clipbuffer);
+		memset(buffer, 0, sizeWithZeroAtEnd);
+		memcpy(buffer, text, charCount*2);
+		GlobalUnlock(clipbuffer);
+		SetClipboardData(CF_UNICODETEXT, clipbuffer);
+		CloseClipboard();
+	}
+
+}
 
 string GetClipboardText()
 {

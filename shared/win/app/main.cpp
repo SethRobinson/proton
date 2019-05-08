@@ -46,6 +46,7 @@ vector<VideoModeEntry> g_videoModes;
 void AddVideoMode(string name, int x, int y, ePlatformID platformID, eOrientationMode forceOrientation = ORIENTATION_DONT_CARE);
 void SetVideoModeByName(string name); 
 bool InitVideo(int width, int height, bool bFullscreen, float aspectRatio);
+void HandleWMHotkey(UINT message, WPARAM wParam, LPARAM lParam); //callback if RT_HANDLE_WM_HOTKEY is defined so the app can look at these messages
 
 #ifdef RT_RUNS_IN_BACKGROUND
 bool g_bAppCanRunInBackground = true;
@@ -139,7 +140,7 @@ void InitVideoSize()
 	AddVideoMode("Flash", 640, 480, PLATFORM_ID_FLASH);
 
 	//WORK: Change device emulation here
-	string desiredVideoMode = "Windows";
+	string desiredVideoMode = "Playbook Landscape";
 	SetVideoModeByName(desiredVideoMode);
 	GetBaseApp()->OnPreInitVideo(); //gives the app level code a chance to override any of these parms if it wants to
 }
@@ -1084,6 +1085,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	//	LogMsg("Mouse leaving window");
 		break;
 
+	case WM_HOTKEY:
+#ifdef RT_HANDLE_WM_HOTKEY
+		HandleWMHotkey(message, wParam, lParam);
+#endif
+
+		break;
+
 	case WM_CANCELMODE:
 
 		//LogMsg("Got WM cancel mode");
@@ -1711,7 +1719,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLin
 	g_hInstance = hInstance;
 	RemoveFile("log.txt", true);
 
-
 	if (lpCmdLine[0])
 	{
 		vector<string> parms = StringTokenize(lpCmdLine, " ");
@@ -1759,7 +1766,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLin
 	{
 		goto cleanup;
 	}
-
 	
 	if (!GetBaseApp()->Init())
 	{
@@ -1767,8 +1773,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLin
 		MessageBox(NULL, "Error initializing the game.  Did you unzip everything right?", "Unable to load stuff", NULL);
 		goto cleanup;
 	}
-
-
 
 #ifdef C_GL_MODE
 	if (!g_glesExt.InitExtensions())
@@ -1970,6 +1974,32 @@ void AddText(const char *tex ,const char *filename)
 	}
 }
 #ifndef RT_CUSTOM_LOGMSG
+
+
+void LogMsgNoCR(const char* traceStr, ...)
+{
+	va_list argsVA;
+	const int logSize = 1024 * 10;
+	char buffer[logSize];
+	memset((void*)buffer, 0, logSize);
+
+	va_start(argsVA, traceStr);
+	vsnprintf_s(buffer, logSize, logSize, traceStr, argsVA);
+	va_end(argsVA);
+
+
+	OutputDebugString(buffer);
+
+	if (IsBaseAppInitted())
+	{
+		GetBaseApp()->GetConsole()->AddLine(buffer);
+		//OutputDebugString( (string("writing to ")+GetSavePath()+"log.txt\n").c_str());
+		AddText(buffer, (GetSavePath() + "log.txt").c_str());
+	}
+
+}
+
+
 void LogMsg ( const char* traceStr, ... )
 {
 	va_list argsVA;

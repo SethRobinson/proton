@@ -124,6 +124,7 @@ public:
 	void RemoveBlendingMode(uint32 rgba); //undoes the above, used in renderbatcher
 
 	void HardKill(); //like kill, but also forces the texture to forget things about itself so it won't auto reinit if surfaces are lost
+	void SetDefaults();
 
 protected:
 
@@ -146,8 +147,7 @@ private:
 	void IncreaseMemCounter(int mem);
 	void SetTextureStates();
 	void PrepareGLForNewTexture();
-	void SetDefaults();
-	void PreMultiplyAlpha(byte *pBytes, int width, int height, int format);
+		void PreMultiplyAlpha(byte *pBytes, int width, int height, int format);
 	void OnEnterForeground(VariantList *pVList); //only wired up in Windows currently, don't need it anywhere
 	//else, windows is a special case
 	GLuint m_glTextureID;

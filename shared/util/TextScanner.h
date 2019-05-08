@@ -38,8 +38,6 @@ int lives = atoi( t.GetParmString("lives",1,"|") );
 
 */
 
-
-
 #ifndef TextScanner_h__
 #define TextScanner_h__
 

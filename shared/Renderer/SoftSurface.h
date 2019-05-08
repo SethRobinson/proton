@@ -17,6 +17,7 @@
 #include "Surface.h"
 #endif
 
+#include "bitmap.h"
 
 #ifdef RT_PNG_SUPPORT
 #include "../../Irrlicht/source/Irrlicht/libpng/png.h"
@@ -62,7 +63,7 @@ public:
 
 	bool IsActive() {return m_surfaceType != SURFACE_NONE;}
 
-	bool Init(int sizex, int sizey, eSurfaceType type);
+	bool Init(int sizex, int sizey, eSurfaceType type, bool bRememberOriginalData = false);
 	void Kill();
 	void FillColor(glColorBytes color);
 	byte * GetPixelData() {return m_pPixels;}
@@ -137,6 +138,7 @@ public:
 	void SetModified(bool bNew) {m_bModified = bNew;}
 	void FlipY();
 	void Rotate90Degrees(bool bRotateLeft);
+	BMPImageHeader BuildBitmapHeader();
 	void BlitFromScreen(int dstX, int dstY, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/); //deprecated
 	void BlitFromScreenFixed(int dstX, int dstY, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/);
 	void WriteRawDataOut(string fileName);
@@ -146,7 +148,9 @@ public:
 	void SetForceBlackAndWhiteOnBmpPalettes(bool bNew) { m_bForceBlackAndWhiteOnBmpPalettes = bNew; }
 	float GetAverageLumaFromRect(const CL_Vec2i vAreaPos, const CL_Vec2i vAreaSize); //send the upper left, and the width/height you want.  Measures brightness of pixels
 	float GetAverageComplexityFromRect(const CL_Vec2i vAreaPos, const CL_Vec2i vAreaSize); //measures variation between pixels
+	void FlipRedAndBlue(); //I needed this to fix colors before sending camera capture to an OGL surface
 
+	void RemoveTrueBlack(byte minimumLuma);
 private:
 
 	SoftSurface(const SoftSurface&); //don't allow copy operation.  Use Blit or Surface::CreateFromSoftSurface instead

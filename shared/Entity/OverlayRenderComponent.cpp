@@ -167,7 +167,6 @@ void OverlayRenderComponent::OnRender(VariantList *pVList)
 		vRotationPt.x += (m_pTex->GetFrameSize().x* (m_pScale2d->x)) * m_pRotationCenter->x;
 		vRotationPt.y += (m_pTex->GetFrameSize().y* (m_pScale2d->y)) * m_pRotationCenter->y;
 		
-		
 		if (m_pScale2d->x != 1 || m_pScale2d->y != 1 || *m_pFlipX != 0 || *m_pFlipY != 0)
 		{
 			

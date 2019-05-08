@@ -55,6 +55,10 @@ cross scripting privileges are setup.
 #include "util/MiscUtils.h"
 #include "NetSocket.h"
 
+#ifdef RT_USE_LIBCURL
+#include <curl/curl.h>
+#endif
+
 class NetHTTP
 {
 public:
@@ -102,7 +106,7 @@ public:
 	void Update();
 	void Reset(bool bClearPostData=true); //completely clears it out so it can be used again
 
-private:
+protected:
 
 #ifdef PLATFORM_HTML5
 
@@ -115,6 +119,19 @@ private:
 	void KillConnectionIfNeeded();
 
 	int m_emscriptenWgetHandle;
+#endif
+
+#ifdef RT_USE_LIBCURL
+
+	static size_t CURLWriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *pThisInstance);
+
+	char *m_pReceiveBuff = NULL;
+	size_t m_receivedSize = 0;
+	CURLM *m_CURL_multi_handle = NULL;
+	int m_CURL_handles_still_running = 0;
+	CURL *m_CURL_handle = NULL;
+	void SetBuffer(const char *pData, int byteSize);
+	void SetProgress(int bytesDownloaded, int totalBytes);
 #endif
 
 	string BuildHTTPHeader();

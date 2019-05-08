@@ -230,7 +230,7 @@ bool OpenCVManager::InitCamera(int deviceID)
 	LogMsg("Camera initialized. (Opened device %d)", deviceID);
 
 	//To see what your cam can do on a raspberry pi do: v4l2-ctl -d 0 --list-formats-ext 
-	
+
 
 	
 	//m_capture.set(CV_CAP_PROP_FOURCC, CV_FOURCC('M', 'J', 'P', 'G'));
@@ -307,8 +307,15 @@ void OpenCVManager::SetCaptureSize(int width, int height)
 
 #else
 
-	m_capture.set(CV_CAP_PROP_FRAME_WIDTH, width);
-	m_capture.set(CV_CAP_PROP_FRAME_HEIGHT, height);
+	if (!m_capture.set(CV_CAP_PROP_FRAME_WIDTH, width))
+	{
+		LogMsg("Unable to set capture size X to %d", width);
+	}
+
+	if (!m_capture.set(CV_CAP_PROP_FRAME_HEIGHT, height))
+	{
+		LogMsg("Unable to set capture size Y to %d", height);
+	}
 
 #endif
 

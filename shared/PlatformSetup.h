@@ -117,7 +117,8 @@ std::string GetPlatformName();
 void SetMarketID(eMarketID marketID);
 eMarketID GetMarketID();
 bool GetForceAspectRatioWhenResizing();
-
+void LaunchURLW(uint16 * url); //wide char version, implemented only on Win I think
+void SetClipboardTextW(uint16 *text, int charCount); //wide char version, implemented only on Win I think
 //copy these here, so I don't have to include ResourceUtils.cpp in my console only apps
 int GetScreenSizeY();
 int GetScreenSizeX();

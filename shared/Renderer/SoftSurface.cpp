@@ -51,7 +51,7 @@ void SoftSurface::Kill()
 	m_bModified = true;
 }
 
-bool SoftSurface::Init( int sizex, int sizey, eSurfaceType type )
+bool SoftSurface::Init( int sizex, int sizey, eSurfaceType type, bool bRememberOriginalData )
 {
 	Kill();
 
@@ -59,8 +59,16 @@ bool SoftSurface::Init( int sizex, int sizey, eSurfaceType type )
 	m_height = sizey;
 	m_surfaceType = type;
 
-	if (m_originalWidth == 0)	m_originalWidth = m_width;
-	if (m_originalHeight == 0) m_originalHeight = m_height;
+	if (bRememberOriginalData)
+	{
+		if (m_originalWidth == 0)	m_originalWidth = m_width;
+		if (m_originalHeight == 0) m_originalHeight = m_height;
+	}
+	else
+	{
+		m_originalWidth = m_width;
+		m_originalHeight = m_height;
+	}
 
 	switch (type)
 	{
@@ -773,8 +781,11 @@ bool SoftSurface::LoadPNGTexture(byte *pMem, int inputSize, bool bApplyCheckerBo
 	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 
 	m_bUsesAlpha = true;
-
+	
 	assert(GetWidth() && GetHeight());
+	m_originalWidth = GetWidth();
+	m_originalHeight = GetHeight();
+
 	assert(m_surfaceType == SURFACE_RGBA);
 	IncreaseMemCounter(m_width*m_height*m_bytesPerPixel);
 	return true;
@@ -1329,7 +1340,7 @@ bool SoftSurface::LoadRTTexture(byte *pMem)
 				surfType = SURFACE_RGB;
 			}
 			
-			Init(m_width, m_height, surfType);
+			Init(m_width, m_height, surfType, true);
 
 			//copy image data
 			assert(pMipSection->dataSize == m_width*m_height*GetBytesPerPixel() && "We only support RGB and RGBA when loading rttex from SoftSurface");
@@ -1926,6 +1937,80 @@ void SoftSurface::Blit8BitFrom8Bit( int dstX, int dstY, SoftSurface *pSrc, int s
 }
 
 
+
+void SoftSurface::FlipRedAndBlue()
+{
+
+
+	if (GetSurfaceType() == SURFACE_RGBA)
+	{
+		int *pSrcImage = (int*)GetPointerToPixel(0, 0);
+		for (int y = 0; y < GetHeight(); y++)
+		{
+			for (int x = 0; x < GetWidth(); x++)
+			{
+
+				pSrcImage[x] = ((pSrcImage[x] & 0xff00ff00) |
+					(pSrcImage[x] & 0xff) << 16) |
+					(pSrcImage[x] & 0xff0000) >> 16;
+			}
+			pSrcImage += GetWidth();
+		}
+	}
+	else
+	{
+		byte *pSrcImage = (byte*)GetPointerToPixel(0, 0);
+		byte tempRed;
+
+		for (int y = 0; y < GetHeight(); y++)
+		{
+			for (int x = 0; x < GetWidth(); x++)
+			{
+				tempRed = pSrcImage[0];
+
+				pSrcImage[0] = pSrcImage[2];
+				pSrcImage[2] = tempRed;
+				pSrcImage += 3;
+			}
+		}
+
+	}
+}
+
+
+
+void SoftSurface::RemoveTrueBlack(byte minimumLuma)
+{
+	if (GetSurfaceType() == SURFACE_RGBA)
+	{
+		assert(!"Add this!");
+	}
+	else
+	{
+		byte *pSrcImage = (byte*)GetPointerToPixel(0, 0);
+	
+		for (int y = 0; y < GetHeight(); y++)
+		{
+			for (int x = 0; x < GetWidth(); x++)
+			{
+				if (pSrcImage[0] < minimumLuma && pSrcImage[1] < minimumLuma && pSrcImage[2] < minimumLuma)
+				{
+					//yeah, make sure it's not close to pure black, otherwise it could throw off luma keying
+					pSrcImage[0] = minimumLuma;
+					pSrcImage[1] = minimumLuma;
+					pSrcImage[2] = minimumLuma;
+				}
+
+
+				pSrcImage += 3;
+			}
+		}
+
+	}
+
+
+}
+
 void SoftSurface::FlipY()
 {
 	if (m_surfaceType == SURFACE_NONE) return;
@@ -2207,6 +2292,24 @@ void SoftSurface::Rotate90Degrees( bool bRotateLeft )
 	m_usedPitch = targetPitch;
 }
 
+BMPImageHeader SoftSurface::BuildBitmapHeader()
+{
+	BMPImageHeader bmpImageInfo;
+
+	memset(&bmpImageInfo, 0, sizeof(BMPImageHeader));
+
+	assert(sizeof(BMPImageHeader) == 40);
+
+	bmpImageInfo.Size = sizeof(BMPImageHeader);
+	bmpImageInfo.Width = m_width;
+	bmpImageInfo.Height = m_height;
+	bmpImageInfo.BitCount = m_bytesPerPixel * 8;
+	bmpImageInfo.Planes = 1;
+	bmpImageInfo.Compression = BMP_COMPRESSION_NONE;
+
+	return bmpImageInfo;
+}
+
 void SoftSurface::WriteBMPOut( string fileName )
 {
 	if (GetSurfaceType() != SURFACE_RGB && GetSurfaceType() != SURFACE_RGBA)
@@ -2233,18 +2336,7 @@ void SoftSurface::WriteBMPOut( string fileName )
 	temp = 14+sizeof(BMPImageHeader);
 	fwrite(&temp, 4, 1, fp);
 
-	BMPImageHeader bmpImageInfo;
-	memset(&bmpImageInfo, 0, sizeof(BMPImageHeader));
-	
-	assert(sizeof(BMPImageHeader) == 40);
-
-	bmpImageInfo.Size = sizeof(BMPImageHeader);
-	bmpImageInfo.Width = m_width;
-	bmpImageInfo.Height = m_height;
-	bmpImageInfo.BitCount = m_bytesPerPixel*8;
-	bmpImageInfo.Planes = 1;
-	bmpImageInfo.Compression = BMP_COMPRESSION_NONE;
-	
+	BMPImageHeader bmpImageInfo = BuildBitmapHeader();
 	fwrite(&bmpImageInfo, sizeof(BMPImageHeader), 1, fp);
 
 	//now write the data

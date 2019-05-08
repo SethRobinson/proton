@@ -2,6 +2,8 @@
 
 #if defined PLATFORM_HTML5
 #include "../html5/NetHTTP_HTML5.cpp"
+#elif defined RT_USE_LIBCURL
+#include "NetHTTP_libCURL.cpp"
 #else
 
 #include "NetHTTP.h"
@@ -124,10 +126,8 @@ bool NetHTTP::AddPostData( const string &name, const byte *pData, int len/*=-1*/
 	*/
 
 #endif
-
 	return true;
 }
-
 
 bool NetHTTP::AddPutData( const string data )
 {
@@ -316,8 +316,7 @@ void NetHTTP::Update()
 			
 			if (m_expectedFileBytes == 0)
 			{
-
-				//if we know it's a .html file we can look for the double CR to know if it's done
+			//if we know it's a .html file we can look for the double CR to know if it's done
 
 				switch (m_endOfDataSignal)
 				{

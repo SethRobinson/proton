@@ -410,8 +410,8 @@ CHECK_GL_ERROR();
 				{
 					//Go ahead and activate premultiplied alpha processing.  This will allow us to zoom in on textures and not have ugly artifacts
 					//around the edges.
-					
-					m_blendingMode = BLENDING_PREMULTIPLIED_ALPHA;
+
+m_blendingMode = BLENDING_PREMULTIPLIED_ALPHA;
 				}
 
 				if (m_blendingMode == BLENDING_PREMULTIPLIED_ALPHA && m_bUsesAlpha)
@@ -419,29 +419,30 @@ CHECK_GL_ERROR();
 					PreMultiplyAlpha(pTextureData, width, height, format);
 				}
 
-				glTexImage2D( GL_TEXTURE_2D, nMipLevel, internalColorFormat, width, height, 0, colorType, format, pTextureData );
-CHECK_GL_ERROR();				
+				glTexImage2D(GL_TEXTURE_2D, nMipLevel, internalColorFormat, width, height, 0, colorType, format, pTextureData);
+				CHECK_GL_ERROR();
 #ifdef _DEBUG
 				if (nMipLevel == 0) LogMsg("Surface::LoadRTTexture: Loading surface: %d, %d -  internalFormat: %d, format: %d color type: %d", width, height, internalColorFormat, format, colorType);
-			
-				#endif
-			} else
+
+#endif
+			}
+ else
 			{
 
 #if defined(C_GL_MODE) || defined(RT_GLES_ADAPTOR_MODE) || defined(RT_USING_OSMESA)
 
-				assert(!"You cannot use PVR compressed textures in GL mode!");
+			assert(!"You cannot use PVR compressed textures in GL mode!");
 #else
 
-				glCompressedTexImage2D(
-					GL_TEXTURE_2D, 
-					nMipLevel, 
-					pTexHeader->format, 
-					pMipSection->width, 
-					pMipSection->height, 
-					0, 
-					pMipSection->dataSize, 
-					pTextureData);
+			glCompressedTexImage2D(
+				GL_TEXTURE_2D,
+				nMipLevel,
+				pTexHeader->format,
+				pMipSection->width,
+				pMipSection->height,
+				0,
+				pMipSection->dataSize,
+				pTextureData);
 #endif
 			}
 
@@ -457,17 +458,17 @@ CHECK_GL_ERROR();
 	IncreaseMemCounter(memUsed);
 	SetTextureStates();
 #ifndef PLATFORM_HTML5
-	glTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_FALSE );
+	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_FALSE);
 	//unknown parm in emscripten's emulated GL1 support
 #endif
 	CHECK_GL_ERROR();
 	return true;
 }
 
-bool Surface::LoadFileFromMemory( byte *pMem, int inputSize )
+bool Surface::LoadFileFromMemory(byte *pMem, int inputSize)
 {
 	Kill();
-	
+
 	if (!pMem)
 	{
 		assert(!"LoadFileFromMemory sent a null pointer?  AW HELL NAW");
@@ -481,14 +482,15 @@ bool Surface::LoadFileFromMemory( byte *pMem, int inputSize )
 		if (m_textureCreationMethod == TEXTURE_CREATION_NONE)
 		{
 			m_textureCreationMethod = TEXTURE_CREATION_MEMORY;
-		} else
+		}
+		else
 		{
 			//load on demand, helps with speed
 		}
-	
+
 		//unload happens right away though
 		GetBaseApp()->m_sig_unloadSurfaces.connect(1, boost::bind(&Surface::OnUnloadSurfaces, this));
-	
+
 #ifdef WINAPI
 		GetBaseApp()->m_sig_enterforeground.connect(1, boost::bind(&Surface::OnEnterForeground, this, _1));
 #endif
@@ -496,17 +498,29 @@ bool Surface::LoadFileFromMemory( byte *pMem, int inputSize )
 		CHECK_GL_ERROR();
 	}
 
-	if (*((uint16*)pMem) == C_JPG_HEADER_MARKER)
+
+	byte png_signature[8] = { 137, 80, 78, 71, 13, 10, 26, 10 };
+
+
+	if (*((uint16*)pMem) == C_JPG_HEADER_MARKER || memcmp(pMem, png_signature, 8) == 0)
 	{
 		SoftSurface s;
 		if (!s.LoadFileFromMemory(pMem, SoftSurface::COLOR_KEY_NONE, inputSize, false))
 		{
-			LogMsg("(Failed to load jpg)");
+			LogMsg("(Failed to load jpg or png)");
 			return false;
 		}
+
+		if (memcmp(pMem, png_signature, 8) == 0)
+		{
+			//needs to be upside down for a texture for pngs
+			s.FlipY();
+		}
+
 		bReturn = InitFromSoftSurface(&s);
 		
-	}else
+	} else
+
 	if (strncmp((char*)pMem, "BM", 2) == 0)
 	{
 		//we've got a bitmap on our hands it looks like
@@ -1306,12 +1320,18 @@ bool Surface::InitFromSoftSurface( SoftSurface *pSurf, bool bCreateSurface, int 
 				yStart += (m_texHeight-m_originalHeight);
 			} 
 
-			assert(pSurf->GetWidth()%4 == 0 && "This will probably crash glTexSubImage2D.  Pad your textures to multiples of 4, or use the .rttex format.");
-			//note: We could get around the error above with glPixelStorei(GL_PACK_ALIGNMENT, 1), but I don't think
-			//it's available on all platforms so not going to bother
+#ifdef _DEBUG
+			//if (pSurf->GetWidth() % 4 != 0)
+			{
+				//LogMsg("Warning: Texture is not divisible by 4, might crash old hardware?");
+				//note: We could get around the error above with glPixelStorei(GL_PACK_ALIGNMENT, 1), but I don't think
+				//it's available on all platforms so not going to bother
+			}
+#endif
 			
 			glTexSubImage2D(GL_TEXTURE_2D, mipLevel, 0, yStart, pSurf->GetWidth(), pSurf->GetHeight(), internalColorFormat, pixelFormat, pSurf->GetPixelData());
-		#endif
+			CHECK_GL_ERROR();
+#endif
 	}
 
 	if (bCreateSurface && mipLevel == 0)

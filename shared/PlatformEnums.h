@@ -122,6 +122,7 @@ unsigned int GetNativeMemoryUsed(); //for flash, this means how many bytes the F
 void LaunchURL(std::string url);
 void FireAchievement(std::string achievement);
 void LogMsg(const char *lpFormat, ...);
+void LogMsgNoCR(const char *lpFormat, ...); //not implemented for all platforms yet
 void LogError (const char* traceStr, ... );
 void SetLastStringInput(std::string s);
 std::string GetLastStringInput();

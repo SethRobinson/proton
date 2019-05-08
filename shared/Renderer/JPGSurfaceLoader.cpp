@@ -266,6 +266,7 @@ bool JPGSurfaceLoader::LoadFromMem( byte *pMem, int inputSize, SoftSurface *pSur
 	return true; //success
 }
 
+
 bool JPGSurfaceLoader::SaveToFile(SoftSurface *pSource, string fileName, int quality)
 {
 	//credit to the Clanlib team, this code is based on their jpg writing code
@@ -280,7 +281,6 @@ bool JPGSurfaceLoader::SaveToFile(SoftSurface *pSource, string fileName, int qua
 		pSource = &convertSurface; //use this instead
 	}
 	
-
 	struct jpeg_compress_struct cinfo;
 	struct jpeg_error_mgr jerr;
 	/* More stuff */

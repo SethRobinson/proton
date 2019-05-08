@@ -452,8 +452,7 @@ if (!m_pMusicChannel)
 
 		}
 	}
-
-
+	
 #ifdef _DEBUG
 	LogMsg("AudioSDL: Playing sfx %s", fName.c_str());
 #endif

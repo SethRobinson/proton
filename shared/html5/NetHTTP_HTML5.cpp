@@ -18,7 +18,6 @@ cross scripting privileges are setup.
 #define C_END_DOWNLOAD_MARKER_STRING "RTENDMARKERBS1001"
 #define C_DEFAULT_IDLE_TIMEOUT_MS (25*1000)
 
-
 NetHTTP::NetHTTP()
 {
 	m_emscriptenWgetHandle = -1;
@@ -31,7 +30,7 @@ void NetHTTP::KillConnectionIfNeeded()
 	if (m_emscriptenWgetHandle != -1)
 	{
 #ifdef _DEBUG
-	LogMsg("Aborting emscripten wget handle %d",m_emscriptenWgetHandle );
+		LogMsg("Aborting emscripten wget handle %d", m_emscriptenWgetHandle);
 #endif
 		emscripten_async_wget2_abort(m_emscriptenWgetHandle);
 		m_emscriptenWgetHandle = -1;
