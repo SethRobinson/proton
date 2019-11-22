@@ -92,10 +92,16 @@ bool GamepadDirectX::Init()
 
 	m_buttons[4].m_virtualKey = VIRTUAL_DPAD_LBUTTON;
 	m_buttons[5].m_virtualKey = VIRTUAL_DPAD_RBUTTON;
+	
 	m_buttons[6].m_virtualKey = VIRTUAL_DPAD_SELECT;
 	m_buttons[7].m_virtualKey = VIRTUAL_DPAD_START;
+	m_buttons[8].m_virtualKey = VIRTUAL_JOYSTICK_BUTTON_LEFT;
+	m_buttons[9].m_virtualKey = VIRTUAL_JOYSTICK_BUTTON_RIGHT;
 
 
+
+
+	
 	//hack for the xbox right stick.  Add real profiles later?
 	if (m_name.find("Xbox 360 Wireless") != string::npos)
 	{
@@ -110,6 +116,30 @@ bool GamepadDirectX::Init()
 
 	}
 
+	if (m_name == "Wireless Controller" || m_name == "DUALSHOCKR4 USB Wireless Adaptor")
+	{
+		//Works for PS4 controller connected via USB cable or with the Sony wireless bluetooth dongle.  I couldn't get
+		//this PC to direct with bluetooth to check that though.
+		
+		m_buttons[0].m_virtualKey = VIRTUAL_DPAD_BUTTON_LEFT;
+		m_buttons[1].m_virtualKey = VIRTUAL_DPAD_BUTTON_DOWN;
+		m_buttons[2].m_virtualKey = VIRTUAL_DPAD_BUTTON_RIGHT;
+		m_buttons[3].m_virtualKey = VIRTUAL_DPAD_BUTTON_UP;
+
+		m_buttons[4].m_virtualKey = VIRTUAL_DPAD_LBUTTON;
+		m_buttons[5].m_virtualKey = VIRTUAL_DPAD_RBUTTON;
+		m_buttons[6].m_virtualKey = VIRTUAL_DPAD_LTRIGGER;
+		m_buttons[7].m_virtualKey = VIRTUAL_DPAD_RTRIGGER;
+
+		
+
+		m_buttons[8].m_virtualKey = VIRTUAL_DPAD_SELECT;
+		m_buttons[9].m_virtualKey = VIRTUAL_DPAD_START;
+		m_buttons[10].m_virtualKey = VIRTUAL_JOYSTICK_BUTTON_LEFT;
+		m_buttons[11].m_virtualKey = VIRTUAL_JOYSTICK_BUTTON_RIGHT;
+
+
+	}
 	return true;
 }
 

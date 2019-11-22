@@ -75,6 +75,7 @@ public:
 	void Reset() {m_bIsUsed = false;}
 	bool GetIsUsed() {return m_bIsUsed;}
 	void SetIsUsed(bool bUsed) {m_bIsUsed = bUsed;}
+	void ClearState(); //unpress all buttons/directions. Too bad reset is already being used
 
 	//if you'd like to read full analog for the sticks, you should send false for bSendPadEventsAsFourDirections and listen
 	//to those events yourself straight from the signal here
@@ -84,8 +85,11 @@ public:
 	CL_Vec2f GetLeftStick();
 	CL_Vec2f GetRightStick();
 
-	//for directly polling the button state
+	//for directly polling the button state by raw ID
 	GamepadButton * GetButton(int buttonID);
+
+	//for directly polling the button state by virtual ID
+	GamepadButton* GetVirtualButton(eVirtualKeys virtualKey);
 
 	//which axes are used for the right stick varies per joystick on desktops, this lets us tweak it
 	void SetRightStickAxis(int axisX, int axisY);
@@ -141,7 +145,7 @@ protected:
 	//helps when sending stick movement as directions
 	MoveButtonState m_dirButtons[MOVE_BUTTON_DIR_COUNT];
 	ArcadeInputComponent *m_pArcadeComp;
-
+	bool m_bSendLeftStickAsDirectionsToo = false;
 
 };
 

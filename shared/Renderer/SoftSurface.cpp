@@ -1993,6 +1993,13 @@ void SoftSurface::RemoveTrueBlack(byte minimumLuma)
 		{
 			for (int x = 0; x < GetWidth(); x++)
 			{
+
+				pSrcImage[0] = rt_max(minimumLuma, pSrcImage[0]);
+				pSrcImage[1] = rt_max(minimumLuma, pSrcImage[1]);
+				pSrcImage[2] = rt_max(minimumLuma, pSrcImage[2]);
+
+				/*
+
 				if (pSrcImage[0] < minimumLuma && pSrcImage[1] < minimumLuma && pSrcImage[2] < minimumLuma)
 				{
 					//yeah, make sure it's not close to pure black, otherwise it could throw off luma keying
@@ -2000,6 +2007,7 @@ void SoftSurface::RemoveTrueBlack(byte minimumLuma)
 					pSrcImage[1] = minimumLuma;
 					pSrcImage[2] = minimumLuma;
 				}
+				*/
 
 
 				pSrcImage += 3;

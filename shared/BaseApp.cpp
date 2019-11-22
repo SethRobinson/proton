@@ -107,10 +107,12 @@ bool BaseApp::Init()
 	PrintGLString("Version", GL_VERSION);
 	PrintGLString("Vendor", GL_VENDOR);
 	PrintGLString("Renderer", GL_RENDERER);
-	PrintGLString("Extensions", GL_EXTENSIONS);
+	//PrintGLString("Extensions", GL_EXTENSIONS); //this can crash systems?!?
+	//Too many extensions causes a buffer overrun issue?
 
 	InitializeGLDefaults();
 	
+	LogMsg("Initialized GL defaults");
 	GLint depthbits;
 	glGetIntegerv(GL_DEPTH_BITS, &depthbits);
 	LogMsg("GL depth buffer: %d bit", depthbits);
@@ -121,6 +123,8 @@ bool BaseApp::Init()
 	{
 		GetAudioManager()->Init();
 	}
+	LogMsg("Initialized Audio");
+
 	m_gameTimer.Reset(); //another one
 	
 #ifdef PLATFORM_ANDROID

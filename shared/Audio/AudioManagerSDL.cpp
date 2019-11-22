@@ -128,7 +128,8 @@ bool AudioManagerSDL::Init()
 
 
 //44100 or  22050
-	int rate = 44100;
+	int rate = 44100; 
+	//They play right in other players, so sdlmixer bug I assume
 	Uint16 format = AUDIO_S16LSB;
 	int channels = 2;
 	int bufferSize = 2048;
@@ -309,11 +310,14 @@ void AudioManagerSDL::Preload( string fName, bool bLooping /*= false*/, bool bIs
 		//assert(! (GetFileExtension(fName) == "mp3" || GetFileExtension(fName) == "ogg") && "SDL mixer doesn't support mp3/ogg for non music playback though");
 	
 #ifndef PLATFORM_HTML5 //html5's emscripten version does let the browser play mp3.  Safari on ios can't play ogg though
-		if (GetFileExtension(fName) == "mp3")
+		if (PreferOGG())
 		{
-			fName = ModifyFileExtension(fName, "ogg");
-			StringReplace("/mp3", "/ogg", fName);
-		} 
+			if (GetFileExtension(fName) == "mp3")
+			{
+				fName = ModifyFileExtension(fName, "ogg");
+				StringReplace("/mp3", "/ogg", fName);
+			}
+		}
 #endif
 
 		string basePath;
@@ -394,10 +398,13 @@ AudioHandle AudioManagerSDL::Play( string fName, bool bLooping /*= false*/, bool
 #endif
 
 #ifndef PLATFORM_HTML5 //html5's emscripten version does let the browser play mp3.  Safari on ios can't play ogg though
-		if (GetFileExtension(fName) == "mp3")
+		if (PreferOGG())
 		{
-			fName = ModifyFileExtension(fName, "ogg");
-			StringReplace("/mp3", "/ogg", fName);
+			if (GetFileExtension(fName) == "mp3")
+			{
+				fName = ModifyFileExtension(fName, "ogg");
+				StringReplace("/mp3", "/ogg", fName);
+			}
 		}
 #endif
 

@@ -2,11 +2,9 @@
 #include "Gamepad.h"
 #include "Entity/ArcadeInputComponent.h"
 
-
 #ifdef _DEBUG
-	//#define SHOW_GAMEPAD_DEBUG_STUFF
+//	#define SHOW_GAMEPAD_DEBUG_STUFF
 #endif
-
 
 Gamepad::Gamepad()
 {
@@ -36,7 +34,7 @@ void Gamepad::SetAxis( int axis, float val )
 	m_axis[axis].m_axis = val;
 
 #ifdef SHOW_GAMEPAD_DEBUG_STUFF
-	if (val != 0)	LogMsg("Got axis %d: %.2f", axis, val);
+	//if (val != 0)	LogMsg("Got axis %d: %.2f", axis, val);
 #endif
 
 }
@@ -217,6 +215,21 @@ void Gamepad::OnArcadeCompDestroyed( VariantList *pVList )
 
 }
 
+void Gamepad::ClearState()
+{
+	for (int i = 0; i < GAMEPAD_MAX_AXIS; i++)
+	{
+		SetAxis(i, 0.0f);
+	}
+
+	for (int i = 0; i < GAMEPAD_MAX_BUTTONS; i++)
+	{
+		m_buttons[i].m_bDown = false;
+	}
+
+
+}
+
 void Gamepad::ConnectToArcadeComponent( ArcadeInputComponent *pComp, bool bSendButtonEvents, bool bSendPadEventsAsFourDirections )
 {
 
@@ -232,18 +245,36 @@ void Gamepad::ConnectToArcadeComponent( ArcadeInputComponent *pComp, bool bSendB
 		m_sig_gamepad_buttons.connect(1, boost::bind(&ArcadeInputComponent::OnRawKeyboard, pComp, _1));
 	}
 
-	if (bSendPadEventsAsFourDirections)
-	{
+	//we always want this, correct?
+
 		m_pArcadeComp = pComp;
 		//we should get notified if this component is destroyed
 		pComp->GetFunction("OnDelete")->sig_function.connect(1, boost::bind(&Gamepad::OnArcadeCompDestroyed, this, _1));
-	}
+
+		if (bSendPadEventsAsFourDirections)
+		{
+			m_bSendLeftStickAsDirectionsToo = true;
+		}
 }
 
 GamepadButton * Gamepad::GetButton( int buttonID )
 {
 	assert(buttonID < GAMEPAD_MAX_BUTTONS && "No button this high");
 	return &m_buttons[buttonID];
+}
+
+GamepadButton* Gamepad::GetVirtualButton(eVirtualKeys virtualKey)
+{
+	//try to find the virtual key
+	for (int i = 0; i < GAMEPAD_MAX_BUTTONS; i++)
+	{
+		if (m_buttons[i].m_virtualKey == virtualKey)
+		{
+			return &m_buttons[i];
+		}
+	}
+
+	return NULL; //can't find it
 }
 
 CL_Vec2f Gamepad::GetLeftStick()
@@ -264,7 +295,7 @@ void Gamepad::Update()
 		m_sig_left_stick(&v);
 		m_vLastSentLeftStick = GetLeftStick();
 
-		if (m_pArcadeComp)
+		if (m_bSendLeftStickAsDirectionsToo && m_pArcadeComp)
 		{
 			//let's convert to 8 way directional signals as well
 			const float deadSpace = 0.3f; //TODO: make member var and add an accessor to it?

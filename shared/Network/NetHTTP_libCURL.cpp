@@ -153,6 +153,41 @@ void LogMsgNoCR(const char* traceStr, ...);
 void dump(const char *text,
 	FILE *stream, unsigned char *ptr, size_t size);
 
+
+void SimpleDump(const char* text,
+	FILE* stream, unsigned char* ptr, size_t size)
+{
+	size_t i;
+	size_t c;
+	unsigned int width = 0x10;
+
+	LogMsgNoCR("%s, %10.10ld bytes (0x%8.8lx): %s\n",
+		text, (long)size, (long)size, ptr);
+
+	return;
+	for (i = 0; i < size; i += width) {
+		LogMsgNoCR("%4.4lx: ", (long)i);
+
+		/* show hex to the left */
+		for (c = 0; c < width; c++) {
+			if (i + c < size)
+				LogMsgNoCR("%02x ", ptr[i + c]);
+			else
+				LogMsgNoCR("   ");
+		}
+
+		/* show data on the right */
+		for (c = 0; (c < width) && (i + c < size); c++)
+		{
+			char x = (ptr[i + c] >= 0x20 && ptr[i + c] < 0x80) ? ptr[i + c] : '.';
+			LogMsgNoCR("%c", c);
+		}
+		LogMsgNoCR("\n");
+	}
+}
+
+
+
 static int CURLDebugTrace(CURL *handle, curl_infotype type,
 	char *data, size_t size,
 	void *userp)
@@ -187,7 +222,7 @@ static int CURLDebugTrace(CURL *handle, curl_infotype type,
 		// 		break;
 	}
 
-	dump(text, stderr, (unsigned char *)data, size);
+	SimpleDump(text, stderr, (unsigned char *)data, size);
 	return 0;
 }
 
@@ -214,6 +249,24 @@ size_t NetHTTP::CURLWriteMemoryCallback(void *contents, size_t size, size_t nmem
 	return realsize;
 }
 
+void InitCURLIfNeeded()
+{
+	static bool oneTimeInittedDone = false;
+
+	if (!oneTimeInittedDone)
+	{
+		LogMsg("Initting libCURL %s", curl_version());
+		if (curl_global_init(CURL_GLOBAL_ALL) == 0)
+		{
+			oneTimeInittedDone = true;
+		}
+		else
+		{
+			LogMsg("Error initting libCURL with curl_global_init, will try again soon");
+		}
+	}
+}
+
 bool NetHTTP::Start()
 {
 	m_bytesWrittenToFile = 0;
@@ -223,7 +276,7 @@ bool NetHTTP::Start()
 	m_expectedFileBytes = 0;
 
 #ifdef _DEBUG
-	//LogMsg("Opening %s on port %d.  Postdata has %d chars", m_serverName.c_str(), m_port, m_postData.length());
+	LogMsg("Opening %s on port %d.  Postdata has %d chars", m_serverName.c_str(), m_port, m_postData.length());
 #endif
 
 	string header, stCommand;
@@ -245,18 +298,17 @@ bool NetHTTP::Start()
 		LogMsg("Warning: CURL activity already in progress");
 	}
 
-	static bool oneTimeInittedDone = false;
-
-	if (!oneTimeInittedDone)
-	{
-		curl_global_init(CURL_GLOBAL_ALL);
-		oneTimeInittedDone = true;
-	}
-
+	InitCURLIfNeeded();
+	
 	m_pReceiveBuff = (char*)malloc(1);
 	m_receivedSize = 0;
 
 	m_CURL_handle = curl_easy_init();
+
+	if (!m_CURL_handle)
+	{
+		LogMsg("Error with curl_easy_init, got NULL back.");
+	}
 	m_CURL_multi_handle = curl_multi_init();
 	
 	//curl_easy_setopt(m_CURL_handle, CURLOPT_VERBOSE, 1L);

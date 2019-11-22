@@ -833,6 +833,13 @@ float StringToFloat( const string &s )
 	return (float)atof(s.c_str());
 }
 
+bool StringToBool(const string& s)
+{
+	string lower = ToLowerCaseString(s);
+	if (lower == "true" || lower == "1"| lower == "yes") return true;
+	return false;
+}
+
 bool DateIsOlder(int month, int day, int year, int hour, int min, int sec,
 				 int monthB, int dayB, int yearB, int hourB, int minB, int secB)
 {

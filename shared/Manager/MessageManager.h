@@ -112,7 +112,9 @@ enum eVirtualKeys
     VIRTUAL_KEY_ADB_RIGHT_SHOULDER,
     
     VIRTUAL_KEY_GAME_JUMP, //useful for games when used by ArcadeInputComponent
-    
+	VIRTUAL_JOYSTICK_BUTTON_LEFT, //you know, like how you can push a joystick "in" and it clicks?
+	VIRTUAL_JOYSTICK_BUTTON_RIGHT,
+
     VIRTUAL_KEY_CUSTOM_START = 510000, //if you add your own at the app specific level, do it after this
 };
 
