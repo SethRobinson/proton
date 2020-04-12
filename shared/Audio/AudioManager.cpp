@@ -11,6 +11,7 @@ AudioManager::AudioManager()
 	m_musicVol = m_defaultVol = 1.0f;
 	m_bStreamMusic = true;
 	m_bPreferOGG = false;
+	
 }
 
 AudioManager::~AudioManager()
@@ -33,6 +34,11 @@ void AudioManager::SetDLS(string fName)
 	m_midiSoundBankFile = fName;
 }
 
+
+void AudioManager::SetRequestedDriverByName(string requestedPartialDriverName)
+{
+	m_requestedPartialDriverName = requestedPartialDriverName;
+}
 
 AudioHandle AudioManager::Play( string fName, bool bLooping , bool bIsMusic , bool bAddBasePath , bool bForceStreaming )
 {

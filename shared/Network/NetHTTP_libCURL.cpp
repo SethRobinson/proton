@@ -249,6 +249,34 @@ size_t NetHTTP::CURLWriteMemoryCallback(void *contents, size_t size, size_t nmem
 	return realsize;
 }
 
+size_t NetHTTP::CURLReadMemoryCallback(void* ptr, size_t size, size_t nmemb, void* pThisInstance)
+{
+
+	int maxBytesToRead = size * nmemb;
+
+	if (maxBytesToRead < 1)
+	{
+		return 0;
+	}
+
+	NetHTTP* pCURLInstance = (NetHTTP*)pThisInstance;
+
+  	if (pCURLInstance->m_CURL_bytesSent == pCURLInstance->m_postData.length())
+	{
+		return 0;
+	}
+
+	/* copy as much data as possible into the 'ptr' buffer, but no more than
+	   'size' * 'nmemb' bytes! */
+
+	int bytesToRead = rt_min(maxBytesToRead, pCURLInstance->m_postData.size() - pCURLInstance->m_CURL_bytesSent);
+	
+	memcpy(ptr, (byte*)pCURLInstance->m_postData.c_str()+ pCURLInstance->m_CURL_bytesSent, bytesToRead);
+	pCURLInstance->m_CURL_bytesSent += bytesToRead;
+
+	return  (curl_off_t)bytesToRead;
+}
+
 void InitCURLIfNeeded()
 {
 	static bool oneTimeInittedDone = false;
@@ -310,7 +338,8 @@ bool NetHTTP::Start()
 		LogMsg("Error with curl_easy_init, got NULL back.");
 	}
 	m_CURL_multi_handle = curl_multi_init();
-	
+	m_CURL_bytesSent = 0;
+
 	//curl_easy_setopt(m_CURL_handle, CURLOPT_VERBOSE, 1L);
 #ifdef WINAPI
 	curl_easy_setopt(m_CURL_handle, CURLOPT_DEBUGFUNCTION, CURLDebugTrace);
@@ -322,13 +351,22 @@ bool NetHTTP::Start()
 	curl_easy_setopt(m_CURL_handle, CURLOPT_WRITEDATA, this);
 	curl_easy_setopt(m_CURL_handle, CURLOPT_USERAGENT, "gametrans-agent/1.0");
 	curl_easy_setopt(m_CURL_handle, CURLOPT_PRIVATE, this);
-	curl_easy_setopt(m_CURL_handle, CURLOPT_POST, 1L);
-	curl_easy_setopt(m_CURL_handle, CURLOPT_POSTFIELDS, m_postData.c_str());
+	//curl_easy_setopt(m_CURL_handle, CURLOPT_POST, 1L);
+//	curl_easy_setopt(m_CURL_handle, CURLOPT_POSTFIELDS, m_postData.c_str());
 	//manually set the certs otherwise it can't find it (a windows only issue?)
-	curl_easy_setopt(m_CURL_handle, CURLOPT_CAINFO, "curl-ca-bundle.crt");
 
-	//curl_easy_setopt(curl_handle, CURLOPT_READFUNCTION, ReadMemoryCallback);
-	//curl_easy_setopt(curl_handle, CURLOPT_READDATA, this);
+
+	curl_easy_setopt(m_CURL_handle, CURLOPT_CAINFO, "curl-ca-bundle.crt");
+	
+	
+	if (!m_postData.empty())
+	{
+		curl_easy_setopt(m_CURL_handle, CURLOPT_POST, 1L);
+		curl_easy_setopt(m_CURL_handle, CURLOPT_POSTFIELDSIZE, (curl_off_t)m_postData.size());
+		curl_easy_setopt(m_CURL_handle, CURLOPT_READFUNCTION, NetHTTP::CURLReadMemoryCallback);
+		curl_easy_setopt(m_CURL_handle, CURLOPT_READDATA, this);
+		curl_easy_setopt(m_CURL_handle, CURLOPT_INFILESIZE_LARGE, (curl_off_t)m_postData.size());
+	}
 
 	struct curl_slist *chunk = NULL;
 
@@ -495,6 +533,7 @@ void NetHTTP::Update()
 			curl_easy_getinfo(msg->easy_handle, CURLINFO_PRIVATE, &pMe);
 			assert(pMe == this &&"This should be the case");
 
+		
 			//LogMsg("CURL done, HTTP status: %d, downloaded %d bytes. ", http_status_code, pMe->m_receivedSize);
 			//LogMsg("Data is %s", pMe->m_pReceiveBuff);
 
@@ -511,6 +550,16 @@ void NetHTTP::Update()
 			curl_multi_remove_handle(m_CURL_multi_handle, msg->easy_handle);
 			curl_easy_cleanup(m_CURL_handle);
 		}
+		else
+
+		{
+	   
+			double dataSize = 0;
+		curl_easy_getinfo(msg->easy_handle, CURLINFO_SIZE_UPLOAD, &dataSize);
+		LogMsg("Data sent: %d", dataSize);
+
+		}
+
 
 
 	}

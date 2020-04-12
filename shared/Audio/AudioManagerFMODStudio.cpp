@@ -42,7 +42,6 @@ bool AudioManagerFMOD::Init()
 	unsigned int      version;
 	void             *extradriverdata = 0;
 
-
 	/*
 	Create a System object and initialize
 	*/
@@ -68,6 +67,47 @@ bool AudioManagerFMOD::Init()
 #endif
 	
 	LogMsg("Initting FMOD...");
+
+	int numdrivers;
+	int selectedindex = -1;
+
+	result = system->getNumDrivers(&numdrivers);
+	ERRCHECK(result);
+	char name[256];
+
+	if (!m_requestedPartialDriverName.empty() && ToLowerCaseString(m_requestedPartialDriverName) != "default")
+	{
+		for (int i = 0; i < numdrivers; i++)
+		{
+			result = system->getDriverInfo(i, name, sizeof(name), 0, 0, 0, 0);
+			ToLowerCase(name);
+			
+			if (IsInString(name, ToLowerCaseString(m_requestedPartialDriverName).c_str()))
+			{
+				
+				selectedindex = i;
+			}
+			ERRCHECK(result);
+		}
+
+	}
+	
+	for (int i = 0; i < numdrivers; i++)
+	{
+		result = system->getDriverInfo(i, name, sizeof(name), 0, 0, 0, 0);
+		LogMsg("[%c] - %d. %s", selectedindex == i ? 'X' : ' ', i, name);
+		ERRCHECK(result);
+	}
+
+
+
+	if (selectedindex != -1)
+	{
+		LogMsg("Audio system overriding default driver with index %d", selectedindex);
+		system->setDriver(selectedindex);
+	}
+
+
 	//extradriverdata
 	result = system->init(1024, FMOD_INIT_NORMAL, extradriverdata);
 	ERRCHECK(result);

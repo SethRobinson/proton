@@ -26,7 +26,7 @@ bool AudioManagerAudiere::Init()
 void AudioManagerAudiere::KillCachedSounds(bool bKillMusic, bool bKillLooping, int ignoreSoundsUsedInLastMS, int killSoundsLowerPriorityThanThis, bool bKillSoundsPlaying)
 {
 	LogMsg("Killing sound cache");
-	list<SoundObject*>::iterator itor = m_soundList.begin();
+	list<AudiereSoundObject*>::iterator itor = m_soundList.begin();
 
 	while (itor != m_soundList.end())
 	{
@@ -55,7 +55,7 @@ void AudioManagerAudiere::KillCachedSounds(bool bKillMusic, bool bKillLooping, i
 		}
 		
 		delete (*itor);
-		list<SoundObject*>::iterator itorTemp = itor;
+		list<AudiereSoundObject*>::iterator itorTemp = itor;
 		itor++;
 		m_soundList.erase(itorTemp);
 	}
@@ -74,7 +74,7 @@ void AudioManagerAudiere::Kill()
 
 bool AudioManagerAudiere::DeleteSoundObjectByFileName(string fName)
 {
-	list<SoundObject*>::iterator itor = m_soundList.begin();
+	list<AudiereSoundObject*>::iterator itor = m_soundList.begin();
 
 	while (itor != m_soundList.end())
 	{
@@ -90,9 +90,9 @@ bool AudioManagerAudiere::DeleteSoundObjectByFileName(string fName)
 	return false; 
 }
 
-SoundObject * AudioManagerAudiere::GetSoundObjectByFileName(string fName)
+AudiereSoundObject * AudioManagerAudiere::GetSoundObjectByFileName(string fName)
 {
-	list<SoundObject*>::iterator itor = m_soundList.begin();
+	list<AudiereSoundObject*>::iterator itor = m_soundList.begin();
 
 	while (itor != m_soundList.end())
 	{
@@ -106,9 +106,9 @@ SoundObject * AudioManagerAudiere::GetSoundObjectByFileName(string fName)
 	return 0; //failed
 }
 
-SoundObject * AudioManagerAudiere::GetSoundObjectByPointer(void *p)
+AudiereSoundObject * AudioManagerAudiere::GetSoundObjectByPointer(void *p)
 {
-	list<SoundObject*>::iterator itor = m_soundList.begin();
+	list<AudiereSoundObject*>::iterator itor = m_soundList.begin();
 
 	while (itor != m_soundList.end())
 	{
@@ -142,12 +142,12 @@ void AudioManagerAudiere::Preload( string fName, bool bLooping /*= false*/, bool
 	{
 		basePath = GetBaseAppPath();
 	}
-	SoundObject *pObject = GetSoundObjectByFileName((GetBaseAppPath()+fName).c_str());
+	AudiereSoundObject *pObject = GetSoundObjectByFileName((GetBaseAppPath()+fName).c_str());
 
 	if (!pObject)
 	{
 		//create it
-		pObject = new SoundObject;
+		pObject = new AudiereSoundObject;
 		pObject->m_fileName = fName;
 
 
@@ -199,7 +199,7 @@ AudioHandle AudioManagerAudiere::Play( string fName, bool bLooping /*= false*/, 
 		m_lastMusicFileName = fName;
 	}
 
-	SoundObject *pObject = GetSoundObjectByFileName(fName);
+	AudiereSoundObject *pObject = GetSoundObjectByFileName(fName);
 
 
 	if (!pObject)
@@ -263,7 +263,7 @@ void AudioManagerAudiere::Update()
 void AudioManagerAudiere::Stop( AudioHandle soundID )
 {
 	
-	SoundObject *pObject = GetSoundObjectByPointer((void*)soundID);
+	AudiereSoundObject *pObject = GetSoundObjectByPointer((void*)soundID);
 
 	if (pObject && pObject->m_pSound)
 	{
@@ -304,7 +304,7 @@ void AudioManagerAudiere::StopMusic()
 {
 	m_lastMusicFileName = "";
 	
-	list<SoundObject*>::iterator itor = m_soundList.begin();
+	list<AudiereSoundObject*>::iterator itor = m_soundList.begin();
 
 	while (itor != m_soundList.end())
 	{
@@ -355,7 +355,7 @@ void AudioManagerAudiere::SetVol( AudioHandle soundID, float vol )
 		return;
 	}
 
-	SoundObject *pObject = GetSoundObjectByPointer((void*)soundID);
+	AudiereSoundObject *pObject = GetSoundObjectByPointer((void*)soundID);
 
 	if (pObject && pObject->m_pSound)
 	{
@@ -369,7 +369,7 @@ void AudioManagerAudiere::SetMusicVol(float vol )
 
 	//oh, if it's already playing, mod that
 
-	list<SoundObject*>::iterator itor = m_soundList.begin();
+	list<AudiereSoundObject*>::iterator itor = m_soundList.begin();
 
 	while (itor != m_soundList.end())
 	{

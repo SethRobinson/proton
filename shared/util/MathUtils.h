@@ -20,6 +20,7 @@ string PrintVector2(CL_Vec2f v);
 string PrintVector3(CL_Vec3f v);
 string PrintRect(CL_Rectf v);
 string PrintRect(rtRectf v);
+string PrintRect(CL_Rect v);
 string PrintMatrix(CL_Mat4f v);
 string PrintColor(uint32 color);
 

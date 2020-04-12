@@ -126,6 +126,7 @@ public:
 	virtual void SetPos( AudioHandle soundID, uint32 posMS ){}
 	virtual void SetDLS(string fName); //(fmod only) example, "dink/midi/TimGM6mbTiny.dls" - if not set, FMOD will try to use whatever the system has.
 	virtual void SetMusicVol(float vol){}
+	virtual void SetRequestedDriverByName(string requestedPartialDriverName); //only works with FMOD
 	virtual float GetMusicVol() {return m_musicVol;}
 	/**
 	 * Checks if playing of sounds is currently enabled.
@@ -161,6 +162,7 @@ protected:
 	string m_forcedAudioExtension;
 	bool m_bPreferOGG; //will replace mp3's with oggs in filename texts
 	float m_defaultVol; //non music will be played at this vol to start with
+	string m_requestedPartialDriverName;
 };
 
 bool CheckIfOtherAudioIsPlaying(); //are they playing ipod stuff before the app was run?  Should call this before playing your own.

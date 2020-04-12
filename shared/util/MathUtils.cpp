@@ -68,6 +68,12 @@ string PrintMatrix(CL_Mat4f v)
 	return r;
 }
 
+string PrintRect(CL_Rect v)
+{
+	char st[128];
+	sprintf(st, "%d, %d, %d, %d", v.left, v.top, v.right, v.bottom);
+	return string(st);
+}
 string PrintRect(CL_Rectf v)
 {
 	char st[128];

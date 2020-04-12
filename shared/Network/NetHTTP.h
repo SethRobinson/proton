@@ -125,6 +125,8 @@ protected:
 
 	static size_t CURLWriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *pThisInstance);
 
+	static size_t CURLReadMemoryCallback(void* ptr, size_t size, size_t nmemb, void* userdata);
+
 	char *m_pReceiveBuff = NULL;
 	size_t m_receivedSize = 0;
 	CURLM *m_CURL_multi_handle = NULL;
@@ -132,6 +134,17 @@ protected:
 	CURL *m_CURL_handle = NULL;
 	void SetBuffer(const char *pData, int byteSize);
 	void SetProgress(int bytesDownloaded, int totalBytes);
+	int m_CURL_bytesSent;
+
+public:
+	int GetBytesUploaded()
+	{
+		return m_CURL_bytesSent;
+	}
+	int GetPostDataSize() { return (int)m_postData.size(); }
+
+
+private:
 #endif
 
 	string BuildHTTPHeader();

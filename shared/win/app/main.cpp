@@ -553,8 +553,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				GetBaseApp()->OnEnterBackground();
 			}
-
 		}
+
 		g_bHasFocus = false;
 		LogMsg("App lost focus");
 		break;

@@ -29,11 +29,11 @@ http://audiere.sourceforge.net/home.php
 
 using namespace audiere;
 
-class SoundObject
+class AudiereSoundObject
 {
 public:
 
-	SoundObject()
+	AudiereSoundObject()
 	{
 		m_pSound		= NULL;
 		m_bIsLooping	= false;
@@ -41,7 +41,7 @@ public:
 
 	}
 
-	~SoundObject()
+	~AudiereSoundObject()
 	{
 		if (m_pSound)
 		{
@@ -70,7 +70,7 @@ public:
 	
 	virtual void Preload(std::string fName, bool bLooping = false, bool bIsMusic = false, bool bAddBasePath = true, bool bForceStreaming = false);
 
-	SoundObject * GetSoundObjectByFileName(std::string fName);
+	AudiereSoundObject * GetSoundObjectByFileName(std::string fName);
 	virtual void KillCachedSounds(bool bKillMusic, bool bKillLooping, int ignoreSoundsUsedInLastMS, int killSoundsLowerPriorityThanThis, bool bKillSoundsPlaying);
 	virtual void Update();
 	virtual void Stop(AudioHandle soundID);
@@ -87,13 +87,13 @@ public:
 	virtual uint32 GetPos( AudioHandle soundID );
 	virtual void SetPos( AudioHandle soundID, uint32 posMS );
 	virtual void SetMusicVol(float vol);
-	SoundObject * GetSoundObjectByPointer(void *p);
+	AudiereSoundObject * GetSoundObjectByPointer(void *p);
 
 private:
 	
 	AudioDevicePtr	   m_pDevice;
 
-	std::list<SoundObject*>	m_soundList;
+	std::list<AudiereSoundObject*>	m_soundList;
 	float m_globalVol;
 
 protected:
