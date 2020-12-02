@@ -90,7 +90,7 @@ extern "C" int __declspec(dllexport) isCaptureDone(unsigned int deviceno)
 {
 	if (deviceno > MAXDEVICES)
 		return 0;
-	CheckForFail(deviceno);
+ 	CheckForFail(deviceno);
 	if (gDoCapture[deviceno] == 1)
 		return 1;
 	return 0;

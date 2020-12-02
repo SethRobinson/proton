@@ -80,7 +80,7 @@ public:
 	void Update(); //must be called every frame, handles updates, disconnections, etc
 	void SetDefaultGamepad(Gamepad *pPad);
 	
-	int GetGamepadCount() {return m_gamepads.size();}
+	int GetGamepadCount() {return (int)m_gamepads.size();}
 
 	Gamepad * GetGamepad(eGamepadID id);  //returns NULL if unavailable
 

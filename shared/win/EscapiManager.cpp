@@ -32,13 +32,15 @@ int EscapiManager::ElapsedMSFromLastCaptureActivity()
 void EscapiManager::Update(int minimumLumaPerColorChannel)
 {
 
-	if (ElapsedMSFromLastCaptureActivity() > 2000)
+	/*
+	if (ElapsedMSFromLastCaptureActivity() > 5000)
 	{
 		LogMsg("Warning, last capture was %d MS ago, requesting reinit ", ElapsedMSFromLastCaptureActivity());
 		RequestReInit();
 		m_timeOfLastCapture = GetTick();
 	}
 
+	*/
 	if (isCaptureDone(0))
 	{
 		m_timeOfLastCapture = GetTick();

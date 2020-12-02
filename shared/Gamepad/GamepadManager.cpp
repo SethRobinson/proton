@@ -60,10 +60,11 @@ void GamepadManager::Update()
 
 void GamepadManager::AddGamepad( Gamepad * pad )
 {
-	if (pad->Init()) 
+	pad->SetID((eGamepadID)(m_gamepads.size()));
+
+	if (pad->Init())
 	{
 		m_gamepads.push_back(pad);
-		pad->SetID((eGamepadID) (m_gamepads.size()-1));
 		LogMsg("Located gamepad %s", pad->GetName().c_str());
 		if (m_defaultGamepadID == GAMEPAD_ID_NONE)
 		{

@@ -2,7 +2,6 @@
 #include "MessageManager.h"
 #include "BaseApp.h"
 
-
 void Message::SetDeliveryTime( int deliveryTimeMS )
 {
 	if (m_timerMethod == TIMER_GAME)
@@ -62,8 +61,6 @@ MessageManager::~MessageManager()
 {
 	DeleteAllMessages();
 }
-
-
 
 void MessageManager::SendGame( eMessageType type, const string msg, int deliverTimeMS, eTimingSystem timing)
 {
@@ -155,8 +152,6 @@ void MessageManager::AddMessageToList(list <Message*> &messageList, Message *m)
 
 	//add it
 	messageList.insert(itor.base(), m);
-
-	
 }
 
 void MessageManager::Send(Message *m)
@@ -178,7 +173,6 @@ void MessageManager::Send(Message *m)
 		//LogMsg("System messages: %d", m_gameMessages.size());
 	}
 }
-
 
 void MessageManager::DumpMessagesInList(list<Message*> m)
 {
@@ -214,9 +208,7 @@ void MessageManager::DumpMessages()
 	DumpMessagesInList(m_gameMessages);
 	LogMsg("Dumping game messages...");
 	DumpMessagesInList(m_systemMessages);
-
 }
-
 
 void MessageManager::Deliver(Message *m)
 {
@@ -317,7 +309,6 @@ void MessageManager::Deliver(Message *m)
 	} else
 	{
 		GetBaseApp()->OnMessage(*m);
-
 	}
 }
 
@@ -472,7 +463,6 @@ void MessageManager::DeleteMessagesByFunctionCallName( const string &name, eTimi
 	}
 }
 
-
 void MessageManager::DeleteMessagesToComponent( EntityComponent *pComponent)
 {
 	list<Message*> *pList = &m_gameMessages;
@@ -505,7 +495,6 @@ void MessageManager::DeleteMessagesToComponent( EntityComponent *pComponent)
 	}
 
 }
-
 
 void MessageManager::DeleteMessagesToEntity( Entity *pEntity)
 {

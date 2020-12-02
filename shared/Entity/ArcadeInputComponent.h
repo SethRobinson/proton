@@ -176,4 +176,8 @@ CL_Vec2f *m_pPos2d;
 
 void AddKeyBinding(EntityComponent *pComp, string name, uint32 inputcode, uint32 outputcode, bool bAlsoSendAsNormalRawKey = false, uint32 modifiersRequired = 0);
 string ProtonVirtualKeyToString(eVirtualKeys vKey); //stupid helper function that should probably be somewhere else
+eVirtualKeys StringToProtonVirtualKey(string lowerCaseKeyName);
+bool ConvertKeysToDirectionVector(bool bLeft, bool bRight, bool bUp, bool bDown, CL_Vec2f* pVecOut); //same as above
+
+
 #endif // ArcadeInputComponent_h__

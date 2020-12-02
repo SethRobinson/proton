@@ -61,6 +61,7 @@ void Gamepad::OnButton( bool bDown, int buttonID )
 	m_sig_gamepad_buttons(&v);
 }
 
+//NOTE:  This controls the "hat" like keys on a 360. 
 void Gamepad::SendArcadeDirectionByKey(eVirtualKeys key, bool bDown)
 {
     if (!m_pArcadeComp) return;

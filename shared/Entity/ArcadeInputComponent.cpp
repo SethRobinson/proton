@@ -449,6 +449,49 @@ void AddKeyBinding(EntityComponent *pComp, string name, uint32 inputcode, uint32
 	pComp->GetFunction("AddKeyBinding")->sig_function(&vList);
 }
 
+eVirtualKeys StringToProtonVirtualKey(string lowerCaseKeyName)
+{
+
+	if (lowerCaseKeyName == "left action button") return VIRTUAL_DPAD_BUTTON_LEFT;
+	if (lowerCaseKeyName == "right action button") return VIRTUAL_DPAD_BUTTON_RIGHT;
+	if (lowerCaseKeyName == "up action button") return VIRTUAL_DPAD_BUTTON_UP;
+	if (lowerCaseKeyName == "down action button") return VIRTUAL_DPAD_BUTTON_DOWN;
+	if (lowerCaseKeyName == "left shoulder button") return VIRTUAL_DPAD_LBUTTON;
+
+	if (lowerCaseKeyName == "right shoulder button") return VIRTUAL_DPAD_RBUTTON;
+
+	if (lowerCaseKeyName == "select button") return VIRTUAL_DPAD_SELECT;
+	if (lowerCaseKeyName == "start button") return VIRTUAL_DPAD_START;
+
+	if (lowerCaseKeyName == "left hat button") return VIRTUAL_DPAD_HAT_LEFT;
+
+	if (lowerCaseKeyName == "right hat button") return VIRTUAL_DPAD_HAT_RIGHT;
+
+	if (lowerCaseKeyName == "up hat button") return VIRTUAL_DPAD_HAT_UP;
+
+	if (lowerCaseKeyName == "down hat button") return VIRTUAL_DPAD_HAT_DOWN;
+
+	if (lowerCaseKeyName == "left trigger button") return VIRTUAL_DPAD_LTRIGGER;
+
+	if (lowerCaseKeyName == "right trigger button") return VIRTUAL_DPAD_RTRIGGER;
+
+	if (lowerCaseKeyName == "left joystick button") return VIRTUAL_JOYSTICK_BUTTON_LEFT;
+
+	if (lowerCaseKeyName == "right joystick button") return VIRTUAL_JOYSTICK_BUTTON_RIGHT;
+
+//	if (lowerCaseKeyName == "none" || lowerCaseKeyName == "") return VIRTUAL_KEY_NONE;
+	return VIRTUAL_KEY_NONE;
+}
+
+/*
+List of keys:
+
+left action button, right action button,up action button,down action button,left shoulder button,right shoulder button
+select button,start button,left hat button,right hat button,up hat button,down hat button,left trigger button,right trigger button
+left joystick button,right joystick button
+
+*/
+
 string ProtonVirtualKeyToString(eVirtualKeys vKey)
 {
 
@@ -498,6 +541,26 @@ string ProtonVirtualKeyToString(eVirtualKeys vKey)
 	case VIRTUAL_DPAD_HAT_DOWN:
 		return "down hat button";
 		break;
+
+	case VIRTUAL_DPAD_LTRIGGER:
+		return "left trigger button";
+		break;
+
+	case VIRTUAL_DPAD_RTRIGGER:
+		return "right trigger button";
+		break;
+
+	case VIRTUAL_JOYSTICK_BUTTON_LEFT:
+		return "left joystick button";
+		break;
+
+	case VIRTUAL_JOYSTICK_BUTTON_RIGHT:
+		return "right joystick button";
+		break;
+	case VIRTUAL_KEY_NONE:
+		return "none";
+		break;
+
 
 	default:
 		return "Button ID "+toString(vKey);
