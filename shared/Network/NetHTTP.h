@@ -151,7 +151,7 @@ private:
 	void FinishDownload();
 	void OnError(eError e);
 	int ScanDownloadedHeader(); //returns http result code
-
+	
 	string m_serverName; //eg, "www.rtsoft.com"
 	string m_query;  //eg, "crap/index.html"
 	string m_replyHeader; //store what the server sends us
@@ -170,6 +170,8 @@ private:
 	int m_bytesWrittenToFile;
 	string m_fileName;
 	string m_contentType;
+	bool m_bHasEncodedPostData = false; //used by the libcurl implementation
+	
 };
 
 bool CheckCharVectorForString(vector<char> &v, string marker, int *pIndexOfMarkerEndPosOut=NULL);

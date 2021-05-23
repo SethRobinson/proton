@@ -62,7 +62,7 @@ void NetHTTP::Reset(bool bClearPostdata)
 
 void NetHTTP::Setup(string serverName, int port, string query, eEndOfDataSignal eodSignal)
 {
-	
+	m_bHasEncodedPostData = false;
 	m_endOfDataSignal = eodSignal;
 	m_serverName = serverName;
 	m_port = port;
@@ -89,6 +89,11 @@ bool NetHTTP::SetFileOutput(const string &fName)
 
 	return true;
 }
+// 
+// void NetHTTP::SetHeaderContentType(string contentType)
+// {
+// 
+// }
 
 bool NetHTTP::AddPostData(const string &name, const byte *pData, int len/*=-1*/)
 {
@@ -105,6 +110,8 @@ bool NetHTTP::AddPostData(const string &name, const byte *pData, int len/*=-1*/)
 
 	if (!name.empty())
 	{
+		m_bHasEncodedPostData = true;
+
 		encoder.encodeData((const byte*)name.c_str(), name.length(), m_postData);
 		m_postData += '=';
 		
@@ -372,7 +379,17 @@ bool NetHTTP::Start()
 
 	/* Add a custom header */
 	chunk = curl_slist_append(chunk, "Accept: */*");
-	chunk = curl_slist_append(chunk, "Content-Type: application/json");
+	
+	if (m_bHasEncodedPostData)
+	{
+		chunk = curl_slist_append(chunk, "Content-Type: application/x-www-form-urlencoded");
+	}
+	else
+	{
+		
+		//TODO: This probably shouldn't be the default...
+		chunk = curl_slist_append(chunk, "Content-Type: application/json");
+	}
 
 	/* set our custom set of headers */
 	curl_easy_setopt(m_CURL_handle, CURLOPT_HTTPHEADER, chunk);
