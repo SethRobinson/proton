@@ -14,13 +14,19 @@ Here is the basic flow of usage:
 
 NetHTTP myNet;
 
-myNet.Setup("rtsoft.com", 80, "prey/getscores.php", NetHTTP::END_OF_DATA_SIGNAL_HTTP);
+	string url = "www.rtsoft.com/ugt/checking_for_new_version.php";
+	//optionally send other data in our URL (get data)
+	string urlappend = "version=" + toString(GetApp()->m_versionNum);
 
-//also add any number of "post" data pieces that you want the .php to handle:
+	//note:  This works when using the CURL backend, if not, maybe url should only be the rtsoft.com part? I can't
+	//test that out right now, the goal would be to make the input identical though
+
+	myNet.Setup(url, 80, urlappend, NetHTTP::END_OF_DATA_SIGNAL_HTTP);
+
+//optionally also add any number of "post" data pieces that you want the .php to handle:
 
 string anyData = "somedata";
-
-myNet.AddPostData("name", &anyData.at[0], anyData.length();
+myNet.AddPostData("name", (byte*)&data[0], data.length());
 
 For a PUT, use AddPutData instead.
 

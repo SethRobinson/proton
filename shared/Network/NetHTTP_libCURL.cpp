@@ -302,6 +302,15 @@ void InitCURLIfNeeded()
 	}
 }
 
+static int seek_cb(void* userp, curl_off_t offset, int origin)
+{
+	NetHTTP *pNetHTTP = (NetHTTP* )userp;
+	
+	//lseek(our_fd, offset, origin);
+	return CURL_SEEKFUNC_OK;
+}
+
+
 bool NetHTTP::Start()
 {
 	m_bytesWrittenToFile = 0;
@@ -347,6 +356,7 @@ bool NetHTTP::Start()
 	m_CURL_multi_handle = curl_multi_init();
 	m_CURL_bytesSent = 0;
 
+	//to figure out problems, uncomment below
 	//curl_easy_setopt(m_CURL_handle, CURLOPT_VERBOSE, 1L);
 #ifdef WINAPI
 	curl_easy_setopt(m_CURL_handle, CURLOPT_DEBUGFUNCTION, CURLDebugTrace);
@@ -354,18 +364,20 @@ bool NetHTTP::Start()
 	curl_easy_setopt(m_CURL_handle, CURLOPT_URL, finalURL.c_str());
 	//curl_easy_setopt(curl_handle, CURLOPT_SSL_VERIFYPEER, 0);
 	curl_easy_setopt(m_CURL_handle, CURLOPT_FOLLOWLOCATION, 1L);
+	curl_easy_setopt(m_CURL_handle, CURLOPT_MAXREDIRS, 5L);
+
 	curl_easy_setopt(m_CURL_handle, CURLOPT_WRITEFUNCTION, NetHTTP::CURLWriteMemoryCallback);
 	curl_easy_setopt(m_CURL_handle, CURLOPT_WRITEDATA, this);
 	curl_easy_setopt(m_CURL_handle, CURLOPT_USERAGENT, "gametrans-agent/1.0");
 	curl_easy_setopt(m_CURL_handle, CURLOPT_PRIVATE, this);
-	//curl_easy_setopt(m_CURL_handle, CURLOPT_POST, 1L);
-//	curl_easy_setopt(m_CURL_handle, CURLOPT_POSTFIELDS, m_postData.c_str());
+
 	//manually set the certs otherwise it can't find it (a windows only issue?)
-
-
 	curl_easy_setopt(m_CURL_handle, CURLOPT_CAINFO, "curl-ca-bundle.crt");
 	
-	
+	//needed to handle moved content (http 301 codes, etc)
+	curl_easy_setopt(m_CURL_handle, CURLOPT_SEEKFUNCTION, seek_cb);
+	curl_easy_setopt(m_CURL_handle, CURLOPT_SEEKDATA, this);
+
 	if (!m_postData.empty())
 	{
 		curl_easy_setopt(m_CURL_handle, CURLOPT_POST, 1L);
@@ -525,6 +537,7 @@ int NetHTTP::ScanDownloadedHeader()
 	return resultCode;
 }
 
+
 void NetHTTP::Update()
 {
 
@@ -559,7 +572,6 @@ void NetHTTP::Update()
 				OnError(ERROR_404_FILE_NOT_FOUND);
 			}
 
-			
 			SetBuffer(pMe->m_pReceiveBuff, pMe->m_receivedSize);
 			m_downloadData.push_back(0); //useful if used like a string
 			m_state = STATE_FINISHED;
@@ -573,7 +585,7 @@ void NetHTTP::Update()
 	   
 			double dataSize = 0;
 		curl_easy_getinfo(msg->easy_handle, CURLINFO_SIZE_UPLOAD, &dataSize);
-		LogMsg("Data sent: %d", dataSize);
+		//LogMsg("Data sent: %d", dataSize);
 
 		}
 
