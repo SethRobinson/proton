@@ -182,9 +182,9 @@ void TextBoxRenderComponent::DrawTextType(CL_Vec2f vPos)
 	{
 		if (vPos.y > GetOrthoRenderSizeYf()) return; //no use drawing any more down here
 		
-		if (m_lines[i].length() < charsToRender)
+		if ((unsigned int)m_lines[i].length() < charsToRender)
 		{
-			charsToRender -= m_lines[i].length();
+			charsToRender -= (unsigned int)m_lines[i].length();
 		} else
 		{
 			if (m_lastLineRendered < i)

@@ -197,7 +197,7 @@ void Entity::CallFunctionRecursivelyWithUpdatedVarBackwards( const string funcNa
 
 	//now do the actual calls, in reverse order
 
-	for (int i=entList.size()-1; i >= 0; i--)
+	for (int i=(int)entList.size()-1; i >= 0; i--)
 	{
 		pVList->m_variant[varIndex].Set(entList[i].vUpdatedVar);
 		entList[i].pEnt->GetShared()->CallFunctionIfExists(funcName, pVList);

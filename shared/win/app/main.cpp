@@ -780,9 +780,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			if (!isBitSet)
 			{
-				int vKey = ConvertWindowsKeycodeToProtonVirtualKey(wParam); 
+				int vKey = ConvertWindowsKeycodeToProtonVirtualKey((int)wParam); 
 				GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_CHAR_RAW, (float)vKey, 1.0f);  
-				if (vKey != wParam)
+				if (vKey != (int)wParam)
 				{
 					bWasChanged = true;
 				}
@@ -795,7 +795,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				{
 
 				
-				int wmCharKey = VKeyToWMCharKey(wParam);
+				int wmCharKey = VKeyToWMCharKey((int)wParam);
 			
 				if (wmCharKey != 0)
 				{
@@ -830,13 +830,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				//repeat key
 				#ifdef C_DONT_USE_WM_CHAR
-				int vKey = ConvertWindowsKeycodeToProtonVirtualKey(wParam); 
+				int vKey = ConvertWindowsKeycodeToProtonVirtualKey((int)wParam); 
 				if (vKey != wParam)
 				{
 					bWasChanged = true;
 				}
 				
-				int wmCharKey = VKeyToWMCharKey(wParam);
+				int wmCharKey = VKeyToWMCharKey((int)wParam);
 				if ( !bWasChanged || (wParam < 37 || wParam > 40 )) //filter out the garbage the arrow keys make
 				{
 					if (wmCharKey != 0)
@@ -858,7 +858,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 #ifdef _DEBUG
 		//	LogMsg("Got key up %d (%c)", (int)wParam, (char)wParam);
 #endif
-			uint32 key = ConvertWindowsKeycodeToProtonVirtualKey(wParam);
+			uint32 key = ConvertWindowsKeycodeToProtonVirtualKey((int)wParam);
 
 			/*
 			if (key == VIRTUAL_KEY_BACK)
@@ -1060,7 +1060,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 #ifndef RT_DONT_DO_MOVE_TIMER_TRICK
 		if (g_timerID == 0)
-			g_timerID = SetTimer(NULL, 0, 33, (TIMERPROC) TimerProc);
+			g_timerID = (uint32)SetTimer(NULL, 0, 33, (TIMERPROC) TimerProc);
 #endif
 		break;
 

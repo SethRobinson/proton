@@ -12,7 +12,7 @@
 #include "Entity/EntityUtils.h"//create the classes that our globally library expects to exist somewhere.
 #include "Renderer/SoftSurface.h"
 #include "GUI/AboutMenu.h"
-
+ 
 SurfaceAnim g_surf;
  
 MessageManager g_messageManager;
@@ -61,10 +61,6 @@ AudioManagerBBX g_audioManager;
 AudioManagerFlash *g_audioManager = new AudioManagerFlash;
 #else
 
-
-//in windows
-//AudioManager g_audioManager; //to disable sound
-
 #ifdef RT_USE_SDL_AUDIO
 #include "Audio/AudioManagerSDL.h"
 AudioManagerSDL g_audioManager; //sound in windows and WebOS
@@ -72,12 +68,17 @@ AudioManagerSDL g_audioManager; //sound in windows and WebOS
 #elif defined RT_FLASH_TEST
 #include "Audio/AudioManagerFlash.h"
 AudioManagerFlash g_audioManager;
+#elif defined RT_ENABLE_FMOD
+#include "Audio/AudioManagerFMOD.h"
+AudioManagerFMOD g_audioManager; //if we wanted FMOD sound in windows
 #else
+
+//in windows
+//AudioManager g_audioManager; //to disable sound
+
 #include "Audio/AudioManagerAudiere.h"
 AudioManagerAudiere g_audioManager;  //Use Audiere for audio
 #endif
-//#include "Audio/AudioManagerFMOD.h"
-//AudioManagerFMOD g_audioManager; //if we wanted FMOD sound in windows
 
 #endif
 #endif
@@ -133,9 +134,11 @@ bool App::Init()
 {
 	//SetDefaultAudioClickSound("audio/enter.wav");
 	SetDefaultButtonStyle(Button2DComponent::BUTTON_STYLE_CLICK_ON_TOUCH_RELEASE);
-	//SetManualRotationMode(true); //commented out, so iOS will handle rotations, plays better with 3rd party libs and looks cool
-
-    bool bScaleScreenActive = true; //if true, we'll stretch every screen to the coords below
+	 
+    bool bScaleScreenActive = true; //if true, we'll internally pretend the screen is this, but stretch to the real screensize when drawing.
+	//You should probably change this to false, but it makes the app look bad because the GUI art is 480X320, keep in mind this sample was made
+	//for like an iPhone 3GS...uhh...
+	
     int scaleToX = 480;
 	int scaleToY = 320;
     
@@ -235,14 +238,11 @@ void App::Update()
 	if (!m_bDidPostInit)
 	{
 		m_bDidPostInit = true;
-		m_special = GetSystemData() != C_PIRATED_NO;
-
+	
 		//build a dummy entity called "GUI" to put our GUI menu entities under
 		Entity *pGUIEnt = GetEntityRoot()->AddEntity(new Entity("GUI"));
 		MainMenuCreate(pGUIEnt);
-		
 	}
-    
 }
 
 void App::Draw()
@@ -264,26 +264,6 @@ void App::OnEnterBackground()
 void App::OnScreenSizeChange()
 {
 	BaseApp::OnScreenSizeChange();
-}
-
-void App::GetServerInfo( string &server, uint32 &port )
-{
-#if defined (_DEBUG) && defined(WIN32)
-	server = "localhost";
-	port = 8080;
-
-	//server = "www.rtsoft.com";
-	//port = 80;
-#else
-
-	server = "rtsoft.com";
-	port = 80;
-#endif
-}
-
-int App::GetSpecial()
-{
-	return m_special; //1 means pirated copy
 }
 
 Variant * App::GetVar( const string &keyName )
@@ -328,7 +308,7 @@ bool App::OnPreInitVideo()
 	//extern these vars from main.cpp to change them...
 
 	//SetEmulatedPlatformID(PLATFORM_ID_WINDOWS);
-#if defined (_DEBUG) && defined(WINAPI)
+#if defined(WINAPI)
 	SetPrimaryScreenSize(1024, 768);
 	SetupScreenInfo(1024, 768, ORIENTATION_DONT_CARE);
 #endif

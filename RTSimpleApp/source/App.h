@@ -27,11 +27,9 @@ public:
 	string GetVersionString();
 	float GetVersion();
 	int GetBuild();
-	void GetServerInfo(string &server, uint32 &port);
 	VariantDB * GetShared() {return &m_varDB;}
 	Variant * GetVar(const string &keyName );
 	Variant * GetVarWithDefault(const string &varName, const Variant &var) {return m_varDB.GetVarWithDefault(varName, var);}
-	int GetSpecial();
 	void OnExitApp(VariantList *pVarList);
 
 private:
@@ -40,7 +38,7 @@ private:
 
 	bool m_bDidPostInit;
 	VariantDB m_varDB; //holds all data we want to save/load
-	int m_special;
+	
 };
  
 

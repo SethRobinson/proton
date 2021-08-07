@@ -40,7 +40,7 @@ void GameTimer::SetGameTick( unsigned int tick )
 
 int GameTimer::GetHistorySize()
 {
-	return m_tickHistory.size();
+	return (int)m_tickHistory.size();
 }
 
 float GameTimer::GetDeltaHistory()

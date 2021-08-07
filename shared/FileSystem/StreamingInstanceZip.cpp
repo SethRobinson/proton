@@ -110,7 +110,7 @@ int StreamingInstanceZip::Read( byte * pBufferOut, int maxBytesToRead )
 	{
 		//special way using a real file pointer
 
-		int bytesRead = fread(pBufferOut, 1, maxBytesToRead,  m_pFile);
+		int bytesRead = (int)fread(pBufferOut, 1, maxBytesToRead,  m_pFile);
 
 		if (bytesRead < maxBytesToRead || feof(m_pFile))
 		{

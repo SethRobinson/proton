@@ -175,14 +175,14 @@ bool RTFont::IsFontCode(const char *pText, FontStateStack *pState)
 
 void RTFont::MeasureText( rtRectf *pRectOut, const string &text, float scale /*= 1.0f*/ )
 {
-	MeasureText(pRectOut, &text[0], text.length(), scale);
+	MeasureText(pRectOut, &text[0], (int)text.length(), scale);
 }
 
 CL_Vec2f RTFont::MeasureText( const string &text, float scale /*= 1.0f*/ )
 {
 	//TODO: Switch to using CL_Rectf
 	rtRectf r;
-	MeasureText(&r, &text[0], text.length(), scale);
+	MeasureText(&r, &text[0], (int)text.length(), scale);
 	return CL_Vec2f(r.GetWidth(), r.GetHeight());
 }
 
@@ -649,7 +649,7 @@ string RTFont::GetNextLine(const CL_Vec2f &textBounds, char **pCur, float scale,
 			continue;
 		}
 				
-		MeasureText(&r, (*pCur), text.length(), scale);
+		MeasureText(&r, (*pCur), (int)text.length(), scale);
 		
 		if (r.GetWidth() > textBounds.x)
 		{

@@ -166,7 +166,10 @@
     <ClCompile Include="videobufferlock.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="escapi.h" />
+    <ClInclude Include="capture.h" />
+    <ClInclude Include="conversion.h" />
+    <ClInclude Include="scopedrelease.h" />
+    <ClInclude Include="videobufferlock.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

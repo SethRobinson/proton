@@ -670,6 +670,9 @@
     <ClCompile Include="..\..\shared\SDL\SDL2Main.cpp">
       <Filter>shared\SDL</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\shared\Audio\AudioManagerFMODStudio.cpp">
+      <Filter>shared\Audio</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\App.h">
@@ -1121,6 +1124,9 @@
     </ClInclude>
     <ClInclude Include="..\..\shared\linux\PlatformSetupLinux.h">
       <Filter>shared\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\Audio\AudioManagerFMODStudio.h">
+      <Filter>shared\Audio</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

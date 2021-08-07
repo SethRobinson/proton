@@ -693,17 +693,17 @@ HRESULT CaptureClass::initCapture(int aDevice)
 		return MF_E_INVALIDINDEX;
 	}
 
-	/*
-	for (i = 0; i < 16; i++)
-	{
-	char temp[128];
-	float v;
-	int f;
-	int r = GetProperty(i, v, f);
-	sprintf(temp, "%d: %3.3f %d (%d)\n", i, v, f, r);
-	OutputDebugStringA(temp);
-	}
-	*/
+//	int i;
+// 	for (i = 0; i < 16; i++)
+// 	{
+// 	char temp[128];
+// 	float v;
+// 	int f;
+// 	int r = getProperty(i, v, f);
+// 	sprintf(temp, "%d: %3.3f %d (%d)\n", i, v, f, r);
+// 	OutputDebugStringA(temp);
+// 	}
+	
 
 	return 0;
 }

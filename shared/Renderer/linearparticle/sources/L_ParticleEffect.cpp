@@ -416,7 +416,7 @@ L_REAL L_ParticleEffect::get_y_pos(void)
 
 int L_ParticleEffect::get_particle_num(void)
 {
-	return particle_list.size();
+	return (int)particle_list.size();
 }
 
 

@@ -509,7 +509,7 @@ void AudioManagerSDL::Stop( AudioHandle soundID )
 	}
 	//pChannel->stop();
 
-	Mix_HaltChannel(soundID-C_CHANNEL_OFFSET_SO_ZERO_ISNT_USED);
+	Mix_HaltChannel((int) (soundID-C_CHANNEL_OFFSET_SO_ZERO_ISNT_USED));
 
 }
 
@@ -529,7 +529,7 @@ bool AudioManagerSDL::IsPlaying( AudioHandle soundID )
 		return Mix_PlayingMusic() != 0;
 	}
 
-	return Mix_Playing(soundID-C_CHANNEL_OFFSET_SO_ZERO_ISNT_USED) != 0;
+	return Mix_Playing((int) (soundID-C_CHANNEL_OFFSET_SO_ZERO_ISNT_USED)) != 0;
 }
 
 
@@ -626,7 +626,7 @@ void AudioManagerSDL::SetVol( AudioHandle soundID, float vol )
 	//LogMsg("Setting audio handle %d to %d", soundID, ivol);
 #endif
 
-	Mix_Volume(soundID-C_CHANNEL_OFFSET_SO_ZERO_ISNT_USED,ivol);
+	Mix_Volume((int) (soundID-C_CHANNEL_OFFSET_SO_ZERO_ISNT_USED),ivol);
 	//assert(soundID);
 	//pChannel->setVolume(vol);
 }

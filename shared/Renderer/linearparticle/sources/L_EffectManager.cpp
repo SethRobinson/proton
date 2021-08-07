@@ -107,5 +107,5 @@ int L_EffectManager::get_particle_num(void)
 
 int L_EffectManager::get_effect_num(void)
 {
-	return effect_list.size();
+	return (int)effect_list.size();
 }
