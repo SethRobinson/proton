@@ -52,6 +52,10 @@
 #include "flash/PlatformSetupFlash.h"
 #endif
 
+#ifdef PLATFORM_VITA
+#include "vita/PlatformSetupVita.h"
+#endif
+
 #if defined(__cplusplus) || defined(__OBJC__)
 	#include <cstdio>
 	#include <string>

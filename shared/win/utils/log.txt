@@ -1,0 +1,212 @@
+12/10 12:15:16: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:16: Saved out C:\proton-vita\RTSimpleApp\media\interface\font_trajan_00.rttex (512 X 256) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+12/10 12:15:17: Compressing C:\proton-vita\RTSimpleApp\media\interface\font_trajan.rtfont..
+12/10 12:15:17: Compressed to C:\proton-vita\RTSimpleApp\media\interface\font_trajan.rtfont.  (29 kb, 6%%)
+12/10 12:15:17: Finished creating C:\proton-vita\RTSimpleApp\media\interface\font_trajan.rtfont.  223 chars, 20 font state definitions.
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Saved out C:\proton-vita\RTSimpleApp\media\interface\font_trajan_big_00.rttex (512 X 512) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+12/10 12:15:17: Compressing C:\proton-vita\RTSimpleApp\media\interface\font_trajan_big.rtfont..
+12/10 12:15:17: Compressed to C:\proton-vita\RTSimpleApp\media\interface\font_trajan_big.rtfont.  (62 kb, 6%%)
+12/10 12:15:17: Finished creating C:\proton-vita\RTSimpleApp\media\interface\font_trajan_big.rtfont.  223 chars, 20 font state definitions.
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Padding C:\proton-vita\RTSimpleApp\media\interface\bkgd_stone.png from 480X320 to be 512X512
+12/10 12:15:17: Saved out C:\proton-vita\RTSimpleApp\media\interface\bkgd_stone.rttex (480 X 320) with 1 mipmaps.  (Ultra compress RGB bit format)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Saved out C:\proton-vita\RTSimpleApp\media\interface\checkbox.rttex (64 X 32) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Saved out C:\proton-vita\RTSimpleApp\media\interface\font_trajan_00.rttex (512 X 256) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Saved out C:\proton-vita\RTSimpleApp\media\interface\font_trajan_big_00.rttex (512 X 512) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Padding C:\proton-vita\RTSimpleApp\media\interface\menu_bg.png from 480X320 to be 512X512
+12/10 12:15:17: Saved out C:\proton-vita\RTSimpleApp\media\interface\menu_bg.rttex (480 X 320) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Saved out C:\proton-vita\RTSimpleApp\media\interface\proton-128.rttex (128 X 128) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Padding C:\proton-vita\RTSimpleApp\media\interface\rtsoft_logo.png from 48X76 to be 64X128
+12/10 12:15:17: Saved out C:\proton-vita\RTSimpleApp\media\interface\rtsoft_logo.rttex (48 X 76) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Padding C:\proton-vita\RTSimpleApp\media\interface\scroll_bar_caps.png from 10X10 to be 16X16
+12/10 12:15:17: Saved out C:\proton-vita\RTSimpleApp\media\interface\scroll_bar_caps.rttex (10 X 10) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Padding C:\proton-vita\RTSimpleApp\media\interface\slider_button.png from 38X72 to be 64X128
+12/10 12:15:17: Saved out C:\proton-vita\RTSimpleApp\media\interface\slider_button.rttex (38 X 72) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Padding C:\proton-vita\RTSimpleApp\media\interface\summary_bg.png from 480X320 to be 512X512
+12/10 12:15:17: Saved out C:\proton-vita\RTSimpleApp\media\interface\summary_bg.rttex (480 X 320) with 1 mipmaps.  (Ultra compress RGB bit format)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Padding C:\proton-vita\RTSimpleApp\media\interface\summary_continue.png from 72X17 to be 128X32
+12/10 12:15:17: Saved out C:\proton-vita\RTSimpleApp\media\interface\summary_continue.rttex (72 X 17) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Padding C:\proton-vita\RTSimpleApp\media\interface\summary_overlay_bottom.png from 480X46 to be 512X64
+12/10 12:15:17: Saved out C:\proton-vita\RTSimpleApp\media\interface\summary_overlay_bottom.rttex (480 X 46) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Padding C:\proton-vita\RTSimpleApp\media\interface\summary_overlay_top.png from 480X43 to be 512X64
+12/10 12:15:17: Saved out C:\proton-vita\RTSimpleApp\media\interface\summary_overlay_top.rttex (480 X 43) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Saved out C:\proton-vita\RTSimpleApp\media\interface\particle\cflight.rttex (32 X 32) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Saved out C:\proton-vita\RTSimpleApp\media\interface\particle\circle.rttex (128 X 128) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Saved out C:\proton-vita\RTSimpleApp\media\interface\particle\explosion.rttex (32 X 32) with 1 mipmaps.  (Ultra compress RGB bit format)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Saved out C:\proton-vita\RTSimpleApp\media\interface\particle\light16p.rttex (16 X 16) with 1 mipmaps.  (Ultra compress RGB bit format)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Saved out C:\proton-vita\RTSimpleApp\media\interface\particle\pointer.rttex (32 X 32) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Saved out C:\proton-vita\RTSimpleApp\media\interface\particle\sketch.rttex (32 X 8) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Saved out C:\proton-vita\RTSimpleApp\media\interface\particle\small.rttex (4 X 4) with 1 mipmaps.  (Ultra compress RGB bit format)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Saved out C:\proton-vita\RTSimpleApp\media\interface\particle\star.rttex (16 X 16) with 1 mipmaps.  (Ultra compress RGB bit format)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Compressing C:\proton-vita\RTSimpleApp\media\interface\bkgd_stone.rttex..
+12/10 12:15:17: Compressed to C:\proton-vita\RTSimpleApp\media\interface\bkgd_stone.rttex.  (27 kb, 94%%)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Compressing C:\proton-vita\RTSimpleApp\media\interface\checkbox.rttex..
+12/10 12:15:17: Compressed to C:\proton-vita\RTSimpleApp\media\interface\checkbox.rttex.  (0 kb, 6%%)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Compressing C:\proton-vita\RTSimpleApp\media\interface\font_trajan_00.rttex..
+12/10 12:15:17: Compressed to C:\proton-vita\RTSimpleApp\media\interface\font_trajan_00.rttex.  (24 kb, 5%%)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Compressing C:\proton-vita\RTSimpleApp\media\interface\font_trajan_big_00.rttex..
+12/10 12:15:17: Compressed to C:\proton-vita\RTSimpleApp\media\interface\font_trajan_big_00.rttex.  (52 kb, 5%%)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Compressing C:\proton-vita\RTSimpleApp\media\interface\menu_bg.rttex..
+12/10 12:15:17: Compressed to C:\proton-vita\RTSimpleApp\media\interface\menu_bg.rttex.  (69 kb, 7%%)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Compressing C:\proton-vita\RTSimpleApp\media\interface\proton-128.rttex..
+12/10 12:15:17: Compressed to C:\proton-vita\RTSimpleApp\media\interface\proton-128.rttex.  (6 kb, 10%%)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Compressing C:\proton-vita\RTSimpleApp\media\interface\rtsoft_logo.rttex..
+12/10 12:15:17: Compressed to C:\proton-vita\RTSimpleApp\media\interface\rtsoft_logo.rttex.  (3 kb, 10%%)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Compressing C:\proton-vita\RTSimpleApp\media\interface\scroll_bar_caps.rttex..
+12/10 12:15:17: Compressed to C:\proton-vita\RTSimpleApp\media\interface\scroll_bar_caps.rttex.  (0 kb, 13%%)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Compressing C:\proton-vita\RTSimpleApp\media\interface\slider_button.rttex..
+12/10 12:15:17: Compressed to C:\proton-vita\RTSimpleApp\media\interface\slider_button.rttex.  (4 kb, 14%%)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Compressing C:\proton-vita\RTSimpleApp\media\interface\summary_bg.rttex..
+12/10 12:15:17: Compressed to C:\proton-vita\RTSimpleApp\media\interface\summary_bg.rttex.  (39 kb, 96%%)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Compressing C:\proton-vita\RTSimpleApp\media\interface\summary_continue.rttex..
+12/10 12:15:17: Compressed to C:\proton-vita\RTSimpleApp\media\interface\summary_continue.rttex.  (2 kb, 13%%)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Compressing C:\proton-vita\RTSimpleApp\media\interface\summary_overlay_bottom.rttex..
+12/10 12:15:17: Compressed to C:\proton-vita\RTSimpleApp\media\interface\summary_overlay_bottom.rttex.  (41 kb, 33%%)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Compressing C:\proton-vita\RTSimpleApp\media\interface\summary_overlay_top.rttex..
+12/10 12:15:17: Compressed to C:\proton-vita\RTSimpleApp\media\interface\summary_overlay_top.rttex.  (38 kb, 30%%)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Compressing C:\proton-vita\RTSimpleApp\media\interface\particle\cflight.rttex..
+12/10 12:15:17: Compressed to C:\proton-vita\RTSimpleApp\media\interface\particle\cflight.rttex.  (0 kb, 20%%)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Compressing C:\proton-vita\RTSimpleApp\media\interface\particle\circle.rttex..
+12/10 12:15:17: Compressed to C:\proton-vita\RTSimpleApp\media\interface\particle\circle.rttex.  (3 kb, 6%%)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Compressing C:\proton-vita\RTSimpleApp\media\interface\particle\explosion.rttex..
+12/10 12:15:17: Compressed to C:\proton-vita\RTSimpleApp\media\interface\particle\explosion.rttex.  (0 kb, 76%%)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Compressing C:\proton-vita\RTSimpleApp\media\interface\particle\light16p.rttex..
+12/10 12:15:17: Compressed to C:\proton-vita\RTSimpleApp\media\interface\particle\light16p.rttex.  (0 kb, 69%%)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Compressing C:\proton-vita\RTSimpleApp\media\interface\particle\pointer.rttex..
+12/10 12:15:17: Compressed to C:\proton-vita\RTSimpleApp\media\interface\particle\pointer.rttex.  (0 kb, 10%%)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Compressing C:\proton-vita\RTSimpleApp\media\interface\particle\sketch.rttex..
+12/10 12:15:17: Compressed to C:\proton-vita\RTSimpleApp\media\interface\particle\sketch.rttex.  (0 kb, 69%%)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Compressing C:\proton-vita\RTSimpleApp\media\interface\particle\small.rttex..
+12/10 12:15:17: Compressed to C:\proton-vita\RTSimpleApp\media\interface\particle\small.rttex.  (0 kb, 68%%)
+12/10 12:15:17: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+12/10 12:15:17: Compressing C:\proton-vita\RTSimpleApp\media\interface\particle\star.rttex..
+12/10 12:15:17: Compressed to C:\proton-vita\RTSimpleApp\media\interface\particle\star.rttex.  (0 kb, 72%%)
