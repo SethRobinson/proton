@@ -36,7 +36,11 @@ using namespace std;
 #include "Entity/Entity.h"
 #include "Audio/AudioManager.h"
 
+#ifdef PLATFORM_VITA
+#include "Gamepad/GamepadManager.h"
+#else
 class GamepadManager;
+#endif
 
 enum eFont
 {
