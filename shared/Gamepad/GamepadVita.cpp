@@ -53,7 +53,7 @@ void GamepadVita::Update()
     PressButton(SCE_CTRL_LEFT, 13);
 
     PressButton(SCE_CTRL_START, 5);
-    PressButton(SCE_CTRL_START, 4);
+    PressButton(SCE_CTRL_SELECT, 4);
     
     PressButton(SCE_CTRL_L1, 6);
     PressButton(SCE_CTRL_R1, 7);
@@ -61,8 +61,8 @@ void GamepadVita::Update()
 
 void GamepadVita::PressButton(int Mask, int Id)
 {
-    if ( m_buttons[Id].m_bDown != ( ( m_state.buttons == Mask ) != 0 ) )
+    if ( m_buttons[Id].m_bDown != ( ( m_state.buttons & Mask ) != 0 ) )
     {
-        OnButton(m_state.buttons == Mask, Id);
+        OnButton(m_state.buttons & Mask, Id);
     }
 }
