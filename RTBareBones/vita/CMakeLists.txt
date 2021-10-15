@@ -27,6 +27,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 proton_include_components(FocusInputComponent)
 proton_include_components(CustomInputComponent ArcadeInputComponent)
+proton_include_gamepad(Vita)
 
 set(APP "../source")
 proton_set_sources("${APP}/App.cpp")

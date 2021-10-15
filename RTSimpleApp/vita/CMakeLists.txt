@@ -30,8 +30,6 @@ proton_use_jpeg_support()
 proton_use_linearparticles()
 proton_use_sdl_audio()
 
-proton_include_gamepad(Vita) #test gamepad
-
 set(APP "../source")
 include_directories("${APP}")
 proton_set_sources("${APP}/App.cpp" "${APP}/GUI/DebugMenu.cpp" "${APP}/GUI/EnterNameMenu.cpp" "${APP}/GUI/ParticleTestMenu.cpp" "${APP}/GUI/MainMenu.cpp" "${APP}/GUI/AboutMenu.cpp" "${APP}/GUI/TouchTestMenu.cpp" "${APP}/Component/TouchTestComponent.cpp" "${APP}/Component/ParticleTestComponent.cpp")

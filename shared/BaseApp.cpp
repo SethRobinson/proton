@@ -233,6 +233,7 @@ void RunStaticUpdateThing();
 
 void BaseApp::Update()
 {
+	g_gamePadManager.Update(); //very serious...
 	m_gameTimer.Update();
 #ifdef RT_RUN_STATIC_UPDATE
 //Don't ask, for Seth

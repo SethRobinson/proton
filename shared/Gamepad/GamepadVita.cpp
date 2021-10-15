@@ -12,6 +12,10 @@ GamepadVita::~GamepadVita()
 
 bool GamepadVita::Init()
 {
+    m_name = "Vita";
+    m_buttonsUsedCount = 14;
+    m_axisUsedCount = 2;
+
     sceCtrlSetSamplingMode(SCE_CTRL_MODE_ANALOG);
 
     m_buttons[0].m_virtualKey = VIRTUAL_DPAD_BUTTON_LEFT;
@@ -39,7 +43,6 @@ void GamepadVita::Kill()
 
 void GamepadVita::Update()
 {
-    memset(&m_state, 0, sizeof(SceCtrlData));
     sceCtrlPeekBufferPositive(0, &m_state, 1);
 
     PressButton(SCE_CTRL_TRIANGLE, 1);
@@ -57,12 +60,28 @@ void GamepadVita::Update()
     
     PressButton(SCE_CTRL_L1, 6);
     PressButton(SCE_CTRL_R1, 7);
+
+	SetAxis(0, ConvertToProtonStickWithDeadZone(m_state.lx));
+	SetAxis(1, ConvertToProtonStickWithDeadZone(m_state.ly * -1.0f));
+	SetAxis(2, ConvertToProtonStickWithDeadZone(m_state.rx));
+	SetAxis(3, ConvertToProtonStickWithDeadZone(m_state.ry * -1.0f));
 }
 
-void GamepadVita::PressButton(int Mask, int Id)
+void GamepadVita::PressButton(int mask, int id)
 {
-    if ( m_buttons[Id].m_bDown != ( ( m_state.buttons & Mask ) != 0 ) )
-    {
-        OnButton(m_state.buttons & Mask, Id);
-    }
+    if (m_buttons[id].m_bDown != ((m_state.buttons & mask) != 0))
+	{
+		OnButton(m_state.buttons & mask, id);
+	}
+}
+
+float GamepadVita::ConvertToProtonStickWithDeadZone(float stick)
+{
+	stick /= 32767.0f;
+	const float deadZone = 0.15f;
+	if (fabs(stick) < deadZone)
+	{
+		stick = 0;
+	}
+	return stick;
 }

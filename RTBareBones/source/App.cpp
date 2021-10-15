@@ -9,7 +9,9 @@
 
 #include "Entity/CustomInputComponent.h" //used for the back button (android)
 #include "Entity/FocusInputComponent.h" //needed to let the input component see input messages
-#include "Entity/ArcadeInputComponent.h" 
+#include "Entity/ArcadeInputComponent.h"
+#include "Gamepad/GamepadProviderVita.h" //supply our GamePad.
+#include "Gamepad/GamepadVita.h"
 //#include "util/TextScanner.h"
 
 MessageManager g_messageManager;
@@ -74,6 +76,10 @@ bool App::Init()
 #ifndef C_NO_ZLIB
 	//fonts need zlib to decompress.  When porting a new platform I define C_NO_ZLIB and add zlib support later sometimes
 	if (!GetFont(FONT_SMALL)->Load("interface/font_trajan.rtfont")) return false;
+#endif
+
+#ifdef PLATFORM_VITA
+	GetGamepadManager()->AddProvider(new GamepadProviderVita);
 #endif
 
 	GetBaseApp()->SetFPSVisible(true);
@@ -160,19 +166,19 @@ void App::OnArcadeInput(VariantList *pVList)
 
 	switch (vKey)
 	{
-		case VIRTUAL_KEY_DIR_LEFT:
+		case VIRTUAL_DPAD_BUTTON_LEFT:
 			keyName = "Left";
 			break;
 
-		case VIRTUAL_KEY_DIR_RIGHT:
-			keyName = "Right";
-			break;
-
-		case VIRTUAL_KEY_DIR_UP:
+		case VIRTUAL_DPAD_BUTTON_UP:
 			keyName = "Up";
 			break;
 
-		case VIRTUAL_KEY_DIR_DOWN:
+		case VIRTUAL_DPAD_BUTTON_RIGHT:
+			keyName = "Right";
+			break;
+
+		case VIRTUAL_DPAD_BUTTON_DOWN:
 			keyName = "Down";
 			break;
 
@@ -258,6 +264,21 @@ void App::Update()
 		//GetBaseApp()->m_sig_accel.connect(1, boost::bind(&App::OnAccel, this, _1));
 
 		//TRACKBALL/ARCADETEST: Uncomment below to see log messages on trackball/key movement input
+
+#ifdef PLATFORM_VITA
+		pComp = pEnt->AddComponent(new ArcadeInputComponent);
+		GetBaseApp()->m_sig_arcade_input.connect(1, boost::bind(&App::OnArcadeInput, this, _1));
+		Gamepad *pPad = GetGamepadManager()->GetUnusedGamepad();
+		if (pPad)
+		{
+			pPad->ConnectToArcadeComponent((ArcadeInputComponent*)pComp, true, false);
+			//these arrow keys will be triggered by the keyboard, if applicable
+			AddKeyBinding(pComp, "Left", VIRTUAL_DPAD_BUTTON_LEFT, VIRTUAL_DPAD_BUTTON_LEFT);
+			AddKeyBinding(pComp, "Right", VIRTUAL_DPAD_BUTTON_RIGHT, VIRTUAL_DPAD_BUTTON_RIGHT);
+			AddKeyBinding(pComp, "Up", VIRTUAL_DPAD_BUTTON_UP, VIRTUAL_DPAD_BUTTON_UP);
+			AddKeyBinding(pComp, "Down", VIRTUAL_DPAD_BUTTON_DOWN, VIRTUAL_DPAD_BUTTON_DOWN);
+		}
+#else
 		pComp = pEnt->AddComponent(new ArcadeInputComponent);
 		GetBaseApp()->m_sig_arcade_input.connect(1, boost::bind(&App::OnArcadeInput, this, _1));
 	
@@ -267,6 +288,7 @@ void App::Update()
 		AddKeyBinding(pComp, "Up", VIRTUAL_KEY_DIR_UP, VIRTUAL_KEY_DIR_UP);
 		AddKeyBinding(pComp, "Down", VIRTUAL_KEY_DIR_DOWN, VIRTUAL_KEY_DIR_DOWN);
 		AddKeyBinding(pComp, "Fire", VIRTUAL_KEY_CONTROL, VIRTUAL_KEY_GAME_FIRE);
+#endif
 
 		//INPUT TEST - wire up input to some functions to manually handle.  AppInput will use LogMsg to
 		//send them to the log.  (Each device has a way to view a debug log in real-time)
@@ -295,6 +317,10 @@ void App::Update()
 		b.DumpToLog();
 		*/
 	}
+
+//#ifdef PLATFORM_VITA
+//	GetGamepadManager()->Update();
+//#endif
 
 	//game is thinking.  
 }

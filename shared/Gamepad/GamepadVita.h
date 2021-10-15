@@ -20,6 +20,7 @@ class GamepadVita : public Gamepad
     protected:
 
         void PressButton(int mask, int id);
+        float ConvertToProtonStickWithDeadZone(float stick);
 
         SceCtrlData m_state;
 };
