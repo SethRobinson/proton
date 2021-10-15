@@ -1,26 +1,38 @@
 # Proton SDK
 
-[[Sample]](https://www.youtube.com/watch?v=Nm8G_4_VMiw)
+## For tutorials and more info, visit [The Proton SDK wiki](https://www.protonsdk.com)
 
-## Compiling
+License: [BSD style with attribution required](https://github.com/SethRobinson/proton/blob/master/license.txt)
 
-to compile this project you must have [VitaSDK](https://vitasdk.org/) installed.
-after you have installed the vitaSDK you can locate `RTBareBones` or `RTSimpleApp` and find `vita` folder which contains `compile.sh` you can use that script to compile the sample after its complete you can find your built binaries at `bin`.
+Seth's GL/GLES messy multi-platform C++ game SDK.  Can output to **Windows**, **Linux** (including the **Raspberry Pi**), **HTML5**, **OS X**,  **iOS**, **Android**
 
-## Running
+A component based toolbox of useful things built up over the last ten years.  Instead of a giant .lib you link only the .cpp files used when possible to simplify multiplatform support as well as keep code size down.
 
-to run Proton SDK to vita we must manually copy files to the vita to begin with we must generate our media so find your preferred sample and then locate `media` folder you must create folder called `game` in `media` then run `update_media.bat` or `update_media.sh` if you're using linux instead of WSL after the script is done running you should see our files at `bin` after they are there you can copy them to your vita to `ux0:/proton/` using your preferred method (`ftp`, `usb`) after we have our assets at the correct folder we can copy our `vpk` to the vita and then install it and after its done installing run it and you should have proton sdk running on PS Vita!
 
-## TODO List
-- Joysticks
-- Keypad
-- Text Input
-- ???
 
-## Credits
-- @NabsiYa - Porting Proton over to PS Vita
-- @SethRobinson - Making proton SDK
+It's kind of an SDL-like on steroids (while also being able to target SDL2 for setup/input/audio itself when needed) but generally gets the best results with its own native implementations of things. For example, it can target the following audio subsystems: SDL2_mixer, Audiere, FMOD, FMODStudio, Native iOS, Native Android, Denshion, Native Flash
+
+It's designed with a "Write stuff in Windows with Visual Studio 2017, then compile/export to other platforms as needed" mentality.
+
+Deprecated platforms no longer actively supported:  Flash, BBX, WebOS
+
+Some things written with Proton:
+
+* [Growtopia](https://www.growtopiagame.com) - 2D MMO, a good example of using Proton's GUI for many screen sizes.
+* [Dungeon Scroll](https://www.rtsoft.com/pages/dscroll_mobile.php) - A word game.  ([HTML5 version](http://www.dungeonscroll.com))
+* [Dink Smallwood](https://www.rtsoft.com/pages/dink.php) - Good example of porting old code to Proton to add touch controls and multiplatform support. Open source. [HTML5 version](https://www.rtsoft.com/web/dink)
+* [Mind Wall](https://www.codedojo.com/?p=138) - 3D puzzle game
+* [Tanked](https://www.rtsoft.com/pages/tanked.php) - 3D multiplayer tank combat game including four player split screen support as well as internet match making.
+* Arduboy Simulator - Allows you to write and debug [Arduboy](arduboy.com) apps with MSVC as well as output HTML5 playable versions (included with [Proton SDK](https://www.arduboy.com)) [HTML5 Example game](http://www.rtsoft.com/arduman.html)
+
+Credits and links
+- [Proton SDK wiki/tutorial site](https://www.protonsdk.com)
+- Seth A. Robinson (seth@rtsoft.com) (Wrote most of Proton SDK) ([Codedojo](https://www.codedojo.com), Seth's blog)
+- Aki Koskinen (Contibutions to Linux support, SpriteAnim, documentation)
+- [Clanlib team](https://github.com/sphair/ClanLib/blob/master/CREDITS) (Some math functions were taken from Clanlib)
+- Dan Walma (contributions to SoftSurface)
+- Fatalfeel's [Proton SDK forks](https://github.com/fatalfeel) for GLES 2 support and Cocos2D integration
 
 # Want to contribute?
 
-Feel free to submit a pull request!
+Feel free to submit a pull request! At this point the goal is that all changes be *non-breaking* to existing projects.
