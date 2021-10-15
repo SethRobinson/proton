@@ -289,7 +289,7 @@ void RemoveFile( string fileName, bool bAddSavePath)
 
 string GetRegionString()
 {
-	return "us_en";
+	return "en_us";
 }
 
 //month is 1-12 btw
