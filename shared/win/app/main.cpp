@@ -553,9 +553,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				GetBaseApp()->OnEnterBackground();
 			}
+			g_bHasFocus = false;
 		}
 
-		g_bHasFocus = false;
 		LogMsg("App lost focus");
 		break;
 
@@ -1893,6 +1893,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLin
 		if (g_bHasFocus && !g_bIsMinimized)
 		{
 	#ifdef C_GL_MODE
+			
 			SwapBuffers(g_hDC);
 	#else
 			eglSwapBuffers(g_eglDisplay, g_eglSurface);
