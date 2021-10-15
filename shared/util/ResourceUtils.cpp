@@ -476,8 +476,9 @@ string SeparateStringSTL(string input, int index, char delimiter)
 
 bool SeparateString (const char str[], int num, char delimiter, char *return1) 
 {
+	size_t sLen = strlen(str);
 	int l = 0;
-	return1[0] = 0;
+	int c = 0;
 
 	for (unsigned int k = 0; str[k] != 0; k++)
 	{
@@ -487,11 +488,12 @@ bool SeparateString (const char str[], int num, char delimiter, char *return1)
 			if (l == num+1)
 				break;
 
-			if (k < strlen(str)) strcpy(return1,"");
+			if (k < sLen) c = 0;
 		}
 		if (str[k] != delimiter)
-			sprintf(return1, "%s%c",return1 ,str[k]);
+			return1[c++] = str[k];
 	}
+	return1[c] = 0;
 
 	if (l < num)
 	{
