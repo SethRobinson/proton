@@ -1893,6 +1893,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLin
 		if (g_bHasFocus && !g_bIsMinimized)
 		{
 	#ifdef C_GL_MODE
+			
 			SwapBuffers(g_hDC);
 	#else
 			eglSwapBuffers(g_eglDisplay, g_eglSurface);

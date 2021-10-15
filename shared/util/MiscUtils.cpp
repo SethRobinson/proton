@@ -563,6 +563,7 @@ string GetFileNameWithoutExtension(const string fileName)
 	return fName.substr(0, dotIndex);
 
 }
+
 string GetPathFromString(const string &path)
 {
 
