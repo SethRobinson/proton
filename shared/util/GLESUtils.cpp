@@ -643,7 +643,7 @@ void PrepareForGL()
 
 	g_globalBatcher.Flush();
 	CHECK_GL_ERROR();
-
+	
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	CHECK_GL_ERROR();
