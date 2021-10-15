@@ -164,6 +164,7 @@ void App::OnArcadeInput(VariantList *pVList)
 	
 	string keyName = "unknown";
 
+#ifdef PLATFORM_VITA
 	switch (vKey)
 	{
 		case VIRTUAL_DPAD_BUTTON_LEFT:
@@ -183,6 +184,27 @@ void App::OnArcadeInput(VariantList *pVList)
 			break;
 
 	}
+#else
+	switch (vKey)
+	{
+		case VIRTUAL_KEY_DIR_LEFT:
+			keyName = "Left";
+			break;
+
+		case VIRTUAL_KEY_DIR_UP:
+			keyName = "Up";
+			break;
+
+		case VIRTUAL_KEY_DIR_RIGHT:
+			keyName = "Right";
+			break;
+
+		case VIRTUAL_KEY_DIR_DOWN:
+			keyName = "Down";
+			break;
+
+	}
+#endif
 	
 	LogMsg("Arcade input: Hit %d (%s) (%s)", vKey, keyName.c_str(), pressed.c_str());
 }

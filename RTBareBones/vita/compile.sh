@@ -1,7 +1,7 @@
 # Compile Script for vpk
 
-#rm -rf build
-#mkdir build
+rm -rf build
+mkdir build
 cd build
 cmake ..
 make -j8
