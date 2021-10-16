@@ -18,10 +18,6 @@ bool g_isBaseAppInitted = false;
 bool g_bUseBorderlessFullscreenOnWindows = true; //extern and change yourself if needed, done this way to stay compatible with old stuff.  (true was old default behavior)
 bool g_defaultSmoothing = true;
 
-#ifdef PLATFORM_VITA
-GamepadManager g_gamePadManager;
-#endif
-
 bool IsBaseAppInitted()
 {
 	return g_isBaseAppInitted;
@@ -233,7 +229,6 @@ void RunStaticUpdateThing();
 
 void BaseApp::Update()
 {
-	g_gamePadManager.Update(); //very serious...
 	m_gameTimer.Update();
 #ifdef RT_RUN_STATIC_UPDATE
 //Don't ask, for Seth
@@ -548,13 +543,6 @@ unsigned int GetTick( eTimingSystem timingSystem )
 {
 	return GetBaseApp()->GetTickTimingSystem(timingSystem);
 }
-
-#ifdef PLATFORM_VITA
-GamepadManager * GetGamepadManager()
-{
-	return &g_gamePadManager;
-}
-#endif
 
 ResourceManager * GetResourceManager()
 {

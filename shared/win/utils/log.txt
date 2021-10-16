@@ -210,3 +210,1139 @@ RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
 
 12/10 12:15:17: Compressing C:\proton-vita\RTSimpleApp\media\interface\particle\star.rttex..
 12/10 12:15:17: Compressed to C:\proton-vita\RTSimpleApp\media\interface\particle\star.rttex.  (0 kb, 72%%)
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\font_big_00.rttex (512 X 256) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:49: Compressing C:\proton-vita\RTDink\media\interface\font_big.rtfont..
+16/10 10:37:49: Compressed to C:\proton-vita\RTDink\media\interface\font_big.rtfont.  (36 kb, 7%%)
+16/10 10:37:49: Finished creating C:\proton-vita\RTDink\media\interface\font_big.rtfont.  223 chars, 15 font state definitions.
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\font_bigx2_00.rttex (1024 X 512) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:49: Compressing C:\proton-vita\RTDink\media\interface\font_bigx2.rtfont..
+16/10 10:37:49: Compressed to C:\proton-vita\RTDink\media\interface\font_bigx2.rtfont.  (76 kb, 4%%)
+16/10 10:37:49: Finished creating C:\proton-vita\RTDink\media\interface\font_bigx2.rtfont.  223 chars, 15 font state definitions.
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\font_normal_00.rttex (256 X 256) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:49: Compressing C:\proton-vita\RTDink\media\interface\font_normal.rtfont..
+16/10 10:37:49: Compressed to C:\proton-vita\RTDink\media\interface\font_normal.rtfont.  (18 kb, 7%%)
+16/10 10:37:49: Finished creating C:\proton-vita\RTDink\media\interface\font_normal.rtfont.  223 chars, 16 font state definitions.
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\font_normalx2_00.rttex (512 X 256) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:49: Compressing C:\proton-vita\RTDink\media\interface\font_normalx2.rtfont..
+16/10 10:37:49: Compressed to C:\proton-vita\RTDink\media\interface\font_normalx2.rtfont.  (38 kb, 7%%)
+16/10 10:37:49: Finished creating C:\proton-vita\RTDink\media\interface\font_normalx2.rtfont.  223 chars, 16 font state definitions.
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Padding C:\proton-vita\RTDink\media\interface\akiko.png from 150X120 to be 256X128
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\akiko.rttex (150 X 120) with 1 mipmaps.  (Ultra compress RGB bit format)
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\center_ball.rttex (32 X 32) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\checkbox.rttex (64 X 32) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Padding C:\proton-vita\RTDink\media\interface\dink_ad.png from 100X67 to be 128X128
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\dink_ad.rttex (100 X 67) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Padding C:\proton-vita\RTDink\media\interface\ds_ad.png from 100X100 to be 128X128
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\ds_ad.rttex (100 X 100) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Padding C:\proton-vita\RTDink\media\interface\fling_ad.png from 100X66 to be 128X128
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\fling_ad.rttex (100 X 66) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\font_bigx2_00.rttex (1024 X 512) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\font_big_00.rttex (512 X 256) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\font_normalx2_00.rttex (512 X 256) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\font_normal_00.rttex (256 X 256) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Padding C:\proton-vita\RTDink\media\interface\mindwall_ad.png from 100X100 to be 128X128
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\mindwall_ad.rttex (100 X 100) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Padding C:\proton-vita\RTDink\media\interface\rtsoft_logo.png from 48X76 to be 64X128
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\rtsoft_logo.rttex (48 X 76) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Padding C:\proton-vita\RTDink\media\interface\scroll_bar_caps.png from 10X10 to be 16X16
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\scroll_bar_caps.rttex (10 X 10) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Padding C:\proton-vita\RTDink\media\interface\seth.png from 150X120 to be 256X128
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\seth.rttex (150 X 120) with 1 mipmaps.  (Ultra compress RGB bit format)
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Padding C:\proton-vita\RTDink\media\interface\sixtybeat_ad.png from 500X195 to be 512X256
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\sixtybeat_ad.rttex (500 X 195) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Padding C:\proton-vita\RTDink\media\interface\slider_button.png from 38X72 to be 64X128
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\slider_button.rttex (38 X 72) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Padding C:\proton-vita\RTDink\media\interface\turn_arrows.png from 125X65 to be 128X128
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\turn_arrows.rttex (125 X 65) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Padding C:\proton-vita\RTDink\media\interface\android\quicktip_dmod.png from 500X320 to be 512X512
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\android\quicktip_dmod.rttex (500 X 320) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Padding C:\proton-vita\RTDink\media\interface\generic\quicktip_dmod.png from 480X307 to be 512X512
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\generic\quicktip_dmod.rttex (480 X 307) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Padding C:\proton-vita\RTDink\media\interface\ipad\arrows.png from 200X200 to be 256X256
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\ipad\arrows.rttex (200 X 200) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Padding C:\proton-vita\RTDink\media\interface\ipad\bg_stone_overlay.png from 1024X85 to be 1024X128
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\ipad\bg_stone_overlay.rttex (1024 X 85) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Saved out C:\proton-vita\RTDink\media\interface\ipad\bkgd_anim_fire.rttex (1024 X 1024) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:49: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:49: Padding C:\proton-vita\RTDink\media\interface\ipad\bkgd_stone.png from 1024X768 to be 1024X1024
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\ipad\bkgd_stone.rttex (1024 X 768) with 1 mipmaps.  (Ultra compress RGB bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\ipad\logo_dink.rttex (1024 X 512) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\ipad\logo_rtsoft.png from 131X196 to be 256X256
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\ipad\logo_rtsoft.rttex (131 X 196) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\ipad\main_but_about.png from 223X80 to be 256X128
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\ipad\main_but_about.rttex (223 X 80) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\ipad\main_but_addon10.png from 512X80 to be 512X128
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\ipad\main_but_addon10.rttex (512 X 80) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\ipad\main_but_continue.png from 256X80 to be 256X128
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\ipad\main_but_continue.rttex (256 X 80) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\ipad\main_but_load.png from 256X80 to be 256X128
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\ipad\main_but_load.rttex (256 X 80) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\ipad\main_but_new.png from 256X80 to be 256X128
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\ipad\main_but_new.rttex (256 X 80) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\ipad\main_but_options.png from 256X80 to be 256X128
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\ipad\main_but_options.rttex (256 X 80) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\arrows.rttex (128 X 128) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone\bg_stone_overlay.png from 480X39 to be 512X64
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\bg_stone_overlay.rttex (480 X 39) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone\bkgd_anim_fire.png from 480X320 to be 512X512
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\bkgd_anim_fire.rttex (480 X 320) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone\bkgd_stone.png from 480X320 to be 512X512
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\bkgd_stone.rttex (480 X 320) with 1 mipmaps.  (Ultra compress RGB bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone\browse_dmod_bar.png from 440X64 to be 512X64
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\browse_dmod_bar.rttex (440 X 64) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone\browse_install.png from 53X25 to be 64X32
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\browse_install.rttex (53 X 25) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\button_arrow_back.rttex (64 X 64) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\button_arrow_down.rttex (64 X 64) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\button_arrow_up.rttex (64 X 64) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\button_examine.rttex (64 X 64) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\button_inventory.rttex (64 X 64) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\button_item_base.rttex (64 X 64) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\button_item_no.rttex (64 X 64) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\button_magic_base.rttex (64 X 64) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\button_magic_no.rttex (64 X 64) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\button_quickload.rttex (128 X 128) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\button_quicksave.rttex (128 X 128) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone\dmod_bar.png from 451X101 to be 512X128
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\dmod_bar.rttex (451 X 101) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone\dmod_bg.png from 480X320 to be 512X512
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\dmod_bg.rttex (480 X 320) with 1 mipmaps.  (Ultra compress RGB bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone\dmod_delete_button.png from 33X33 to be 64X64
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\dmod_delete_button.rttex (33 X 33) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone\dmod_info_button.png from 31X29 to be 32X32
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\dmod_info_button.rttex (31 X 29) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone\logo_dink.png from 480X320 to be 512X512
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\logo_dink.rttex (480 X 320) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone\logo_rtsoft.png from 66X91 to be 128X128
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\logo_rtsoft.rttex (66 X 91) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone\main_but_about.png from 85X33 to be 128X64
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\main_but_about.rttex (85 X 33) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone\main_but_addon10.png from 202X32 to be 256X32
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\main_but_addon10.rttex (202 X 32) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone\main_but_continue.png from 120X35 to be 128X64
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\main_but_continue.rttex (120 X 35) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone\main_but_load.png from 72X35 to be 128X64
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\main_but_load.rttex (72 X 35) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone\main_but_new.png from 67X36 to be 128X64
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\main_but_new.rttex (67 X 36) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone\main_but_options.png from 107X37 to be 128X64
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\main_but_options.rttex (107 X 37) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone\pause_icon.png from 39X39 to be 64X64
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\pause_icon.rttex (39 X 39) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone\pop_up.png from 285X183 to be 512X256
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\pop_up.rttex (285 X 183) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone\pop_up_button.png from 80X37 to be 128X64
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\pop_up_button.rttex (80 X 37) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone\quicktip_dmod.png from 480X307 to be 512X512
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\quicktip_dmod.rttex (480 X 307) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone\quicktip_feeding.png from 480X307 to be 512X512
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\quicktip_feeding.rttex (480 X 307) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone\quicktip_saving.png from 480X307 to be 512X512
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\quicktip_saving.rttex (480 X 307) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone\speed_up_button.png from 32X26 to be 32X32
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone\speed_up_button.rttex (32 X 26) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone4\arrows.rttex (256 X 256) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone4\bg_stone_overlay.png from 960X78 to be 1024X128
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone4\bg_stone_overlay.rttex (960 X 78) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone4\bkgd_anim_fire.png from 960X640 to be 1024X1024
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone4\bkgd_anim_fire.rttex (960 X 640) with 1 mipmaps.  (Ultra compress RGB bit format)
+16/10 10:37:50: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:50: Padding C:\proton-vita\RTDink\media\interface\iphone4\bkgd_stone.png from 960X640 to be 1024X1024
+16/10 10:37:50: Saved out C:\proton-vita\RTDink\media\interface\iphone4\bkgd_stone.rttex (960 X 640) with 1 mipmaps.  (Ultra compress RGB bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\iphone4\button_quickload.rttex (128 X 128) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Padding C:\proton-vita\RTDink\media\interface\iphone4\logo_dink.png from 960X403 to be 1024X512
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\iphone4\logo_dink.rttex (960 X 403) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Padding C:\proton-vita\RTDink\media\interface\iphone4\logo_rtsoft.png from 133X180 to be 256X256
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\iphone4\logo_rtsoft.rttex (133 X 180) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Padding C:\proton-vita\RTDink\media\interface\iphone4\main_but_about.png from 174X62 to be 256X64
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\iphone4\main_but_about.rttex (174 X 62) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Padding C:\proton-vita\RTDink\media\interface\iphone4\main_but_addon10.png from 401X63 to be 512X64
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\iphone4\main_but_addon10.rttex (401 X 63) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Padding C:\proton-vita\RTDink\media\interface\iphone4\main_but_continue.png from 235X59 to be 256X64
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\iphone4\main_but_continue.rttex (235 X 59) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Padding C:\proton-vita\RTDink\media\interface\iphone4\main_but_load.png from 151X64 to be 256X64
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\iphone4\main_but_load.rttex (151 X 64) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Padding C:\proton-vita\RTDink\media\interface\iphone4\main_but_new.png from 134X63 to be 256X64
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\iphone4\main_but_new.rttex (134 X 63) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Padding C:\proton-vita\RTDink\media\interface\iphone4\main_but_options.png from 215X73 to be 256X128
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\iphone4\main_but_options.rttex (215 X 73) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Padding C:\proton-vita\RTDink\media\interface\large\browse_dmod_bar.png from 880X128 to be 1024X128
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\large\browse_dmod_bar.rttex (880 X 128) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Padding C:\proton-vita\RTDink\media\interface\large\browse_install.png from 105X50 to be 128X64
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\large\browse_install.rttex (105 X 50) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\large\button_arrow_back.rttex (128 X 128) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\large\button_arrow_down.rttex (128 X 128) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\large\button_arrow_up.rttex (128 X 128) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\large\button_examine.rttex (128 X 128) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\large\button_inventory.rttex (128 X 128) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\large\button_item_base.rttex (128 X 128) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\large\button_item_no.rttex (128 X 128) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\large\button_magic_base.rttex (128 X 128) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\large\button_magic_no.rttex (128 X 128) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\large\button_quickload.rttex (256 X 256) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\large\button_quicksave.rttex (256 X 256) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Padding C:\proton-vita\RTDink\media\interface\large\dmod_bar.png from 902X202 to be 1024X256
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\large\dmod_bar.rttex (902 X 202) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Padding C:\proton-vita\RTDink\media\interface\large\dmod_delete_button.png from 66X66 to be 128X128
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\large\dmod_delete_button.rttex (66 X 66) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Padding C:\proton-vita\RTDink\media\interface\large\dmod_info_button.png from 72X68 to be 128X128
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\large\dmod_info_button.rttex (72 X 68) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\large\pause_icon.rttex (64 X 64) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Padding C:\proton-vita\RTDink\media\interface\large\pop_up.png from 570X365 to be 1024X512
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\large\pop_up.rttex (570 X 365) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Padding C:\proton-vita\RTDink\media\interface\large\pop_up_button.png from 159X74 to be 256X128
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\large\pop_up_button.rttex (159 X 74) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Padding C:\proton-vita\RTDink\media\interface\large\quicktip_dmod.png from 792X507 to be 1024X512
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\large\quicktip_dmod.rttex (792 X 507) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Padding C:\proton-vita\RTDink\media\interface\large\quicktip_feeding.png from 800X512 to be 1024X512
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\large\quicktip_feeding.rttex (800 X 512) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Padding C:\proton-vita\RTDink\media\interface\large\quicktip_saving.png from 800X512 to be 1024X512
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\large\quicktip_saving.rttex (800 X 512) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Padding C:\proton-vita\RTDink\media\interface\large\speed_up_button.png from 64X51 to be 64X64
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\large\speed_up_button.rttex (64 X 51) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Padding C:\proton-vita\RTDink\media\interface\osx\quicktip_dmod.png from 800X512 to be 1024X512
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\osx\quicktip_dmod.rttex (800 X 512) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\particle\cflight.rttex (32 X 32) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\particle\circle.rttex (128 X 128) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\particle\explosion.rttex (32 X 32) with 1 mipmaps.  (Ultra compress RGB bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\particle\light16p.rttex (16 X 16) with 1 mipmaps.  (Ultra compress RGB bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\particle\pointer.rttex (32 X 32) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\particle\sketch.rttex (32 X 8) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\particle\small.rttex (4 X 4) with 1 mipmaps.  (Ultra compress RGB bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\particle\star.rttex (16 X 16) with 1 mipmaps.  (Ultra compress RGB bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Padding C:\proton-vita\RTDink\media\interface\win\quicktip_dmod.png from 800X512 to be 1024X512
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\win\quicktip_dmod.rttex (800 X 512) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Padding C:\proton-vita\RTDink\media\interface\win\quicktip_feeding.png from 800X512 to be 1024X512
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\win\quicktip_feeding.rttex (800 X 512) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Padding C:\proton-vita\RTDink\media\interface\win\quicktip_saving.png from 800X512 to be 1024X512
+16/10 10:37:51: Saved out C:\proton-vita\RTDink\media\interface\win\quicktip_saving.rttex (800 X 512) with 1 mipmaps. (uses alpha) (RGBA 32 bit format)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Compressing C:\proton-vita\RTDink\media\interface\akiko.rttex..
+16/10 10:37:51: Compressed to C:\proton-vita\RTDink\media\interface\akiko.rttex.  (8 kb, 96%%)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Compressing C:\proton-vita\RTDink\media\interface\center_ball.rttex..
+16/10 10:37:51: Compressed to C:\proton-vita\RTDink\media\interface\center_ball.rttex.  (0 kb, 20%%)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Compressing C:\proton-vita\RTDink\media\interface\checkbox.rttex..
+16/10 10:37:51: Compressed to C:\proton-vita\RTDink\media\interface\checkbox.rttex.  (0 kb, 6%%)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Compressing C:\proton-vita\RTDink\media\interface\dink_ad.rttex..
+16/10 10:37:51: Compressed to C:\proton-vita\RTDink\media\interface\dink_ad.rttex.  (20 kb, 31%%)
+16/10 10:37:51: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:51: Compressing C:\proton-vita\RTDink\media\interface\ds_ad.rttex..
+16/10 10:37:51: Compressed to C:\proton-vita\RTDink\media\interface\ds_ad.rttex.  (26 kb, 41%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\fling_ad.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\fling_ad.rttex.  (9 kb, 15%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\font_bigx2_00.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\font_bigx2_00.rttex.  (72 kb, 4%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\font_big_00.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\font_big_00.rttex.  (32 kb, 6%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\font_normalx2_00.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\font_normalx2_00.rttex.  (36 kb, 7%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\font_normal_00.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\font_normal_00.rttex.  (16 kb, 6%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\mindwall_ad.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\mindwall_ad.rttex.  (2 kb, 3%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\rtsoft_logo.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\rtsoft_logo.rttex.  (3 kb, 10%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\scroll_bar_caps.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\scroll_bar_caps.rttex.  (0 kb, 13%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\seth.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\seth.rttex.  (8 kb, 96%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\sixtybeat_ad.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\sixtybeat_ad.rttex.  (60 kb, 12%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\slider_button.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\slider_button.rttex.  (4 kb, 14%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\turn_arrows.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\turn_arrows.rttex.  (5 kb, 8%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\android\quicktip_dmod.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\android\quicktip_dmod.rttex.  (380 kb, 37%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\generic\quicktip_dmod.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\generic\quicktip_dmod.rttex.  (356 kb, 35%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\ipad\arrows.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\ipad\arrows.rttex.  (60 kb, 24%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\ipad\bg_stone_overlay.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\ipad\bg_stone_overlay.rttex.  (169 kb, 33%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\ipad\bkgd_anim_fire.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\ipad\bkgd_anim_fire.rttex.  (2323 kb, 57%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\ipad\bkgd_stone.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\ipad\bkgd_stone.rttex.  (136 kb, 97%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\ipad\logo_dink.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\ipad\logo_dink.rttex.  (732 kb, 36%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\ipad\logo_rtsoft.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\ipad\logo_rtsoft.rttex.  (19 kb, 8%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\ipad\main_but_about.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\ipad\main_but_about.rttex.  (9 kb, 7%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\ipad\main_but_addon10.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\ipad\main_but_addon10.rttex.  (16 kb, 6%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\ipad\main_but_continue.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\ipad\main_but_continue.rttex.  (10 kb, 8%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\ipad\main_but_load.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\ipad\main_but_load.rttex.  (7 kb, 6%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\ipad\main_but_new.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\ipad\main_but_new.rttex.  (6 kb, 5%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\ipad\main_but_options.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\ipad\main_but_options.rttex.  (10 kb, 9%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\iphone\arrows.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\iphone\arrows.rttex.  (25 kb, 40%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\iphone\bg_stone_overlay.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\iphone\bg_stone_overlay.rttex.  (37 kb, 29%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\iphone\bkgd_anim_fire.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\iphone\bkgd_anim_fire.rttex.  (375 kb, 37%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\iphone\bkgd_stone.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\iphone\bkgd_stone.rttex.  (27 kb, 94%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\iphone\browse_dmod_bar.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\iphone\browse_dmod_bar.rttex.  (2 kb, 2%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\iphone\browse_install.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\iphone\browse_install.rttex.  (2 kb, 30%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\iphone\button_arrow_back.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\iphone\button_arrow_back.rttex.  (3 kb, 22%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\iphone\button_arrow_down.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\iphone\button_arrow_down.rttex.  (2 kb, 18%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\iphone\button_arrow_up.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\iphone\button_arrow_up.rttex.  (2 kb, 18%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\iphone\button_examine.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\iphone\button_examine.rttex.  (5 kb, 34%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\iphone\button_inventory.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\iphone\button_inventory.rttex.  (8 kb, 50%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\iphone\button_item_base.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\iphone\button_item_base.rttex.  (4 kb, 29%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\iphone\button_item_no.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\iphone\button_item_no.rttex.  (8 kb, 53%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\iphone\button_magic_base.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\iphone\button_magic_base.rttex.  (6 kb, 38%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\iphone\button_magic_no.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\iphone\button_magic_no.rttex.  (10 kb, 64%%)
+16/10 10:37:52: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:52: Compressing C:\proton-vita\RTDink\media\interface\iphone\button_quickload.rttex..
+16/10 10:37:52: Compressed to C:\proton-vita\RTDink\media\interface\iphone\button_quickload.rttex.  (20 kb, 32%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone\button_quicksave.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone\button_quicksave.rttex.  (19 kb, 31%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone\dmod_bar.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone\dmod_bar.rttex.  (16 kb, 7%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone\dmod_bg.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone\dmod_bg.rttex.  (39 kb, 96%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone\dmod_delete_button.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone\dmod_delete_button.rttex.  (1 kb, 12%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone\dmod_info_button.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone\dmod_info_button.rttex.  (1 kb, 42%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone\logo_dink.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone\logo_dink.rttex.  (172 kb, 17%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone\logo_rtsoft.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone\logo_rtsoft.rttex.  (5 kb, 9%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone\main_but_about.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone\main_but_about.rttex.  (4 kb, 14%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone\main_but_addon10.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone\main_but_addon10.rttex.  (9 kb, 29%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone\main_but_continue.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone\main_but_continue.rttex.  (5 kb, 18%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone\main_but_load.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone\main_but_load.rttex.  (3 kb, 11%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone\main_but_new.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone\main_but_new.rttex.  (3 kb, 10%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone\main_but_options.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone\main_but_options.rttex.  (6 kb, 19%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone\pause_icon.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone\pause_icon.rttex.  (3 kb, 22%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone\pop_up.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone\pop_up.rttex.  (131 kb, 26%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone\pop_up_button.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone\pop_up_button.rttex.  (4 kb, 14%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone\quicktip_dmod.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone\quicktip_dmod.rttex.  (356 kb, 35%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone\quicktip_feeding.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone\quicktip_feeding.rttex.  (363 kb, 35%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone\quicktip_saving.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone\quicktip_saving.rttex.  (358 kb, 35%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone\speed_up_button.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone\speed_up_button.rttex.  (0 kb, 23%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone4\arrows.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone4\arrows.rttex.  (85 kb, 33%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone4\bg_stone_overlay.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone4\bg_stone_overlay.rttex.  (144 kb, 28%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone4\bkgd_anim_fire.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone4\bkgd_anim_fire.rttex.  (167 kb, 96%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone4\bkgd_stone.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone4\bkgd_stone.rttex.  (102 kb, 94%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone4\button_quickload.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone4\button_quickload.rttex.  (20 kb, 32%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone4\logo_dink.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone4\logo_dink.rttex.  (615 kb, 30%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone4\logo_rtsoft.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone4\logo_rtsoft.rttex.  (19 kb, 8%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone4\main_but_about.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone4\main_but_about.rttex.  (12 kb, 19%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone4\main_but_addon10.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone4\main_but_addon10.rttex.  (24 kb, 19%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone4\main_but_continue.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone4\main_but_continue.rttex.  (15 kb, 24%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone4\main_but_load.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone4\main_but_load.rttex.  (9 kb, 15%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone4\main_but_new.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone4\main_but_new.rttex.  (9 kb, 14%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\iphone4\main_but_options.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\iphone4\main_but_options.rttex.  (15 kb, 12%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\large\browse_dmod_bar.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\large\browse_dmod_bar.rttex.  (4 kb, 1%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\large\browse_install.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\large\browse_install.rttex.  (3 kb, 11%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\large\button_arrow_back.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\large\button_arrow_back.rttex.  (11 kb, 18%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\large\button_arrow_down.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\large\button_arrow_down.rttex.  (9 kb, 14%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\large\button_arrow_up.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\large\button_arrow_up.rttex.  (9 kb, 14%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\large\button_examine.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\large\button_examine.rttex.  (18 kb, 29%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\large\button_inventory.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\large\button_inventory.rttex.  (29 kb, 46%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\large\button_item_base.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\large\button_item_base.rttex.  (7 kb, 12%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\large\button_item_no.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\large\button_item_no.rttex.  (16 kb, 25%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\large\button_magic_base.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\large\button_magic_base.rttex.  (15 kb, 24%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\large\button_magic_no.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\large\button_magic_no.rttex.  (26 kb, 41%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\large\button_quickload.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\large\button_quickload.rttex.  (60 kb, 24%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\large\button_quicksave.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\large\button_quicksave.rttex.  (60 kb, 24%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\large\dmod_bar.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\large\dmod_bar.rttex.  (52 kb, 5%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\large\dmod_delete_button.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\large\dmod_delete_button.rttex.  (5 kb, 8%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\large\dmod_info_button.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\large\dmod_info_button.rttex.  (6 kb, 10%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\large\pause_icon.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\large\pause_icon.rttex.  (8 kb, 53%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\large\pop_up.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\large\pop_up.rttex.  (518 kb, 25%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\large\pop_up_button.rttex..
+16/10 10:37:53: Compressed to C:\proton-vita\RTDink\media\interface\large\pop_up_button.rttex.  (15 kb, 12%%)
+16/10 10:37:53: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:53: Compressing C:\proton-vita\RTDink\media\interface\large\quicktip_dmod.rttex..
+16/10 10:37:54: Compressed to C:\proton-vita\RTDink\media\interface\large\quicktip_dmod.rttex.  (948 kb, 46%%)
+16/10 10:37:54: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:54: Compressing C:\proton-vita\RTDink\media\interface\large\quicktip_feeding.rttex..
+16/10 10:37:54: Compressed to C:\proton-vita\RTDink\media\interface\large\quicktip_feeding.rttex.  (987 kb, 48%%)
+16/10 10:37:54: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:54: Compressing C:\proton-vita\RTDink\media\interface\large\quicktip_saving.rttex..
+16/10 10:37:54: Compressed to C:\proton-vita\RTDink\media\interface\large\quicktip_saving.rttex.  (957 kb, 47%%)
+16/10 10:37:54: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:54: Compressing C:\proton-vita\RTDink\media\interface\large\speed_up_button.rttex..
+16/10 10:37:54: Compressed to C:\proton-vita\RTDink\media\interface\large\speed_up_button.rttex.  (1 kb, 11%%)
+16/10 10:37:54: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:54: Compressing C:\proton-vita\RTDink\media\interface\osx\quicktip_dmod.rttex..
+16/10 10:37:54: Compressed to C:\proton-vita\RTDink\media\interface\osx\quicktip_dmod.rttex.  (974 kb, 48%%)
+16/10 10:37:54: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:54: Compressing C:\proton-vita\RTDink\media\interface\particle\cflight.rttex..
+16/10 10:37:54: Compressed to C:\proton-vita\RTDink\media\interface\particle\cflight.rttex.  (0 kb, 20%%)
+16/10 10:37:54: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:54: Compressing C:\proton-vita\RTDink\media\interface\particle\circle.rttex..
+16/10 10:37:54: Compressed to C:\proton-vita\RTDink\media\interface\particle\circle.rttex.  (3 kb, 6%%)
+16/10 10:37:54: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:54: Compressing C:\proton-vita\RTDink\media\interface\particle\explosion.rttex..
+16/10 10:37:54: Compressed to C:\proton-vita\RTDink\media\interface\particle\explosion.rttex.  (0 kb, 76%%)
+16/10 10:37:54: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:54: Compressing C:\proton-vita\RTDink\media\interface\particle\light16p.rttex..
+16/10 10:37:54: Compressed to C:\proton-vita\RTDink\media\interface\particle\light16p.rttex.  (0 kb, 69%%)
+16/10 10:37:54: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:54: Compressing C:\proton-vita\RTDink\media\interface\particle\pointer.rttex..
+16/10 10:37:54: Compressed to C:\proton-vita\RTDink\media\interface\particle\pointer.rttex.  (0 kb, 10%%)
+16/10 10:37:54: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:54: Compressing C:\proton-vita\RTDink\media\interface\particle\sketch.rttex..
+16/10 10:37:54: Compressed to C:\proton-vita\RTDink\media\interface\particle\sketch.rttex.  (0 kb, 69%%)
+16/10 10:37:54: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:54: Compressing C:\proton-vita\RTDink\media\interface\particle\small.rttex..
+16/10 10:37:54: Compressed to C:\proton-vita\RTDink\media\interface\particle\small.rttex.  (0 kb, 68%%)
+16/10 10:37:54: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:54: Compressing C:\proton-vita\RTDink\media\interface\particle\star.rttex..
+16/10 10:37:54: Compressed to C:\proton-vita\RTDink\media\interface\particle\star.rttex.  (0 kb, 72%%)
+16/10 10:37:54: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:54: Compressing C:\proton-vita\RTDink\media\interface\win\quicktip_dmod.rttex..
+16/10 10:37:54: Compressed to C:\proton-vita\RTDink\media\interface\win\quicktip_dmod.rttex.  (964 kb, 47%%)
+16/10 10:37:54: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:54: Compressing C:\proton-vita\RTDink\media\interface\win\quicktip_feeding.rttex..
+16/10 10:37:54: Compressed to C:\proton-vita\RTDink\media\interface\win\quicktip_feeding.rttex.  (980 kb, 48%%)
+16/10 10:37:54: 
+RTPack V1.5 by Seth A. Robinson. (compiled with PVRTC support) /h for help
+
+16/10 10:37:54: Compressing C:\proton-vita\RTDink\media\interface\win\quicktip_saving.rttex..
+16/10 10:37:54: Compressed to C:\proton-vita\RTDink\media\interface\win\quicktip_saving.rttex.  (945 kb, 46%%)

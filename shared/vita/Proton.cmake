@@ -52,6 +52,7 @@ set(PROTON_SOURCES_BASIC "${PROTON_SHARED}/BaseApp.cpp" "${PROTON_SHARED}/Platfo
 	"${PROTON_BOOSTSIGNALS}/connection.cpp" "${PROTON_BOOSTSIGNALS}/named_slot_map.cpp" "${PROTON_BOOSTSIGNALS}/signal_base.cpp" "${PROTON_BOOSTSIGNALS}/slot.cpp" "${PROTON_BOOSTSIGNALS}/trackable.cpp"
 	"${PROTON_CLANMATH}/angle.cpp" "${PROTON_CLANMATH}/mat3.cpp" "${PROTON_CLANMATH}/mat4.cpp" "${PROTON_CLANMATH}/rect.cpp" "${PROTON_CLANMATH}/vec2.cpp" "${PROTON_CLANMATH}/vec3.cpp" "${PROTON_CLANMATH}/vec4.cpp"
 	"${PROTON_SHARED}/vita/Input/Touch/VitaTouch.cpp"
+	"${PROTON_UTIL}/archive/TarHandler.cpp"
 )
 
 # Includes a specific list of Components to the project. The names of
@@ -70,9 +71,8 @@ endmacro(proton_include_components)
 # Additionally includes the EntityUtils helpers.
 # Brings in all the dependencies as well.
 macro(proton_include_all_components)
-	proton_include_components(ArcadeInputComponent Button2DComponent Component CustomInputComponent DPadComponent EmitVirtualKeyComponent FilterComponent FilterInputComponent FocusInputComponent FocusRenderComponent FocusUpdateComponent InputTextRenderComponent InterpolateComponent LogDisplayComponent OverlayRenderComponent ProgressBarComponent RandomAudioPlayerComponent RectRenderComponent RenderClipComponent RenderScissorComponent ScrollBarRenderComponent ScrollComponent SelectButtonWithCustomInputComponent SliderComponent SplashComponent TapSequenceDetectComponent TextBoxRenderComponent TextRenderComponent TouchDragComponent TouchHandlerComponent TouchStripComponent TrailRenderComponent TyperComponent UnderlineRenderComponent)
-	#HTTPComponent is removed for now.
-	#list(APPEND PROTON_SOURCES "${PROTON_NETWORK}/NetHTTP.cpp" "${PROTON_NETWORK}/NetSocket.cpp" "${PROTON_NETWORK}/NetUtils.cpp" "${PROTON_UTIL}/TextScanner.cpp")
+	proton_include_components(ArcadeInputComponent Button2DComponent Component CustomInputComponent DPadComponent EmitVirtualKeyComponent FilterComponent FilterInputComponent FocusInputComponent FocusRenderComponent FocusUpdateComponent InputTextRenderComponent InterpolateComponent LogDisplayComponent OverlayRenderComponent ProgressBarComponent RandomAudioPlayerComponent RectRenderComponent RenderClipComponent RenderScissorComponent ScrollBarRenderComponent ScrollComponent SelectButtonWithCustomInputComponent SliderComponent SplashComponent TapSequenceDetectComponent TextBoxRenderComponent HTTPComponent TextRenderComponent TouchDragComponent TouchHandlerComponent TouchStripComponent TrailRenderComponent TyperComponent UnderlineRenderComponent)
+	list(APPEND PROTON_SOURCES "${PROTON_NETWORK}/NetHTTP.cpp" "${PROTON_NETWORK}/NetSocket.cpp" "${PROTON_NETWORK}/NetUtils.cpp" "${PROTON_UTIL}/TextScanner.cpp")
 	list(APPEND PROTON_SOURCES "${PROTON_ENTITY}/EntityUtils.cpp")
 endmacro(proton_include_all_components)
 
@@ -256,6 +256,6 @@ function(proton_set_sources)
     endif(PROTON_USE_SDL_AUDIO)
 
     #link required depencies.
-    target_link_libraries(${PROJECT_NAME} vitaGL vitashark SceShaccCg_stub SceGxm_stub SceKernelDmacMgr_stub SceDisplay_stub SceCtrl_stub SceAudio_stub SceSysmodule_stub SceCommonDialog_stub SceAppMgr_stub SceHid_stub SceMotion_stub SceIme_stub SceTouch_stub freetype mathneon m c z)
+    target_link_libraries(${PROJECT_NAME} vitaGL vitashark SceShaccCg_stub SceGxm_stub SceKernelDmacMgr_stub SceDisplay_stub SceCtrl_stub SceAudio_stub SceSysmodule_stub SceCommonDialog_stub SceAppMgr_stub SceHid_stub SceMotion_stub SceIme_stub SceTouch_stub freetype mathneon m c z bz2)
 
 endfunction(proton_set_sources)

@@ -352,3 +352,21 @@ string GetNetworkType()
 {
 	return "none"; // not supported for this OS
 }
+
+bool IsStillLoadingPersistentData()
+{
+	return false;
+}
+bool IsStillSavingPersistentData()
+{
+	return false;
+}
+
+void SyncPersistentData() //required for DTDink
+{
+}
+
+string GetClipboardText()
+{
+    return ""; //cant be used...
+}
