@@ -27,7 +27,7 @@ std::string GetBaseAppPath()
 
 std::string GetSavePath()
 {
-    return GetBaseAppPath() + string(GetAppName()) + "/";
+    return GetBaseAppPath(); // + string(GetAppName()) + "/"  for now...
 }
 
 string g_CachePath;
@@ -146,7 +146,7 @@ std::string GetLastStringInput()
     return g_string;
 }
 
-bool GetLastWriteDateOfFile(int *monthOut, int *dayOut, int *yearOut, int *hourOut, int *minOut, int *secOut, std::string fileName, bool bAddSavePath)
+bool GetLastWriteDateOf (int *monthOut, int *dayOut, int *yearOut, int *hourOut, int *minOut, int *secOut, std::string fileName, bool bAddSavePath)
 {
     return false; //TODO!!
 }
@@ -158,17 +158,29 @@ void RemoveFile(std::string fileName, bool bAddSavePath)
     
     if(sceIoRemove(fileName.c_str()) < 0)
     {
-        LogMsg("RemoveFile(): Failed to remove file!!!");
+        LogMsg("RemoveFile(): Failed to remove file!!! dir: %s", bAddSavePath);
     }
 }
 
 void CreateDirectoryRecursively(std::string basePath, std::string path)
 {
-    string directory = basePath + path;
-    if(sceIoMkdir(directory.c_str(), 0777) != 0) //TODO: 0777 is dangerous use proper file permissions!
-    {
-        LogMsg("CreateDirectoryRecursively(): Failed to create directory!!!");
-    }
+    vector<string> tok = StringTokenize(path, "/");
+
+	if (!basePath.empty())
+	{
+		if (basePath[basePath.size()-1] != '/') basePath += "/";
+	}
+	path = "";
+	for (unsigned int i=0; i < tok.size(); i++)
+	{
+		path += tok[i].c_str();
+        string directory = basePath + path;
+        if(sceIoMkdir(directory.c_str(), 0777) != 0)
+        {
+            //LogMsg("CreateDirectoryRecursively(): Failed to Make Dir %s", directory.c_str());
+        }
+		path += "/";
+	}
 }
 
 bool RemoveDirectoryRecursively(std::string path)
@@ -200,7 +212,7 @@ std::vector<std::string> GetDirectoriesAtPath(std::string path)
             {
                 if (SCE_S_ISDIR(dir.d_stat.st_mode))
                 {
-                    LogMsg("Dir is %d", dir.d_name);
+                    v.push_back(string(dir.d_name));
                 }
             }
 
@@ -228,7 +240,10 @@ std::vector<std::string> GetFilesAtPath(std::string path)
 
             if ( result > 0 )
             {
-                LogMsg("Dir is %d", dir.d_name);
+                if (!SCE_S_ISDIR(dir.d_stat.st_mode))
+                {
+                    v.push_back(string(dir.d_name));
+                }
             }
 
         } while ( result > 0 );
@@ -281,7 +296,7 @@ eNetworkType IsNetReachable(std::string url)
 
 eDeviceMemoryClass GetDeviceMemoryClass()
 {
-    return C_DEVICE_MEMORY_CLASS_3;   
+    return C_DEVICE_MEMORY_CLASS_2;   
 }
 
 bool IsIPodTouchThirdGen()

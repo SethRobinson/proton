@@ -50,10 +50,10 @@ void GamepadVita::Update()
     PressButton(SCE_CTRL_CROSS, 3);
     PressButton(SCE_CTRL_SQUARE, 0);
     
-    PressButton(SCE_CTRL_UP, 10);
-    PressButton(SCE_CTRL_RIGHT, 11);
-    PressButton(SCE_CTRL_DOWN, 12);
-    PressButton(SCE_CTRL_LEFT, 13);
+    //PressButton(SCE_CTRL_UP, 10);
+    //PressButton(SCE_CTRL_RIGHT, 11);
+    //PressButton(SCE_CTRL_DOWN, 12);
+    //PressButton(SCE_CTRL_LEFT, 13);
 
     PressButton(SCE_CTRL_START, 5);
     PressButton(SCE_CTRL_SELECT, 4);
@@ -61,10 +61,15 @@ void GamepadVita::Update()
     PressButton(SCE_CTRL_L1, 6);
     PressButton(SCE_CTRL_R1, 7);
 
-	SetAxis(0, ConvertToProtonStickWithDeadZone(m_state.lx));
-	SetAxis(1, ConvertToProtonStickWithDeadZone(m_state.ly * -1.0f));
-	SetAxis(2, ConvertToProtonStickWithDeadZone(m_state.rx));
-	SetAxis(3, ConvertToProtonStickWithDeadZone(m_state.ry * -1.0f));
+    SendArcadeDirectionByKey(VIRTUAL_KEY_DIR_DOWN, m_state.buttons & SCE_CTRL_DOWN);
+	SendArcadeDirectionByKey(VIRTUAL_KEY_DIR_UP, m_state.buttons & SCE_CTRL_UP);
+	SendArcadeDirectionByKey(VIRTUAL_KEY_DIR_LEFT, m_state.buttons & SCE_CTRL_LEFT);
+	SendArcadeDirectionByKey(VIRTUAL_KEY_DIR_RIGHT, m_state.buttons & SCE_CTRL_RIGHT);
+
+	//SetAxis(0, ConvertToProtonStickWithDeadZone(m_state.lx));
+	//SetAxis(1, ConvertToProtonStickWithDeadZone(m_state.ly * -1.0f));
+	//SetAxis(2, ConvertToProtonStickWithDeadZone(m_state.rx));
+	//SetAxis(3, ConvertToProtonStickWithDeadZone(m_state.ry * -1.0f));
 }
 
 void GamepadVita::PressButton(int mask, int id)

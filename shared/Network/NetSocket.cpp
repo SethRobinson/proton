@@ -42,6 +42,7 @@
 #elif defined (PLATFORM_VITA)
 #include <psp2/sysmodule.h>
 #include <psp2/net/net.h>
+#include <psp2/net/netctl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #else
@@ -64,12 +65,29 @@
 
 NetSocket::NetSocket()
 {
+	/*
+	sceSysmoduleLoadModule(SCE_SYSMODULE_NET);
+	
+	SceNetInitParam netInitParam;
+	int size = 4 * 1024 * 1024;
+	netInitParam.memory = malloc(size);
+	netInitParam.size = size;
+	netInitParam.flags = 0;
+	sceNetInit(&netInitParam);
+	sceNetCtlInit();
+	*/
 	m_socket = INVALID_SOCKET;
 	m_bWasDisconnected = false;
 }
 
 NetSocket::~NetSocket()
 {
+	/*
+	sceNetCtlTerm();
+	sceNetTerm();
+	sceSysmoduleUnloadModule(SCE_SYSMODULE_NET);
+	*/
+	
 	Kill();
 }
 
@@ -311,15 +329,6 @@ bool NetSocket::Init( string url, int port )
 
 bool NetSocket::InitHost( int port, int connections )
 {
-	sceSysmoduleLoadModule(SCE_SYSMODULE_NET);
-	
-	SceNetInitParam netInitParam;
-	int size = 1 * 1024 * 1024;
-	netInitParam.memory = malloc(size);
-	netInitParam.size = size;
-	netInitParam.flags = 0;
-	sceNetInit(&netInitParam);
-
 	Kill();
 
 	sockaddr_in sa;

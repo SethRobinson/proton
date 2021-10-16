@@ -63,7 +63,7 @@ int main()
 		g_VitaTouch.Update();
 		vglSwapBuffers(GL_FALSE);
 
-	} while(ctrlData.buttons != SCE_CTRL_START); //kill switch.
+	} while(ctrlData.buttons != SCE_CTRL_PSBUTTON); //kill switch.
 	
 	GetBaseApp()->Kill();
 	vglEnd();
