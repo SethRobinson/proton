@@ -623,7 +623,7 @@ string ReplaceMP3( const string &fName)
 {
 	if (GetEmulatedPlatformID() != PLATFORM_ID_ANDROID)
 	{
-		//check if platform is PSVita so we replace mp3 with "ogg" since SDL doesnt support ogg on psvita or it seems..
+		//check if platform is PSVita so we replace mp3 with "ogg" since SDL doesnt support mp3 on psvita or it seems..
 		if(GetEmulatedPlatformID() == PLATFORM_ID_PSVITA)
 		{
 			string final = fName;
