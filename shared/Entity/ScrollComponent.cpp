@@ -52,6 +52,7 @@ void ScrollComponent::OnAdd(Entity *pEnt)
 	GetParent()->GetFunction("OnOverEnd")->sig_function.connect(1, boost::bind(&ScrollComponent::OnOverEnd, this, _1));
 	GetParent()->GetFunction("OnOverMove")->sig_function.connect(1, boost::bind(&ScrollComponent::OnOverMove, this, _1));
 	GetParent()->GetFunction("OnUpdate")->sig_function.connect(1, boost::bind(&ScrollComponent::OnUpdate, this, _1));
+	GetParent()->GetFunction("OnInput")->sig_function.connect(1, boost::bind(&ScrollComponent::OnInput, this, _1));
 	GetFunction("SetProgress")->sig_function.connect(1, boost::bind(&ScrollComponent::SetProgress, this, _1));
 }
 
@@ -116,6 +117,18 @@ void ScrollComponent::OnOverStart(VariantList *pVList)
 	
 	SetIsScrolling(false); 
 	m_lastTouchPos = pVList->m_variant[0].GetVector2();
+}
+
+// handles MESSAGE_TYPE_GUI_MOUSEWHEEL only. Platforms other than Windows and HTML 5 don't seem to send this
+void ScrollComponent::OnInput(VariantList* pVList)
+{
+	float f = pVList->Get(0).GetFloat();
+	if (f == MESSAGE_TYPE_GUI_MOUSEWHEEL) {
+		SetIsScrolling(true);
+		m_vecDisplacement.y += pVList->Get(1).GetVector2().x * *m_pPowerMod * 0.75f;//Maybe change if on HTML5?
+		m_vTotalDisplacementOnCurrentSwipe.y += pVList->Get(1).GetVector2().x * *m_pPowerMod * 0.75f;
+		SetPosition(m_vecDisplacement, false);
+	}
 }
 
 void ScrollComponent::OnOverEnd(VariantList *pVList)
@@ -224,7 +237,7 @@ void ScrollComponent::OnUpdate(VariantList *pVList)
 		if (m_bIsScrolling || GetBaseApp()->GetTotalActiveTouches() == 0 || *m_pSwipeDetectDistance == 0 || *m_pDontScrollUntilSwipeDetected == 0)
 		{
 			SetPosition(m_vecDisplacement*GetBaseApp()->GetDelta(), false);
-			m_vecDisplacement *= (1- (*m_pFriction*GetBaseApp()->GetDelta()));
+			m_vecDisplacement *= (1 - (*m_pFriction * GetBaseApp()->GetDelta()));
 		}
 	}
 }

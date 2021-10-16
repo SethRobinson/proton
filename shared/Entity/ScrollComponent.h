@@ -86,6 +86,7 @@ private:
 	bool isInterestingFinger(uint32 fingerID) const;
 
 	void OnUpdate(VariantList *pVList);
+	void OnInput(VariantList *pVList);
 	void OnOverStart(VariantList *pVList);
 	void OnOverEnd(VariantList *pVList);
 	void OnOverMove(VariantList *pVList);
