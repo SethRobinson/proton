@@ -139,39 +139,13 @@ int MySQLManager::AddSelectResults(vector<VariantDB> &vdb)
 	int rows = (int)mysql_num_rows(result);
 
 	MYSQL_ROW row;
-	MYSQL_FIELD *field;
-	
-	vector<string> fieldNames;
-	vector<enum_field_types> fieldType;
-	vector<int> maxLength;
-	vector<bool> isBinary;
+	MYSQL_FIELD *fields = mysql_fetch_fields(result);
 
-	int curRow = (int)vdb.size();
-	vdb.resize(curRow+rows);
-
-	bool bGotFields = false;
-
-	while ((row = mysql_fetch_row(result)))
+	for(int i = 0; i < num_fields; i++)
 	{
-	
-	  VariantDB &db = vdb[curRow++];
+        auto field = fields[i];
 
-	  if (!bGotFields) 
-	  {
-		  bGotFields = true;
-
-		  while(field = mysql_fetch_field(result)) 
-		  {
-			  fieldNames.push_back(field->name);
-			  fieldType.push_back(field->type);
-			  maxLength.push_back(field->max_length);
-			  isBinary.push_back((field->flags&BINARY_FLAG)!=0);
-		  }
-	  }
-	  for(int i = 0; i < num_fields; i++)
-		{
-
-			switch(fieldType[i])
+			switch(field.type)
 			{
 			case FIELD_TYPE_NEWDECIMAL:
 			case FIELD_TYPE_DECIMAL:
@@ -179,10 +153,10 @@ int MySQLManager::AddSelectResults(vector<VariantDB> &vdb)
 			case FIELD_TYPE_DOUBLE:
 				if (!row[i])
 				{
-					db.GetVar(fieldNames[i])->Set((float)0);
+					db.GetVar(field.name)->Set((float)0);
 				} else
 				{
-					db.GetVar(fieldNames[i])->Set((float)atof(row[i]));
+					db.GetVar(field.name)->Set((float)atof(row[i]));
 				}
 				break;
 
@@ -191,10 +165,10 @@ int MySQLManager::AddSelectResults(vector<VariantDB> &vdb)
 			case FIELD_TYPE_LONGLONG:
 				if (!row[i])
 				{
-					db.GetVar(fieldNames[i])->Set((int32)0);
+					db.GetVar(field.name)->Set((int32)0);
 				} else
 				{
-					db.GetVar(fieldNames[i])->Set((int32)atoi(row[i]));
+					db.GetVar(field.name)->Set((int32)atoi(row[i]));
 				}
 				break;
 
@@ -203,7 +177,7 @@ int MySQLManager::AddSelectResults(vector<VariantDB> &vdb)
 					if (!row[i])
 					{
 						//it's null, no date set. Guess we'll just call that a 0.
-						db.GetVar(fieldNames[i])->Set(uint32(0));
+						db.GetVar(field.name)->Set(uint32(0));
 					} else
 					{
 						uint	y, m, d, h, mn, s;
@@ -222,7 +196,7 @@ int MySQLManager::AddSelectResults(vector<VariantDB> &vdb)
 						myTm.tm_yday = -1;
 						//assert( sizeof(time_t) == 4 && "Uh oh.. define _USE_32BIT_TIME_T somewhere for MSVC");
 						uint32 t = (uint32)mktime(&myTm);
-						db.GetVar(fieldNames[i])->Set(t);
+						db.GetVar(field.name)->Set(t);
 					}
 				}
 				break;
@@ -233,7 +207,7 @@ int MySQLManager::AddSelectResults(vector<VariantDB> &vdb)
 					if (!row[i])
 					{
 						//it's null, no date set. Guess we'll just call that a 0.
-						db.GetVar(fieldNames[i])->Set(uint32(0));
+						db.GetVar(field.name)->Set(uint32(0));
 					} else
 					{
 						uint	y, m, d;
@@ -252,7 +226,7 @@ int MySQLManager::AddSelectResults(vector<VariantDB> &vdb)
 						myTm.tm_yday = -1;
 						//assert( sizeof(time_t) == 4 && "Uh oh.. define _USE_32BIT_TIME_T somewhere for MSVC");
 						uint32 t = (uint32) mktime(&myTm);
-						db.GetVar(fieldNames[i])->Set(t);
+						db.GetVar(field.name)->Set(t);
 					}
 				}
 				break;
@@ -278,7 +252,7 @@ int MySQLManager::AddSelectResults(vector<VariantDB> &vdb)
 
 
 					uint32 t = (uint32) mktime(&tm);
-					db.GetVar(fieldNames[i])->Set(t);
+					db.GetVar(field.name)->Set(t);
 				}
 				break;
 
@@ -294,7 +268,6 @@ int MySQLManager::AddSelectResults(vector<VariantDB> &vdb)
 						{
 							//now put it into the string, keeping things like nulls and such.  (up to you to pull it out right though)
 							s.resize(maxLength[i]);
-
 							if (row[i])
 								memcpy((void*)s.c_str(), &row[i][0], maxLength[i]);
 						}
@@ -311,25 +284,27 @@ int MySQLManager::AddSelectResults(vector<VariantDB> &vdb)
 				if (!row[i])
 				{
 					//well, it's null.  Just pretend it's a blank string
-					db.GetVar(fieldNames[i])->Set("");
+					db.GetVar(field.name)->Set("");
 				} else
 				{
-					if(isBinary[i])
+					if ((field.flags & BINARY_FLAG) != 0)
 					{
-						db.GetVar(fieldNames[i])->Set(string());
-						string &s = db.GetVar(fieldNames[i])->GetString();
-						if (maxLength[i] > 0)
+						db.GetVar(field.name)->Set(string());
+						string &s = db.GetVar(field.name)->GetString();
+                        auto maxLen = field.max_length;
+                        
+						if (maxLen > 0)
 						{
 							//now put it into the string, keeping things like nulls and such.  (up to you to pull it out right though)
-							s.resize(maxLength[i]);
+							s.resize(maxLen);
 
 							if (row[i])
-								memcpy((void*)s.c_str(), &row[i][0], maxLength[i]);
+								memcpy((void*)s.c_str(), &row[i][0], maxLen);
 						}
 					} 
 					else
 					{
-						db.GetVar(fieldNames[i])->Set(string(row[i]));
+						db.GetVar(field.name)->Set(string(row[i]));
 					}
 				}
 				break;
@@ -338,16 +313,16 @@ int MySQLManager::AddSelectResults(vector<VariantDB> &vdb)
 				if (!row[i])
 				{
 					//well, it's null.  Just pretend it's a blank string
-					db.GetVar(fieldNames[i])->Set("");
+					db.GetVar(field.name)->Set("");
 				} else
 				{
-					db.GetVar(fieldNames[i])->Set(string(row[i]));
+					db.GetVar(field.name)->Set(string(row[i]));
 				}
 				break;
 
 			default:;
 				assert(!"Unknown mysql type");
-				db.GetVar(fieldNames[i])->Set(string(row[i]));
+				db.GetVar(field.name)->Set(string(row[i]));
 
 			}
 
