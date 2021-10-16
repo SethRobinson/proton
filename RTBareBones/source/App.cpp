@@ -296,11 +296,7 @@ void App::Update()
 		b.DumpToLog();
 		*/
 	}
-
-//#ifdef PLATFORM_VITA
-//	GetGamepadManager()->Update();
-//#endif
-
+	
 	//game is thinking.  
 }
 
