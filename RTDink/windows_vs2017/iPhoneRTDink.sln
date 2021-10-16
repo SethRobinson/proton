@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.16
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "winRTDink", "winRTDink.vcxproj", "{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Common Debug|Win32 = Common Debug|Win32
+		Common Debug|x64 = Common Debug|x64
+		Common Release|Win32 = Common Release|Win32
+		Common Release|x64 = Common Release|x64
+		Debug GL|Win32 = Debug GL|Win32
+		Debug GL|x64 = Debug GL|x64
+		Debug WebOS|Win32 = Debug WebOS|Win32
+		Debug WebOS|x64 = Debug WebOS|x64
+		Flash GLES Debug Test|Win32 = Flash GLES Debug Test|Win32
+		Flash GLES Debug Test|x64 = Flash GLES Debug Test|x64
+		Release GL AkikoBox|Win32 = Release GL AkikoBox|Win32
+		Release GL AkikoBox|x64 = Release GL AkikoBox|x64
+		Release GL|Win32 = Release GL|Win32
+		Release GL|x64 = Release GL|x64
+		ReleaseBeta GL|Win32 = ReleaseBeta GL|Win32
+		ReleaseBeta GL|x64 = ReleaseBeta GL|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Common Debug|Win32.ActiveCfg = Common Debug|Win32
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Common Debug|Win32.Build.0 = Common Debug|Win32
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Common Debug|x64.ActiveCfg = Common Debug|x64
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Common Debug|x64.Build.0 = Common Debug|x64
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Common Release|Win32.ActiveCfg = Common Release|Win32
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Common Release|Win32.Build.0 = Common Release|Win32
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Common Release|x64.ActiveCfg = Common Release|x64
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Common Release|x64.Build.0 = Common Release|x64
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Debug GL|Win32.ActiveCfg = Debug GL|Win32
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Debug GL|Win32.Build.0 = Debug GL|Win32
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Debug GL|x64.ActiveCfg = Debug GL|x64
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Debug GL|x64.Build.0 = Debug GL|x64
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Debug WebOS|Win32.ActiveCfg = Debug WebOS|Win32
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Debug WebOS|Win32.Build.0 = Debug WebOS|Win32
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Debug WebOS|x64.ActiveCfg = Debug WebOS|x64
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Debug WebOS|x64.Build.0 = Debug WebOS|x64
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Flash GLES Debug Test|Win32.ActiveCfg = Debug WebOS|Win32
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Flash GLES Debug Test|Win32.Build.0 = Debug WebOS|Win32
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Flash GLES Debug Test|x64.ActiveCfg = Common Release|x64
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Flash GLES Debug Test|x64.Build.0 = Common Release|x64
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Release GL AkikoBox|Win32.ActiveCfg = Release GL AkikoBox|Win32
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Release GL AkikoBox|Win32.Build.0 = Release GL AkikoBox|Win32
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Release GL AkikoBox|x64.ActiveCfg = Release GL AkikoBox|x64
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Release GL AkikoBox|x64.Build.0 = Release GL AkikoBox|x64
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Release GL|Win32.ActiveCfg = Release GL|Win32
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Release GL|Win32.Build.0 = Release GL|Win32
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Release GL|x64.ActiveCfg = Release GL|x64
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.Release GL|x64.Build.0 = Release GL|x64
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.ReleaseBeta GL|Win32.ActiveCfg = ReleaseBeta GL|Win32
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.ReleaseBeta GL|Win32.Build.0 = ReleaseBeta GL|Win32
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.ReleaseBeta GL|x64.ActiveCfg = ReleaseBeta GL|x64
+		{AD1D1337-0F3F-4AC5-B9EE-EE151B0193FE}.ReleaseBeta GL|x64.Build.0 = ReleaseBeta GL|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
