@@ -62,18 +62,19 @@ AudioHandle AudioManagerSDL::Play( const string fileName )
 bool AudioManagerSDL::Init()
 {
 
-	//SDL_Init(SDL_INIT_AUDIO);
-#ifndef PLATFORM_HTML5
-	//Emscripten's fake ass SDL audio doesn't like this
+#if defined(PLATFORM_HTML5) || defined(PLATFORM_VITA)
+	//do nothing.
+#else
 	SDL_InitSubSystem(SDL_INIT_AUDIO);
 #endif
 
-	
+#ifndef PLATFORM_VITA
 	int i;
 
 	for (i = 0; i < SDL_GetNumAudioDrivers(); ++i) {
 		LogMsg("Audio driver %d: %s\n", i, SDL_GetAudioDriver(i));
 	}
+#endif
 
 	//valid is directsound or winmm
 	
@@ -134,7 +135,7 @@ bool AudioManagerSDL::Init()
 	int channels = 2;
 	int bufferSize = 2048;
 	
-#ifdef PLATFORM_HTML5
+#if defined(PLATFORM_HTML5) || defined(PLATFORM_VITA)
 	int ret = Mix_OpenAudio(0, 0, 0, 0); // we ignore all these..
 	assert(ret == 0);
 #else
@@ -183,8 +184,9 @@ bool AudioManagerSDL::Init()
 	//SDL_PauseAudioDevice(dev, 0); // start audio playing.
 	SDL_PauseAudio(0);
 
+#ifndef PLATFORM_VITA
 	LogMsg("SDL2_mixer initted using %s", SDL_GetCurrentAudioDriver());
-	
+#endif
 	
 #ifdef PLATFORM_HTML5
 	LogMsg("Preloading audio/blank.wav, an audio sample MUST exist here, we use it on the first tap to get around locked audio on iOS");
