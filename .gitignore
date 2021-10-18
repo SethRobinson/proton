@@ -9,3 +9,14 @@ NotShared/
 *.obj
 *.DS_Store
 *.pdb
+RTSimpleApp/media/interface/*.rttex
+RTSimpleApp/media/interface/*.rtfont
+RTSimpleApp/bin/
+shared/win/utils/log.txt
+.vs
+*.tlog
+*.log
+*.recipe
+*.vcxproj.user
+**/bin/log.txt
+**/bin/*.exe
