@@ -9,7 +9,7 @@
 
 #include "Entity/CustomInputComponent.h" //used for the back button (android)
 #include "Entity/FocusInputComponent.h" //needed to let the input component see input messages
-#include "Entity/ArcadeInputComponent.h" 
+#include "Entity/ArcadeInputComponent.h"
 //#include "util/TextScanner.h"
 
 MessageManager g_messageManager;
@@ -164,12 +164,12 @@ void App::OnArcadeInput(VariantList *pVList)
 			keyName = "Left";
 			break;
 
-		case VIRTUAL_KEY_DIR_RIGHT:
-			keyName = "Right";
-			break;
-
 		case VIRTUAL_KEY_DIR_UP:
 			keyName = "Up";
+			break;
+
+		case VIRTUAL_KEY_DIR_RIGHT:
+			keyName = "Right";
 			break;
 
 		case VIRTUAL_KEY_DIR_DOWN:
@@ -258,6 +258,7 @@ void App::Update()
 		//GetBaseApp()->m_sig_accel.connect(1, boost::bind(&App::OnAccel, this, _1));
 
 		//TRACKBALL/ARCADETEST: Uncomment below to see log messages on trackball/key movement input
+
 		pComp = pEnt->AddComponent(new ArcadeInputComponent);
 		GetBaseApp()->m_sig_arcade_input.connect(1, boost::bind(&App::OnArcadeInput, this, _1));
 	
@@ -295,7 +296,7 @@ void App::Update()
 		b.DumpToLog();
 		*/
 	}
-
+	
 	//game is thinking.  
 }
 

@@ -14,19 +14,21 @@
 
 #include <fcntl.h>
 
-#elif defined(PLATFORM_BBX)
+#elif defined(PLATFORM_BBX) || defined(PLATFORM_VITA)
 #include <fcntl.h>
 
 #else
 	#include <sys/fcntl.h>
 #endif
 
-
+#ifndef PLATFORM_VITA
 #include <sys/ioctl.h>
+#endif
+
 #define INVALID_SOCKET  (~0)
 #define rt_closesocket(x) close(x)
 
-#if defined(RT_WEBOS_ARM) || defined(ANDROID_NDK) || defined (RTLINUX) 
+#if defined(RT_WEBOS_ARM) || defined(ANDROID_NDK) || defined (RTLINUX)
 	#include <linux/sockios.h>
 	#include <errno.h>
 
@@ -37,6 +39,12 @@
 
 #elif defined (PLATFORM_HTML5)
 #include <sys/errno.h>
+#elif defined (PLATFORM_VITA)
+#include <psp2/sysmodule.h>
+#include <psp2/net/net.h>
+#include <psp2/net/netctl.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 #else
 	//default
 	#include <sys/sockio.h>
@@ -57,12 +65,29 @@
 
 NetSocket::NetSocket()
 {
+	/*
+	sceSysmoduleLoadModule(SCE_SYSMODULE_NET);
+	
+	SceNetInitParam netInitParam;
+	int size = 4 * 1024 * 1024;
+	netInitParam.memory = malloc(size);
+	netInitParam.size = size;
+	netInitParam.flags = 0;
+	sceNetInit(&netInitParam);
+	sceNetCtlInit();
+	*/
 	m_socket = INVALID_SOCKET;
 	m_bWasDisconnected = false;
 }
 
 NetSocket::~NetSocket()
 {
+	/*
+	sceNetCtlTerm();
+	sceNetTerm();
+	sceSysmoduleUnloadModule(SCE_SYSMODULE_NET);
+	*/
+	
 	Kill();
 }
 
@@ -268,7 +293,7 @@ bool NetSocket::Init( string url, int port )
 	memset(&sa,0,sizeof(sa));
 	memcpy((char *)&sa.sin_addr,hp->h_addr,hp->h_length);    
 	sa.sin_family= hp->h_addrtype;
-	sa.sin_port= htons((u_short)port);
+	sa.sin_port= htons((unsigned short)port);
 
 	if ((m_socket= (int)socket(hp->h_addrtype,SOCK_STREAM,0)) < 0)    
 		return false;
@@ -382,6 +407,9 @@ void NetSocket::SetSocket( int socket )
 
 string NetSocket::GetClientIPAsString()
 {
+#ifdef PLATFORM_VITA
+	return "NOT SUPPORTED";
+#endif
 	if (m_socket == INVALID_SOCKET) return "NOT CONNECTED";
 
 	sockaddr_in addr;
@@ -395,6 +423,7 @@ string NetSocket::GetClientIPAsString()
 
 	int result = getpeername(m_socket, (sockaddr*) &addr, &addrsize);
 	//printf("Result = %d\n", result);
+	
 	char* ip = inet_ntoa(addr.sin_addr);
 	int port = addr.sin_port;
 	//printf("IP: %s ... PORT: %d\n", ip, port);

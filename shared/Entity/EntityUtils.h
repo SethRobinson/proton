@@ -396,4 +396,5 @@ void GetFontAndScaleToFitThisLinesPerScreenY(eFont *pFontIDOut, float *pFontScal
 void GetFontAndScaleToFitThisPixelHeight(eFont *pFontIDOut, float *pFontScaleOut, float heightPixels);
 void GetFontAndScaleToFitThisStringInWidthPixels(eFont *pFontIDOut, float *pFontScaleOut, string text, float desiredWidth);
 void SetEntityOverlayToUnloadImageOnKill(Entity *pImage);
+
 #endif // EntityUtils_h__

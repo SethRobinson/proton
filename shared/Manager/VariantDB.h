@@ -40,7 +40,7 @@ public:
 
 #else
 
-#if defined( __APPLE__) || defined(RTLINUX)|| defined(PLATFORM_LINUX)||ANDROID_NDK || defined(PLATFORM_FLASH) || defined(PLATFORM_HTML5)
+#if defined( __APPLE__) || defined(RTLINUX)|| defined(PLATFORM_LINUX)||ANDROID_NDK || defined(PLATFORM_FLASH) || defined(PLATFORM_HTML5) || defined(PLATFORM_VITA)
 
 #ifdef PLATFORM_HTML5
 
