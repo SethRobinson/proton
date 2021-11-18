@@ -28,8 +28,18 @@ void VitaTouch::Update()
 		    float y = lerp(m_Touch.report[i].y, 1087, 544);
 
             ConvertCoordinatesIfRequired(x, y);
-            GetMessageManager()->SendGUIEx(MESSAGE_TYPE_GUI_CLICK_START, x, y, i);
-            GetMessageManager()->SendGUIEx(MESSAGE_TYPE_GUI_CLICK_MOVE, x, y, i);
+
+            bool FingerDown = false;
+            for(int j = 0; j < m_TouchPrevious.reportNum; j++)
+                if (m_Touch.report[i].id == m_TouchPrevious.report[j].id)
+                    FingerDown = true;
+
+            if(!FingerDown)
+                GetMessageManager()->SendGUIEx(MESSAGE_TYPE_GUI_CLICK_START, x, y, i);
+            else
+                for(int j = 0; j < m_TouchPrevious.reportNum; j++)
+                    if(m_TouchPrevious.report[j].x != m_Touch.report[i].x || m_TouchPrevious.report[j].y != m_Touch.report[i].y)
+                        GetMessageManager()->SendGUIEx(MESSAGE_TYPE_GUI_CLICK_MOVE, x, y, i);
         }
     }
 
