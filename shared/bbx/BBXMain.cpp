@@ -477,7 +477,7 @@ int main(int argc, char *argv[])
 
 					if (!accelerometer_is_supported())
 					{
-						LogMsg("Ignoring acceleremeter command, device doesn't have one");
+						LogMsg("Ignoring accelerometer command, device doesn't have one");
 					} else
 					{
 						if (m.m_x != 0)

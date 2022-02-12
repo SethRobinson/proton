@@ -3,7 +3,7 @@
 #include "Entity/ArcadeInputComponent.h"
 
 #ifdef _DEBUG
-//	#define SHOW_GAMEPAD_DEBUG_STUFF
+	//#define SHOW_GAMEPAD_DEBUG_STUFF
 #endif
 
 Gamepad::Gamepad()
@@ -34,7 +34,7 @@ void Gamepad::SetAxis( int axis, float val )
 	m_axis[axis].m_axis = val;
 
 #ifdef SHOW_GAMEPAD_DEBUG_STUFF
-	//if (val != 0)	LogMsg("Got axis %d: %.2f", axis, val);
+	if (val != 0)	LogMsg("Got axis %d: %.2f", axis, val);
 #endif
 
 }
@@ -290,7 +290,7 @@ CL_Vec2f Gamepad::GetRightStick()
 
 void Gamepad::Update()
 {
-	if (GetLeftStick() != m_vLastSentLeftStick)
+	//if (GetLeftStick() != m_vLastSentLeftStick)
 	{
 		VariantList v(GetLeftStick(), (int32)m_id, (int32)0);
 		m_sig_left_stick(&v);
@@ -299,7 +299,7 @@ void Gamepad::Update()
 		if (m_bSendLeftStickAsDirectionsToo && m_pArcadeComp)
 		{
 			//let's convert to 8 way directional signals as well
-			const float deadSpace = 0.3f; //TODO: make member var and add an accessor to it?
+			const float deadSpace = 0.2f; //TODO: make member var and add an accessor to it?
 			if (GetLeftStick().length() > deadSpace)
 			{
 				//convert to 360 degrees
@@ -307,7 +307,7 @@ void Gamepad::Update()
 				//convert into 8 directions
 				int finaldir = mod(dir-(45/2), 360)/45;
 #ifdef _DEBUG
-	//			LogMsg("Pressing %s, which is dir %d (final: %d)", PrintVector2(GetLeftStick()).c_str(), dir, finaldir);
+				//LogMsg("Pressing %s, which is dir %d (final: %d)", PrintVector2(GetLeftStick()).c_str(), dir, finaldir);
 #endif
 				SendArcadeDirectionByDegrees( (finaldir*45)-45 );
 				m_bJustSentStickRelease = false;
@@ -327,7 +327,7 @@ void Gamepad::Update()
 		}
 	}
 
-	if (GetRightStick() != m_vLastSentRightStick)
+	//if (GetRightStick() != m_vLastSentRightStick)
 	{
 		VariantList v(GetRightStick(), (int32)m_id, (int32)1);
 		m_sig_right_stick(&v);

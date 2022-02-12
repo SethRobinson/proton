@@ -140,7 +140,7 @@ void InitVideoSize()
 	AddVideoMode("Flash", 640, 480, PLATFORM_ID_FLASH);
 
 	//WORK: Change device emulation here
-	string desiredVideoMode = "Playbook Landscape";
+	string desiredVideoMode = "Windows";
 	SetVideoModeByName(desiredVideoMode);
 	GetBaseApp()->OnPreInitVideo(); //gives the app level code a chance to override any of these parms if it wants to
 }
@@ -627,13 +627,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	
 	case WM_SIZE:
 		{
-	
+		
+		
 			// Respond to the message:				
 			int Width = LOWORD( lParam );
 			int Height = HIWORD( lParam ); 
 				
 			if (Width != GetPrimaryGLX() || Height != GetPrimaryGLY())
 			{
+				LogMsg("Got new size: %d, %d.  Have focus is %d, minimized: %d, fullscreen: %d", Width, Height, g_bHasFocus, g_bIsMinimized, g_bIsFullScreen);
 				if (Width == 0 && Height == 0)
 				{
 					//we're actually being minimized
@@ -642,7 +644,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					
 					//break;
 				}
-				//LogMsg("Got new size: %d, %d", Width, Height);
 				GetBaseApp()->KillOSMessagesByType(OSMessage::MESSAGE_SET_VIDEO_MODE);
 				GetBaseApp()->SetVideoMode(Width, Height, false, 0);
 			
@@ -1059,26 +1060,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		
 
 #ifndef RT_DONT_DO_MOVE_TIMER_TRICK
-		if (g_timerID == 0)
-			g_timerID = (uint32)SetTimer(NULL, 0, 33, (TIMERPROC) TimerProc);
+		//if (g_timerID == 0)
+		//	g_timerID = (uint32)SetTimer(NULL, 0, 33, (TIMERPROC) TimerProc);
 #endif
 		break;
 
 	case WM_WINDOWPOSCHANGING:
-		CheckWindowLagTimer();
+		//CheckWindowLagTimer();
 	
 		break;
 	case WM_EXITSIZEMOVE:
 #ifdef _DEBUG
 		//LogMsg("Exit size move");
 #endif
-		CheckWindowLagTimer();
-		if (g_timerID)
-		{
-			KillTimer(NULL, g_timerID);
-			g_timerID = 0;
-		}
-		GetBaseApp()->OnScreenSizeChange();
+		//CheckWindowLagTimer();
+		//if (g_timerID)
+		//{
+		//	KillTimer(NULL, g_timerID);
+		//	g_timerID = 0;
+		//}
+		//GetBaseApp()->OnScreenSizeChange();
 		break;
 
 	case WM_MOUSELEAVE:
@@ -1295,6 +1296,12 @@ bool InitVideo(int width, int height, bool bFullscreen, float aspectRatio)
 	ResetOrthoFlag();
 
 	LogMsg("Setting native video mode to %d, %d - Fullscreen: %d  Aspect Ratio: %.2f", width, height, int(bFullscreen), aspectRatio);
+
+	if (height == 1440)
+		{
+		LogMsg("Woah!");
+			assert(!"1440!");
+		}
 	g_winVideoScreenY = height;
 	g_winVideoScreenX = width;
 
@@ -1701,6 +1708,23 @@ void CheckIfMouseLeftWindowArea()
 		}
 }
 
+void SetVSync(bool sync)
+{
+	typedef BOOL(APIENTRY* PFNWGLSWAPINTERVALPROC)(int);
+	PFNWGLSWAPINTERVALPROC wglSwapIntervalEXT = 0;
+
+	const char* extensions = (char*)glGetString(GL_EXTENSIONS);
+
+	wglSwapIntervalEXT = (PFNWGLSWAPINTERVALPROC)wglGetProcAddress("wglSwapIntervalEXT");
+
+	if (wglSwapIntervalEXT)
+	{
+		wglSwapIntervalEXT(sync);
+	} else
+	{
+		LogMsg("Can't do wglSwapIntervalEXT");
+	}
+}
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLine, int nCmdShow)
 {
@@ -1788,6 +1812,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLin
 	while(1)
 	{
 		
+		//wglSwapIntervalEXT(0);
+		SetVSync(true);
+
 		/*
 		if (GetAsyncKeyState('Q') && GetAsyncKeyState(VK_MENU))
 		{
@@ -1893,7 +1920,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLin
 		if (g_bHasFocus && !g_bIsMinimized)
 		{
 	#ifdef C_GL_MODE
-			
+			glFinish();
 			SwapBuffers(g_hDC);
 	#else
 			eglSwapBuffers(g_eglDisplay, g_eglSurface);

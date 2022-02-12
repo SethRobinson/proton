@@ -14,6 +14,7 @@
 //NOTE: Use must SAFE_DELETE_ARRAY() the return from this..
 byte * LoadFileIntoMemory(std::string fileName, unsigned int *p_ui_size, bool bUseSavePath = false); //automatically decompresses if needed
 byte * LoadFileIntoMemoryBasic(std::string fileName, unsigned int *length, bool bUseSavePath = false, bool bAddBasePath = true); //won't try to automatically decompress
+bool SaveMemoryIntoFileBasic(byte* pData, unsigned int length, std::string fileName, bool bUseSavePath = false, bool bAddBasePath = true);
 
 bool FileExists(const std::string &fName);
 

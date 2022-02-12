@@ -30,6 +30,8 @@ bool RTGLESExt::InitExtensions()
 
 	glClientActiveTextureARB = (PFNGLCLIENTACTIVETEXTUREARBPROC) wglGetProcAddress("glClientActiveTextureARB");
 	if (!glClientActiveTextureARB) bResult = false;
+	
+	
 	return bResult;
 }
 
