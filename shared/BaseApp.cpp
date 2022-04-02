@@ -726,7 +726,9 @@ void BaseApp::OnFullscreenToggleRequest()
 
 			savex = GetPrimaryGLX();
 			savey = GetPrimaryGLY();
-			GetBaseApp()->SetVideoMode(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), true);
+			GetBaseApp()->SetVideoMode(savex, savey, true);
+			//this seems like a very bad idea, we don't want to set the resolution to anything
+			//GetBaseApp()->SetVideoMode(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), true);
 
 		}
 

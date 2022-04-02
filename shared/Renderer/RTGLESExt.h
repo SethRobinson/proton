@@ -10,7 +10,7 @@
 #ifndef RTGLESExt_h__
 #define RTGLESExt_h__
 
-
+#include "Irrlicht\source\Irrlicht\wglext.h"
 
 #if defined(_WIN32) && defined C_GL_MODE
 

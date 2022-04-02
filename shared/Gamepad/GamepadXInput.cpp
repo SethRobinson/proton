@@ -134,7 +134,7 @@ void GamepadXInput::Update()
 float GamepadXInput::ConvertToProtonStickWithDeadZone(float xInputStick)
 {
 	xInputStick /= 32767.0f;
-	const float deadZone = 0.15f;
+	const float deadZone = 0; //do NOT process the deadzone here, it should be handled elsewhere!
 	if (fabs(xInputStick) < deadZone)
 	{
 		xInputStick = 0;

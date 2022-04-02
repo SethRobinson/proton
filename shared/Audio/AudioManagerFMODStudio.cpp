@@ -66,7 +66,7 @@ bool AudioManagerFMOD::Init()
 	system->setDSPBufferSize(1024*4, 2);
 #endif
 	
-	LogMsg("Initting FMOD...");
+	LogMsg("Initting FMOD  %08x...", version);
 
 	int numdrivers;
 	int selectedindex = -1;
