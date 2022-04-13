@@ -53,6 +53,8 @@ while (1)
 Note:  html5 builds automatically use NetHTTP_HTML5.cpp instead of NetHTTP.cpp.  The usage is the same but internally they use
 emscripten_async_wget2_data.  Due to javascript security issues, you can only download files on website the .html is hosted on, unless
 cross scripting privileges are setup.
+
+If RT_USE_LIBCURL is defined, CURL will be used instead.  (HTTPS is supported then)
 */
 
 #ifndef NetHTTP_h__

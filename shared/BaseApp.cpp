@@ -602,7 +602,7 @@ void BaseApp::OnEnterForeground()
 		LogMsg("Entering foreground");
 #endif
 	
-	#ifndef PLATFORM_ANDROID
+	#ifndef PLATFORM_ANDROID  //wtf?!
 		if (GetEmulatedPlatformID() == PLATFORM_ID_ANDROID)
 		{
 			GetBaseApp()->m_sig_loadSurfaces(); //for anyone who cares

@@ -32,7 +32,7 @@ FileManager * GetFileManager() {return &g_fileManager;}
 	AudioManagerDenshion g_audioManager;
 #else
 	//it's being compiled as a native OSX app
-   #include "Audio/AudioManagerFMOD.h"
+   #include "Audio/AudioManagerFMODStudio.h"
   AudioManagerFMOD g_audioManager; //dummy with no sound
 
 //in theory, CocosDenshion should work for the Mac builds, but right now it seems to want a big chunk of
@@ -69,7 +69,7 @@ AudioManagerSDL g_audioManager; //sound in windows and WebOS
 #include "Audio/AudioManagerFlash.h"
 AudioManagerFlash g_audioManager;
 #elif defined RT_ENABLE_FMOD
-#include "Audio/AudioManagerFMOD.h"
+#include "Audio/AudioManagerFMODStudio.h"
 AudioManagerFMOD g_audioManager; //if we wanted FMOD sound in windows
 #else
 

@@ -611,3 +611,22 @@ void Entity::AddEntitiesToVectorRescursively( vector<Entity*> *pEntVec )
 	}
 
 }
+
+void Entity::GetEntitiesByName(std::vector<Entity*> *pEnts, string name)
+{
+
+	    if (m_bTaggedForDeletion) return;
+		
+		if (name == m_name) pEnts->push_back(this);
+
+		EntityListItor itor = m_children.begin();
+
+		Entity* pEnt = NULL;
+
+		while (itor != m_children.end())
+		{
+			(*itor)->GetEntitiesByName(pEnts, name);
+			itor++;
+		}
+	
+}

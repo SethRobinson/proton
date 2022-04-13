@@ -32,18 +32,6 @@
     <Filter Include="source\Platform Stuff\bbx">
       <UniqueIdentifier>{b9e8a869-bff3-431b-93c6-ccb4beda3f3d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\Platform Stuff\android">
-      <UniqueIdentifier>{8f000dcd-c3c4-44b2-bd76-1e966298f73a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\Platform Stuff\android\proguard">
-      <UniqueIdentifier>{2b783ba6-d075-4daf-934c-63f12f664f63}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\Platform Stuff\android\jni">
-      <UniqueIdentifier>{d53aefd6-d886-4e39-9b85-13a0b3419cad}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\Platform Stuff\android\src">
-      <UniqueIdentifier>{901f9f38-252c-46c6-90cf-e3865280e6de}</UniqueIdentifier>
-    </Filter>
     <Filter Include="source\Platform Stuff\linux">
       <UniqueIdentifier>{4704bffa-1dbd-48b1-99e6-2f011e19154f}</UniqueIdentifier>
     </Filter>
@@ -116,15 +104,6 @@
     <Filter Include="shared\android">
       <UniqueIdentifier>{9ee7c4fa-dba8-4bca-91c5-069751b33aa7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="shared\android\v2_src">
-      <UniqueIdentifier>{dc2f18a3-ed72-490a-85af-079f986285b0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="shared\android\v2_src\java">
-      <UniqueIdentifier>{69255be7-9b38-42b8-bdfb-d03cfebb7d27}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="shared\android\v2_src\cpp">
-      <UniqueIdentifier>{9e24d5c2-20df-45db-b0a5-e509be5db7ec}</UniqueIdentifier>
-    </Filter>
     <Filter Include="shared\FileSystem">
       <UniqueIdentifier>{25ea145e-d9a2-40f8-acb3-eb323ab63c59}</UniqueIdentifier>
     </Filter>
@@ -166,6 +145,15 @@
     </Filter>
     <Filter Include="shared\SDL">
       <UniqueIdentifier>{5e0bdd69-8cce-4432-9497-9d5766ce09e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\Platform Stuff\AndroidGradle">
+      <UniqueIdentifier>{d871c899-7e36-4987-b5d2-270d792e7e2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shared\android\v3_src">
+      <UniqueIdentifier>{3cf09f03-6501-4137-b9d0-0e81693ce2f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\Platform Stuff\AndroidGradle\App">
+      <UniqueIdentifier>{a00e5302-0f3d-45ca-8b32-61833ded3397}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -595,9 +583,6 @@
     <ClCompile Include="..\..\shared\Audio\AudioManagerFlash.cpp">
       <Filter>shared\Audio</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\shared\Audio\AudioManagerFMOD.cpp">
-      <Filter>shared\Audio</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\shared\Audio\AudioManagerSDL.cpp">
       <Filter>shared\Audio</Filter>
     </ClCompile>
@@ -618,9 +603,6 @@
     </ClCompile>
     <ClCompile Include="..\..\shared\android\AndroidUtils.cpp">
       <Filter>shared\android</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\shared\android\v2_src\cpp\AndroidApp.cpp">
-      <Filter>shared\android\v2_src\cpp</Filter>
     </ClCompile>
     <ClCompile Include="..\..\shared\FileSystem\FileManager.cpp">
       <Filter>shared\FileSystem</Filter>
@@ -1202,45 +1184,6 @@
     <None Include="..\bbx\UploadRelease.bat">
       <Filter>source\Platform Stuff\bbx</Filter>
     </None>
-    <None Include="..\android\ant.properties">
-      <Filter>source\Platform Stuff\android</Filter>
-    </None>
-    <None Include="..\android\app_info_setup.bat">
-      <Filter>source\Platform Stuff\android</Filter>
-    </None>
-    <None Include="..\android\build.bat">
-      <Filter>source\Platform Stuff\android</Filter>
-    </None>
-    <None Include="..\android\build_prepare.bat">
-      <Filter>source\Platform Stuff\android</Filter>
-    </None>
-    <None Include="..\android\buildRelease.bat">
-      <Filter>source\Platform Stuff\android</Filter>
-    </None>
-    <None Include="..\android\Clean.bat">
-      <Filter>source\Platform Stuff\android</Filter>
-    </None>
-    <None Include="..\android\default.properties">
-      <Filter>source\Platform Stuff\android</Filter>
-    </None>
-    <None Include="..\android\InstallOnDefaultPhone.bat">
-      <Filter>source\Platform Stuff\android</Filter>
-    </None>
-    <None Include="..\android\InstallOnDefaultPhoneRelease.bat">
-      <Filter>source\Platform Stuff\android</Filter>
-    </None>
-    <None Include="..\android\ViewLogDefaultPhone.bat">
-      <Filter>source\Platform Stuff\android</Filter>
-    </None>
-    <None Include="..\android\jni\Android.mk">
-      <Filter>source\Platform Stuff\android\jni</Filter>
-    </None>
-    <None Include="..\android\jni\Application.mk">
-      <Filter>source\Platform Stuff\android\jni</Filter>
-    </None>
-    <None Include="..\android\src\Main.java">
-      <Filter>source\Platform Stuff\android\src</Filter>
-    </None>
     <None Include="..\linux\linux_compile.sh">
       <Filter>source\Platform Stuff\linux</Filter>
     </None>
@@ -1261,30 +1204,6 @@
     </None>
     <None Include="..\..\shared\Audio\AudioManagerDenshion.mm">
       <Filter>shared\Audio</Filter>
-    </None>
-    <None Include="..\..\shared\android\v2_src\java\BillingReceiver.java">
-      <Filter>shared\android\v2_src\java</Filter>
-    </None>
-    <None Include="..\..\shared\android\v2_src\java\BillingService.java">
-      <Filter>shared\android\v2_src\java</Filter>
-    </None>
-    <None Include="..\..\shared\android\v2_src\java\Consts.java">
-      <Filter>shared\android\v2_src\java</Filter>
-    </None>
-    <None Include="..\..\shared\android\v2_src\java\PurchaseObserver.java">
-      <Filter>shared\android\v2_src\java</Filter>
-    </None>
-    <None Include="..\..\shared\android\v2_src\java\ResponseHandler.java">
-      <Filter>shared\android\v2_src\java</Filter>
-    </None>
-    <None Include="..\..\shared\android\v2_src\java\Security.java">
-      <Filter>shared\android\v2_src\java</Filter>
-    </None>
-    <None Include="..\..\shared\android\v2_src\java\SharedActivity.java">
-      <Filter>shared\android\v2_src\java</Filter>
-    </None>
-    <None Include="..\..\shared\android\v2_src\java\SharedMultiTouchInput.java">
-      <Filter>shared\android\v2_src\java</Filter>
     </None>
     <None Include="..\..\shared\OSX\OSXUtils.mm">
       <Filter>shared\OSX</Filter>
@@ -1334,37 +1253,46 @@
     <None Include="..\..\shared\linux\Proton.cmake">
       <Filter>shared\linux</Filter>
     </None>
+    <None Include="..\AndroidGradle\local.properties">
+      <Filter>source\Platform Stuff\AndroidGradle</Filter>
+    </None>
+    <None Include="..\AndroidGradle\PrepareResources.bat">
+      <Filter>source\Platform Stuff\AndroidGradle</Filter>
+    </None>
+    <None Include="..\..\shared\android\v3_src\SharedActivity.java">
+      <Filter>shared\android\v3_src</Filter>
+    </None>
+    <None Include="..\..\shared\android\v3_src\SharedMultiTouchInput.java">
+      <Filter>shared\android\v3_src</Filter>
+    </None>
+    <None Include="..\AndroidGradle\app\build.gradle">
+      <Filter>source\Platform Stuff\AndroidGradle\App</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\flash\exports.txt">
       <Filter>source\Platform Stuff\flash</Filter>
-    </Text>
-    <Text Include="..\android\proguard\config.txt">
-      <Filter>source\Platform Stuff\android\proguard</Filter>
     </Text>
     <Text Include="..\linux\CMakeLists.txt">
       <Filter>source\Platform Stuff\linux</Filter>
     </Text>
     <Text Include="..\..\license.txt" />
     <Text Include="..\..\Programmer Readme.txt" />
+    <Text Include="..\AndroidGradle\app\src\main\cpp\CMakeLists.txt">
+      <Filter>source\Platform Stuff\AndroidGradle\App</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\bbx\bar-descriptor.xml">
       <Filter>source\Platform Stuff\bbx</Filter>
     </Xml>
-    <Xml Include="..\android\AndroidManifest.xml">
-      <Filter>source\Platform Stuff\android</Filter>
-    </Xml>
-    <Xml Include="..\android\build.xml">
-      <Filter>source\Platform Stuff\android</Filter>
+    <Xml Include="..\AndroidGradle\app\src\main\AndroidManifest.xml">
+      <Filter>source\Platform Stuff\AndroidGradle\App</Filter>
     </Xml>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\shared\Entity\TemplateComponent.h">
       <Filter>shared\Entity\Component</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\shared\Audio\AudioManagerFMOD.h">
-      <Filter>shared\Audio</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\shared\Audio\AudioManagerOS.mm">
       <Filter>shared\Audio</Filter>

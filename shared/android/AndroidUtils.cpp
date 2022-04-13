@@ -137,7 +137,9 @@ char * GetAndroidMainClassName()
 	if (bFirstTime)
 	{
 		bFirstTime = false;
-		string package = string(GetBundlePrefix())+string(GetBundleName())+"/Main";
+		string package = string(GetBundlePrefix()) + string("RTAndroidApp") + "/Main";
+
+		//string package = string(GetBundlePrefix())+string(GetBundleName())+"/Main";
 		StringReplace(".", "/", package);
 		sprintf(name, package.c_str());
 	}
@@ -817,6 +819,22 @@ bool HasVibration()
 	return true;
 }
 
+void SetJavaPackageName(string packageName)
+{
+	JNIEnv* env = GetJavaEnv();
+
+
+	LogMsg("Setting package name to %s", packageName.c_str());
+
+	if (!env) return;
+	jclass cls = env->FindClass(GetAndroidMainClassName());
+	jmethodID mid = env->GetStaticMethodID(cls,
+		"SetPackageName",
+		"(Ljava/lang/String;)V");
+	env->CallStaticVoidMethod(cls, mid, env->NewStringUTF(packageName.c_str()));
+
+}
+
 void AppResize( JNIEnv*  env, jobject  thiz, jint w, jint h )
 {
 	g_winVideoScreenX = w;
@@ -828,6 +846,13 @@ void AppResize( JNIEnv*  env, jobject  thiz, jint w, jint h )
 	if (!GetBaseApp()->IsInitted())
 	{
 		SetupScreenInfo(GetPrimaryGLX(), GetPrimaryGLY(), ORIENTATION_PORTRAIT);
+		
+		//tell the app what its true package ID is.  The reason we have to do this is the new gradle build system
+		//sort of fakes the ID change during the final build and asking ourselves gives RTAndroidApp instead of the true
+		//one.
+
+		SetJavaPackageName(string(GetBundlePrefix())+string(GetBundleName()));
+		
 		LogMsg("Initializing BaseApp.  APK filename is %s", GetAPKFile().c_str());
 		srand( (unsigned)time(NULL) );
 		FileSystemZip *pFileSystem = new FileSystemZip();

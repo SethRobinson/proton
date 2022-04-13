@@ -426,7 +426,16 @@ void NetHTTP::FinishDownload()
 			break;
 
 		case END_OF_DATA_SIGNAL_RTSOFT_MARKER:
-			m_downloadData.insert(m_downloadData.begin(), s.begin()+m_downloadHeader.length(), s.end()-strlen(C_END_DOWNLOAD_MARKER_STRING));
+			{
+
+			int downloadSize = s.size() - m_downloadHeader.length();
+			int markerSize = strlen(C_END_DOWNLOAD_MARKER_STRING);
+
+				if (downloadSize >= markerSize)
+				{
+					m_downloadData.insert(m_downloadData.begin(), s.begin() + m_downloadHeader.length(), s.end() - markerSize);
+				}
+			}
 			break;
 		}
 	} else

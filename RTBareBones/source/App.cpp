@@ -11,7 +11,7 @@
 #include "Entity/FocusInputComponent.h" //needed to let the input component see input messages
 #include "Entity/ArcadeInputComponent.h"
 //#include "util/TextScanner.h"
-
+#include "Manager/MessageManager.h"
 MessageManager g_messageManager;
 MessageManager * GetMessageManager() {return &g_messageManager;}
 
@@ -388,8 +388,9 @@ const char * GetBundlePrefix()
 }
 
 const char * GetBundleName()
+
 {
-	const char * bundleName = "rtbarebones";
+	const char * bundleName = "RTBareBones";
 	return bundleName;
 }
 

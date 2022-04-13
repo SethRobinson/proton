@@ -52,7 +52,8 @@ void NetHTTP::Reset(bool bClearPostdata)
 	m_downloadData.clear();
 	m_replyHeader.clear();
 	m_query.clear();
-	
+	m_bHasEncodedPostData = false;
+
 	if (bClearPostdata)
 	{
 		m_postData.clear();
@@ -62,7 +63,6 @@ void NetHTTP::Reset(bool bClearPostdata)
 
 void NetHTTP::Setup(string serverName, int port, string query, eEndOfDataSignal eodSignal)
 {
-	m_bHasEncodedPostData = false;
 	m_endOfDataSignal = eodSignal;
 	m_serverName = serverName;
 	m_port = port;
@@ -154,11 +154,14 @@ string NetHTTP::BuildHTTPHeader()
 	return "";
 }
 
-#ifdef WINAPI
 void AddText(const char *tex, const char *filename);
 void LogMsgNoCR(const char* traceStr, ...);
+
+
 void dump(const char *text,
 	FILE *stream, unsigned char *ptr, size_t size);
+
+
 
 
 void SimpleDump(const char* text,
@@ -168,14 +171,16 @@ void SimpleDump(const char* text,
 	size_t c;
 	unsigned int width = 0x10;
 
-	LogMsgNoCR("%s, %10.10ld bytes (0x%8.8lx): %s\n",
+	LogMsg("%s, %10.10ld bytes (0x%8.8lx): %s\n",
 		text, (long)size, (long)size, ptr);
 
 	return;
+	
+	/*
 	for (i = 0; i < size; i += width) {
 		LogMsgNoCR("%4.4lx: ", (long)i);
 
-		/* show hex to the left */
+		
 		for (c = 0; c < width; c++) {
 			if (i + c < size)
 				LogMsgNoCR("%02x ", ptr[i + c]);
@@ -183,7 +188,7 @@ void SimpleDump(const char* text,
 				LogMsgNoCR("   ");
 		}
 
-		/* show data on the right */
+		
 		for (c = 0; (c < width) && (i + c < size); c++)
 		{
 			char x = (ptr[i + c] >= 0x20 && ptr[i + c] < 0x80) ? ptr[i + c] : '.';
@@ -191,8 +196,8 @@ void SimpleDump(const char* text,
 		}
 		LogMsgNoCR("\n");
 	}
+	*/
 }
-
 
 
 static int CURLDebugTrace(CURL *handle, curl_infotype type,
@@ -205,7 +210,7 @@ static int CURLDebugTrace(CURL *handle, curl_infotype type,
 
 	switch (type) {
 	case CURLINFO_TEXT:
-		LogMsgNoCR("== Info: %s", data);
+		LogMsg("== Info: %s", data);
 	default: /* in case a new one is introduced to shock us */
 		return 0;
 
@@ -230,10 +235,11 @@ static int CURLDebugTrace(CURL *handle, curl_infotype type,
 	}
 
 	SimpleDump(text, stderr, (unsigned char *)data, size);
+	//LogMsg("more info but can't display it... fix it, Seth");
 	return 0;
 }
 
-#endif
+
 
 size_t NetHTTP::CURLWriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *pThisInstance)
 {
@@ -357,10 +363,11 @@ bool NetHTTP::Start()
 	m_CURL_bytesSent = 0;
 
 	//to figure out problems, uncomment below
-	//curl_easy_setopt(m_CURL_handle, CURLOPT_VERBOSE, 1L);
-#ifdef WINAPI
+#ifdef _DEBUG
+	curl_easy_setopt(m_CURL_handle, CURLOPT_VERBOSE, 1L);
 	curl_easy_setopt(m_CURL_handle, CURLOPT_DEBUGFUNCTION, CURLDebugTrace);
 #endif
+
 	curl_easy_setopt(m_CURL_handle, CURLOPT_URL, finalURL.c_str());
 	//curl_easy_setopt(curl_handle, CURLOPT_SSL_VERIFYPEER, 0);
 	curl_easy_setopt(m_CURL_handle, CURLOPT_FOLLOWLOCATION, 1L);
@@ -370,14 +377,26 @@ bool NetHTTP::Start()
 	curl_easy_setopt(m_CURL_handle, CURLOPT_WRITEDATA, this);
 	curl_easy_setopt(m_CURL_handle, CURLOPT_USERAGENT, "gametrans-agent/1.0");
 	curl_easy_setopt(m_CURL_handle, CURLOPT_PRIVATE, this);
+	 
 
-	//manually set the certs otherwise it can't find it (a windows only issue?)
-	curl_easy_setopt(m_CURL_handle, CURLOPT_CAINFO, "curl-ca-bundle.crt");
+	if (GetPlatformID() == PLATFORM_ID_ANDROID)
+	{
+		//Android needs the physical file copied for this to work, so include it in your assets and do something like this on app startup:
+		//Don't ask me why, but it fails if we don't set the path both ways like this
+		curl_easy_setopt(m_CURL_handle, CURLOPT_CAPATH, GetSavePath().c_str());
+		curl_easy_setopt(m_CURL_handle, CURLOPT_CAINFO, (GetSavePath()+"curl-ca-bundle.crt").c_str());
+	} else
+	{
+		//manually set the cert on windows otherwise it can't find it.  I've only used this curl stuff on android and windows so no idea on other platforms.
+		curl_easy_setopt(m_CURL_handle, CURLOPT_CAINFO, "curl-ca-bundle.crt");
+	}
+
+	
 	
 	//needed to handle moved content (http 301 codes, etc)
 	curl_easy_setopt(m_CURL_handle, CURLOPT_SEEKFUNCTION, seek_cb);
 	curl_easy_setopt(m_CURL_handle, CURLOPT_SEEKDATA, this);
-
+	
 	if (!m_postData.empty())
 	{
 		curl_easy_setopt(m_CURL_handle, CURLOPT_POST, 1L);
@@ -400,7 +419,8 @@ bool NetHTTP::Start()
 	{
 		
 		//TODO: This probably shouldn't be the default...
-		chunk = curl_slist_append(chunk, "Content-Type: application/json");
+		//chunk = curl_slist_append(chunk, "Content-Type: application/json");
+		chunk = curl_slist_append(chunk, "Content-Type: application/html");
 	}
 
 	/* set our custom set of headers */
@@ -658,9 +678,12 @@ void NetHTTP::SetBuffer(const char *pData, int byteSize)
 		//move it back
 		string crap;
 		m_downloadData = vector<char>(temp.begin(), temp.end());
-		if (m_downloadData[m_downloadData.size() - 1] != 0)
+		if (!m_downloadData.empty()) //make sure we put a null on the end
 		{
-			m_downloadData.push_back(char(0)); //add the null
+			if (m_downloadData[m_downloadData.size() - 1] != 0)
+			{
+				m_downloadData.push_back(char(0)); //add the null
+			}
 		}
 	}
 

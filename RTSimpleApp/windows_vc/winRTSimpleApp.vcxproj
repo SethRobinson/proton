@@ -52,52 +52,52 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GL_SDL_Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GL_SDL_Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_GL|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FMOD_GL|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_GL|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FMOD_GL|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_GL|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FMOD_GL|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_GL|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FMOD_GL|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -436,18 +436,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_GL|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_FMOD_GL|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\shared\android\v2_src\cpp\AndroidApp.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_GL|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_FMOD_GL|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_GL|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_FMOD_GL|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='GL_SDL_Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='GL_SDL_Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_GL|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_FMOD_GL|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_GL|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_FMOD_GL|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\..\shared\Audio\AudioManager.cpp" />
     <ClCompile Include="..\..\shared\Audio\AudioManagerAndroid.cpp" />
     <ClCompile Include="..\..\shared\Audio\AudioManagerAudiere.cpp">
@@ -471,18 +459,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_FMOD_GL|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\shared\Audio\AudioManagerFlash.cpp" />
-    <ClCompile Include="..\..\shared\Audio\AudioManagerFMOD.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_GL|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_FMOD_GL|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_GL|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_FMOD_GL|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='GL_SDL_Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='GL_SDL_Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_GL|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_FMOD_GL|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_GL|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_FMOD_GL|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\..\shared\Audio\AudioManagerFMODStudio.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_FMOD_GL|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_FMOD_GL|x64'">false</ExcludedFromBuild>
@@ -2159,18 +2135,6 @@
     <ClInclude Include="..\..\shared\Audio\AudioManagerBBX.h" />
     <ClInclude Include="..\..\shared\Audio\AudioManagerDenshion.h" />
     <ClInclude Include="..\..\shared\Audio\AudioManagerFlash.h" />
-    <CustomBuild Include="..\..\shared\Audio\AudioManagerFMOD.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_GL|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_FMOD_GL|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_GL|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_FMOD_GL|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='GL_SDL_Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='GL_SDL_Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_GL|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_FMOD_GL|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_GL|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_FMOD_GL|x64'">true</ExcludedFromBuild>
-    </CustomBuild>
     <ClInclude Include="..\..\shared\Audio\AudioManagerFMODStudio.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_FMOD_GL|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_FMOD_GL|x64'">false</ExcludedFromBuild>
@@ -2338,14 +2302,8 @@
     <ClInclude Include="..\source\GUI\TouchTestMenu.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\shared\android\v2_src\java\BillingReceiver.java" />
-    <None Include="..\..\shared\android\v2_src\java\BillingService.java" />
-    <None Include="..\..\shared\android\v2_src\java\Consts.java" />
-    <None Include="..\..\shared\android\v2_src\java\PurchaseObserver.java" />
-    <None Include="..\..\shared\android\v2_src\java\ResponseHandler.java" />
-    <None Include="..\..\shared\android\v2_src\java\Security.java" />
-    <None Include="..\..\shared\android\v2_src\java\SharedActivity.java" />
-    <None Include="..\..\shared\android\v2_src\java\SharedMultiTouchInput.java" />
+    <None Include="..\..\shared\android\v3_src\SharedActivity.java" />
+    <None Include="..\..\shared\android\v3_src\SharedMultiTouchInput.java" />
     <None Include="..\..\shared\Audio\AudioManagerDenshion.mm" />
     <CustomBuild Include="..\..\shared\Audio\AudioManagerOS.mm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_GL|Win32'">true</ExcludedFromBuild>
@@ -2374,19 +2332,9 @@
     <None Include="..\..\shared\OSX\app\MyApplication.m" />
     <None Include="..\..\shared\OSX\app\MyOpenGLView.mm" />
     <None Include="..\..\shared\OSX\OSXUtils.mm" />
-    <None Include="..\android\ant.properties" />
-    <None Include="..\android\app_info_setup.bat" />
-    <None Include="..\android\build.bat" />
-    <None Include="..\android\buildRelease.bat" />
-    <None Include="..\android\build_prepare.bat" />
-    <None Include="..\android\Clean.bat" />
-    <None Include="..\android\default.properties" />
-    <None Include="..\android\InstallOnDefaultPhone.bat" />
-    <None Include="..\android\InstallOnDefaultPhoneRelease.bat" />
-    <None Include="..\android\jni\Android.mk" />
-    <None Include="..\android\jni\Application.mk" />
-    <None Include="..\android\src\Main.java" />
-    <None Include="..\android\ViewLogDefaultPhone.bat" />
+    <None Include="..\AndroidGradle\app\build.gradle" />
+    <None Include="..\AndroidGradle\local.properties" />
+    <None Include="..\AndroidGradle\PrepareResources.bat" />
     <None Include="..\bbx\.cproject" />
     <None Include="..\bbx\.project" />
     <None Include="..\bbx\app_info_setup.bat" />
@@ -2416,13 +2364,12 @@
   <ItemGroup>
     <Text Include="..\..\license.txt" />
     <Text Include="..\..\Programmer Readme.txt" />
-    <Text Include="..\android\proguard\config.txt" />
+    <Text Include="..\AndroidGradle\app\src\main\cpp\CMakeLists.txt" />
     <Text Include="..\flash\exports.txt" />
     <Text Include="..\linux\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="..\android\AndroidManifest.xml" />
-    <Xml Include="..\android\build.xml" />
+    <Xml Include="..\AndroidGradle\app\src\main\AndroidManifest.xml" />
     <Xml Include="..\bbx\bar-descriptor.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
