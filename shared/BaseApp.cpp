@@ -88,6 +88,16 @@ void BaseApp::InitializeGLDefaults()
 	glClearColor(0,0,0,255);
 }
 
+
+void OnKillKeyboard(VariantList* pVList)
+{
+	if (!IsBaseAppInitted()) return;
+
+	OSMessage o;
+	o.m_type = OSMessage::MESSAGE_CLOSE_TEXT_BOX;
+	GetBaseApp()->AddOSMessage(o);
+}
+
 bool BaseApp::Init()
 {
 	
@@ -127,11 +137,16 @@ bool BaseApp::Init()
 
 	m_gameTimer.Reset(); //another one
 	
+
+	
 #ifdef PLATFORM_ANDROID
-	LogMsg("Killing keyboard at launch because sometimes it openes by itself");
-	OSMessage o;
-	o.m_type = OSMessage::MESSAGE_CLOSE_TEXT_BOX;
-	AddOSMessage(o);
+	LogMsg("Killing keyboard at launch because sometimes it opens by itself");
+	VariantList vList;
+	GetMessageManager()->CallStaticFunction(OnKillKeyboard, 50, &vList, TIMER_SYSTEM);
+	
+	//Try again for slow loaders.  This seems to be an Android OS 7 problem (?)
+	GetMessageManager()->CallStaticFunction(OnKillKeyboard, 500, &vList, TIMER_SYSTEM);
+
 
 #endif
 	
