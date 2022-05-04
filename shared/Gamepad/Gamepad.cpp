@@ -3,7 +3,7 @@
 #include "Entity/ArcadeInputComponent.h"
 
 #ifdef _DEBUG
-	//#define SHOW_GAMEPAD_DEBUG_STUFF
+	#define SHOW_GAMEPAD_DEBUG_STUFF
 #endif
 
 Gamepad::Gamepad()

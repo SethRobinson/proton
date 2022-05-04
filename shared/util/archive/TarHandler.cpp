@@ -169,7 +169,7 @@ bool TarHandler::WriteBZipStream(byte *pData, int size)
 						return false;
 					}
 #ifdef _DEBUG
-					LogMsg("Writing %s...", (m_destPath + m_tarHeader.name).c_str());
+					//LogMsg("Writing %s...", (m_destPath + m_tarHeader.name).c_str());
 #endif				
 
 

@@ -13,7 +13,7 @@ void ToLowerCase(char *pCharArray);
 void ToUpperCase(char *pCharArray);
 std::string ToLowerCaseString (const std::string & s);
 std::string ToUpperCaseString (const std::string & s);
-
+char *strcpy_safe(char *dest, const char* src); //allows overlapping src/dst
 bool CaseInsensitiveCompare(const char*a, const char*b);
 void SetIntWithTarget(int32 *p_out_dest, int r_target, int r_amount);
 int mod(int a, int b);

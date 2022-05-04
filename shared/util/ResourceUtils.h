@@ -17,6 +17,7 @@ byte * LoadFileIntoMemoryBasic(std::string fileName, unsigned int *length, bool 
 bool SaveMemoryIntoFileBasic(byte* pData, unsigned int length, std::string fileName, bool bUseSavePath = false, bool bAddBasePath = true);
 
 bool FileExists(const std::string &fName);
+bool FileExistsRaw(const string& fName);
 
 std::string SeparateStringSTL(std::string input, int index, char delimiter);
 bool SeparateString (const char str[], int num, char delimiter, char *return1);

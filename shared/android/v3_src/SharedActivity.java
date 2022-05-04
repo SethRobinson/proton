@@ -162,7 +162,7 @@ import android.net.ConnectivityManager;
 	public static boolean update_display_ad;
 	public static boolean run_hooked;
 	public static int tapjoy_ad_show; //0 for don't shot, 1 for show
-
+	public static String m_externalDir="";
 	
 	public static boolean set_allow_dimming_asap = false;
 	public static boolean set_disallow_dimming_asap = false;
@@ -221,10 +221,11 @@ import android.net.ConnectivityManager;
     protected void onCreate(Bundle savedInstanceState) 
 	{
         app = this;
+		m_externalDir = this.getExternalFilesDir(null).getAbsolutePath();
 		apiVersion = Build.VERSION.SDK_INT;
 	    Log.d(PackageName, "***********************************************************************");
 		Log.d(PackageName, "API Level: " + apiVersion);
-				
+	
 		super.onCreate(savedInstanceState);
         mGLView = new AppGLSurfaceView(this, this);
     	
@@ -509,32 +510,13 @@ m_editText.addTextChangedListener(new TextWatcher()
      	return fdir.getAbsolutePath();
     }
  	
+	
 	public static String get_externaldir()
 	{
-		//directory of external storage
-		boolean mExternalStorageAvailable = false;
-		boolean mExternalStorageWriteable = false;
-
-		String state = Environment.getExternalStorageState();
-		if (Environment.MEDIA_MOUNTED.equals(state))
-		{
-			mExternalStorageAvailable = mExternalStorageWriteable = true;
-		} 
-		else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) 
-		{
-			mExternalStorageAvailable = true;
-			mExternalStorageWriteable = false;
-		} 
-		else 
-		{
-		   // mExternalStorageAvailable = mExternalStorageWriteable = false;
-		}
-
-		if (mExternalStorageWriteable == false) 
-			return "";
-
-		return Environment.getExternalStorageDirectory().toString();
+		return app.m_externalDir;
+		
 	}
+
 
 	public static void SetPackageName(String packageID)
 	{
@@ -756,18 +738,7 @@ public static String get_getNetworkType()
 		//sensorManager.registerListener(app, sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), sensorManager.SENSOR_DELAY_GAME);
 	}
 	
-	// Achievement handler (called from C++ class, and the actual handler is overriden in Main.java to do the actual app specific API call
-	public void FireAchievement(String achievement)
-	{
-		Log.v("Achievement", "Firing in Wrong instance");
-	}
-	 
-	// JNI to talk to Kiip
-    public static void HandleAchievement(String achievement)
-	{
-        Log.v("Achievement", "Unlocked value: "+achievement);
-		app.FireAchievement(achievement);
-    }
+
 	
 	/**
      * The listener that listen to events from the accelerometer listener

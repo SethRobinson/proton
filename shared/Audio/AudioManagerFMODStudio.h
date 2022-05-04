@@ -7,17 +7,17 @@
 //  Programmer(s):  Seth A. Robinson (seth@rtsoft.com)
 //  ***************************************************************
 
-//this works with FMOD Studio 1.09 - to keep compatibility with projects that use FmodEx, I've left AudioManagerFMOD intact for that, and this file should be used instead for FMODStudio
+//this works with FMOD Studio 2.02 - to keep compatibility with projects that use FmodEx, I've left AudioManagerFMOD intact for that, and this file should be used instead for FMODStudio
 
 #ifndef AudioManagerFMOD_h__
 #define AudioManagerFMOD_h__
 
 #include "AudioManager.h"
 
-#if !defined RT_WEBOS && !defined (ANDROID_NDK)
+#if !defined RT_WEBOS
 
-#include "fmodstudio/api/lowlevel/inc/fmod.hpp"
-#include "fmodstudio/api/lowlevel/inc/fmod_errors.h"
+#include "fmodstudio/api/core/inc/fmod.hpp"
+#include "fmodstudio/api/core/inc/fmod_errors.h"
 
 class SoundObject
 {

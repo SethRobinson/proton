@@ -24,9 +24,11 @@ include_directories("${SHARED}")
 include_directories("${SHARED}/util/boost")
 include_directories("${SHARED}/ClanLib-2.0/Sources")
 include_directories("${APP}")
+include_directories("${SHARED}/android/optional_src/libs")
 
 
-add_definitions(-Wno-error=format-security -DANDROID_NDK -DBOOST_ALL_NO_LIB -DBUILD_ANDROID -DPLATFORM_ANDROID -DRT_JPG_SUPPORT)
+
+add_definitions(-Wno-error=format-security -DANDROID_NDK -DBOOST_ALL_NO_LIB -DBUILD_ANDROID -DPLATFORM_ANDROID -DRT_JPG_SUPPORT -DRT_ENABLE_FMOD)
 
 message("Building ${CMAKE_BUILD_TYPE}")
 
@@ -48,7 +50,7 @@ add_library( # Sets the name of the library.
         SHARED
 
 
-${SHARED}/PlatformSetup.cpp ${SHARED}/android/AndroidUtils.cpp ${SHARED}/android/AndroidApp.cpp ${SHARED}/Audio/AudioManager.cpp ${SHARED}/Audio/AudioManagerAndroid.cpp
+${SHARED}/PlatformSetup.cpp ${SHARED}/android/AndroidUtils.cpp ${SHARED}/android/AndroidApp.cpp ${SHARED}/Audio/AudioManager.cpp ${SHARED}/Audio/AudioManagerFMODStudio.cpp
 ${CLANMATH}/angle.cpp ${CLANMATH}/mat3.cpp ${CLANMATH}/mat4.cpp ${CLANMATH}/rect.cpp ${CLANMATH}/vec2.cpp ${CLANMATH}/vec3.cpp ${CLANMATH}/vec4.cpp 
 ${SHARED}/Entity/Entity.cpp ${SHARED}/Entity/Component.cpp ${SHARED}/GUI/RTFont.cpp ${SHARED}/Manager/Console.cpp 
 ${SHARED}/Manager/GameTimer.cpp ${SHARED}/Manager/MessageManager.cpp ${SHARED}/Manager/ResourceManager.cpp ${SHARED}/Manager/VariantDB.cpp ${SHARED}/Math/rtPlane.cpp 
@@ -89,6 +91,9 @@ ${APP}/GUI/ParticleTestMenu.cpp ${APP}/GUI/AboutMenu.cpp ${APP}/GUI/TouchTestMen
 #add_library(lib_crypto STATIC IMPORTED)
 #set_target_properties(lib_crypto PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/${SHARED}/android/optional_src/libs/libopenssl/${ANDROID_ABI}/libcrypto.a)
 
+add_library(lib_fmod STATIC IMPORTED)
+set_target_properties(lib_fmod PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/${SHARED}/android/optional_src/libs/fmodstudio/api/core/lib/${ANDROID_ABI}/libfmod.so)
+
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -115,4 +120,4 @@ target_link_libraries( # Specifies the target library.
 
         # Links the target library to the log library
         # included in the NDK.
-        ${log-lib} dl GLESv1_CM z)
+        ${log-lib} dl GLESv1_CM z lib_fmod)

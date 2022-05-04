@@ -241,14 +241,14 @@ string GetAppCachePath()
 
 		if (!retString.empty())
 		{
-			retString += string("/Android/data/")+GetBundlePrefix()+GetBundleName()+"/files/";
-			//LogMsg("External dir is %s", retString.c_str());
+			//retString += string("/Android/data/")+GetBundlePrefix()+GetBundleName()+"/files/";
+			LogMsg("External dir is %s", retString.c_str());
 
 			//looks valid
 #ifdef _DEBUG
 //LogMsg("GetAppCachePath returning %s",retString.c_str());
 #endif
-			return retString;
+			return retString+"/";
 		}
 
 		retString = GetSavePathBasic();
@@ -673,9 +673,20 @@ void CreateDirectoryRecursively(string basePath, string path)
 	jmethodID mid = env->GetStaticMethodID(cls,
 		"create_dir_recursively",
 		"(Ljava/lang/String;Ljava/lang/String;)V");
-	jstring ret;
-	env->CallStaticVoidMethod(cls, mid, env->NewStringUTF(basePath.c_str()), env->NewStringUTF(path.c_str()));
-	return;
+	//jstring ret;
+
+    jstring tempBase = env->NewStringUTF(basePath.c_str());
+	jstring tempPath =   env->NewStringUTF(path.c_str());
+    env->CallStaticVoidMethod(cls, mid, tempBase, tempPath);
+	
+    //without these DeleteLocalRefs, if you call this 500+ times in a single loop Android won't
+    //have time to garbage collect and it will crash on some devices.  Why would you call this 500+
+    //times?  Installing a DMOD of course
+    
+	env->DeleteLocalRef(tempBase);
+    env->DeleteLocalRef(tempPath);
+	env->DeleteLocalRef(cls);
+ 	return;
 }
 
 
@@ -693,7 +704,7 @@ vector<string> GetDirectoriesAtPath(string path)
 	dp = opendir(path.c_str());
 	if (!dp)
 	{
-		LogError("GetDirectoriesAtPath: opendir failed");
+		LogError("GetDirectoriesAtPath: opendir failed (%s)", path.c_str());
 		return v;
 	}
 
@@ -1020,6 +1031,17 @@ void AppInit(JNIEnv*  env)
 {
 	//happens after the gl surface is initialized
 
+	//Newer versions of Android don't automatically create the "files" subdir - we create it here if needed, this way data isn't lost
+	//when upgrading our apps.
+	
+	
+	/*
+	string tempDir = GetAppCachePath();
+	StringReplace("/files/", "/", tempDir);
+	        LogMsg("Creating dir %s if needed", tempDir.c_str());
+	CreateDirectoryRecursively(tempDir, "files");
+	*/
+	 
 	LogMsg("Initialized GL surfaces for game");
 	GetBaseApp()->InitializeGLDefaults();
 	LogMsg("gl defaults set");
@@ -1033,8 +1055,6 @@ void AppInit(JNIEnv*  env)
 	LogMsg("Surfaces loaded");
 
 }
-
-
 
 enum eAndroidActions
 {
@@ -1098,7 +1118,6 @@ void AppOnSendGUIStringEx(JNIEnv*  env, jobject thiz,jint messageType, jint parm
 	env->ReleaseStringUTFChars(s, ss);
 
 	GetMessageManager()->SendGUIStringEx((eMessageType)messageType, (float)parm1, (float)parm2, finger, str);  
-
 }
 
 void AppOnKey( JNIEnv*  env, jobject jobj, jint type, jint keycode, jint c)
@@ -1183,7 +1202,6 @@ void AppOnKey( JNIEnv*  env, jobject jobj, jint type, jint keycode, jint c)
 		break;
 	}
 }
-
 
 int AppOSMessageGet(JNIEnv* env)
 {

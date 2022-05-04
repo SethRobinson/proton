@@ -20,6 +20,7 @@ public:
 	virtual ~GamepadXInput();
 	virtual bool Init();
 	virtual void Kill();
+	void SendArcadeDirectionByKeyIfChanged(eVirtualKeys key, bool bDown);
 	virtual void Update();
 
 protected:

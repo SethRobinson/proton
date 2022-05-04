@@ -1,3 +1,5 @@
+//Deprecated, use AudioManagerFMODStudio instead
+
 #include "PlatformPrecomp.h"
 
 #ifndef RT_WEBOS

@@ -3,7 +3,8 @@
 #include "GamepadXInput.h"
 #include "GamepadManager.h"
 
-#pragma comment (lib, "xinput.lib")
+//#pragma comment (lib, "xinput.lib") //win 10+ only?
+#pragma comment (lib, "XINPUT9_1_0.LIB") //so we can work with Win7
 
 GamepadProviderXInput::GamepadProviderXInput()
 {

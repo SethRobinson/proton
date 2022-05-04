@@ -15,6 +15,7 @@ import android.os.Bundle;
 
 public class Main extends SharedActivity
 {
+
 	@Override
     protected void onCreate(Bundle savedInstanceState) 
 	{
@@ -24,8 +25,21 @@ public class Main extends SharedActivity
 
 		dllname= "RTAndroidApp"; //this doesn't need to be changed
 
+		System.loadLibrary("fmod");
+
+		org.fmod.FMOD.init(this);
+		
 		System.loadLibrary(dllname);
+
+		
 		super.onCreate(savedInstanceState);
     }
+
+	protected void onDestroy()
+	{
+
+		org.fmod.FMOD.close();
+		super.onDestroy();
+	}
 }
 	

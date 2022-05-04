@@ -55,6 +55,13 @@ bool IsEven(int number)
 	return (number & 1) == 0;
 }
 
+char *strcpy_safe(char *dest, const char* src)
+{
+	char *ret = dest;
+	while (*dest++ = *src++)
+		;
+	return ret;
+}
 
 string BoolToEnabled(bool bEnabled)
 {

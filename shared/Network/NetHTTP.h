@@ -151,6 +151,11 @@ public:
 	}
 	int GetPostDataSize() { return (int)m_postData.size(); }
 
+	void SetExpectedBytes(int bytes)
+	{
+		m_expectedFileBytes = bytes;
+	}
+
 
 private:
 #endif

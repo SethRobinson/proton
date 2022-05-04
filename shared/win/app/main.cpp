@@ -5,6 +5,7 @@
 #include "main.h"
 #include "WebOS/SDLMain.h"
 #include "BaseApp.h"
+#include "shellscalingapi.h" //for DPI awareness, this means Win7+ from now on
 
 //avoid needing to define _WIN32_WINDOWS > 0x0400.. although I guess we could in PlatformPrecomp's win stuff...
 #ifndef WM_MOUSEWHEEL
@@ -1297,11 +1298,6 @@ bool InitVideo(int width, int height, bool bFullscreen, float aspectRatio)
 
 	LogMsg("Setting native video mode to %d, %d - Fullscreen: %d  Aspect Ratio: %.2f", width, height, int(bFullscreen), aspectRatio);
 
-	if (height == 1440)
-		{
-		LogMsg("Woah!");
-			assert(!"1440!");
-		}
 	g_winVideoScreenY = height;
 	g_winVideoScreenX = width;
 
@@ -1737,11 +1733,26 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLin
 	SetDoubleClickTime(0);
 #endif
 
+
 	//first make sure our working directory is the .exe dir
 	 _chdir(GetExePath().c_str());
 	
 	g_hInstance = hInstance;
 	RemoveFile("log.txt", true);
+	
+	//No, set it in the manifest, there is an option located in Input/Output under Manifest in project settings in VS,
+	//however, I set this Win7 method for Win7 computer, it should be ignored by Win10+ due to the manifest setting using a newer
+	//version (per monitor awareness)
+
+	if (!SetProcessDPIAware())//Win7+
+	{
+		assert(!"Error setting DPI aware");
+	} 
+	/*
+	//Nah, you should set this in the manifest settings, it's easy.  If we do it here we have to link to shcore.lib and be win 8.1+
+	HRESULT r = SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
+	assert(r == S_OK);
+	*/
 
 	if (lpCmdLine[0])
 	{

@@ -191,12 +191,12 @@ void HTTPComponent::OnOS(VariantList *pVList)
 #endif
 			
 			m_state = STATE_CONNECTED;
-			m_netHTTP.Start();
 			if (!m_fileName.empty())
 			{
 				m_netHTTP.SetFileOutput(m_fileName);
 			}
-
+			m_netHTTP.Start();
+			
 			break;
 
 		case RT_kCFStreamEventErrorOccurred:

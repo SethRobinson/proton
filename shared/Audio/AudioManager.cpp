@@ -8,7 +8,7 @@ AudioManager::AudioManager()
 	m_bLastMusicLooping = true;
 	m_lastMusicID = AUDIO_HANDLE_BLANK;
 	m_bVibrationDisabled = false;
-	m_musicVol = m_defaultVol = 1.0f;
+	m_musicVol = m_defaultVol = m_midiVolumeMod = 1.0f;
 	m_bStreamMusic = true;
 	m_bPreferOGG = false;
 	
