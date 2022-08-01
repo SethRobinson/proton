@@ -239,6 +239,34 @@ byte * LoadFileIntoMemoryBasic(string fileName, unsigned int *length, bool bUseS
 	return pData;
 }
 
+
+bool SaveMemoryIntoFileBasic(byte* pData, unsigned int length, std::string fileName, bool bUseSavePath, bool bAddBasePath)
+{
+	if (bAddBasePath)
+	{
+		if (bUseSavePath)
+		{
+			fileName = GetSavePath() + fileName;
+		}
+		else
+		{
+			fileName = GetBaseAppPath() + fileName;
+		}
+	}
+	FILE* fp = fopen(fileName.c_str(), "wb");
+	if (!fp)
+	{
+		return false;
+	}
+
+	fwrite(pData, length, 1, fp);
+	fclose(fp);
+
+	return true;
+
+}
+
+
 bool IsAPackedFile(byte *pFile)
 {
 	return (strncmp((char*)pFile, C_RTFILE_PACKAGE_HEADER, C_RTFILE_PACKAGE_HEADER_BYTE_SIZE) == 0);

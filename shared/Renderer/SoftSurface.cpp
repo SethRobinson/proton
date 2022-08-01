@@ -983,6 +983,9 @@ bool SoftSurface::LoadBMPTexture(byte *pMem)
 {
 
 	BMPImageHeader *pBmpImageInfo = (BMPImageHeader*)&pMem[14];
+	
+	BMPImageHeaderWithBitfields *pBmpImageInfoWithBitfields = (BMPImageHeaderWithBitfields*)&pMem[14];
+	
 	//get around alignment issues
 	BMPImageHeader bmpImageInfoCopy;
 	memcpy(&bmpImageInfoCopy, &pMem[14], sizeof(BMPImageHeader) );
@@ -1055,6 +1058,15 @@ bool SoftSurface::LoadBMPTexture(byte *pMem)
 		break;
 
 	case BMP_COMPRESSION_RLE8:
+		break;
+	case BMP_COMPRESSION_BITFIELDS:
+	{
+		LogMsg("Bitmap mask: %u (%04x), %u (%04x), %u (%04x), %u (%04x)", pBmpImageInfoWithBitfields->RedMask, pBmpImageInfoWithBitfields->RedMask,
+			pBmpImageInfoWithBitfields->GreenMask, pBmpImageInfoWithBitfields->GreenMask, 
+			pBmpImageInfoWithBitfields->BlueMask, pBmpImageInfoWithBitfields->BlueMask, 
+			pBmpImageInfoWithBitfields->AlphaMask, pBmpImageInfoWithBitfields->AlphaMask);
+		
+	}
 		break;
 
 	default:
@@ -1246,12 +1258,31 @@ bool SoftSurface::LoadBMPTexture(byte *pMem)
 		while ((srcUsedPitch+srcPitchOffset)%4) {srcPitchOffset++;} //what's needed to pad it to a 32 byte boundry
 		int totalPitch = srcUsedPitch+srcPitchOffset;
 
-		for (int y=0; y < m_height; y++)
+		if (bmpImageInfoCopy.Compression == BMP_COMPRESSION_BITFIELDS && pBmpImageInfoWithBitfields->RedMask == 4278190080)
 		{
-			for (int x=0; x < m_width; x++)
+			//ok, I found a weird bitmap that wasn't in the normal format.  If the green is here, I'm assuming it's that kind and
+			//doing it this way.  Should probably handle ANY bitfield format, but there are actually not that many in use so ..
+			//close enough.  If your colors are wrong, this is why though
+			for (int y = 0; y < m_height; y++)
 			{
-				byte *pSrc = &pPixelData[(m_height-y-1)*totalPitch+x*4];
-				pImg[y*m_width+x] = GetFinalRGBAColorWithColorKey(glColorBytes(pSrc[2], pSrc[1], pSrc[0], pSrc[3]));
+				for (int x = 0; x < m_width; x++)
+				{
+					byte* pSrc = &pPixelData[(m_height - y - 1) * totalPitch + x * 4];
+					pImg[y * m_width + x] = GetFinalRGBAColorWithColorKey(glColorBytes(pSrc[3], pSrc[2], pSrc[1], pSrc[0]));
+				}
+			}
+			
+		}
+		else
+		{
+
+			for (int y = 0; y < m_height; y++)
+			{
+				for (int x = 0; x < m_width; x++)
+				{
+					byte* pSrc = &pPixelData[(m_height - y - 1) * totalPitch + x * 4];
+					pImg[y * m_width + x] = GetFinalRGBAColorWithColorKey(glColorBytes(pSrc[2], pSrc[1], pSrc[0], pSrc[3]));
+				}
 			}
 		}
 
@@ -1259,6 +1290,7 @@ bool SoftSurface::LoadBMPTexture(byte *pMem)
 		{
 			PreMultiplyAlpha();
 		}
+		
 
 		//memset(pImg, 600, m_bytesPerPixel*GetWidth()*GetHeight());
 	}

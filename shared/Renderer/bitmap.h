@@ -33,6 +33,30 @@ typedef struct BMPImageHeader
 	unsigned int YPixels;
 	unsigned int ColorsUsed;
 	unsigned int ColorsImportant;
+
+
 } BMPImageHeader;
+
+typedef struct BMPImageHeaderWithBitfields
+{
+	unsigned int Size;
+	unsigned int Width;
+	unsigned int Height;
+	unsigned short Planes;
+	unsigned short BitCount;
+	unsigned int Compression;
+	unsigned int ImageSize;
+	unsigned int XPixels;
+	unsigned int YPixels;
+	unsigned int ColorsUsed;
+	unsigned int ColorsImportant;
+
+	unsigned int RedMask;
+	unsigned int GreenMask;
+	unsigned int BlueMask;
+	unsigned int AlphaMask;
+
+} BMPImageHeaderWithBitfields;
+
 
 #endif // bitmap_h__

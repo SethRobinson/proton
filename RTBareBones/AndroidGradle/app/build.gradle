@@ -81,6 +81,7 @@ android {
     buildFeatures {
         viewBinding true
     }
+    namespace 'com.rtsoft.RTAndroidApp'
 }
 
 dependencies {

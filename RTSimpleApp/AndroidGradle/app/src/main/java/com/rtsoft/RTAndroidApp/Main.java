@@ -25,9 +25,9 @@ public class Main extends SharedActivity
 
 		dllname= "RTAndroidApp"; //this doesn't need to be changed
 
-		System.loadLibrary("fmod");
+		//System.loadLibrary("fmod");
 
-		org.fmod.FMOD.init(this);
+		//org.fmod.FMOD.init(this);
 		
 		System.loadLibrary(dllname);
 
@@ -38,7 +38,7 @@ public class Main extends SharedActivity
 	protected void onDestroy()
 	{
 
-		org.fmod.FMOD.close();
+		//org.fmod.FMOD.close();
 		super.onDestroy();
 	}
 }
