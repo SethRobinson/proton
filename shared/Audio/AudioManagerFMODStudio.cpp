@@ -47,10 +47,8 @@ bool AudioManagerFMOD::Init()
 	Create a System object and initialize
 	*/
 
-	LogMsg("Creating FMOD system...");
 	result = FMOD::System_Create(&system);
 	ERRCHECK(result);
-	LogMsg("Getting version...");
 
 	result = system->getVersion(&version);
 	ERRCHECK(result);

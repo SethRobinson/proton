@@ -16,9 +16,16 @@
 
 #if !defined RT_WEBOS
 
+#ifdef __APPLE__
+//paths are different on the ios stuff
+#include "fmod.hpp"
+#include "fmod_errors.h"
+
+#else
+
 #include "fmodstudio/api/core/inc/fmod.hpp"
 #include "fmodstudio/api/core/inc/fmod_errors.h"
-
+#endif
 class SoundObject
 {
 public:

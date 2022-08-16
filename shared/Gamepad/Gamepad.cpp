@@ -31,16 +31,27 @@ Gamepad::~Gamepad()
 
 void Gamepad::SetAxis( int axis, float val )
 {
+	//this deadzone calculation is only for understanding inactivity, doesn't affect anything else
+	if (val >= 0.2f)
+	{
+		SetTimeOfLastGamepadInputMS(GetSystemTimeTick());
+	}
+	
 	m_axis[axis].m_axis = val;
 
 #ifdef SHOW_GAMEPAD_DEBUG_STUFF
-	if (val != 0)	LogMsg("Got axis %d: %.2f", axis, val);
+	//if (val != 0)	LogMsg("Got axis %d: %.2f", axis, val);
 #endif
 
 }
 
 void Gamepad::OnButton( bool bDown, int buttonID )
 {
+    if (m_buttons[buttonID].m_bDown == bDown) return;
+    
+	SetTimeOfLastGamepadInputMS(GetSystemTimeTick());
+
+	
 	m_buttons[buttonID].OnPress(bDown);
 	
 #ifdef SHOW_GAMEPAD_DEBUG_STUFF
@@ -299,7 +310,7 @@ void Gamepad::Update()
 		if (m_bSendLeftStickAsDirectionsToo && m_pArcadeComp)
 		{
 			//let's convert to 8 way directional signals as well
-			const float deadSpace = 0.2f; //TODO: make member var and add an accessor to it?
+			const float deadSpace = 0.5f; //TODO: make member var and add an accessor to it?
 			if (GetLeftStick().length() > deadSpace)
 			{
 				//convert to 360 degrees

@@ -20,7 +20,6 @@ FileManager * GetFileManager() {return &g_fileManager;}
 
 #include "Audio/AudioManager.h"
 AudioManager g_audioManager; //to disable sound, this is a dummy
-
 AudioManager * GetAudioManager(){return &g_audioManager;}
 
 App *g_pApp = NULL;
@@ -183,9 +182,81 @@ void App::OnArcadeInput(VariantList *pVList)
 
 void AppInputRawKeyboard(VariantList *pVList)
 {
-	char key = (char) pVList->Get(0).GetUINT32();
-	bool bDown = pVList->Get(1).GetUINT32() != 0;
-	LogMsg("Raw key %c (%d)",key, (int)bDown);
+	 
+    int vKey = pVList->Get(0).GetUINT32();
+    eVirtualKeyInfo keyInfo = (eVirtualKeyInfo) pVList->Get(1).GetUINT32();
+    
+    string pressed;
+
+    switch (keyInfo)
+    {
+        case VIRTUAL_KEY_PRESS:
+            pressed = "pressed";
+            break;
+
+        case VIRTUAL_KEY_RELEASE:
+            pressed = "released";
+            break;
+
+        default:
+            LogMsg("AppInputRawKeyboard> Bad value of %d", keyInfo);
+    }
+    
+    string keyName = "unknown";
+
+    switch (vKey)
+    {
+        case VIRTUAL_KEY_DIR_LEFT:
+            keyName = "Left";
+            break;
+
+        case VIRTUAL_KEY_DIR_UP:
+            keyName = "Up";
+            break;
+
+        case VIRTUAL_KEY_DIR_RIGHT:
+            keyName = "Right";
+            break;
+
+        case VIRTUAL_KEY_DIR_DOWN:
+            keyName = "Down";
+            break;
+
+        case VIRTUAL_DPAD_BUTTON_DOWN:
+            keyName = "Button Bottom";
+            break;
+        case VIRTUAL_DPAD_BUTTON_UP:
+            keyName = "Button Top";
+            break;
+        case VIRTUAL_DPAD_BUTTON_LEFT:
+            keyName = "Button Left";
+            break;
+        case VIRTUAL_DPAD_BUTTON_RIGHT:
+            keyName = "Button Right";
+            break;
+        case VIRTUAL_DPAD_START:
+            keyName = "Start";
+            break;
+        case VIRTUAL_DPAD_SELECT:
+            keyName = "Select";
+            break;
+        case VIRTUAL_DPAD_RBUTTON:
+            keyName = "R1";
+            break;
+        case VIRTUAL_DPAD_RTRIGGER:
+            keyName = "R2";
+            break;
+
+        case VIRTUAL_DPAD_LBUTTON:
+            keyName = "L1";
+            break;
+        case VIRTUAL_DPAD_LTRIGGER:
+            keyName = "L2";
+            break;
+
+    }
+    
+    LogMsg("MESSAGE_TYPE_GUI_CHAR_RAW: Hit %d (%s) (%s)", vKey, keyName.c_str(), pressed.c_str());
 }
 
 void AppInput(VariantList *pVList)
@@ -223,7 +294,7 @@ void AppInput(VariantList *pVList)
 
 	case MESSAGE_TYPE_GUI_CHAR:
 		char key = (char)pVList->Get(2).GetUINT32();
-		LogMsg("Hit key %c (%d)", key, (int)key);
+		LogMsg("MESSAGE_TYPE_GUI_CHAR sent key %c (%d)", key, (int)key);
 		break;
 	}	
 }
@@ -276,7 +347,7 @@ void App::Update()
 		//this one gives raw up and down of keyboard events, where the one above only gives
 		//MESSAGE_TYPE_GUI_CHAR which is just the down and includes keyboard repeats from
 		//holding the key
-		//GetBaseApp()->m_sig_raw_keyboard.connect(&AppInputRawKeyboard);
+		GetBaseApp()->m_sig_raw_keyboard.connect(&AppInputRawKeyboard);
 		
 		
 		/*

@@ -8,6 +8,7 @@
 #import "MyViewController.h"
 #import "EAGLView.h"
 #import "iOSUtils.h"
+#import <GameController/GameController.h>
 
 CGRect iOS7StyleScreenBounds();
 
@@ -31,9 +32,6 @@ CGRect iOS7StyleScreenBounds();
 	
 }
 
-
-
-
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)myinterfaceOrientation
 {
     if (!GetBaseApp()->GetManualRotationMode())
@@ -52,7 +50,6 @@ CGRect iOS7StyleScreenBounds();
 	//No matter what, we tell it to do portrait mode
 	/*
 	
-	
 	//LogMsg("Setting orientation to interfaceOrientation %d", myinterfaceOrientation);
 	[[UIApplication sharedApplication] setStatusBarOrientation: myinterfaceOrientation animated:NO];
 	SetupScreenInfoIPhone(myinterfaceOrientation); 
@@ -62,7 +59,6 @@ CGRect iOS7StyleScreenBounds();
 
 - (BOOL)shouldAutorotate
 {
-    
     if (!GetBaseApp()->GetManualRotationMode())
     {
         //Let our view controller handle our rotations for us
@@ -71,9 +67,98 @@ CGRect iOS7StyleScreenBounds();
    	return false;
 }
 
-- (NSUInteger)supportedInterfaceOrientations
+//in 2020 Apple added a way to get scancodes from low level keyboard events.  Naturally they aren't the same as the Windows ones
+//Proton uses, so let's convert them to normal ascii codes and proton virtual keys
+
+- (long) HIDKeyToProtonKey: (long) keyCode type: (long) type
+{
+    if (keyCode >= UIKeyboardHIDUsageKeyboardA && keyCode <= UIKeyboardHIDUsageKeyboardZ)
+    {
+        return ((long)'a')+(keyCode-UIKeyboardHIDUsageKeyboardA); // convert A-Z
+    }
+    
+    if (keyCode >= UIKeyboardHIDUsageKeyboard1 && keyCode <= UIKeyboardHIDUsageKeyboard9)
+    {
+        return ((long)'1')+(keyCode-UIKeyboardHIDUsageKeyboard1); // cobvert 1-9
+    }
+    
+    if (keyCode >= UIKeyboardHIDUsageKeyboardF1 && keyCode <= UIKeyboardHIDUsageKeyboardF12)
+    {
+        return  VIRTUAL_KEY_F1  +(keyCode-UIKeyboardHIDUsageKeyboardF1); // covert F1-F16
+    }
+
+    //get into the nitty gritty where tricks don't work
+    switch(keyCode)
+    {
+        case UIKeyboardHIDUsageKeyboard0: return '0';
+            
+        case UIKeyboardHIDUsageKeyboardLeftControl:
+        case UIKeyboardHIDUsageKeyboardRightControl: return VIRTUAL_KEY_CONTROL;
+            
+        case UIKeyboardHIDUsageKeyboardLeftShift:
+        case UIKeyboardHIDUsageKeyboardRightShift: return VIRTUAL_KEY_SHIFT;
+
+        case UIKeyboardHIDUsageKeyboardLeftAlt:
+        case UIKeyboardHIDUsageKeyboardRightAlt: return VIRTUAL_KEY_ALT;
+
+        case UIKeyboardHIDUsageKeyboardTab: return 9;
+        case UIKeyboardHIDUsageKeyboardDeleteOrBackspace: return 8;
+        case UIKeyboardHIDUsageKeyboardEscape: return VIRTUAL_KEY_BACK;
+        case UIKeyboardHIDUsageKeyboardLeftArrow: return VIRTUAL_KEY_DIR_LEFT;
+        case UIKeyboardHIDUsageKeyboardRightArrow: return VIRTUAL_KEY_DIR_RIGHT;
+        case UIKeyboardHIDUsageKeyboardUpArrow: return VIRTUAL_KEY_DIR_UP;
+        case UIKeyboardHIDUsageKeyboardDownArrow: return VIRTUAL_KEY_DIR_DOWN;
+        case UIKeyboardHIDUsageKeyboardSpacebar:  return ' ';
+        case UIKeyboardHIDUsageKeyboardGraveAccentAndTilde: return '`';
+        case UIKeyboardHIDUsageKeyboardBackslash: return '\\';
+        case UIKeyboardHIDUsageKeyboardReturnOrEnter: return 13;
+        case UIKeyboardHIDUsageKeyboardComma: return ',';
+        case UIKeyboardHIDUsageKeyboardPeriod: return '.';
+        case UIKeyboardHIDUsageKeyboardSlash: return '/';
+        case UIKeyboardHIDUsageKeyboardOpenBracket: return '[';
+        case UIKeyboardHIDUsageKeyboardCloseBracket: return ']';
+        default:;
+    }
+    
+    return keyCode;
+}
+
+- (void) pressesBegan:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
 {
     
+    for(UIPress *press in presses)
+    {
+        int protonChar = (int)[self HIDKeyToProtonKey: press.key.keyCode type: press.type];
+        //LogMsg("Pressed %d, converted to %d (type: %d)", press.key.keyCode, protonChar, press.type);
+        
+        if (protonChar > 0)
+        {
+            //generate events
+            GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_CHAR_RAW, (float)protonChar, 1.0f);
+            
+            //Um, I think we need to lower case this, then check if Shift is down for it to work right
+            GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_CHAR, (float)protonChar, 1.0f);
+        }
+        
+    }
+}
+
+- (void) pressesEnded:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
+{
+    for(UIPress *press in presses)
+    {
+        int protonChar = (int)[self HIDKeyToProtonKey: press.key.keyCode type: press.type];
+     
+        if (protonChar > 0)
+        {
+            GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_CHAR_RAW, (float)protonChar, 0.0f);
+        }
+    }
+}
+
+
+- (NSUInteger)supportedInterfaceOrientations
+{
     if (!GetBaseApp()->GetManualRotationMode())
     {
         if (GetLockedLandscape())
@@ -105,15 +190,11 @@ CGRect iOS7StyleScreenBounds();
     //when in manual rotation mode, this gets hit before a valid SetProtonPixelScaleFactor is set, so we need to set it here
     //to be safe
      
-
-    
 	UIScreen *pScreen = [UIScreen mainScreen];
 //    CGRect fullScreenRect = pScreen.bounds;
     CGRect fullScreenRect = iOS7StyleScreenBounds();
 
     LogMsg("Rotated to orientation %d (%.2f, %.2f)", interfaceOrientation, fullScreenRect.size.width* GetProtonPixelScaleFactor(), fullScreenRect.size.height* GetProtonPixelScaleFactor());
-
-      
     
     if (GetBaseApp()->GetManualRotationMode())
     {
@@ -139,11 +220,9 @@ CGRect iOS7StyleScreenBounds();
             interfaceOrientation == UIInterfaceOrientationLandscapeLeft)
         {
             SetupScreenInfo( GetPrimaryGLY(), GetPrimaryGLX(), interfaceOrientation);
-            
         } else
         {
             SetupScreenInfo( GetPrimaryGLX(), GetPrimaryGLY(), interfaceOrientation);
-            
         }
         
         return;
@@ -152,10 +231,8 @@ CGRect iOS7StyleScreenBounds();
 	if (!CanRotateTo(interfaceOrientation))
 	{
 		LogMsg("Refusing orientation %d",interfaceOrientation);
-		
 		return;
 	}
-    
     
     if (!GetBaseApp()->GetManualRotationMode())
     {

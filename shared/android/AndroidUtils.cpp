@@ -1099,7 +1099,8 @@ void AppOnTouch( JNIEnv*  env, jobject jobj,jint action, jfloat x, jfloat y, jin
 	m.y = y;
 	m.finger = finger;
 	m.type = messageType;
-
+	SetTimeOfLastTouchMS(GetSystemTimeTick());
+	
 	g_messageCache.push_back(m);
 	//GetMessageManager()->SendGUI(messageType, x, y);
 }
@@ -1123,16 +1124,47 @@ void AppOnSendGUIStringEx(JNIEnv*  env, jobject thiz,jint messageType, jint parm
 void AppOnKey( JNIEnv*  env, jobject jobj, jint type, jint keycode, jint c)
 {
 	
+	//android keycode list here, thanks microsoft (?!) https://docs.microsoft.com/en-us/dotnet/api/android.views.keycode?view=xamarin-android-sdk-12
 #ifdef _DEBUG
 	//LogMsg("Native Got type %d, keycode %d, key %d (%c)", type, keycode, c, (char(c)));
 #endif
 
+	//OPTIMIZE:  Why didn't I convert the F keys a smart way? Maybe
+	//the compiler will optimize it to if keycode >= 131 && keycode >= 141...
+	
+	
 	switch (keycode)
 	{
+	case VIRTUAL_DPAD_BUTTON_DOWN:
+	case VIRTUAL_DPAD_BUTTON_RIGHT:
+	case VIRTUAL_DPAD_BUTTON_UP:
+	case VIRTUAL_DPAD_BUTTON_LEFT:
+	case VIRTUAL_KEY_DIR_DOWN:
+	case VIRTUAL_KEY_DIR_UP:
+	case VIRTUAL_KEY_DIR_LEFT:
+	case VIRTUAL_KEY_DIR_RIGHT:
+		//some of the joystick events we might get
+		SetTimeOfLastGamepadInputMS(GetSystemTimeTick());
 		
-		//case 4: e.v = KEY_BACK; break; // KEYCODE_BACK
-		//case 82: e.v = KEY_MENU; break; // KEYCODE_MENU
-		//case 84: e.v = KEY_SEARCH; break; // KEYCODE_SEARCH
+		break;
+		
+		
+		
+		
+		
+	case 131: c = VIRTUAL_KEY_F1; break;
+	case 132: c = VIRTUAL_KEY_F2; break;
+	case 133: c = VIRTUAL_KEY_F3; break;
+	case 134: c = VIRTUAL_KEY_F4; break;
+	case 135: c = VIRTUAL_KEY_F5; break;
+	case 136: c = VIRTUAL_KEY_F6; break;
+	case 137: c = VIRTUAL_KEY_F7; break;
+	case 138: c = VIRTUAL_KEY_F8; break;
+	case 139: c = VIRTUAL_KEY_F9; break;
+	case 140: c = VIRTUAL_KEY_F10; break;
+	case 141: c = VIRTUAL_KEY_F11; break;
+	case 142: c = VIRTUAL_KEY_F12; break;
+
 	case 66: //enter
 		c = 13;
 		break;
@@ -1140,36 +1172,8 @@ void AppOnKey( JNIEnv*  env, jobject jobj, jint type, jint keycode, jint c)
 		c = 8;
 		break;
 
-	case 99:
-		keycode = VIRTUAL_DPAD_BUTTON_LEFT;
-		break;
+    }
 
-	case 100:
-		keycode = VIRTUAL_DPAD_BUTTON_UP;
-		break;
-
-
-	case 4:
-		//actually this will never get hit, the java side will send VIRTUAL_DPAD_BUTTON_RIGHT directly, because it
-		//shares stuff with the back button and has to detect which one it is on that side
-		keycode = VIRTUAL_DPAD_BUTTON_RIGHT;
-		break;
-	case 109:
-		keycode = VIRTUAL_DPAD_SELECT;
-		break;
-	case 108:
-		keycode =  VIRTUAL_DPAD_START;
-		break;
-
-	case 102:
-		keycode =  VIRTUAL_DPAD_LBUTTON;
-	break;
-	case 103:
-		keycode =  VIRTUAL_DPAD_RBUTTON;
-		break;
-
-	}
-	
 	if (keycode >= VIRTUAL_KEY_BACK)
 	{
 		
@@ -1178,12 +1182,8 @@ void AppOnKey( JNIEnv*  env, jobject jobj, jint type, jint keycode, jint c)
 			//hitting back with the keyboard open?  Just pretend they closed the keyboard.
 			SetIsUsingNativeUI(false);
 			return;
-		} else
-		{
-			c = keycode;
 		}
 		
-
 		c = keycode;
 	}
 
@@ -1191,7 +1191,6 @@ void AppOnKey( JNIEnv*  env, jobject jobj, jint type, jint keycode, jint c)
 	{
 	case 1: //keydown
 		GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_CHAR, (float)c, (float)1);  
-		
 		if (c < 128) c = toupper(c);
 		GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_CHAR_RAW, (float)c, (float)1);  
 		break;

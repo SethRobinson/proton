@@ -13,6 +13,8 @@
 #include <Xinput.h>
 
 #include "GamepadProvider.h"
+#include "Gamepad.h"
+
 
 class GamepadProviderXInput : public GamepadProvider
 {
@@ -29,7 +31,10 @@ public:
 	
 protected:
 	
+	eGamepadID m_gamepadUniqueID[XUSER_MAX_COUNT]; //remember where we put controllers
+	
 	bool _preallocateControllersEvenIfMissing;
+	XINPUT_STATE m_stateTemp;
 
 private:
 };

@@ -453,9 +453,9 @@ bool NetHTTP::Start()
 
 	//to figure out problems, uncomment below
 #ifdef _DEBUG
-	LogMsg("CURL in debug mode");
-	curl_easy_setopt(m_CURL_handle, CURLOPT_VERBOSE, 1L);
-	curl_easy_setopt(m_CURL_handle, CURLOPT_DEBUGFUNCTION, CURLDebugTrace);
+	//LogMsg("CURL in debug mode");
+	//curl_easy_setopt(m_CURL_handle, CURLOPT_VERBOSE, 1L);
+	//curl_easy_setopt(m_CURL_handle, CURLOPT_DEBUGFUNCTION, CURLDebugTrace);
 #endif
 
 	curl_easy_setopt(m_CURL_handle, CURLOPT_URL, finalURL.c_str());

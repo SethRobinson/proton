@@ -21,8 +21,10 @@
 	#include <direct.h>
 #endif
 
-//uncomment below and so you can use alt print-screen to take screenshots easier (no border)
-//#define C_BORDERLESS_WINDOW_MODE_FOR_SCREENSHOT_EASE 
+#ifdef _DEBUG
+    //uncomment below and so you can use alt print-screen to take screenshots easier (no border)
+	//#define C_BORDERLESS_WINDOW_MODE_FOR_SCREENSHOT_EASE 
+#endif
 
 //My system, or the PVR GLES emulator or something often has issues with WM_CHAR missing messages.  So I work around it with this:
 #define C_DONT_USE_WM_CHAR
@@ -44,6 +46,9 @@ bool g_winAllowWindowResize = true;
 #endif
 bool g_bMouseIsInsideArea = true;
 vector<VideoModeEntry> g_videoModes;
+float g_xPosLast = 0;
+float g_yPosLast = 0;
+
 void AddVideoMode(string name, int x, int y, ePlatformID platformID, eOrientationMode forceOrientation = ORIENTATION_DONT_CARE);
 void SetVideoModeByName(string name); 
 bool InitVideo(int width, int height, bool bFullscreen, float aspectRatio);
@@ -54,7 +59,6 @@ bool g_bAppCanRunInBackground = true;
 #else
 bool g_bAppCanRunInBackground = false;
 #endif
-
 
 void InitVideoSize()
 {
@@ -98,7 +102,9 @@ void InitVideoSize()
 	AddVideoMode("iPad HD", 768*2, 1024*2, PLATFORM_ID_IOS);
 	AddVideoMode("iPad HD Landscape", 1024*2,768*2 , PLATFORM_ID_IOS,  ORIENTATION_PORTRAIT);
 	AddVideoMode("iPhone 5.5 Retina Landscape", 2208, 1242, PLATFORM_ID_IOS, ORIENTATION_PORTRAIT);
-	AddVideoMode("iPhone 12.9 Retina Landscape", 2732, 2048, PLATFORM_ID_IOS, ORIENTATION_PORTRAIT);
+	AddVideoMode("iPad Pro 12.9 Retina Landscape", 2732, 2048, PLATFORM_ID_IOS, ORIENTATION_PORTRAIT);
+	AddVideoMode("iPhone 12 Pro Landscape", 2532, 1170,  PLATFORM_ID_IOS, ORIENTATION_PORTRAIT);
+	AddVideoMode("iPhone 6.5 Retina Landscape", 2688, 1242, PLATFORM_ID_IOS, ORIENTATION_PORTRAIT);
 
 	//Palm er, I mean HP. These should use the Debug WebOS build config in MSVC for the best results, it will
 	//use their funky SDL version
@@ -142,6 +148,12 @@ void InitVideoSize()
 
 	//WORK: Change device emulation here
 	string desiredVideoMode = "Windows";
+	
+#ifdef _DEBUG
+
+	//desiredVideoMode = "iPhone 6.5 Retina Landscape";
+#endif // DEBUG
+
 	SetVideoModeByName(desiredVideoMode);
 	GetBaseApp()->OnPreInitVideo(); //gives the app level code a chance to override any of these parms if it wants to
 }
@@ -629,14 +641,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_SIZE:
 		{
 		
-		
 			// Respond to the message:				
 			int Width = LOWORD( lParam );
 			int Height = HIWORD( lParam ); 
-				
+
 			if (Width != GetPrimaryGLX() || Height != GetPrimaryGLY())
 			{
 				LogMsg("Got new size: %d, %d.  Have focus is %d, minimized: %d, fullscreen: %d", Width, Height, g_bHasFocus, g_bIsMinimized, g_bIsFullScreen);
+				
 				if (Width == 0 && Height == 0)
 				{
 					//we're actually being minimized
@@ -657,13 +669,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					RECT rect;
 					if (GetUpdateRect(g_hWnd, &rect, FALSE))
 					{
+						HDC hDesktopDC = GetDC(g_hWnd);
+							
 						PAINTSTRUCT paint;
 						BeginPaint(g_hWnd, &paint);
+
+						HBRUSH brush = CreateSolidBrush(RGB(0, 0,0));
+
+						FillRect(hDesktopDC, &rect, brush);
+
+						DeleteObject(brush);
 	#ifdef C_GL_MODE
-						SwapBuffers(g_hDC);
+					//	SwapBuffers(g_hDC);
 	#endif
 						EndPaint(g_hWnd, &paint);
+						ReleaseDC(g_hWnd, hDesktopDC);
+
 					}
+					
 				}
 			}
 		}
@@ -945,6 +968,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			}
 
+
+#ifdef C_TREAT_MOUSE_AS_TOUCH
+			//useful for testing certain functionality on PCs
+			SetTimeOfLastTouchMS(GetSystemTimeTick()); //should a mouse count as a touch?  I guess. Makes it easier to test touch stuff on a desktop
+
+#endif
+			
 			g_leftMouseButtonDown = true;
 			int xPos = GET_X_LPARAM(lParam);
 			int yPos = GET_Y_LPARAM(lParam);
@@ -979,6 +1009,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			}
 
+#ifdef C_TREAT_MOUSE_AS_TOUCH
+			//useful for testing certain functionality on PCs
+			SetTimeOfLastTouchMS(GetSystemTimeTick()); //should a mouse count as a touch?  I guess. Makes it easier to test touch stuff on a desktop
+
+#endif
+			
 			g_rightMouseButtonDown = true;
 			int xPos = GET_X_LPARAM(lParam);
 			int yPos = GET_Y_LPARAM(lParam);
@@ -1014,6 +1050,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			float xPos = (float)GET_X_LPARAM(lParam);
 			float yPos = (float)GET_Y_LPARAM(lParam);
+			if (xPos == g_xPosLast && yPos == g_yPosLast)
+			{
+				//ignore.  Spurious mouse messages can happen when certain apps do weird things
+				break;
+			} 
+			
+#ifdef C_TREAT_MOUSE_AS_TOUCH
+			//useful for testing certain functionality on PCs
+			SetTimeOfLastTouchMS(GetSystemTimeTick()); //should a mouse count as a touch?  I guess. Makes it easier to test touch stuff on a desktop
+
+#endif
+			g_xPosLast = xPos;
+			g_yPosLast = yPos;
+			
 			ConvertCoordinatesIfRequired(xPos, yPos);
 	
 			if (g_leftMouseButtonDown)
@@ -1026,9 +1076,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				GetMessageManager()->SendGUIEx2(MESSAGE_TYPE_GUI_CLICK_MOVE, xPos, yPos, 1, GetWinkeyModifiers());
 			} 
 
+			//LogMsg("MOVE %.2f %.2f", xPos, yPos);
 			GetMessageManager()->SendGUIEx2(MESSAGE_TYPE_GUI_CLICK_MOVE_RAW, xPos, yPos, 0, GetWinkeyModifiers());
 		}
-		//sreturn true;
 
 		break;
 
@@ -1101,7 +1151,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	
 #ifdef RT_WIN_MULTITOUCH_SUPPORT
 	case WM_TOUCH:
-		
 		{
 		
 			//LogMsg("Got touch event");
@@ -1135,6 +1184,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 							if (eventStyle != -1)
 							{
+
+								SetTimeOfLastTouchMS(GetSystemTimeTick());
 								bHandled = true;
 								
 								POINT pt;
@@ -1153,7 +1204,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 							
 								if (eventStyle == MESSAGE_TYPE_GUI_CLICK_START)
 								{
-								
+									
 									//found a touch.  Is it already on our list?
 									fingerID = GetFingerTrackIDByTouch(touchID);
 
@@ -1170,7 +1221,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 									//LogMsg("TOUCH ID %d - DOWN FingerID: %d at %.2f, %.2f", touchID,fingerID, xPos, yPos);
 
 								}
-
 
 								if (eventStyle == MESSAGE_TYPE_GUI_CLICK_END)
 								{

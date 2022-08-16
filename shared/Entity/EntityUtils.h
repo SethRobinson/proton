@@ -130,8 +130,12 @@ void OneTimeBobEntity(Entity *pEnt, float bobAmount = -10, int delayBeforeBob = 
  * \param delayInputMS specifies a delay in milliseconds after which the \c FocusInputComponent is added to the \c Entity.
  * \param updateAndRenderDelay specifies a delay in milliseconds after which the \c FocusUpdateComponent and
  *        \c FocusRenderComponent are added to the \c Entity.
+ * Note:  If you want to always render/update/input something last, set its priority # higher.  Default is 1.
  */
-void AddFocusIfNeeded(Entity *pEnt, bool bAlsoLinkMoveMessages = false, int delayInputMS = 0, int updateAndRenderDelay = 0); //add input, think, and render focuses to an entity (if they don't exist)
+
+
+void AddFocusIfNeeded(Entity *pEnt, bool bAlsoLinkMoveMessages = false, int delayInputMS = 0, int updateAndRenderDelay = 0, int32 priority = 1); //add input, think, and render focuses to an entity (if they don't exist)
+
 void AddInputMovementFocusIfNeeded(Entity *pEnt);
 /**
  * Commands a \c FocusInputComponent in \a pEnt to also recognize the raw keyboard input messages.

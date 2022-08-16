@@ -32,7 +32,7 @@ import android.view.KeyEvent;
 import android.view.inputmethod.InputMethodManager;
 import android.opengl.GLSurfaceView;
 import android.graphics.PixelFormat;
-
+import android.view.InputDevice;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.View.OnKeyListener;
@@ -167,8 +167,15 @@ import android.net.ConnectivityManager;
 	public static boolean set_allow_dimming_asap = false;
 	public static boolean set_disallow_dimming_asap = false;
 
+	public Map<Integer, Integer> m_gamepadMap = new HashMap<>();
     ////////////////////////////////////////////////////////////////////////////
 	final Handler mMainThreadHandler = new Handler();
+
+	final static int C_CONTROLLER_MAPPING_PS5 = 0;
+	final static int C_CONTROLLER_MAPPING_XBOX = 1;
+	final static int C_CONTROLLER_MAPPING_PS4 = 2;
+	final static int C_CONTROLLER_MAPPING_SWITCH_PRO = 3;
+	final static int C_CONTROLLER_MAPPING_8BITDO = 4;
 
 	@Override
 	protected void onDestroy()
@@ -176,7 +183,6 @@ import android.net.ConnectivityManager;
      	Log.d(PackageName, "Destroying...");
 		
         super.onDestroy();
-
     }
 
     @Override
@@ -186,16 +192,13 @@ import android.net.ConnectivityManager;
 
     }
 
-
-
     @Override
     protected void onStop()
     {
         super.onStop();
 
     }
-	
-	
+
 	@Override
 	public void onBackPressed() 
 {
@@ -389,7 +392,9 @@ m_editText.addTextChangedListener(new TextWatcher()
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
 		
-		Log.d(PackageName, "Setting IAB...");
+		Log.d(PackageName, "Checking for controllers...");
+
+		CheckControllers();
 
 		update_display_ad = false;
 		run_hooked = false;
@@ -400,6 +405,68 @@ m_editText.addTextChangedListener(new TextWatcher()
 
 
 //#endif
+
+	public void CheckControllers()
+	{
+		Log.d(PackageName, "Yeah, checking for controllers...");
+
+		SharedActivity.app.m_gamepadMap.clear();
+
+
+		int[] deviceIds = InputDevice.getDeviceIds();
+		for (int deviceId : deviceIds)
+		{
+			InputDevice dev = InputDevice.getDevice(deviceId);
+			int sources = dev.getSources();
+
+			// Verify that the device has gamepad buttons, control sticks, or both.
+			if (((sources & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD)
+					|| ((sources & InputDevice.SOURCE_JOYSTICK)
+					== InputDevice.SOURCE_JOYSTICK))
+			{
+				String deviceName = dev.getName().toLowerCase();
+
+				//2508 (Wireless Controller Touchpad) = PS4 bluecontroller
+				//3302 (Wireless Controller) = PS5 (launch?)
+				//2835 (Xbox Wireless Controller) = Robot White XBOX 1X controller, Also Black model
+				//2850 (Xbox Wireless Controller) = Elite Series 2 (Same button layout as above)
+
+				//8201 (Nintendo Switch Pro Controller) = Green & Pink Pro Controller
+
+				//24835 8BitDo Pro 2 (D setting for pairing, required 8bitdo ultimate software installed on device before it worked)
+				//24834 (8BitDo SN30 Pro+) 8BitDo SN30 Pro+ Black, 5.04 firmware
+
+
+				Log.d(PackageName, "Found controller "+dev.getName()+" ProductID: "+dev.getProductId());
+				if (deviceName.contains("Wireless Controller Touchpad") || dev.getProductId() == 2508)
+				{
+					m_gamepadMap.put(deviceId, C_CONTROLLER_MAPPING_PS4);
+				} else
+				if (dev.getProductId() == 3302) //ps5.  Matching on "Wireless Controller" seems dangerously generic
+				{
+					m_gamepadMap.put(deviceId, C_CONTROLLER_MAPPING_PS5);
+				} else
+				if (
+					deviceName.contains("Nintendo Switch Pro Controller") || dev.getProductId() == 8201
+				)
+				{
+					m_gamepadMap.put(deviceId, C_CONTROLLER_MAPPING_SWITCH_PRO);
+				} else
+				if (
+					deviceName.contains("8BitDo SN30 Pro") || dev.getProductId() == 24834
+  					|| deviceName.contains("8BitDo Pro 2") || dev.getProductId() == 24835
+					)
+					{
+						m_gamepadMap.put(deviceId, C_CONTROLLER_MAPPING_8BITDO);
+					} else
+				{
+					m_gamepadMap.put(deviceId, C_CONTROLLER_MAPPING_XBOX);  //default
+				}
+
+			}
+		}
+
+	}
 
 
     @Override
@@ -794,6 +861,8 @@ public static String get_getNetworkType()
 	final static int VIRTUAL_KEY_VOLUME_UP = 500009;
 	final static int VIRTUAL_KEY_VOLUME_DOWN = 500010;
 	final static int VIRTUAL_KEY_SHIFT = 500011;
+	final static int VIRTUAL_KEY_ALT = 500012;
+	final static int VIRTUAL_KEY_CONTROL = 500013;
 	final static int VIRTUAL_KEY_TRACKBALL_DOWN = 500035;
 	final static int VIRTUAL_DPAD_BUTTON_LEFT = 500036; //square on xperia
 	final static int VIRTUAL_DPAD_BUTTON_UP = 500037; //triangle on xperia
@@ -803,6 +872,13 @@ public static String get_getNetworkType()
 	final static int VIRTUAL_DPAD_START = 500041;
 	final static int VIRTUAL_DPAD_LBUTTON = 500042;
 	final static int VIRTUAL_DPAD_RBUTTON = 500043;
+	final static int VIRTUAL_DPAD_LTRIGGER = 500044;
+    final static int VIRTUAL_DPAD_RTRIGGER = 500045;
+	
+	final static int VIRTUAL_KEY_GAME_JUMP = 500056;
+	final static int VIRTUAL_JOYSTICK_BUTTON_LEFT = 500057; //you know, like how you can push a joystick "in" and it clicks?
+	final static int VIRTUAL_JOYSTICK_BUTTON_RIGHT = 500058;
+
 	
 //messages we could call on Proton using nativeSendGUIEx:
 	final static int MESSAGE_TYPE_GUI_CLICK_START = 0;
@@ -879,6 +955,316 @@ public static String get_getNetworkType()
 	final static int RESULT_ERROR = 6;
     final static int RESULT_OK_ALREADY_PURCHASED = 7;
 	
+	public int TranslateControllerCodeToProtonVirtualKey(int controllerMapping, int keycode)
+	{
+
+		int result = -1;
+
+		switch (keycode)
+		{
+		case KeyEvent.KEYCODE_DPAD_DOWN:
+				result = VIRTUAL_KEY_DIR_DOWN;
+				break;
+				case KeyEvent.KEYCODE_DPAD_UP:
+				result = VIRTUAL_KEY_DIR_UP;
+				break;
+			case KeyEvent.KEYCODE_DPAD_LEFT:
+				result = VIRTUAL_KEY_DIR_LEFT;
+				break;
+			case KeyEvent.KEYCODE_DPAD_RIGHT:
+				result = VIRTUAL_KEY_DIR_RIGHT;
+				break;
+
+			default:
+
+		}
+
+		if (result != -1) return result; //we're done
+
+		//well, it's not one of the inputs that are the same across various
+		//controllers, so let's get controller specific here
+
+		//NOTE: PS5 returns 0 for O button as well as R1, I assume this is a bug and will be fixed later which will break
+		//these bindings of course, because that's life.  (with latest firmware on ps5 controller, August 4th 2022)
+		if (controllerMapping == C_CONTROLLER_MAPPING_PS5)
+		{
+			switch (keycode)
+			{
+			case KeyEvent.KEYCODE_BUTTON_A:
+				result = VIRTUAL_DPAD_BUTTON_LEFT;
+				break;
+
+			case KeyEvent.KEYCODE_BUTTON_B:
+				result = VIRTUAL_DPAD_BUTTON_DOWN;
+				break;
+			case KeyEvent.KEYCODE_BUTTON_Y:
+				result = VIRTUAL_DPAD_BUTTON_UP;
+				break;
+			 case 0:
+				result = VIRTUAL_DPAD_BUTTON_RIGHT;
+				break;
+			case KeyEvent.KEYCODE_BUTTON_X:
+				result = VIRTUAL_JOYSTICK_BUTTON_LEFT;
+					break;
+
+
+
+				case KeyEvent.KEYCODE_BUTTON_SELECT:
+					result = VIRTUAL_JOYSTICK_BUTTON_LEFT;
+					break;
+				case KeyEvent.KEYCODE_BUTTON_START:
+					result = VIRTUAL_JOYSTICK_BUTTON_RIGHT;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_R1:
+					result =VIRTUAL_DPAD_RBUTTON;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_L1:
+					result =VIRTUAL_DPAD_LBUTTON;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_R2:
+					result =VIRTUAL_DPAD_START;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_L2:
+					result =VIRTUAL_DPAD_SELECT;
+					break;
+				default:
+			}
+		}
+
+		if (controllerMapping == C_CONTROLLER_MAPPING_PS4)
+		{
+			switch (keycode)
+			{
+				case KeyEvent.KEYCODE_BUTTON_A:
+					result = VIRTUAL_DPAD_BUTTON_DOWN;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_B:
+					result = VIRTUAL_DPAD_BUTTON_RIGHT;
+					break;
+				case KeyEvent.KEYCODE_BUTTON_Y:
+					result = VIRTUAL_DPAD_BUTTON_UP;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_X:
+					result = VIRTUAL_DPAD_BUTTON_LEFT;
+					break;
+
+
+
+				case KeyEvent.KEYCODE_BUTTON_START:
+					result = VIRTUAL_DPAD_START;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_SELECT:
+					result = VIRTUAL_DPAD_SELECT;
+					break;
+
+
+				case KeyEvent.KEYCODE_BUTTON_THUMBL:
+					result = VIRTUAL_JOYSTICK_BUTTON_LEFT;
+					break;
+				case KeyEvent.KEYCODE_BUTTON_THUMBR:
+					result = VIRTUAL_JOYSTICK_BUTTON_RIGHT;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_R1:
+					result =VIRTUAL_DPAD_RBUTTON;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_L1:
+					result =VIRTUAL_DPAD_LBUTTON;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_R2:
+					result =VIRTUAL_DPAD_RTRIGGER;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_L2:
+					result =VIRTUAL_DPAD_LTRIGGER;
+					break;
+
+
+				default:
+			}
+		}
+		if (controllerMapping == C_CONTROLLER_MAPPING_8BITDO)
+		{
+			switch (keycode)
+			{
+				case KeyEvent.KEYCODE_BUTTON_A:
+					result = VIRTUAL_DPAD_BUTTON_RIGHT;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_B:
+					result = VIRTUAL_DPAD_BUTTON_DOWN;
+					break;
+				case KeyEvent.KEYCODE_BUTTON_Y:
+					result = VIRTUAL_DPAD_BUTTON_LEFT;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_X:
+					result = VIRTUAL_DPAD_BUTTON_UP;
+					break;
+
+
+				case KeyEvent.KEYCODE_BUTTON_START:
+					result = VIRTUAL_DPAD_START;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_SELECT:
+					result = VIRTUAL_DPAD_SELECT;
+					break;
+
+
+				case KeyEvent.KEYCODE_BUTTON_THUMBL:
+					result = VIRTUAL_JOYSTICK_BUTTON_LEFT;
+					break;
+				case KeyEvent.KEYCODE_BUTTON_THUMBR:
+					result = VIRTUAL_JOYSTICK_BUTTON_RIGHT;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_R1:
+					result =VIRTUAL_DPAD_RBUTTON;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_L1:
+					result =VIRTUAL_DPAD_LBUTTON;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_R2:
+					result =VIRTUAL_DPAD_RTRIGGER;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_L2:
+					result =VIRTUAL_DPAD_LTRIGGER;
+					break;
+				default:
+			}
+		}
+		if (controllerMapping == C_CONTROLLER_MAPPING_SWITCH_PRO)
+		{
+			switch (keycode)
+			{
+				case KeyEvent.KEYCODE_BUTTON_B:
+					result = VIRTUAL_DPAD_BUTTON_RIGHT;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_A:
+					result = VIRTUAL_DPAD_BUTTON_DOWN;
+					break;
+				case KeyEvent.KEYCODE_BUTTON_X:
+					result = VIRTUAL_DPAD_BUTTON_LEFT;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_Y:
+					result = VIRTUAL_DPAD_BUTTON_UP;
+					break;
+
+
+				case KeyEvent.KEYCODE_BUTTON_START:
+					result = VIRTUAL_DPAD_START;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_SELECT:
+					result = VIRTUAL_DPAD_SELECT;
+					break;
+
+
+				case KeyEvent.KEYCODE_BUTTON_THUMBL:
+					result = VIRTUAL_JOYSTICK_BUTTON_LEFT;
+					break;
+				case KeyEvent.KEYCODE_BUTTON_THUMBR:
+					result = VIRTUAL_JOYSTICK_BUTTON_RIGHT;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_R1:
+					result =VIRTUAL_DPAD_RBUTTON;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_L1:
+					result =VIRTUAL_DPAD_LBUTTON;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_R2:
+					result =VIRTUAL_DPAD_RTRIGGER;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_L2:
+					result =VIRTUAL_DPAD_LTRIGGER;
+					break;
+				default:
+			}
+		}
+
+
+		if (controllerMapping == C_CONTROLLER_MAPPING_XBOX)
+		{
+			switch (keycode)
+			{
+				case KeyEvent.KEYCODE_BUTTON_A:
+					result = VIRTUAL_DPAD_BUTTON_DOWN;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_B:
+					result = VIRTUAL_DPAD_BUTTON_RIGHT;
+					break;
+				case KeyEvent.KEYCODE_BUTTON_Y:
+					result = VIRTUAL_DPAD_BUTTON_UP;
+					break;
+
+					case KeyEvent.KEYCODE_BUTTON_X:
+					result = VIRTUAL_DPAD_BUTTON_LEFT;
+					break;
+
+
+				case KeyEvent.KEYCODE_BUTTON_START:
+					result = VIRTUAL_DPAD_START;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_SELECT:
+					result = VIRTUAL_DPAD_SELECT;
+					break;
+
+
+				case KeyEvent.KEYCODE_BUTTON_THUMBL:
+					result = VIRTUAL_JOYSTICK_BUTTON_LEFT;
+					break;
+				case KeyEvent.KEYCODE_BUTTON_THUMBR:
+					result = VIRTUAL_JOYSTICK_BUTTON_RIGHT;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_R1:
+					result =VIRTUAL_DPAD_RBUTTON;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_L1:
+					result =VIRTUAL_DPAD_LBUTTON;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_R2:
+					result =VIRTUAL_DPAD_RTRIGGER;
+					break;
+
+				case KeyEvent.KEYCODE_BUTTON_L2:
+					result =VIRTUAL_DPAD_LTRIGGER;
+					break;
+
+				default:
+			}
+		}
+
+		if (result != -1) return result; //we're done
+
+
+		return keycode;  //uhh... don't change it?  We don't have a match
+	}
+
+
 	public int TranslateKeycodeToProtonVirtualKey(int keycode)
 	{
 		switch (keycode)
@@ -889,13 +1275,19 @@ public static String get_getNetworkType()
 			case KeyEvent.KEYCODE_MENU:
 				keycode = VIRTUAL_KEY_PROPERTIES;
 				break;
+				
 			case KeyEvent.KEYCODE_SEARCH:
 				keycode = VIRTUAL_KEY_SEARCH;
 				break;
+		
+			case KeyEvent.KEYCODE_DPAD_CENTER:
+				keycode = VIRTUAL_KEY_DIR_CENTER;
+				break;
+			
 			case KeyEvent.KEYCODE_DPAD_DOWN:
 				keycode = VIRTUAL_KEY_DIR_DOWN;
 				break;
-			case KeyEvent.KEYCODE_DPAD_UP:
+				case KeyEvent.KEYCODE_DPAD_UP:
 				keycode = VIRTUAL_KEY_DIR_UP;
 				break;
 			case KeyEvent.KEYCODE_DPAD_LEFT:
@@ -904,18 +1296,31 @@ public static String get_getNetworkType()
 			case KeyEvent.KEYCODE_DPAD_RIGHT:
 				keycode = VIRTUAL_KEY_DIR_RIGHT;
 				break;
-			case KeyEvent.KEYCODE_DPAD_CENTER:
-				keycode = VIRTUAL_KEY_DIR_CENTER;
-				break;
-			case 0:
+
+				
+			case 59:
+			case 60:
+
 				keycode = VIRTUAL_KEY_SHIFT;
 				break;
+			case 113:
+			case 114:
+				keycode = VIRTUAL_KEY_CONTROL;
+				break;
+			case 57:
+			case 58:
+				keycode = VIRTUAL_KEY_ALT;
+				break;
+
+
 			case KeyEvent.KEYCODE_VOLUME_UP:
 				keycode = VIRTUAL_KEY_VOLUME_UP;
 				break;
 			case KeyEvent.KEYCODE_VOLUME_DOWN:
 				keycode = VIRTUAL_KEY_VOLUME_DOWN;
 				break;
+
+				
 		}
 		return keycode;
 	}
@@ -937,6 +1342,13 @@ public static String get_getNetworkType()
 		return false; 
 	}
 
+	boolean isController(int device) 
+	{
+		return ((device & InputDevice.SOURCE_CLASS_JOYSTICK) == InputDevice.SOURCE_CLASS_JOYSTICK)
+      || (((device & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD));
+	}
+
+
 @Override
 		public boolean onKeyMultiple (int keyCode, 
                 int count, 
@@ -948,7 +1360,8 @@ public static String get_getNetworkType()
 @Override
 	public boolean onKeyDown(int keycode, KeyEvent e) 
 	{
-		//Log.v("onKeyDown","Keydown Got "+keycode+" "+Character.toString(Character.toChars(e.getUnicodeChar())[0]));
+	//    Log.v("onKeyDown","Keydown Got "+keycode+" "+Character.toString(Character.toChars(e.getUnicodeChar())[0])
+	//	+" External: "+e.getSource()+" Is alt pressed: "+e.isAltPressed());
   
 		if (keycode == 67)
 		{
@@ -958,11 +1371,25 @@ public static String get_getNetworkType()
 		if (e.getRepeatCount() > 0) 
 			return super.onKeyDown(keycode, e);
 
-		if(e.isAltPressed() && keycode == KeyEvent.KEYCODE_BACK) 
+	  	if(isController(e.getSource())) 
 		{
-			//XPeria's O button, not the back button!
-			//Log.v("onKeyDown","Sending xperia back key");
-			nativeOnKey(1, VIRTUAL_DPAD_BUTTON_RIGHT, e.getUnicodeChar()); 
+			//is it an xbox or ps5 pad?
+			if (!m_gamepadMap.containsKey(e.getDeviceId()))
+			{
+				//we don't know what it is, go look at the name and fill in this data
+				//Log.v("Debug", "Checking controllers...");
+				CheckControllers();
+			}
+		    int protonCode = TranslateControllerCodeToProtonVirtualKey(m_gamepadMap.get(e.getDeviceId()), keycode);
+			if (protonCode != -1)
+		    {
+			
+		    	nativeOnKey(1, protonCode, 0);
+		    } else
+			{
+				//Log.v("Debug", "Ignoring controller keycode: "+keycode+" as the proton code is "+protonCode);
+			}
+		
 			return true; //signal that we handled it
 		}
 		
@@ -972,9 +1399,8 @@ public static String get_getNetworkType()
         switch (keycode)
 		{
 			case KeyEvent.KEYCODE_BACK:
-		{
-
-				nativeOnKey(1, VIRTUAL_KEY_BACK, e.getUnicodeChar()); 
+			{
+				nativeOnKey(1, VIRTUAL_KEY_BACK, e.getUnicodeChar());
 				return true; //signal that we handled it
 			}
 		}
@@ -983,6 +1409,7 @@ public static String get_getNetworkType()
 		nativeOnKey(1, vKey, (char)e.getUnicodeChar()); //1  means keydown
         return super.onKeyDown(keycode, e);
     }
+	
 @Override
     public boolean onKeyUp(int keycode, KeyEvent e)
 	{
@@ -993,20 +1420,31 @@ public static String get_getNetworkType()
 			return true;			
 		}
 
-       	if(e.isAltPressed() && keycode == KeyEvent.KEYCODE_BACK) 
+		if(isController(e.getSource()))
 		{
-			//XPeria's O button, not the back button!
-			//Log.v("onKeyUp","Sending xperia back key");
-			nativeOnKey(0, VIRTUAL_DPAD_BUTTON_RIGHT, e.getUnicodeChar()); 
+			//is it an xbox or ps5 pad?
+			if (!m_gamepadMap.containsKey(e.getDeviceId()))
+			{
+				//we don't know what it is, go look at the name and fill in this data
+				//Log.v("Debug", "Checking controllers...");
+				CheckControllers();
+			}
+			int protonCode = TranslateControllerCodeToProtonVirtualKey(m_gamepadMap.get(e.getDeviceId()), keycode);
+			if (protonCode != -1)
+			{
+				nativeOnKey(0, protonCode, 0);
+			} else
+			{
+			//	Log.v("Debug", "Ignoring controller keycode" +	": "+keycode+" as the proton code is "+protonCode);
+			}
+
 			return true; //signal that we handled it
 		}
-		
+
 		switch (keycode)
 		{
 			case KeyEvent.KEYCODE_BACK:
 			{
-
-    
 				nativeOnKey(0, VIRTUAL_KEY_BACK, e.getUnicodeChar()); //0 is type keyup
 				return true; //signal that we handled it
 			}

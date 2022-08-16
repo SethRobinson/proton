@@ -27,6 +27,8 @@ private:
 
 	void OnRender(VariantList *pVList);
 
+	int32* m_pPriority; //if higher, will get called first (default is 1)
+		
 };
 
 #endif // FocusRenderComponent_h__

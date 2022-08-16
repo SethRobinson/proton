@@ -15,9 +15,10 @@ FocusRenderComponent::~FocusRenderComponent()
 void FocusRenderComponent::OnAdd(Entity *pEnt)
 {
 	EntityComponent::OnAdd(pEnt);
+	m_pPriority = &GetVarWithDefault("priority", Variant(int32(INTERPOLATE_LINEAR)))->GetINT32();
 
 	//register to get updated every frame
-	GetBaseApp()->m_sig_render.connect(1, boost::bind(&FocusRenderComponent::OnRender, this, _1));
+	GetBaseApp()->m_sig_render.connect(*m_pPriority, boost::bind(&FocusRenderComponent::OnRender, this, _1));
 }
 
 void FocusRenderComponent::OnRemove()

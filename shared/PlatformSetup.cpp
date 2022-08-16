@@ -1,6 +1,8 @@
 #include "PlatformPrecomp.h"
 
 bool g_forceAspectRatioWhenChangingWindowSize = true; //applicable to manually dragging corners/sides.  Can hold Shift while dragging to toggle.
+unsigned int g_timeOfLastTouchMS = 0;
+unsigned int g_timeOfLastGamepadInputMS = 0;
 
 bool GetForceAspectRatioWhenResizing()
 {
@@ -120,6 +122,19 @@ void SetEmulatedPlatformID(ePlatformID platformID)
 {
 	g_emulatedPlatformID = platformID;
 }
+
+
+int GetTimeOfLastTouchMS() { return g_timeOfLastTouchMS; }
+void SetTimeOfLastTouchMS(unsigned int time)
+{
+	g_timeOfLastTouchMS = time; 
+}
+int GetTimeOfLastGamepadInputMS() { return g_timeOfLastGamepadInputMS; }
+void SetTimeOfLastGamepadInputMS(unsigned int time) 
+{ 
+	g_timeOfLastGamepadInputMS = time; 
+}
+
 
 #ifdef _CONSOLE
 float GetScreenSizeXf() { assert(0); return 0;}

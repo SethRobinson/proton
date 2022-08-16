@@ -8,13 +8,16 @@ RenderClipComponent::RenderClipComponent()
 	SetName("RenderClip");
 	if (GetEmulatedPlatformID() == PLATFORM_ID_ANDROID)
 	{
-		LogError("ANDROID WARNING: using glclipplane KILLS your fps on the Nexus One, and isn't supported on the G1. You sure you want to use RenderClipComponent?!");
-		assert(0);
+
+		//LogError("ANDROID WARNING: using glclipplane KILLS your fps on the Nexus One, and isn't supported on the G1. You sure you want to use RenderClipComponent?!");
+		//assert(0);
 	}
 
 	if (GetEmulatedPlatformID() == PLATFORM_ID_HTML5)
 	{
+ #ifdef _DEBUG
 		LogError("HTML5 warning:  RenderClipComponent disabled for HTML5, the legacy G1 emulation doesn't seem to find the function at all");
+ #endif
 		return;
 	}
 }

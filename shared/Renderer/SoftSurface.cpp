@@ -2173,6 +2173,33 @@ void SoftSurface::Blit( int dstX, int dstY, SoftSurface *pSrc, int srcX /*= 0*/,
 	srcWidth = rt_min(GetWidth()-dstX, srcWidth);
 	srcHeight = rt_min(GetHeight()-dstY, srcHeight);
 
+	if (srcY + srcHeight > pSrc->GetHeight())
+	{
+		//this is invalid, we're trying to draw more than what exists.  Truncate it
+		srcHeight = pSrc->GetHeight() - srcY;
+		if (srcHeight <= 0)
+		{
+			//well, nope.  And zero height means abort completely
+			return;
+		}
+
+	}
+
+	if (srcX + srcWidth > pSrc->GetWidth())
+	{
+		//this is invalid, we're trying to draw more than what exists.  Truncate it
+		srcWidth = pSrc->GetWidth() - srcX;
+		if (srcWidth <= 0)
+		{
+			//well, nope.  Zero width means abort completely
+			return;
+		}
+
+	}
+
+	
+	//also truncate if we're drawing off the screen to the right
+	
 	SetModified(true);
 	
 	if (GetSurfaceType() == SURFACE_RGBA)
