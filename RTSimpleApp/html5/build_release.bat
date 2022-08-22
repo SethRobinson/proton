@@ -27,16 +27,7 @@ where /q emsdk_env.bat
 
 if ERRORLEVEL 1 (
     ECHO You need the environmental EMSCRIPTEN_ROOT set.  This should be set in setup_base.bat in proton's main dir, then called from app_info_setup.bat.
-     beeper
-     pause
-     exit
-) 
-
-where /q sed
-
-if ERRORLEVEL 1 (
-    ECHO You need the utility sed in your path if you want insert.bat to work. Install tortoisegit, I think it comes with that.
-     beeper
+     %RT_UTIL%\beeper
      pause
      exit
 ) 
@@ -107,13 +98,13 @@ REM **************************************** END SOURCE
 
 :unused so far: -s USE_GLFW=3 -s NO_EXIT_RUNTIME=1 -s FORCE_ALIGNED_MEMORY=1 -s EMTERPRETIFY=1  -s EMTERPRETIFY_ASYNC=1 -DRT_EMTERPRETER_ENABLED
 :To skip font loading so it needs no resource files or zlib, add  -DC_NO_ZLIB
-SET CUSTOM_FLAGS= -DHAS_SOCKLEN_T -DBOOST_ALL_NO_LIB -DPLATFORM_HTML5 -DRT_USE_SDL_AUDIO -DRT_JPG_SUPPORT -DC_GL_MODE -s LEGACY_GL_EMULATION=1 -Wno-switch -s WASM=1 -DPLATFORM_HTML5 -s TOTAL_MEMORY=16MB -Wno-c++11-compat-deprecated-writable-strings -Wno-shift-negative-value -s ALLOW_MEMORY_GROWTH=1
+SET CUSTOM_FLAGS= -DHAS_SOCKLEN_T -DBOOST_ALL_NO_LIB -DPLATFORM_HTML5 -DRT_USE_SDL_AUDIO -DRT_JPG_SUPPORT -DC_GL_MODE -s LEGACY_GL_EMULATION=1 -Wno-switch -s WASM=1 -s TOTAL_MEMORY=16MB -Wno-deprecated-builtins -Wno-c++11-compat-deprecated-writable-strings -Wno-shift-negative-value -Wno-deprecated-non-prototype -s ALLOW_MEMORY_GROWTH=1
 
 :unused:   -s FULL_ES2=1 --emrun
 
 IF %USE_HTML5_CUSTOM_MAIN% EQU 1 (
 :add this define so we'll manually call mainf from the html later instead of it being auto
-SET CUSTOM_FLAGS=%CUSTOM_FLAGS% -DRT_HTML5_USE_CUSTOM_MAIN -s EXPORTED_FUNCTIONS=['_mainf','_PROTON_SystemMessage','_PROTON_GUIMessage'] -s EXTRA_EXPORTED_RUNTIME_METHODS=['ccall','cwrap']
+SET CUSTOM_FLAGS=%CUSTOM_FLAGS% -DRT_HTML5_USE_CUSTOM_MAIN -s EXPORTED_FUNCTIONS=['_mainf','_PROTON_SystemMessage','_PROTON_GUIMessage'] -s EXPORTED_RUNTIME_METHODS=['ccall','cwrap']
 SET FINAL_EXTENSION=js
 ) else (
 SET FINAL_EXTENSION=html
@@ -121,10 +112,10 @@ SET FINAL_EXTENSION=html
 
 IF %DEBUG% EQU 0 (
 echo Compiling in release mode
-SET CUSTOM_FLAGS=%CUSTOM_FLAGS% -O2 -DNDEBUG -s EMTERPRETIFY=1  -s EMTERPRETIFY_ASYNC=1 -DRT_EMTERPRETER_ENABLED 
+SET CUSTOM_FLAGS=%CUSTOM_FLAGS% -O2 -DNDEBUG
 ) else (
 echo Compiling in debug mode
-SET CUSTOM_FLAGS=%CUSTOM_FLAGS% -D_DEBUG -s GL_UNSAFE_OPTS=0 -s WARN_ON_UNDEFINED_SYMBOLS=1 -s EXCEPTION_DEBUG=1 -s DEMANGLE_SUPPORT=1 -s ALIASING_FUNCTION_POINTERS=0 --emrun
+SET CUSTOM_FLAGS=%CUSTOM_FLAGS% -D_DEBUG -s GL_UNSAFE_OPTS=0 -s WARN_ON_UNDEFINED_SYMBOLS=1 -s EXCEPTION_DEBUG=1 -s DEMANGLE_SUPPORT=1 -s ALIASING_FUNCTION_POINTERS=0
 )
 
 SET INCLUDE_DIRS=-I%SHARED% -I%APP% -I../../shared/util/boost -I../../shared/ClanLib-2.0/Sources -I../../shared/Network/enet/include ^
@@ -146,17 +137,17 @@ mkdir WebLoaderData
 copy /Y ..\..\shared\html5\templates\WebLoaderData .\WebLoaderData
 
 call emcc %CUSTOM_FLAGS% %INCLUDE_DIRS% ^
-%ZLIB_SRC% %JPG_SRC% %PARTICLE_SRC% -o temp.bc
+%ZLIB_SRC% %JPG_SRC% %PARTICLE_SRC% -r -o temp.o
 
 call emcc %CUSTOM_FLAGS% %INCLUDE_DIRS% ^
-%APP_SRC% %SRC% %COMPONENT_SRC% temp.bc ^
---preload-file ../bin/interface@interface/ --preload-file ../bin/audio@audio/ --js-library %SHARED%\html5\SharedJSLIB.js -o %APP_NAME%.%FINAL_EXTENSION%
+%APP_SRC% %SRC% %COMPONENT_SRC% temp.o ^
+--preload-file ../bin/interface@interface/ --preload-file ../bin/audio@audio/ -lidbfs.js --js-library %SHARED%\html5\SharedJSLIB.js -o %APP_NAME%.%FINAL_EXTENSION%
 
 REM Make sure the file compiled ok
-if not exist %APP_NAME%.js beeper.exe /p
+if not exist %APP_NAME%.js %RT_UTIL%\beeper.exe /p
 
 IF %USE_HTML5_CUSTOM_MAIN% EQU 1 (
-sed 's/RTTemplateName/%APP_NAME%/g' %CUSTOM_TEMPLATE% > %APP_NAME%.html
+%RT_UTIL%\sed "s/RTTemplateName/%APP_NAME%/g" %CUSTOM_TEMPLATE% > %APP_NAME%.html
 ) 
 
 

@@ -1746,6 +1746,7 @@
     <ClInclude Include="..\..\shared\GUI\RTFontFileFormat.h" />
     <ClInclude Include="..\..\shared\html5\HTML5Utils.h" />
     <ClInclude Include="..\..\shared\html5\PlatformSetupHTML5.h" />
+    <ClInclude Include="..\..\shared\html5\SharedJSLIB.h" />
     <ClInclude Include="..\..\shared\iOS\app\EAGLView.h" />
     <ClInclude Include="..\..\shared\iOS\app\MyAppDelegate.h" />
     <ClInclude Include="..\..\shared\iOS\app\MyViewController.h" />
@@ -1808,6 +1809,7 @@
     <None Include="..\..\shared\flash\app\flash\com\rtsoft\AudioManager.as" />
     <None Include="..\..\shared\flash\app\flash\com\rtsoft\GLES1Adaptor.as" />
     <None Include="..\..\shared\flash\app\flash\Console.as" />
+    <None Include="..\..\shared\html5\SharedJSLIB.js" />
     <None Include="..\..\shared\iOS\app\EAGLView.mm" />
     <None Include="..\..\shared\iOS\app\main.mm" />
     <None Include="..\..\shared\iOS\app\MyAppDelegate.mm" />

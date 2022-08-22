@@ -297,6 +297,8 @@ void NetHTTP::FinishDownload()
 		fclose(m_pFile);
 		m_pFile = NULL;
 		m_state = STATE_FINISHED;
+
+		SyncPersistentData();
 		return;
 	}
 	
@@ -328,9 +330,10 @@ void NetHTTP::SetBuffer(const char *pData, int byteSize)
 	m_expectedFileBytes = byteSize;
 	m_downloadData.resize(byteSize+1); //1 extra so we can add a null
 	memcpy((char*)&m_downloadData[0], pData, byteSize); //never do this at home, kids
+	
 	m_downloadData[byteSize]=0; //set the NULL too
 
-	if (m_endOfDataSignal == END_OF_DATA_SIGNAL_RTSOFT_MARKER)
+	if (m_endOfDataSignal == END_OF_DATA_SIGNAL_RTSOFT_MARKER && m_pFile == NULL)
 	{
 		//er.. there has to be a better way then this, but whatever, I don't use rtsoft markers much and when I do it's tiny strings
 		
@@ -339,16 +342,16 @@ void NetHTTP::SetBuffer(const char *pData, int byteSize)
 		StringReplace(C_END_DOWNLOAD_MARKER_STRING, "",temp);
 		//move it back
 		string crap;
-		m_downloadData = vector<char>(temp.begin(), temp.end());
+		m_downloadData = vector<uint8>(temp.begin(), temp.end());
 		if (m_downloadData[m_downloadData.size()-1] != 0)
 		{
-			m_downloadData.push_back(char(0)); //add the null
+			m_downloadData.push_back(uint8(0)); //add the null
 		}
 	}
 
 	if (m_pFile)
 	{
-		fwrite(GetDownloadedData(), GetDownloadedBytes(), 1, m_pFile);
+		int bytesWritten = fwrite(GetDownloadedData(), GetDownloadedBytes(), 1, m_pFile);
 	}
 
 }
@@ -359,9 +362,6 @@ void NetHTTP::onLoaded( unsigned int handle, void* parent, void * file, unsigned
 	pMe->SetBuffer((const char*)file, byteSize);
 	pMe->FinishDownload();
 
-#ifdef _DEBUG
-	LogMsg("Finished download - got %d bytes.  State is %d", byteSize, pMe->GetState());
-#endif
 
 	//http* req = reinterpret_cast<http*>(parent);
 	//req->onLoaded(file);
@@ -370,7 +370,7 @@ void NetHTTP::onLoaded( unsigned int handle, void* parent, void * file, unsigned
 void NetHTTP::onError(unsigned int handle, void* parent, int statuserror, const char *message) 
 {
 //#ifdef _DEBUG
-	LogMsg("Got error %d (%s) - keep in mind you have to run this from the same website you're downloading from!", statuserror, message);
+	LogMsg("Got error %d (%s) - keep in mind you have to run this from the same website you're downloading from, or have CORS setup for the other site", statuserror, message);
 //#endif
 	eError error = ERROR_CANT_RESOLVE_URL;
 	if (statuserror == 404) error = ERROR_404_FILE_NOT_FOUND;

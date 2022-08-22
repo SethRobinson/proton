@@ -2335,42 +2335,19 @@
     <None Include="..\AndroidGradle\app\build.gradle" />
     <None Include="..\AndroidGradle\local.properties" />
     <None Include="..\AndroidGradle\PrepareResources.bat" />
-    <None Include="..\bbx\.cproject" />
-    <None Include="..\bbx\.project" />
-    <None Include="..\bbx\app_info_setup.bat" />
-    <None Include="..\bbx\PackageAndRunDevice.bat" />
-    <None Include="..\bbx\PackageRelease.bat" />
-    <None Include="..\bbx\RequestDebugToken.bat" />
-    <None Include="..\bbx\SignFinal.bat" />
-    <None Include="..\bbx\UploadRelease.bat" />
-    <None Include="..\flash\app_info_setup.bat" />
-    <None Include="..\flash\BuildDebug.bat" />
-    <None Include="..\flash\BuildRelease.bat" />
-    <None Include="..\flash\build_prepare.bat" />
-    <None Include="..\flash\Makefile" />
-    <None Include="..\flash\test1.html" />
-    <None Include="..\flash\upload.bat" />
-    <None Include="..\flash\ViewInBrowser.bat" />
-    <None Include="..\flash\ViewInProjector.bat" />
     <None Include="..\html5\build_release.bat" />
     <None Include="..\html5\UploadToWebsite.bat" />
     <None Include="..\linux\linux_compile.sh" />
     <None Include="..\OSX\RTSimpleApp-Info.plist" />
-    <None Include="..\WebOS\appinfo.json" />
-    <None Include="..\WebOS\app_info_setup.bat" />
-    <None Include="..\WebOS\build.bat" />
-    <None Include="..\WebOS\packageit.bat" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\license.txt" />
     <Text Include="..\..\Programmer Readme.txt" />
     <Text Include="..\AndroidGradle\app\src\main\cpp\CMakeLists.txt" />
-    <Text Include="..\flash\exports.txt" />
     <Text Include="..\linux\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\AndroidGradle\app\src\main\AndroidManifest.xml" />
-    <Xml Include="..\bbx\bar-descriptor.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

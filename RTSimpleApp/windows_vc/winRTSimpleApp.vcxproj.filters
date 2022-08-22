@@ -17,20 +17,11 @@
     <Filter Include="source\Platform Stuff">
       <UniqueIdentifier>{52d5bcd3-c7ca-4cdf-9b81-8fa87ae156e5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\Platform Stuff\WebOS">
-      <UniqueIdentifier>{07ed36ab-7efb-4e87-8cbf-b361df86849e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="source\Platform Stuff\OSX">
       <UniqueIdentifier>{4a377fda-534c-42d8-9836-037a09e0b2b9}</UniqueIdentifier>
     </Filter>
     <Filter Include="source\Platform Stuff\html5">
       <UniqueIdentifier>{0f8e792a-85e5-4081-93af-9fea14995d51}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\Platform Stuff\flash">
-      <UniqueIdentifier>{62cdb0b6-ac2f-4f5d-95df-55ee05ada2d3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\Platform Stuff\bbx">
-      <UniqueIdentifier>{b9e8a869-bff3-431b-93c6-ccb4beda3f3d}</UniqueIdentifier>
     </Filter>
     <Filter Include="source\Platform Stuff\linux">
       <UniqueIdentifier>{4704bffa-1dbd-48b1-99e6-2f011e19154f}</UniqueIdentifier>
@@ -1112,18 +1103,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\WebOS\app_info_setup.bat">
-      <Filter>source\Platform Stuff\WebOS</Filter>
-    </None>
-    <None Include="..\WebOS\appinfo.json">
-      <Filter>source\Platform Stuff\WebOS</Filter>
-    </None>
-    <None Include="..\WebOS\build.bat">
-      <Filter>source\Platform Stuff\WebOS</Filter>
-    </None>
-    <None Include="..\WebOS\packageit.bat">
-      <Filter>source\Platform Stuff\WebOS</Filter>
-    </None>
     <None Include="..\OSX\RTSimpleApp-Info.plist">
       <Filter>source\Platform Stuff\OSX</Filter>
     </None>
@@ -1132,57 +1111,6 @@
     </None>
     <None Include="..\html5\UploadToWebsite.bat">
       <Filter>source\Platform Stuff\html5</Filter>
-    </None>
-    <None Include="..\flash\app_info_setup.bat">
-      <Filter>source\Platform Stuff\flash</Filter>
-    </None>
-    <None Include="..\flash\build_prepare.bat">
-      <Filter>source\Platform Stuff\flash</Filter>
-    </None>
-    <None Include="..\flash\BuildDebug.bat">
-      <Filter>source\Platform Stuff\flash</Filter>
-    </None>
-    <None Include="..\flash\BuildRelease.bat">
-      <Filter>source\Platform Stuff\flash</Filter>
-    </None>
-    <None Include="..\flash\Makefile">
-      <Filter>source\Platform Stuff\flash</Filter>
-    </None>
-    <None Include="..\flash\test1.html">
-      <Filter>source\Platform Stuff\flash</Filter>
-    </None>
-    <None Include="..\flash\upload.bat">
-      <Filter>source\Platform Stuff\flash</Filter>
-    </None>
-    <None Include="..\flash\ViewInBrowser.bat">
-      <Filter>source\Platform Stuff\flash</Filter>
-    </None>
-    <None Include="..\flash\ViewInProjector.bat">
-      <Filter>source\Platform Stuff\flash</Filter>
-    </None>
-    <None Include="..\bbx\.cproject">
-      <Filter>source\Platform Stuff\bbx</Filter>
-    </None>
-    <None Include="..\bbx\.project">
-      <Filter>source\Platform Stuff\bbx</Filter>
-    </None>
-    <None Include="..\bbx\app_info_setup.bat">
-      <Filter>source\Platform Stuff\bbx</Filter>
-    </None>
-    <None Include="..\bbx\PackageAndRunDevice.bat">
-      <Filter>source\Platform Stuff\bbx</Filter>
-    </None>
-    <None Include="..\bbx\PackageRelease.bat">
-      <Filter>source\Platform Stuff\bbx</Filter>
-    </None>
-    <None Include="..\bbx\RequestDebugToken.bat">
-      <Filter>source\Platform Stuff\bbx</Filter>
-    </None>
-    <None Include="..\bbx\SignFinal.bat">
-      <Filter>source\Platform Stuff\bbx</Filter>
-    </None>
-    <None Include="..\bbx\UploadRelease.bat">
-      <Filter>source\Platform Stuff\bbx</Filter>
     </None>
     <None Include="..\linux\linux_compile.sh">
       <Filter>source\Platform Stuff\linux</Filter>
@@ -1270,9 +1198,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\flash\exports.txt">
-      <Filter>source\Platform Stuff\flash</Filter>
-    </Text>
     <Text Include="..\linux\CMakeLists.txt">
       <Filter>source\Platform Stuff\linux</Filter>
     </Text>
@@ -1283,9 +1208,6 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="..\bbx\bar-descriptor.xml">
-      <Filter>source\Platform Stuff\bbx</Filter>
-    </Xml>
     <Xml Include="..\AndroidGradle\app\src\main\AndroidManifest.xml">
       <Filter>source\Platform Stuff\AndroidGradle\App</Filter>
     </Xml>

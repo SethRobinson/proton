@@ -278,18 +278,19 @@ void AppInput(VariantList *pVList)
 
 	switch (msgType)
 	{
+	
 	case MESSAGE_TYPE_GUI_CLICK_START:
-		LogMsg("Touch start: X: %.2f YL %.2f (Finger %d)", pt.x, pt.y, fingerID);
+		LogMsg("Touch start: X: %.2f Y: %.2f (Finger %d)", pt.x, pt.y, fingerID);
 		break;
-	case MESSAGE_TYPE_GUI_CLICK_MOVE:
-		LogMsg("Touch move: X: %.2f YL %.2f (Finger %d)", pt.x, pt.y, fingerID);
+	case MESSAGE_TYPE_GUI_MOUSEWHEEL:
+		LogMsg("Mouse wheel: Offet: %.2f (Finger %d)", pt.x,  fingerID);
 		break;
 
 	case MESSAGE_TYPE_GUI_CLICK_MOVE_RAW:
 		//LogMsg("Touch raw move: X: %.2f YL %.2f (Finger %d)", pt.x, pt.y, fingerID);
 		break;
 	case MESSAGE_TYPE_GUI_CLICK_END:
-		LogMsg("Touch end: X: %.2f YL %.2f (Finger %d)", pt.x, pt.y, fingerID);
+		LogMsg("Touch end: X: %.2f Y: %.2f (Finger %d)", pt.x, pt.y, fingerID);
 		break;
 
 	case MESSAGE_TYPE_GUI_CHAR:
@@ -425,8 +426,6 @@ void App::Draw()
 	//the base handles actually drawing the GUI stuff over everything else, if applicable, which in this case it isn't.
 	BaseApp::Draw();
 }
-
-
 
 void App::OnScreenSizeChange()
 {

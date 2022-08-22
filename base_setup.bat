@@ -7,11 +7,13 @@ Echo Setting defaults and US code page
 CHCP 437
 
 SET UNITY_EXE=C:\pro\unity5\Editor\Unity.exe
-SET EMSCRIPTEN_ROOT=C:\pro\emscripten
-:Need Grysnc linux tools for windows, used for ssh and rsyncing stuff: :http://sourceforge.net/projects/grsync-win/
-SET PATH=C:\tools\Grsync\bin;%PATH%
+SET EMSCRIPTEN_ROOT=d:\pro\emsdk
 
-:If we're doign android builds we'll need to know this. androidsdk/tools and androidsdk/ndk should exist there
+:Need Grysnc linux tools for windows, used for ssh and rsyncing stuff: :http://sourceforge.net/projects/grsync-win/
+:Update:  Nah, don't use this crap, install OpenSSH and ssh and scp is probably on the path
+:SET PATH=C:\tools\Grsync\bin;%PATH%
+
+:If we're doign android builds we'll need to know this.(note, this is outdated, new gradle builds don't use this stuff, so ignore it)
 SET ANDROID_SDK=D:\pro\androidsdk
 :Ant 1.9x+ is used for packaging Android builds, add to path if needed
 SET ANT_HOME=D:\pro\apache-ant-1.9.16

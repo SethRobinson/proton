@@ -561,6 +561,9 @@
     <ClInclude Include="..\..\shared\linux\PlatformSetupLinux.h">
       <Filter>shared\linux</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\shared\html5\SharedJSLIB.h">
+      <Filter>shared\html5</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\OSX\RTBareBones-Info.plist">
@@ -655,6 +658,9 @@
     </None>
     <None Include="..\AndroidGradle\app\src\main\java\com\rtsoft\RTAndroidApp\Main.java">
       <Filter>source\AndroidGradle</Filter>
+    </None>
+    <None Include="..\..\shared\html5\SharedJSLIB.js">
+      <Filter>shared\html5</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

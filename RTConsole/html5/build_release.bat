@@ -28,19 +28,11 @@ where /q emsdk_env.bat
 
 if ERRORLEVEL 1 (
     ECHO You need the environmental EMSCRIPTEN_ROOT set.  This should be set in setup_base.bat in proton's main dir, then called from app_info_setup.bat.
-     beeper
+     %RT_UTIL%\beeper
      pause
      exit
 ) 
 
-where /q sed
-
-if ERRORLEVEL 1 (
-    ECHO You need the utility sed in your path if you want insert.bat to work. Install tortoisegit, I think it comes with that.
-     beeper
-     pause
-     exit
-) 
 
 :Oh, we better build our media just in case
 cd ../media
@@ -65,7 +57,7 @@ set LZMASRC=%SHARED%\Irrlicht\source\Irrlicht\lzma
 :%SHARED%\Network\NetHTTP.cpp %SHARED%\Network\NetSocket.cpp %SHARED%\Network\NetUtils.cpp
 
 :Reduced _CONSOLE set of stuff
-set SRC= %SHARED%\PlatformSetup.cpp %SHARED%\util\MiscUtils.cpp %SHARED%\util\ResourceUtils.cpp %SHARED%\util\MathUtils.cpp %SHARED%\util\CRandom.cpp %SHARED%\util\MathUtils.cpp %SHARED%\util\Variant.cpp ^
+set SRC= %SHARED%\PlatformSetup.cpp %SHARED%\util\MiscUtils.cpp %SHARED%\util\ResourceUtils.cpp %SHARED%\util\MathUtils.cpp %SHARED%\util\Variant.cpp ^
 %SHARED%\Manager/VariantDB.cpp %SHARED%\linux/LinuxUtils.cpp ^
 ..\..\shared\ClanLib-2.0\Sources\Core\Math\angle.cpp ^
 ..\..\shared\ClanLib-2.0\Sources\Core\Math\vec2.cpp ^
@@ -118,7 +110,8 @@ SET CUSTOM_FLAGS= -DHAS_SOCKLEN_T -DBOOST_ALL_NO_LIB -DPLATFORM_HTML5 -DRT_USE_S
 
 IF %USE_HTML5_CUSTOM_MAIN% EQU 1 (
 :add this define so we'll manually call mainf from the html later instead of it being auto
-SET CUSTOM_FLAGS=%CUSTOM_FLAGS% -DRT_HTML5_USE_CUSTOM_MAIN -s EXPORTED_FUNCTIONS=['_mainf','_PROTON_SystemMessage','_PROTON_GUIMessage'] -s EXTRA_EXPORTED_RUNTIME_METHODS=['ccall','cwrap']
+:-s EXPORTED_FUNCTIONS=['_mainf','_PROTON_SystemMessage','_PROTON_GUIMessage'] 
+SET CUSTOM_FLAGS=%CUSTOM_FLAGS% -DRT_HTML5_USE_CUSTOM_MAIN -s EXPORTED_RUNTIME_METHODS=['ccall','cwrap']
 SET FINAL_EXTENSION=js
 ) else (
 SET FINAL_EXTENSION=html
@@ -126,7 +119,7 @@ SET FINAL_EXTENSION=html
 
 IF %DEBUG% EQU 0 (
 echo Compiling in release mode
-SET CUSTOM_FLAGS=%CUSTOM_FLAGS% -O2 -DNDEBUG -s EMTERPRETIFY=1  -s EMTERPRETIFY_ASYNC=1 -DRT_EMTERPRETER_ENABLED 
+SET CUSTOM_FLAGS=%CUSTOM_FLAGS% -O2 -DNDEBUG -DRT_EMTERPRETER_ENABLED 
 ) else (
 echo Compiling in debug mode
 SET CUSTOM_FLAGS=%CUSTOM_FLAGS% -D_DEBUG -s GL_UNSAFE_OPTS=0 -s WARN_ON_UNDEFINED_SYMBOLS=1 -s EXCEPTION_DEBUG=1 -s DEMANGLE_SUPPORT=1 -s ALIASING_FUNCTION_POINTERS=0 --emrun
@@ -151,16 +144,15 @@ mkdir WebLoaderData
 copy /Y ..\..\shared\html5\templates\WebLoaderData .\WebLoaderData
 
 
-
 call emcc %CUSTOM_FLAGS% %INCLUDE_DIRS% ^
 %APP_SRC% %SRC%  ^
---preload-file ../bin/interface@interface/ --preload-file ../bin/audio@audio/ --js-library %SHARED%\html5\SharedJSLIB.js -o %APP_NAME%.%FINAL_EXTENSION%
+--preload-file ../bin/interface@interface/ --shell-file %SHARED%\html5\templates\shell_minimal.html --js-library %SHARED%\html5\SharedJSLIB.js -o %APP_NAME%.%FINAL_EXTENSION%
 
 REM Make sure the file compiled ok
-if not exist %APP_NAME%.js beeper.exe /p
+if not exist %APP_NAME%.js %RT_UTIL%\beeper.exe /p
 
 IF %USE_HTML5_CUSTOM_MAIN% EQU 1 (
-sed 's/RTTemplateName/%APP_NAME%/g' %CUSTOM_TEMPLATE% > %APP_NAME%.html
+%RT_UTIL%\sed "s/RTTemplateName/%APP_NAME%/g" %CUSTOM_TEMPLATE% > %APP_NAME%.html
 ) 
 
 

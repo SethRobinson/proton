@@ -784,9 +784,12 @@ void UpdateHTML5Screen()
 
 EM_BOOL uievent_callback(int eventType, const EmscriptenUiEvent *e, void *userData)
 {
+	
+	/*
 	printf("%s, detail: %ld, document.body.client size: (%d,%d), window.inner size: (%d,%d), scrollPos: (%d, %d)\n",
 		emscripten_event_type_to_string(eventType), e->detail, e->documentBodyClientWidth, e->documentBodyClientHeight,
 		e->windowInnerWidth, e->windowInnerHeight, e->scrollTop, e->scrollLeft);
+		*/
 
 #ifdef RT_HTML5_USE_CUSTOM_MAIN
 	double cssW, cssH;
@@ -854,7 +857,6 @@ EM_BOOL mouse_callback(int eventType, const EmscriptenMouseEvent *e, void *userD
 		emscripten_event_type_to_string(eventType), e->screenX, e->screenY, e->clientX, e->clientY,
 		e->ctrlKey ? " CTRL" : "", e->shiftKey ? " SHIFT" : "", e->altKey ? " ALT" : "", e->metaKey ? " META" : "", 
 		e->button, e->buttons, e->movementX, e->movementY, e->canvasX, e->canvasY, e->targetX, e->targetY);
-
 		*/
 
 	switch (eventType)
@@ -864,8 +866,9 @@ EM_BOOL mouse_callback(int eventType, const EmscriptenMouseEvent *e, void *userD
 	case EMSCRIPTEN_EVENT_MOUSEUP:
 	case EMSCRIPTEN_EVENT_MOUSEMOVE:
 
-		float xPos = e->canvasX;
-		float yPos = e->canvasY;
+		float xPos = e->targetX;
+		float yPos = e->targetY;
+
 		ConvertCoordinatesIfRequired(xPos, yPos);
 
 		switch (eventType)
@@ -900,7 +903,7 @@ EM_BOOL mouse_callback(int eventType, const EmscriptenMouseEvent *e, void *userD
 
 EM_BOOL wheel_callback(int eventType, const EmscriptenWheelEvent *e, void *userData)
 {
-/*
+	/*
 	LogMsg("%s, screen: (%ld,%ld), client: (%ld,%ld),%s%s%s%s button: %hu, buttons: %hu, canvas: (%ld,%ld), target: (%ld, %ld), delta:(%g,%g,%g), deltaMode:%lu\n",
 		emscripten_event_type_to_string(eventType), e->mouse.screenX, e->mouse.screenY, e->mouse.clientX, e->mouse.clientY,
 		e->mouse.ctrlKey ? " CTRL" : "", e->mouse.shiftKey ? " SHIFT" : "", e->mouse.altKey ? " ALT" : "", e->mouse.metaKey ? " META" : "", 
@@ -972,8 +975,8 @@ EM_BOOL touch_callback(int eventType, const EmscriptenTouchEvent *e, void *userD
 
 			*/
 
-		float xPos = (float)t->canvasX;
-		float yPos = (float)t->canvasY;
+		float xPos = t->targetX;
+		float yPos = t->targetY;
 
 		int touchID = (int)t->identifier;
 
@@ -1139,7 +1142,7 @@ void AddPersistentFileFolder(string folderName) //should start with a slash
 #else
 	EM_ASM_({
 
-		var pSaveDir = Pointer_stringify($0);
+		var pSaveDir = UTF8ToString($0);
 	//Module.print("Creating save dir "+pSaveDir);
 
 	//create your directory where we keep our persistent data
@@ -1154,6 +1157,8 @@ void AddPersistentFileFolder(string folderName) //should start with a slash
 void mainHTML()
 {
 	
+	string webIDTarget = "canvas"; //we're assuming the webgl canvas is named "canvas", but if wanted multiple apps in one page I guess we'd want to use different ones?
+
 	int w, h, fs;
 	srand( (unsigned)time(NULL) );
 	RemoveFile("log.txt", false);
@@ -1167,7 +1172,6 @@ void mainHTML()
 		/* handle error */
 	}
 
-	
 	r = emscripten_get_canvas_element_size("#canvas", &w, &h); 
 	if (r != EMSCRIPTEN_RESULT_SUCCESS) 
 	{
@@ -1212,12 +1216,8 @@ void mainHTML()
 	EM_ASM(
 		Module.waitingFileReadSync = 0;
 	Module.waitingFileWriteSync = 0;
-
 	);
 
-	
-	
-	
 	AddPersistentFileFolder(GetSavePath());
 	AddPersistentFileFolder(GetAppCachePath());
 	
@@ -1248,40 +1248,44 @@ void mainHTML()
 	fs = e.isFullscreen; 
 
 	EMSCRIPTEN_RESULT ret;
-	ret = emscripten_set_resize_callback(0, 0, 1, uievent_callback);
 
+	
+	//ret = emscripten_set_resize_callback(webIDTarget.c_str(), 0, 1, uievent_callback);
+	ret = emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, uievent_callback);
 
-	ret = emscripten_set_mousedown_callback(0, 0, 1, mouse_callback);
+	
+		
+	ret = emscripten_set_mousedown_callback(webIDTarget.c_str(), 0, 1, mouse_callback);
 	TEST_RESULT(emscripten_set_mousedown_callback);
-	ret = emscripten_set_mouseup_callback(0, 0, 1, mouse_callback);
+	ret = emscripten_set_mouseup_callback(webIDTarget.c_str(), 0, 1, mouse_callback);
 	TEST_RESULT(emscripten_set_mouseup_callback);
-	ret = emscripten_set_mousemove_callback(0, 0, 1, mouse_callback);
+	ret = emscripten_set_mousemove_callback(webIDTarget.c_str(), 0, 1, mouse_callback);
 	TEST_RESULT(emscripten_set_mousemove_callback);
-	ret = emscripten_set_wheel_callback(0, 0, 1, wheel_callback);
+	ret = emscripten_set_wheel_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, wheel_callback);
 	TEST_RESULT(emscripten_set_wheel_callback);
 
 
 	//touch events
-	ret = emscripten_set_touchstart_callback(0, 0, 1, touch_callback);
+	ret = emscripten_set_touchstart_callback(webIDTarget.c_str(), 0, 1, touch_callback);
 	TEST_RESULT(emscripten_set_touchstart_callback);
-	ret = emscripten_set_touchend_callback(0, 0, 1, touch_callback);
+	ret = emscripten_set_touchend_callback(webIDTarget.c_str(), 0, 1, touch_callback);
 	TEST_RESULT(emscripten_set_touchend_callback);
-	ret = emscripten_set_touchmove_callback(0, 0, 1, touch_callback);
+	ret = emscripten_set_touchmove_callback(webIDTarget.c_str(), 0, 1, touch_callback);
 	TEST_RESULT(emscripten_set_touchmove_callback);
-	ret = emscripten_set_touchcancel_callback(0, 0, 1, touch_callback);
+	ret = emscripten_set_touchcancel_callback(webIDTarget.c_str(), 0, 1, touch_callback);
 	TEST_RESULT(emscripten_set_touchcancel_callback);
 
 
 	//focus events
-	ret = emscripten_set_blur_callback(0, 0, true, focus_callback);
+	ret = emscripten_set_blur_callback(webIDTarget.c_str(), 0, true, focus_callback);
 	TEST_RESULT(emscripten_set_blur_callback);
 
-	ret = emscripten_set_focus_callback(0, 0, true, focus_callback);
+	ret = emscripten_set_focus_callback(webIDTarget.c_str(), 0, true, focus_callback);
 	TEST_RESULT(emscripten_set_focus_callback);
 
-	ret = emscripten_set_focusin_callback(0, 0, true, focus_callback);
+	ret = emscripten_set_focusin_callback(webIDTarget.c_str(), 0, true, focus_callback);
 	TEST_RESULT(emscripten_set_focusin_callback);
-	ret = emscripten_set_focusout_callback(0, 0, true, focus_callback);
+	ret = emscripten_set_focusout_callback(webIDTarget.c_str(), 0, true, focus_callback);
 	TEST_RESULT(emscripten_set_focusout_callback);
 
 

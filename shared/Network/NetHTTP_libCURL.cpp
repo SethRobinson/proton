@@ -777,7 +777,7 @@ void NetHTTP::SetBuffer(const char *pData, int byteSize)
 		StringReplace(C_END_DOWNLOAD_MARKER_STRING, "", temp);
 		//move it back
 		string crap;
-		m_downloadData = vector<char>(temp.begin(), temp.end());
+		m_downloadData = vector<uint8>(temp.begin(), temp.end());
 		if (!m_downloadData.empty()) //make sure we put a null on the end
 		{
 			if (m_downloadData[m_downloadData.size() - 1] != 0)

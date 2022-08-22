@@ -173,7 +173,7 @@ private:
 	NetSocket m_netSocket;
 	eState m_state;
 	eError m_error;
-	vector<char> m_downloadData; //holds the actual file/stream of what we've got
+	vector<uint8> m_downloadData; //holds the actual file/stream of what we've got
 	string m_downloadHeader;
 	uint32 m_expectedFileBytes; //0 if content-length is unknown
 	string m_postData; //optional, for if we want to send post data
