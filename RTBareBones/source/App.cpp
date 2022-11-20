@@ -350,23 +350,6 @@ void App::Update()
 		//holding the key
 		GetBaseApp()->m_sig_raw_keyboard.connect(&AppInputRawKeyboard);
 		
-		
-		/*
-		//file handling test, if TextScanner.h is included at the top..
-
-		TextScanner t;
-		t.m_lines.push_back("Testing 123");
-		t.m_lines.push_back("Heck yeah!");
-		t.m_lines.push_back("Whoopsopsop!");
-
-		LogMsg("Saving file...");
-		t.SaveFile("temp.txt");
-
-
-		TextScanner b;
-		b.LoadFile("temp.txt");
-		b.DumpToLog();
-		*/
 	}
 	
 	//game is thinking.  
