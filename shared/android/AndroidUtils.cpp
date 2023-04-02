@@ -137,7 +137,7 @@ char * GetAndroidMainClassName()
 	if (bFirstTime)
 	{
 		bFirstTime = false;
-		string package = string(GetBundlePrefix()) + string("RTAndroidApp") + "/Main";
+		string package = "com.rtsoft.RTAndroidApp/Main";
 
 		//string package = string(GetBundlePrefix())+string(GetBundleName())+"/Main";
 		StringReplace(".", "/", package);
