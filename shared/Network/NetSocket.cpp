@@ -14,14 +14,14 @@
 
 #include <fcntl.h>
 
-#elif defined(PLATFORM_BBX) || defined(PLATFORM_VITA)
+#elif defined(PLATFORM_BBX) || defined(PLATFORM_PSP2)
 #include <fcntl.h>
 
 #else
 	#include <sys/fcntl.h>
 #endif
 
-#ifndef PLATFORM_VITA
+#ifndef PLATFORM_PSP2
 #include <sys/ioctl.h>
 #endif
 
@@ -39,12 +39,13 @@
 
 #elif defined (PLATFORM_HTML5)
 #include <sys/errno.h>
-#elif defined (PLATFORM_VITA)
+#elif defined (PLATFORM_PSP2)
 #include <psp2/sysmodule.h>
 #include <psp2/net/net.h>
 #include <psp2/net/netctl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <unistd.h>
 #else
 	//default
 	#include <sys/sockio.h>
@@ -65,29 +66,12 @@
 
 NetSocket::NetSocket()
 {
-	/*
-	sceSysmoduleLoadModule(SCE_SYSMODULE_NET);
-	
-	SceNetInitParam netInitParam;
-	int size = 4 * 1024 * 1024;
-	netInitParam.memory = malloc(size);
-	netInitParam.size = size;
-	netInitParam.flags = 0;
-	sceNetInit(&netInitParam);
-	sceNetCtlInit();
-	*/
 	m_socket = INVALID_SOCKET;
 	m_bWasDisconnected = false;
 }
 
 NetSocket::~NetSocket()
 {
-	/*
-	sceNetCtlTerm();
-	sceNetTerm();
-	sceSysmoduleUnloadModule(SCE_SYSMODULE_NET);
-	*/
-	
 	Kill();
 }
 
@@ -165,7 +149,7 @@ bool NetSocket::Init( string url, int port )
 	// loop through all the results and connect to the first we can
 	int typeCount = 0;
 	
-    bool bPreferipv4 =false; //very bad idea if you want ipv6 support
+    bool bPreferipv4 =true; //very bad idea if you want ipv6 support
 	
 	
 	bool bipv4Exists = false;
@@ -282,7 +266,6 @@ bool NetSocket::Init( string url, int port )
 	
 	if ((hp= gethostbyname(url.c_str())) == NULL) 
 	{
-		
 #ifndef PLATFORM_BBX
 		//no errno on bbx.  Wait, why am I even setting this?  Does this matter?
 		errno= ECONNREFUSED;                       
@@ -407,9 +390,6 @@ void NetSocket::SetSocket( int socket )
 
 string NetSocket::GetClientIPAsString()
 {
-#ifdef PLATFORM_VITA
-	return "NOT SUPPORTED";
-#endif
 	if (m_socket == INVALID_SOCKET) return "NOT CONNECTED";
 
 	sockaddr_in addr;

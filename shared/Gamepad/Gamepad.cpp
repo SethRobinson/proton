@@ -318,7 +318,7 @@ void Gamepad::Update()
 				//convert into 8 directions
 				int finaldir = mod(dir-(45/2), 360)/45;
 #ifdef _DEBUG
-				//LogMsg("Pressing %s, which is dir %d (final: %d)", PrintVector2(GetLeftStick()).c_str(), dir, finaldir);
+				LogMsg("Pressing %s, which is dir %d (final: %d)", PrintVector2(GetLeftStick()).c_str(), dir, finaldir);
 #endif
 				SendArcadeDirectionByDegrees( (finaldir*45)-45 );
 				m_bJustSentStickRelease = false;

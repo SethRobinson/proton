@@ -14,7 +14,7 @@
 
 #if defined RT_WEBOS || defined RT_USE_SDL_AUDIO
 
-#if defined(PLATFORM_HTML5) || defined(PLATFORM_VITA)
+#if defined(PLATFORM_HTML5) || defined(PLATFORM_PSP2)
 //Support SDL_mixer in the same file as SDL2_mixer?  Probably a bad idea, but it works for HTML builds
 #define RT_USE_SDL1_MIXER 
 #endif

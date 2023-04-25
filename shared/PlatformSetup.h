@@ -52,8 +52,8 @@
 #include "flash/PlatformSetupFlash.h"
 #endif
 
-#ifdef PLATFORM_VITA
-#include "vita/PlatformSetupVita.h"
+#ifdef PLATFORM_PSP2
+#include "psp2/PlatformSetupPSP2.h"
 #endif
 
 #if defined(__cplusplus) || defined(__OBJC__)

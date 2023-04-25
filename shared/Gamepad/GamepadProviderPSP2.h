@@ -3,14 +3,14 @@
 
 #include "GamepadProvider.h"
 
-class GamepadProviderVita : public GamepadProvider
+class GamepadProviderPSP2 : public GamepadProvider
 {
     public:
 
-        GamepadProviderVita();
-        virtual ~GamepadProviderVita();
+        GamepadProviderPSP2();
+        virtual ~GamepadProviderPSP2();
 
-        virtual string GetName() { return "Vita"; }
+        virtual string GetName() { return "Playstation Vita"; }
         virtual bool Init();
 	    virtual void Kill();
 	    virtual void Update();

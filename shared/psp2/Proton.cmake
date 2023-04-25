@@ -1,11 +1,11 @@
-# Proton CMake Configuration for PlayStation Vita.
+# Proton CMake Configuration for PlayStation Vita (PSP2)
 
 string(COMPARE EQUAL "${PROJECT_NAME}" "Project" PROJECT_NOT_SET)
 if(${PROJECT_NOT_SET})
 message(FATAL_ERROR "project() must be called before including Proton.cmake")
 endif(${PROJECT_NOT_SET})
 
-string(REPLACE "/shared/vita/Proton.cmake" "" PROTON_ROOT "${CMAKE_CURRENT_LIST_FILE}")
+string(REPLACE "/shared/psp2/Proton.cmake" "" PROTON_ROOT "${CMAKE_CURRENT_LIST_FILE}")
 
 set(PROTON_SHARED "${PROTON_ROOT}/shared")
 set(PROTON_AD "${PROTON_SHARED}/Ad")
@@ -24,10 +24,10 @@ set(PROTON_ZLIB "${PROTON_UTIL}/zlib")
 set(PROTON_BOOSTSIGNALS "${PROTON_UTIL}/boost/libs/signals/src")
 set(PROTON_CLANMATH "${PROTON_SHARED}/ClanLib-2.0/Sources/Core/Math")
 
-add_definitions(-DBOOST_ALL_NO_LIB -DPLATFORM_PSVITA -DRT_USING_OSMESA)
+add_definitions(-DBOOST_ALL_NO_LIB -DPLATFORM_PSP2)
 
 IF (CMAKE_BUILD_TYPE MATCHES "Debug")
-add_definitions(-ggdb -D_DEBUG)
+add_definitions(-D_DEBUG -fno-lto -O0)
 ENDIF(CMAKE_BUILD_TYPE MATCHES "Debug")
 
 IF (CMAKE_BUILD_TYPE MATCHES "Release")
@@ -39,7 +39,7 @@ include_directories("${PROTON_SHARED}")
 include_directories("${PROTON_UTIL}/boost")
 include_directories("${PROTON_SHARED}/ClanLib-2.0/Sources")
 
-set(PROTON_SOURCES_BASIC "${PROTON_SHARED}/BaseApp.cpp" "${PROTON_SHARED}/PlatformSetup.cpp" "${PROTON_SHARED}/vita/VitaUtils.cpp" "${PROTON_SHARED}/vita/VitaMain.cpp" "${PROTON_UTIL}/VideoModeSelector.cpp" "${PROTON_UTIL}/PassThroughPointerEventHandler.cpp" "${PROTON_UTIL}/TouchDeviceEmulatorPointerEventHandler.cpp"
+set(PROTON_SOURCES_BASIC "${PROTON_SHARED}/BaseApp.cpp" "${PROTON_SHARED}/PlatformSetup.cpp" "${PROTON_SHARED}/psp2/psp2Utils.cpp" "${PROTON_SHARED}/psp2/main.cpp" "${PROTON_SHARED}/psp2/psp2Touch.cpp" "${PROTON_UTIL}/VideoModeSelector.cpp" "${PROTON_UTIL}/PassThroughPointerEventHandler.cpp" "${PROTON_UTIL}/TouchDeviceEmulatorPointerEventHandler.cpp"
 	"${PROTON_UTIL}/Variant.cpp" "${PROTON_SHARED}/Manager/VariantDB.cpp"
 	"${PROTON_AUDIO}/AudioManager.cpp"
 	"${PROTON_FILESYSTEM}/FileManager.cpp" "${PROTON_FILESYSTEM}/StreamingInstance.cpp" "${PROTON_FILESYSTEM}/StreamingInstanceFile.cpp"
@@ -51,7 +51,6 @@ set(PROTON_SOURCES_BASIC "${PROTON_SHARED}/BaseApp.cpp" "${PROTON_SHARED}/Platfo
 	"${PROTON_ENTITY}/Entity.cpp" "${PROTON_ENTITY}/Component.cpp"
 	"${PROTON_BOOSTSIGNALS}/connection.cpp" "${PROTON_BOOSTSIGNALS}/named_slot_map.cpp" "${PROTON_BOOSTSIGNALS}/signal_base.cpp" "${PROTON_BOOSTSIGNALS}/slot.cpp" "${PROTON_BOOSTSIGNALS}/trackable.cpp"
 	"${PROTON_CLANMATH}/angle.cpp" "${PROTON_CLANMATH}/mat3.cpp" "${PROTON_CLANMATH}/mat4.cpp" "${PROTON_CLANMATH}/rect.cpp" "${PROTON_CLANMATH}/vec2.cpp" "${PROTON_CLANMATH}/vec3.cpp" "${PROTON_CLANMATH}/vec4.cpp"
-	"${PROTON_SHARED}/vita/Input/Touch/VitaTouch.cpp"
 	"${PROTON_UTIL}/archive/TarHandler.cpp"
 )
 
@@ -256,6 +255,6 @@ function(proton_set_sources)
     endif(PROTON_USE_SDL_AUDIO)
 
     #link required depencies.
-    target_link_libraries(${PROJECT_NAME} vitaGL vitashark SceShaccCg_stub SceGxm_stub SceNet_stub SceNetCtl_stub SceKernelDmacMgr_stub SceDisplay_stub SceCtrl_stub SceAudio_stub SceSysmodule_stub SceCommonDialog_stub SceAppMgr_stub SceHid_stub SceMotion_stub SceIme_stub SceTouch_stub freetype mathneon m c z bz2)
+    target_link_libraries(${PROJECT_NAME} -Wl,--whole-archive pthread -Wl,--no-whole-archive vitaGL vitashark SceShaccCg_stub SceShaccCgExt taihen_stub SceGxm_stub SceNet_stub SceNetCtl_stub SceKernelDmacMgr_stub SceDisplay_stub SceCtrl_stub SceAudio_stub SceSysmodule_stub SceCommonDialog_stub SceAppMgr_stub SceHid_stub SceMotion_stub SceIme_stub SceTouch_stub SceAppUtil_stub freetype mathneon m c z bz2)
 
 endfunction(proton_set_sources)
