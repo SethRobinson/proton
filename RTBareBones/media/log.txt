@@ -1,7 +1,0 @@
-25/4 16:22:11: 
-RTPack V1.5 by Seth A. Robinson. (compiled without PVRTC support) /h for help
-
-25/4 16:22:11: Wrote out image ./interface/font_trajan_00.rttex.  (original size: 512 x 256) Flipped 1
-25/4 16:22:11: Compressing ./interface/font_trajan.rtfont..
-25/4 16:22:11: Compressed to ./interface/font_trajan.rtfont.  (29 kb, 6%%)
-25/4 16:22:11: Finished creating ./interface/font_trajan.rtfont.  223 chars, 20 font state definitions.
