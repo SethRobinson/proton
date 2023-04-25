@@ -94,12 +94,12 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Mesa GL|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Mesa GL|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Software GL|Win32'" Label="Configuration">
@@ -134,22 +134,22 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release GL|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release GL|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug GL|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug GL|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Common Release|Win32'" Label="Configuration">
@@ -255,6 +255,7 @@
     <OutDir>..\bin\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Common Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -265,6 +266,7 @@
     <OutDir>..\bin\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
+    <TargetName>$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Common Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -297,6 +299,7 @@
     <OutDir>..\bin\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug WebOS|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -307,6 +310,7 @@
     <OutDir>..\bin\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Flash GLES Debug Test|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -317,6 +321,7 @@
     <OutDir>..\bin\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Software GL|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -327,6 +332,7 @@
     <OutDir>..\bin\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Mesa GL|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -446,6 +452,7 @@
       <PrecompiledHeaderFile>PlatformPrecomp.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;zdll.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -469,6 +476,7 @@
       <PrecompiledHeaderFile>PlatformPrecomp.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;zlibwapi.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -1738,6 +1746,7 @@
     <ClInclude Include="..\..\shared\GUI\RTFontFileFormat.h" />
     <ClInclude Include="..\..\shared\html5\HTML5Utils.h" />
     <ClInclude Include="..\..\shared\html5\PlatformSetupHTML5.h" />
+    <ClInclude Include="..\..\shared\html5\SharedJSLIB.h" />
     <ClInclude Include="..\..\shared\iOS\app\EAGLView.h" />
     <ClInclude Include="..\..\shared\iOS\app\MyAppDelegate.h" />
     <ClInclude Include="..\..\shared\iOS\app\MyViewController.h" />
@@ -1800,6 +1809,7 @@
     <None Include="..\..\shared\flash\app\flash\com\rtsoft\AudioManager.as" />
     <None Include="..\..\shared\flash\app\flash\com\rtsoft\GLES1Adaptor.as" />
     <None Include="..\..\shared\flash\app\flash\Console.as" />
+    <None Include="..\..\shared\html5\SharedJSLIB.js" />
     <None Include="..\..\shared\iOS\app\EAGLView.mm" />
     <None Include="..\..\shared\iOS\app\main.mm" />
     <None Include="..\..\shared\iOS\app\MyAppDelegate.mm" />
@@ -1811,62 +1821,22 @@
     <None Include="..\..\shared\OSX\app\MyApplication.m" />
     <None Include="..\..\shared\OSX\app\MyOpenGLView.mm" />
     <None Include="..\..\shared\OSX\OSXUtils.mm" />
-    <None Include="..\android\ant.properties" />
-    <None Include="..\android\app_info_setup.bat" />
-    <None Include="..\android\build.bat" />
-    <None Include="..\android\buildRelease.bat" />
-    <None Include="..\android\build_prepare.bat" />
-    <None Include="..\android\Clean.bat" />
-    <None Include="..\android\default.properties" />
-    <CustomBuild Include="..\android\jni\Android.mk" />
-    <None Include="..\android\jni\Application.mk" />
-    <None Include="..\android\project.properties" />
-    <None Include="..\android\src\com\rtsoft\rtbarebones\Main.java" />
-    <None Include="..\android\src\Main.java" />
-    <None Include="..\bbx\.cproject" />
-    <None Include="..\bbx\.project" />
-    <None Include="..\bbx\app_info_setup.bat" />
-    <None Include="..\bbx\PackageAndRunDevice.bat" />
-    <None Include="..\bbx\PackageRelease.bat" />
-    <None Include="..\bbx\RequestDebugToken.bat" />
-    <None Include="..\bbx\SignFinal.bat" />
-    <None Include="..\bbx\UploadRelease.bat" />
-    <None Include="..\flash\app_info_setup.bat" />
-    <None Include="..\flash\build.sh" />
-    <None Include="..\flash\BuildDebug.bat" />
-    <None Include="..\flash\BuildDebugQuick.bat" />
-    <None Include="..\flash\BuildRelease.bat" />
-    <None Include="..\flash\BuildReleaseQuick.bat" />
-    <None Include="..\flash\build_prepare.bat" />
-    <None Include="..\flash\Clean.bat" />
-    <None Include="..\flash\CygwinPrompt.bat" />
-    <None Include="..\flash\Makefile" />
-    <None Include="..\flash\test1.html" />
-    <None Include="..\flash\upload.bat" />
-    <None Include="..\flash\ViewInBrowser.bat" />
-    <None Include="..\flash\ViewInBrowserRemote.bat" />
-    <None Include="..\flash\ViewInProjector.bat" />
+    <None Include="..\AndroidGradle\app\src\main\java\com\rtsoft\RTAndroidApp\Main.java" />
+    <None Include="..\AndroidGradle\local.properties" />
+    <None Include="..\AndroidGradle\PrepareResources.bat" />
     <None Include="..\html5\build_release.bat" />
     <None Include="..\html5\UploadToWebsite.bat" />
     <None Include="..\linux\linux_compile.sh" />
     <None Include="..\OSX\RTBareBones-Info.plist" />
-    <None Include="..\webOS\appinfo.json" />
-    <None Include="..\webOS\app_info_setup.bat" />
-    <None Include="..\webOS\build.bat" />
-    <None Include="..\webOS\packageit.bat" />
-  </ItemGroup>
-  <ItemGroup>
-    <Xml Include="..\android\AndroidManifest.xml" />
-    <Xml Include="..\android\build.xml" />
-    <Xml Include="..\bbx\bar-descriptor.xml" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\license.txt" />
     <Text Include="..\..\Programmer Readme.txt" />
-    <Text Include="..\android\proguard\config.txt" />
-    <Text Include="..\android\readme.txt" />
-    <Text Include="..\flash\exports.txt" />
+    <Text Include="..\AndroidGradle\app\src\main\cpp\CMakeLists.txt" />
     <Text Include="..\linux\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\AndroidGradle\app\src\main\AndroidManifest.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

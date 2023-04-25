@@ -3,7 +3,8 @@
 #if defined PLATFORM_HTML5
 #include "../html5/NetHTTP_HTML5.cpp"
 #elif defined RT_USE_LIBCURL
-#include "NetHTTP_libCURL.cpp"
+  //#include "NetHTTP_libCURL.cpp"
+//Um, please add NetHTTP_libCURL.cpp to your project
 #else
 
 #include "NetHTTP.h"
@@ -29,6 +30,7 @@ NetHTTP::~NetHTTP()
 		m_pFile = NULL;
 	}
 }
+
 
 void NetHTTP::Reset(bool bClearPostdata)
 {
@@ -426,7 +428,16 @@ void NetHTTP::FinishDownload()
 			break;
 
 		case END_OF_DATA_SIGNAL_RTSOFT_MARKER:
-			m_downloadData.insert(m_downloadData.begin(), s.begin()+m_downloadHeader.length(), s.end()-strlen(C_END_DOWNLOAD_MARKER_STRING));
+			{
+
+			int downloadSize = s.size() - m_downloadHeader.length();
+			int markerSize = strlen(C_END_DOWNLOAD_MARKER_STRING);
+
+				if (downloadSize >= markerSize)
+				{
+					m_downloadData.insert(m_downloadData.begin(), s.begin() + m_downloadHeader.length(), s.end() - markerSize);
+				}
+			}
 			break;
 		}
 	} else

@@ -5,26 +5,8 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="source\android">
-      <UniqueIdentifier>{b553c2fe-2780-4dac-b6df-9fe4d83a75b9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\android\proguard">
-      <UniqueIdentifier>{487edec3-627a-45a9-8875-3d7a9720e11f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\android\src">
-      <UniqueIdentifier>{91ab4e37-dee1-4dc0-8717-91ef2b4433cd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\WebOS">
-      <UniqueIdentifier>{8eaad8f8-93a5-498d-8811-0e2226b2ccb6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="source\OSX">
       <UniqueIdentifier>{498df5e2-6347-41ab-af6d-9e213fd07c10}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\bbx">
-      <UniqueIdentifier>{9c96c379-9600-4275-b970-c0f86926995d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\flash">
-      <UniqueIdentifier>{10b4da84-d45d-4154-8ece-5177efed9e3e}</UniqueIdentifier>
     </Filter>
     <Filter Include="source\html5">
       <UniqueIdentifier>{07f1c5be-84c0-41ad-bd8b-0d759d43eb50}</UniqueIdentifier>
@@ -133,6 +115,9 @@
     </Filter>
     <Filter Include="shared\SDL">
       <UniqueIdentifier>{2e233e55-1a81-4bcb-a19f-0b6373a3aa1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\AndroidGradle">
+      <UniqueIdentifier>{a0c6b63a-ee33-4876-a42b-9012c11e75bc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -576,124 +561,13 @@
     <ClInclude Include="..\..\shared\linux\PlatformSetupLinux.h">
       <Filter>shared\linux</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\shared\html5\SharedJSLIB.h">
+      <Filter>shared\html5</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\android\ant.properties">
-      <Filter>source\android</Filter>
-    </None>
-    <None Include="..\android\app_info_setup.bat">
-      <Filter>source\android</Filter>
-    </None>
-    <None Include="..\android\jni\Application.mk">
-      <Filter>source\android</Filter>
-    </None>
-    <None Include="..\android\build.bat">
-      <Filter>source\android</Filter>
-    </None>
-    <None Include="..\android\build_prepare.bat">
-      <Filter>source\android</Filter>
-    </None>
-    <None Include="..\android\buildRelease.bat">
-      <Filter>source\android</Filter>
-    </None>
-    <None Include="..\android\Clean.bat">
-      <Filter>source\android</Filter>
-    </None>
-    <None Include="..\android\default.properties">
-      <Filter>source\android</Filter>
-    </None>
-    <None Include="..\android\src\com\rtsoft\rtbarebones\Main.java">
-      <Filter>source\android</Filter>
-    </None>
-    <None Include="..\android\project.properties">
-      <Filter>source\android</Filter>
-    </None>
-    <None Include="..\android\src\Main.java">
-      <Filter>source\android\src</Filter>
-    </None>
-    <None Include="..\webOS\app_info_setup.bat">
-      <Filter>source\WebOS</Filter>
-    </None>
-    <None Include="..\webOS\appinfo.json">
-      <Filter>source\WebOS</Filter>
-    </None>
-    <None Include="..\webOS\build.bat">
-      <Filter>source\WebOS</Filter>
-    </None>
-    <None Include="..\webOS\packageit.bat">
-      <Filter>source\WebOS</Filter>
-    </None>
     <None Include="..\OSX\RTBareBones-Info.plist">
       <Filter>source\OSX</Filter>
-    </None>
-    <None Include="..\bbx\.cproject">
-      <Filter>source\bbx</Filter>
-    </None>
-    <None Include="..\bbx\.project">
-      <Filter>source\bbx</Filter>
-    </None>
-    <None Include="..\bbx\app_info_setup.bat">
-      <Filter>source\bbx</Filter>
-    </None>
-    <None Include="..\bbx\PackageAndRunDevice.bat">
-      <Filter>source\bbx</Filter>
-    </None>
-    <None Include="..\bbx\PackageRelease.bat">
-      <Filter>source\bbx</Filter>
-    </None>
-    <None Include="..\bbx\RequestDebugToken.bat">
-      <Filter>source\bbx</Filter>
-    </None>
-    <None Include="..\bbx\SignFinal.bat">
-      <Filter>source\bbx</Filter>
-    </None>
-    <None Include="..\bbx\UploadRelease.bat">
-      <Filter>source\bbx</Filter>
-    </None>
-    <None Include="..\flash\app_info_setup.bat">
-      <Filter>source\flash</Filter>
-    </None>
-    <None Include="..\flash\build.sh">
-      <Filter>source\flash</Filter>
-    </None>
-    <None Include="..\flash\build_prepare.bat">
-      <Filter>source\flash</Filter>
-    </None>
-    <None Include="..\flash\BuildDebug.bat">
-      <Filter>source\flash</Filter>
-    </None>
-    <None Include="..\flash\BuildDebugQuick.bat">
-      <Filter>source\flash</Filter>
-    </None>
-    <None Include="..\flash\BuildRelease.bat">
-      <Filter>source\flash</Filter>
-    </None>
-    <None Include="..\flash\BuildReleaseQuick.bat">
-      <Filter>source\flash</Filter>
-    </None>
-    <None Include="..\flash\Clean.bat">
-      <Filter>source\flash</Filter>
-    </None>
-    <None Include="..\flash\CygwinPrompt.bat">
-      <Filter>source\flash</Filter>
-    </None>
-    <None Include="..\flash\Makefile">
-      <Filter>source\flash</Filter>
-    </None>
-    <None Include="..\flash\test1.html">
-      <Filter>source\flash</Filter>
-    </None>
-    <None Include="..\flash\upload.bat">
-      <Filter>source\flash</Filter>
-    </None>
-    <None Include="..\flash\ViewInBrowser.bat">
-      <Filter>source\flash</Filter>
-    </None>
-    <None Include="..\flash\ViewInBrowserRemote.bat">
-      <Filter>source\flash</Filter>
-    </None>
-    <None Include="..\flash\ViewInProjector.bat">
-      <Filter>source\flash</Filter>
     </None>
     <None Include="..\html5\build_release.bat">
       <Filter>source\html5</Filter>
@@ -776,37 +650,32 @@
     <None Include="..\..\shared\linux\Proton.cmake">
       <Filter>shared\linux</Filter>
     </None>
+    <None Include="..\AndroidGradle\local.properties">
+      <Filter>source\AndroidGradle</Filter>
+    </None>
+    <None Include="..\AndroidGradle\PrepareResources.bat">
+      <Filter>source\AndroidGradle</Filter>
+    </None>
+    <None Include="..\AndroidGradle\app\src\main\java\com\rtsoft\RTAndroidApp\Main.java">
+      <Filter>source\AndroidGradle</Filter>
+    </None>
+    <None Include="..\..\shared\html5\SharedJSLIB.js">
+      <Filter>shared\html5</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="..\android\AndroidManifest.xml">
-      <Filter>source\android</Filter>
-    </Xml>
-    <Xml Include="..\android\build.xml">
-      <Filter>source\android</Filter>
-    </Xml>
-    <Xml Include="..\bbx\bar-descriptor.xml">
-      <Filter>source\bbx</Filter>
-    </Xml>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\android\readme.txt">
-      <Filter>source\android</Filter>
-    </Text>
-    <Text Include="..\android\proguard\config.txt">
-      <Filter>source\android\proguard</Filter>
-    </Text>
-    <Text Include="..\flash\exports.txt">
-      <Filter>source\flash</Filter>
-    </Text>
     <Text Include="..\linux\CMakeLists.txt">
       <Filter>source\linux</Filter>
     </Text>
     <Text Include="..\..\license.txt" />
     <Text Include="..\..\Programmer Readme.txt" />
+    <Text Include="..\AndroidGradle\app\src\main\cpp\CMakeLists.txt">
+      <Filter>source\AndroidGradle</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="..\android\jni\Android.mk">
-      <Filter>source\android</Filter>
-    </CustomBuild>
+    <Xml Include="..\AndroidGradle\app\src\main\AndroidManifest.xml">
+      <Filter>source\AndroidGradle</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

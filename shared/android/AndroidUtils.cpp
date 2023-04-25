@@ -137,7 +137,9 @@ char * GetAndroidMainClassName()
 	if (bFirstTime)
 	{
 		bFirstTime = false;
-		string package = string(GetBundlePrefix())+string(GetBundleName())+"/Main";
+		string package = "com.rtsoft.RTAndroidApp/Main";
+
+		//string package = string(GetBundlePrefix())+string(GetBundleName())+"/Main";
 		StringReplace(".", "/", package);
 		sprintf(name, package.c_str());
 	}
@@ -239,14 +241,14 @@ string GetAppCachePath()
 
 		if (!retString.empty())
 		{
-			retString += string("/Android/data/")+GetBundlePrefix()+GetBundleName()+"/files/";
-			//LogMsg("External dir is %s", retString.c_str());
+			//retString += string("/Android/data/")+GetBundlePrefix()+GetBundleName()+"/files/";
+			LogMsg("External dir is %s", retString.c_str());
 
 			//looks valid
 #ifdef _DEBUG
 //LogMsg("GetAppCachePath returning %s",retString.c_str());
 #endif
-			return retString;
+			return retString+"/";
 		}
 
 		retString = GetSavePathBasic();
@@ -671,9 +673,20 @@ void CreateDirectoryRecursively(string basePath, string path)
 	jmethodID mid = env->GetStaticMethodID(cls,
 		"create_dir_recursively",
 		"(Ljava/lang/String;Ljava/lang/String;)V");
-	jstring ret;
-	env->CallStaticVoidMethod(cls, mid, env->NewStringUTF(basePath.c_str()), env->NewStringUTF(path.c_str()));
-	return;
+	//jstring ret;
+
+    jstring tempBase = env->NewStringUTF(basePath.c_str());
+	jstring tempPath =   env->NewStringUTF(path.c_str());
+    env->CallStaticVoidMethod(cls, mid, tempBase, tempPath);
+	
+    //without these DeleteLocalRefs, if you call this 500+ times in a single loop Android won't
+    //have time to garbage collect and it will crash on some devices.  Why would you call this 500+
+    //times?  Installing a DMOD of course
+    
+	env->DeleteLocalRef(tempBase);
+    env->DeleteLocalRef(tempPath);
+	env->DeleteLocalRef(cls);
+ 	return;
 }
 
 
@@ -691,7 +704,7 @@ vector<string> GetDirectoriesAtPath(string path)
 	dp = opendir(path.c_str());
 	if (!dp)
 	{
-		LogError("GetDirectoriesAtPath: opendir failed");
+		LogError("GetDirectoriesAtPath: opendir failed (%s)", path.c_str());
 		return v;
 	}
 
@@ -817,6 +830,22 @@ bool HasVibration()
 	return true;
 }
 
+void SetJavaPackageName(string packageName)
+{
+	JNIEnv* env = GetJavaEnv();
+
+
+	LogMsg("Setting package name to %s", packageName.c_str());
+
+	if (!env) return;
+	jclass cls = env->FindClass(GetAndroidMainClassName());
+	jmethodID mid = env->GetStaticMethodID(cls,
+		"SetPackageName",
+		"(Ljava/lang/String;)V");
+	env->CallStaticVoidMethod(cls, mid, env->NewStringUTF(packageName.c_str()));
+
+}
+
 void AppResize( JNIEnv*  env, jobject  thiz, jint w, jint h )
 {
 	g_winVideoScreenX = w;
@@ -828,6 +857,13 @@ void AppResize( JNIEnv*  env, jobject  thiz, jint w, jint h )
 	if (!GetBaseApp()->IsInitted())
 	{
 		SetupScreenInfo(GetPrimaryGLX(), GetPrimaryGLY(), ORIENTATION_PORTRAIT);
+		
+		//tell the app what its true package ID is.  The reason we have to do this is the new gradle build system
+		//sort of fakes the ID change during the final build and asking ourselves gives RTAndroidApp instead of the true
+		//one.
+
+		SetJavaPackageName(string(GetBundlePrefix())+string(GetBundleName()));
+		
 		LogMsg("Initializing BaseApp.  APK filename is %s", GetAPKFile().c_str());
 		srand( (unsigned)time(NULL) );
 		FileSystemZip *pFileSystem = new FileSystemZip();
@@ -995,6 +1031,17 @@ void AppInit(JNIEnv*  env)
 {
 	//happens after the gl surface is initialized
 
+	//Newer versions of Android don't automatically create the "files" subdir - we create it here if needed, this way data isn't lost
+	//when upgrading our apps.
+	
+	
+	/*
+	string tempDir = GetAppCachePath();
+	StringReplace("/files/", "/", tempDir);
+	        LogMsg("Creating dir %s if needed", tempDir.c_str());
+	CreateDirectoryRecursively(tempDir, "files");
+	*/
+	 
 	LogMsg("Initialized GL surfaces for game");
 	GetBaseApp()->InitializeGLDefaults();
 	LogMsg("gl defaults set");
@@ -1008,8 +1055,6 @@ void AppInit(JNIEnv*  env)
 	LogMsg("Surfaces loaded");
 
 }
-
-
 
 enum eAndroidActions
 {
@@ -1054,7 +1099,8 @@ void AppOnTouch( JNIEnv*  env, jobject jobj,jint action, jfloat x, jfloat y, jin
 	m.y = y;
 	m.finger = finger;
 	m.type = messageType;
-
+	SetTimeOfLastTouchMS(GetSystemTimeTick());
+	
 	g_messageCache.push_back(m);
 	//GetMessageManager()->SendGUI(messageType, x, y);
 }
@@ -1073,22 +1119,52 @@ void AppOnSendGUIStringEx(JNIEnv*  env, jobject thiz,jint messageType, jint parm
 	env->ReleaseStringUTFChars(s, ss);
 
 	GetMessageManager()->SendGUIStringEx((eMessageType)messageType, (float)parm1, (float)parm2, finger, str);  
-
 }
 
 void AppOnKey( JNIEnv*  env, jobject jobj, jint type, jint keycode, jint c)
 {
 	
+	//android keycode list here, thanks microsoft (?!) https://docs.microsoft.com/en-us/dotnet/api/android.views.keycode?view=xamarin-android-sdk-12
 #ifdef _DEBUG
 	//LogMsg("Native Got type %d, keycode %d, key %d (%c)", type, keycode, c, (char(c)));
 #endif
 
+	//OPTIMIZE:  Why didn't I convert the F keys a smart way? Maybe
+	//the compiler will optimize it to if keycode >= 131 && keycode >= 141...
+	
+	
 	switch (keycode)
 	{
+	case VIRTUAL_DPAD_BUTTON_DOWN:
+	case VIRTUAL_DPAD_BUTTON_RIGHT:
+	case VIRTUAL_DPAD_BUTTON_UP:
+	case VIRTUAL_DPAD_BUTTON_LEFT:
+	case VIRTUAL_KEY_DIR_DOWN:
+	case VIRTUAL_KEY_DIR_UP:
+	case VIRTUAL_KEY_DIR_LEFT:
+	case VIRTUAL_KEY_DIR_RIGHT:
+		//some of the joystick events we might get
+		SetTimeOfLastGamepadInputMS(GetSystemTimeTick());
 		
-		//case 4: e.v = KEY_BACK; break; // KEYCODE_BACK
-		//case 82: e.v = KEY_MENU; break; // KEYCODE_MENU
-		//case 84: e.v = KEY_SEARCH; break; // KEYCODE_SEARCH
+		break;
+		
+		
+		
+		
+		
+	case 131: c = VIRTUAL_KEY_F1; break;
+	case 132: c = VIRTUAL_KEY_F2; break;
+	case 133: c = VIRTUAL_KEY_F3; break;
+	case 134: c = VIRTUAL_KEY_F4; break;
+	case 135: c = VIRTUAL_KEY_F5; break;
+	case 136: c = VIRTUAL_KEY_F6; break;
+	case 137: c = VIRTUAL_KEY_F7; break;
+	case 138: c = VIRTUAL_KEY_F8; break;
+	case 139: c = VIRTUAL_KEY_F9; break;
+	case 140: c = VIRTUAL_KEY_F10; break;
+	case 141: c = VIRTUAL_KEY_F11; break;
+	case 142: c = VIRTUAL_KEY_F12; break;
+
 	case 66: //enter
 		c = 13;
 		break;
@@ -1096,36 +1172,8 @@ void AppOnKey( JNIEnv*  env, jobject jobj, jint type, jint keycode, jint c)
 		c = 8;
 		break;
 
-	case 99:
-		keycode = VIRTUAL_DPAD_BUTTON_LEFT;
-		break;
+    }
 
-	case 100:
-		keycode = VIRTUAL_DPAD_BUTTON_UP;
-		break;
-
-
-	case 4:
-		//actually this will never get hit, the java side will send VIRTUAL_DPAD_BUTTON_RIGHT directly, because it
-		//shares stuff with the back button and has to detect which one it is on that side
-		keycode = VIRTUAL_DPAD_BUTTON_RIGHT;
-		break;
-	case 109:
-		keycode = VIRTUAL_DPAD_SELECT;
-		break;
-	case 108:
-		keycode =  VIRTUAL_DPAD_START;
-		break;
-
-	case 102:
-		keycode =  VIRTUAL_DPAD_LBUTTON;
-	break;
-	case 103:
-		keycode =  VIRTUAL_DPAD_RBUTTON;
-		break;
-
-	}
-	
 	if (keycode >= VIRTUAL_KEY_BACK)
 	{
 		
@@ -1134,12 +1182,8 @@ void AppOnKey( JNIEnv*  env, jobject jobj, jint type, jint keycode, jint c)
 			//hitting back with the keyboard open?  Just pretend they closed the keyboard.
 			SetIsUsingNativeUI(false);
 			return;
-		} else
-		{
-			c = keycode;
 		}
 		
-
 		c = keycode;
 	}
 
@@ -1147,7 +1191,6 @@ void AppOnKey( JNIEnv*  env, jobject jobj, jint type, jint keycode, jint c)
 	{
 	case 1: //keydown
 		GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_CHAR, (float)c, (float)1);  
-		
 		if (c < 128) c = toupper(c);
 		GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_CHAR_RAW, (float)c, (float)1);  
 		break;
@@ -1158,7 +1201,6 @@ void AppOnKey( JNIEnv*  env, jobject jobj, jint type, jint keycode, jint c)
 		break;
 	}
 }
-
 
 int AppOSMessageGet(JNIEnv* env)
 {

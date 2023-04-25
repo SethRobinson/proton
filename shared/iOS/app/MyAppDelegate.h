@@ -30,6 +30,7 @@
     int m_keyboardType; //what proton actually requested, so we know what items to filter
     InAppPurchaseManager *m_IOSIAPManager;
 
+    
 #ifdef RT_TAPJOY_ENABLED
     TapjoyManager *m_tapjoyManager;
 #endif

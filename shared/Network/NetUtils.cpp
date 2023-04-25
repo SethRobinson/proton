@@ -300,6 +300,7 @@ string GetDomainFromURL(string url)
 void BreakDownURLIntoPieces(string url, string &domainOut, string &requestOut, int &port)
 {
 	port = 80;
+	StringReplace("https://", "", url); //don't want that part
 
 	StringReplace("http://", "", url); //don't want that part
 

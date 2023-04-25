@@ -74,9 +74,7 @@ bool TarHandler::WriteBZipStream(byte *pData, int size)
 	if (size == 0) return true;
 
 	int headerSize = sizeof(tar_header);
-#ifdef _DEBUG
-	//LogMsg("Writing %d..", size);
-#endif
+
 	switch (m_tarState)
 	{
 	case TAR_STATE_FILLING_HEADER:
@@ -116,7 +114,9 @@ bool TarHandler::WriteBZipStream(byte *pData, int size)
 			{
 				ToLowerCase(m_tarHeader.name);
 			}
-
+#ifdef _DEBUG
+			//LogMsg("Creating dir: %s : %s", m_destPath.c_str(), GetPathFromString(m_tarHeader.name).c_str());
+#endif
 			CreateDirectoryRecursively(m_destPath, GetPathFromString(m_tarHeader.name));
 
 			//this is some extra info Dink might want
@@ -168,10 +168,6 @@ bool TarHandler::WriteBZipStream(byte *pData, int size)
 						LogMsg("This archive may be trying to write to a sketchy place, we don't trust it. If anyone actually needs this, we could add an option to allow it...");
 						return false;
 					}
-#ifdef _DEBUG
-					LogMsg("Writing %s...", (m_destPath + m_tarHeader.name).c_str());
-#endif				
-
 
 					//open the file for writing
 					m_fpOut = fopen( (m_destPath+m_tarHeader.name).c_str(), "wb");
@@ -200,6 +196,9 @@ bool TarHandler::WriteBZipStream(byte *pData, int size)
 
 				if (bytesRead != amountToRead)
 				{
+#ifdef _DEBUG
+					LogMsg("IO error, bytesRead: %d, amountToRead: %d", bytesRead, amountToRead);
+#endif
 					OnBZIPError(BZ_IO_ERROR);
 					return true;
 				}
@@ -286,8 +285,7 @@ bool TarHandler::uncompressStream ( FILE *zStream)
 				return false;
 			}
 			if (ferror(zStream)) goto errhandler_io;
-		
-			//LogMsg("Doing BZ2_bzReadOpen");
+
 			m_bzf = BZ2_bzReadOpen (&m_bzerr, zStream, 0, (int)true, m_bzipReservedBuffer, m_bzipnUnused);
 			if (m_bzf == NULL || m_bzerr != BZ_OK)
 			{
@@ -300,7 +298,9 @@ bool TarHandler::uncompressStream ( FILE *zStream)
 
 		//LogMsg("Doing BZ2_bzRead..");
 			m_nread = BZ2_bzRead ( &m_bzerr, m_bzf, m_pBzipBuffer, C_BZIP_BUFFER_SIZE );
-			//LogMsg("Read %d bytes.  It returned %d", m_nread, m_bzerr);
+#ifdef _DEBUG
+			LogMsg("Read %d bytes.  Error: %d", m_nread, m_bzerr);
+#endif
 			
 			if (m_bzerr == BZ_DATA_ERROR_MAGIC) goto trycat;
 			if ((m_bzerr == BZ_OK || m_bzerr == BZ_STREAM_END) && m_nread > 0)

@@ -2,6 +2,7 @@
 
 #ifndef RT_WEBOS
 
+
 #include "AudioManagerFMODStudio.h"
 #include "util/MiscUtils.h"
 
@@ -46,10 +47,8 @@ bool AudioManagerFMOD::Init()
 	Create a System object and initialize
 	*/
 
-	LogMsg("Creating FMOD system...");
 	result = FMOD::System_Create(&system);
 	ERRCHECK(result);
-	LogMsg("Getting version...");
 
 	result = system->getVersion(&version);
 	ERRCHECK(result);
@@ -272,6 +271,15 @@ void AudioManagerFMOD::Preload( string fName, bool bLooping /*= false*/, bool bI
 	{
 		basePath = GetBaseAppPath();
 	}
+
+#ifdef PLATFORM_ANDROID
+	if (!FileExistsRaw(fName )) {
+        //we kind of have to do this for files inside the APK itself.  We could't find it, so we'll assume that's where it is.
+        basePath = "file:///android_asset/";
+    }
+#endif
+	
+	
 	SoundObject *pObject = GetSoundObjectByFileName((GetBaseAppPath()+fName).c_str());
 
 	if (!pObject)
@@ -296,22 +304,51 @@ void AudioManagerFMOD::Preload( string fName, bool bLooping /*= false*/, bool bI
 				memset(&ex, 0, sizeof(FMOD_CREATESOUNDEXINFO));
 				ex.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
 				string midiSoundBank = GetBaseAppPath()+m_midiSoundBankFile;
+				if (GetPlatformID() == PLATFORM_ID_ANDROID)
+				{
+					midiSoundBank = string("file:///android_asset/")+m_midiSoundBankFile;
+				}
+
+				
 				if (!m_midiSoundBankFile.empty())
 				{
 					ex.dlsname = midiSoundBank.c_str();
 				}
+
 				ex.suggestedsoundtype = FMOD_SOUND_TYPE_MIDI;
-				LogMsg("Loading %s", midiSoundBank.c_str());
+				
+#ifdef _DEBUG
+				LogMsg("Loading %s with soundbank %s", (basePath+fName).c_str(), midiSoundBank.c_str());
+
+				if (FileExistsRaw(midiSoundBank))
+				{
+					LogMsg("Soundbank located");
+				} else {
+				
+					LogMsg("Soundbank NOT FOUND");
+				}
+
+				if (FileExistsRaw(basePath+fName))
+				{
+					LogMsg("Midi file located");
+				} else {
+
+					LogMsg("Midi file NOT FOUND");
+				}
+
+#endif
 				result = system->createSound( (basePath+fName).c_str(), fModParms, &ex, &pObject->m_pSound);
-						
+				
 			} else
 			{
 				
 				if (bForceStreaming)
 				{
+					//LogMsg("Loading %s (streaming)", (basePath+fName).c_str());
 					result = system->createStream( (basePath+fName).c_str(), fModParms, 0, &pObject->m_pSound);
 				} else
 				{
+					//LogMsg("Loading %s (non-streaming)", (basePath+fName).c_str());
 					result = system->createSound( (basePath+fName).c_str(), fModParms, 0, &pObject->m_pSound);
 				}
 			}
@@ -603,7 +640,17 @@ void AudioManagerFMOD::SetMusicVol(float vol )
 	assert(system);
 	if (m_pMusicChannel != AUDIO_HANDLE_BLANK)
 	{
-		m_pMusicChannel->setVolume(vol);
+		if (ToLowerCaseString(GetFileExtension(m_lastMusicFileName)) == "mid")
+		{
+			//midi plays too loud in Dink because the GM sound .dls is loud I guess
+			m_pMusicChannel->setVolume(vol*m_midiVolumeMod);
+
+		}
+		else
+		{
+			m_pMusicChannel->setVolume(vol);
+		}
+		
 	}
 	m_musicVol = vol;
 }

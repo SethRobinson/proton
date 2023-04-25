@@ -188,7 +188,7 @@ bool FileManager::FileExists( string fileName, bool bAddBasePath)
 	if (!fp)
 	{
 		//file not found	
-		return NULL;
+		return false;
 	}
 
 	fclose(fp);

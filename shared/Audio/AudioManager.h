@@ -126,6 +126,8 @@ public:
 	virtual void SetPos( AudioHandle soundID, uint32 posMS ){}
 	virtual void SetDLS(string fName); //(fmod only) example, "dink/midi/TimGM6mbTiny.dls" - if not set, FMOD will try to use whatever the system has.
 	virtual void SetMusicVol(float vol){}
+	virtual void SetMidiMusicModVol(float mod) { m_midiVolumeMod = mod; };
+
 	virtual void SetRequestedDriverByName(string requestedPartialDriverName); //only works with FMOD
 	virtual float GetMusicVol() {return m_musicVol;}
 	/**
@@ -157,6 +159,7 @@ protected:
 	bool m_bVibrationDisabled;
 	string m_midiSoundBankFile; //only used by FMOD currently
 	float m_musicVol; // 0 means none, 1 means full blast
+	float m_midiVolumeMod; //0 means none, 1 means normal, it's multiplied against m_musicVol when .mid files are played
 	bool m_bSoundEnabled;
 	bool m_bStreamMusic;
 	string m_forcedAudioExtension;

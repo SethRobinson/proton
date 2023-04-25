@@ -8,7 +8,7 @@
 #import "MyAppDelegate.h"
 #import "EAGLView.h"
 #import "InAppPurchaseManager.h"
-
+#import <GameController/GameController.h>
 #ifdef RT_FLURRY_ENABLED
 #import "Flurry.h"
 #endif
@@ -116,7 +116,6 @@
     m_IOSIAPManager = [[InAppPurchaseManager alloc] init];
     [m_IOSIAPManager InitIAP];
 #endif
-    
     
     // pass in version
     NSString *versionString = [NSString stringWithFormat:@"Version %@",[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]];

@@ -1,13 +1,15 @@
-echo For security reasons, Chrome won't properly download data from a file// address.  By running this python based webserver chrome testing will work.  I think it requires Python 3+ to be installed, this might happen automatically when you setup the Emscripten stuff
+echo For security reasons, Chrome won't properly download data from a file// address.  So we use a special server here with emrun or python.
 
 set CURPATH=%cd%
 cd ..
 call app_info_setup.bat
 :um, why does the emsdk_env.bat not fully work unless I'm in the emscripten dir?  Whatever, we'll move there and then back
-cd %EMSCRIPTEN_ROOT%
+cd /d %EMSCRIPTEN_ROOT%
 call emsdk_env.bat
 :Move back to original directory
-cd %CURPATH%
+cd /d %CURPATH%
+dir
+echo Ok, we moved to %CURPATH%
 
 emrun %APP_NAME%.html
 pause

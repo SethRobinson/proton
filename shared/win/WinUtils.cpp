@@ -281,6 +281,7 @@ unsigned int GetSystemTimeTick()
 {
 	return GetTickCount();
 }
+
 double GetSystemTimeAccurate()
 {
 	//return double(GetTickCount());

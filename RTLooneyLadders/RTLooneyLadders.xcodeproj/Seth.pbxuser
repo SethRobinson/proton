@@ -1,0 +1,162 @@
+// !$*UTF8*$!
+{
+	1D6058900D05DD3D006BFB54 /* RTLooneyLadders */ = {
+		activeExec = 0;
+		executables = (
+			5DD3240912BF8F0A0009B0F3 /* RTLooneyLadders */,
+		);
+	};
+	29B97313FDCFA39411CA2CEA /* Project object */ = {
+		activeBuildConfigurationName = AdHoc;
+		activeExecutable = 5DD3240912BF8F0A0009B0F3 /* RTLooneyLadders */;
+		activeSDKPreference = iphonesimulator4.3;
+		activeTarget = 1D6058900D05DD3D006BFB54 /* RTLooneyLadders */;
+		addToTargets = (
+			1D6058900D05DD3D006BFB54 /* RTLooneyLadders */,
+		);
+		codeSenseManager = 5DD3246612BF8F110009B0F3 /* Code sense */;
+		executables = (
+			5DD3240912BF8F0A0009B0F3 /* RTLooneyLadders */,
+		);
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					951,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 318224731;
+			PBXWorkspaceStateSaveDate = 318224731;
+		};
+		perUserProjectItems = {
+			5DD3276612C393FA0009B0F3 /* PBXTextBookmark */ = 5DD3276612C393FA0009B0F3 /* PBXTextBookmark */;
+			5DD328AD12C99E5C0009B0F3 /* PBXTextBookmark */ = 5DD328AD12C99E5C0009B0F3 /* PBXTextBookmark */;
+			5DD9792D12F7B95300024B46 /* PBXTextBookmark */ = 5DD9792D12F7B95300024B46 /* PBXTextBookmark */;
+			5DD9793512F7BA5A00024B46 /* PBXTextBookmark */ = 5DD9793512F7BA5A00024B46 /* PBXTextBookmark */;
+		};
+		sourceControlManager = 5DD3246512BF8F110009B0F3 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	5DD3240912BF8F0A0009B0F3 /* RTLooneyLadders */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		dataTipCustomDataFormattersEnabled = 1;
+		dataTipShowTypeColumn = 1;
+		dataTipSortType = 0;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = RTLooneyLadders;
+		savedGlobals = {
+		};
+		showTypeColumn = 0;
+		sourceDirectories = (
+		);
+	};
+	5DD3246512BF8F110009B0F3 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+			repositoryNamesForRoots = {
+				"" = "";
+			};
+		};
+	};
+	5DD3246612BF8F110009B0F3 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	5DD3272112C1CE500009B0F3 /* GameMenu.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1167, 5291}}";
+			sepNavSelRange = "{9159, 0}";
+			sepNavVisRange = "{8655, 1395}";
+		};
+	};
+	5DD3272A12C1CEBA0009B0F3 /* CharComponent.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1216, 6331}}";
+			sepNavSelRange = "{12318, 0}";
+			sepNavVisRange = "{12007, 641}";
+		};
+	};
+	5DD3272E12C1CEBA0009B0F3 /* BuildingComponent.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1141, 10738}}";
+			sepNavSelRange = "{8755, 0}";
+			sepNavVisRange = "{8619, 286}";
+		};
+	};
+	5DD3276612C393FA0009B0F3 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 5DD3272A12C1CEBA0009B0F3 /* CharComponent.cpp */;
+		name = "CharComponent.cpp: 468";
+		rLen = 0;
+		rLoc = 12318;
+		rType = 0;
+		vrLen = 641;
+		vrLoc = 12007;
+	};
+	5DD328AD12C99E5C0009B0F3 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 5DD3272E12C1CEBA0009B0F3 /* BuildingComponent.cpp */;
+		name = "BuildingComponent.cpp: 361";
+		rLen = 0;
+		rLoc = 8755;
+		rType = 0;
+		vrLen = 286;
+		vrLoc = 8619;
+	};
+	5DD9792D12F7B95300024B46 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 5DD3272112C1CE500009B0F3 /* GameMenu.cpp */;
+		name = "GameMenu.cpp: 322";
+		rLen = 0;
+		rLoc = 9159;
+		rType = 0;
+		vrLen = 530;
+		vrLoc = 8872;
+	};
+	5DD9793512F7BA5A00024B46 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 5DD3272112C1CE500009B0F3 /* GameMenu.cpp */;
+		name = "GameMenu.cpp: 322";
+		rLen = 0;
+		rLoc = 9159;
+		rType = 0;
+		vrLen = 532;
+		vrLoc = 8868;
+	};
+}

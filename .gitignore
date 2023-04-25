@@ -20,3 +20,8 @@ shared/win/utils/log.txt
 *.vcxproj.user
 **/bin/log.txt
 **/bin/*.exe
+RTDink/
+RTMindWall/
+UGT/
+RTDScroll/
+RTLibretroTest

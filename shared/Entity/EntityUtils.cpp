@@ -945,50 +945,57 @@ bool EntityHasInputFocus(Entity *pEnt)
 	return pEnt->GetComponentByName("FocusInput", true) != NULL;
 }
 
-void AddFocusIfNeeded(Entity *pEnt, bool bAlsoLinkMoveMessages, int delayInputMS, int updateAndRenderDelay)
+void AddFocusIfNeeded(Entity *pEnt, bool bAlsoLinkMoveMessages, int delayInputMS, int updateAndRenderDelay, int32 priority)
 {
 	EntityComponent *pComp = pEnt->GetComponentByName("FocusUpdate", true);
 	
 	if (!pComp)
 	{
+		FocusUpdateComponent* pTemp = new FocusUpdateComponent;
+		pTemp->GetVar("priority")->Set(priority);
+		
 		if (updateAndRenderDelay == 0)
 		{
-			pEnt->AddComponent(new FocusUpdateComponent);
+			pEnt->AddComponent(pTemp);
 		} else
 		{
 			//schedule it
-			GetMessageManager()->AddComponent(pEnt, updateAndRenderDelay, new FocusUpdateComponent);
-
+			GetMessageManager()->AddComponent(pEnt, updateAndRenderDelay, pTemp);
 		}
 	}
 
 	if (!pEnt->GetComponentByName("FocusRender", true))
 	{
+		FocusRenderComponent *pTemp = new FocusRenderComponent;
+		pTemp->GetVar("priority")->Set(priority);
+		
 		if (updateAndRenderDelay == 0)
 		{
-			pEnt->AddComponent(new FocusRenderComponent);
+			pEnt->AddComponent(pTemp);
 		} else
 		{
 			//schedule it
-			GetMessageManager()->AddComponent(pEnt, updateAndRenderDelay, new FocusRenderComponent);
-
+			GetMessageManager()->AddComponent(pEnt, updateAndRenderDelay, pTemp);
 		}
 	}
 
 	if (!pEnt->GetComponentByName("FocusInput", true))
 	{
+		FocusInputComponent *pTemp = new FocusInputComponent;
+		pTemp->GetVar("priority")->Set(priority);
+		
 		if (delayInputMS == 0)
 		{
-			FocusInputComponent *pComp = (FocusInputComponent*)pEnt->AddComponent(new FocusInputComponent);
+			pEnt->AddComponent(pTemp);
 		
 			if (bAlsoLinkMoveMessages)
 			{
-				pComp->GetFunction("LinkMoveMessages")->sig_function(NULL);
+				pTemp->GetFunction("LinkMoveMessages")->sig_function(NULL);
 			}
 		} else
 		{
 			//add the input focus, but wait a bit before doing it
-			GetMessageManager()->AddComponent(pEnt, delayInputMS, new FocusInputComponent);
+			GetMessageManager()->AddComponent(pEnt, delayInputMS, pTemp);
 			//call a function on a component that doesn't exist yet, but will be added in 500 ms
 			if (bAlsoLinkMoveMessages)
 			{
@@ -1479,7 +1486,6 @@ void PreloadKeyboard(OSMessage::eParmKeyboardType keyboardType)
 {
 	if (GetEmulatedPlatformID() == PLATFORM_ID_ANDROID) return; //no point on this platform I don't think..
 
-    
 	OSMessage o;
 	o.m_type = OSMessage::MESSAGE_OPEN_TEXT_BOX;
 	o.m_string = "";
@@ -1505,7 +1511,6 @@ void PreloadKeyboard(OSMessage::eParmKeyboardType keyboardType)
     GetBaseApp()->m_sig_hardware(&v);
     
 }
-
 
 void SendFakeInputMessageToEntity(Entity *pEnt, eMessageType msg, CL_Vec2f vClickPos, int delayBeforeStartingMS)
 {

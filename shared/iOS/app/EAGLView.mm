@@ -347,6 +347,7 @@ return count;
 
 		if (fingerID == -1)
 		{
+			SetTimeOfLastTouchMS(GetSystemTimeTick());
 			//add it to our list
 			fingerID = AddNewTouch(touch);
 		} else
@@ -376,6 +377,7 @@ return count;
 		int fingerID = GetFingerTrackIDByTouch(touch);
 		if (fingerID != -1)
 		{
+			SetTimeOfLastTouchMS(GetSystemTimeTick());
 			g_touchTracker[fingerID].m_touchPointer = NULL; //clear it
 		} else
 		{
@@ -398,6 +400,7 @@ return count;
 		int fingerID = GetFingerTrackIDByTouch(touch);
 		if (fingerID != -1)
 		{
+			SetTimeOfLastTouchMS(GetSystemTimeTick());
 			g_touchTracker[fingerID].m_touchPointer = NULL; //clear it
 		} else
 		{
@@ -411,18 +414,17 @@ return count;
 	}	
 }
 
-
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
    // Enumerate through all the touch objects.
 	for (UITouch *touch in touches)
 	{
-	
 		//found a touch.  Is it already on our list?
 		int fingerID = GetFingerTrackIDByTouch(touch);
 		if (fingerID != -1)
 		{
 			//found it
+			SetTimeOfLastTouchMS(GetSystemTimeTick());
 		} else
 		{
 			//wasn't on our list?!
@@ -434,6 +436,5 @@ return count;
 		GetMessageManager()->SendGUIEx(MESSAGE_TYPE_GUI_CLICK_MOVE,pt.x, pt.y, fingerID);
 	}	
 }
-
 
 @end

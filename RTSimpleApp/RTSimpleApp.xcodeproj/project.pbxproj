@@ -51,7 +51,9 @@
 		5D5C10B212779D4400A4E4E3 /* SliderComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D5C10AF12779D4400A4E4E3 /* SliderComponent.cpp */; };
 		5D5C10B312779D4400A4E4E3 /* SelectButtonWithCustomInputComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D5C10B112779D4400A4E4E3 /* SelectButtonWithCustomInputComponent.cpp */; };
 		5D6BA9021511CE47002DC898 /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 5D6BA9011511CE47002DC898 /* Icon-72.png */; };
-		5D7B10E40F245B88003A3396 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D7B10E30F245B88003A3396 /* libz.dylib */; };
+		5D73ADC2289F8270008F6F60 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D73ADC1289F8270008F6F60 /* Reachability.m */; };
+		5D73ADC5289F82B8008F6F60 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D73ADC4289F82B8008F6F60 /* SystemConfiguration.framework */; };
+		5D73ADC6289F8458008F6F60 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D73ADC3289F82B0008F6F60 /* libz.tbd */; };
 		5D7B4CF710CCEE030073DDA8 /* SoftSurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D7B4CF510CCEE030073DDA8 /* SoftSurface.cpp */; };
 		5D7BBCF210144FAE0015A90E /* RectRenderComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D7BBCEA10144FAE0015A90E /* RectRenderComponent.cpp */; };
 		5D7BBCF310144FAE0015A90E /* ScrollBarRenderComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D7BBCEC10144FAE0015A90E /* ScrollBarRenderComponent.cpp */; };
@@ -296,7 +298,10 @@
 		5D5C10B012779D4400A4E4E3 /* SelectButtonWithCustomInputComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SelectButtonWithCustomInputComponent.h; path = Entity/SelectButtonWithCustomInputComponent.h; sourceTree = "<group>"; };
 		5D5C10B112779D4400A4E4E3 /* SelectButtonWithCustomInputComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SelectButtonWithCustomInputComponent.cpp; path = Entity/SelectButtonWithCustomInputComponent.cpp; sourceTree = "<group>"; };
 		5D6BA9011511CE47002DC898 /* Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-72.png"; path = "media/Icon-72.png"; sourceTree = "<group>"; };
-		5D7B10E30F245B88003A3396 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		5D73ADC0289F826F008F6F60 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = iOS/Reachability.h; sourceTree = "<group>"; };
+		5D73ADC1289F8270008F6F60 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = iOS/Reachability.m; sourceTree = "<group>"; };
+		5D73ADC3289F82B0008F6F60 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		5D73ADC4289F82B8008F6F60 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		5D7B4CF510CCEE030073DDA8 /* SoftSurface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SoftSurface.cpp; path = ../shared/Renderer/SoftSurface.cpp; sourceTree = SOURCE_ROOT; };
 		5D7B4CF610CCEE030073DDA8 /* SoftSurface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SoftSurface.h; path = ../shared/Renderer/SoftSurface.h; sourceTree = SOURCE_ROOT; };
 		5D7BBCEA10144FAE0015A90E /* RectRenderComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RectRenderComponent.cpp; path = Entity/RectRenderComponent.cpp; sourceTree = "<group>"; };
@@ -502,13 +507,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
+				5D73ADC6289F8458008F6F60 /* libz.tbd in Frameworks */,
 				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
 				28FD15000DC6FC520079059D /* OpenGLES.framework in Frameworks */,
 				28FD15080DC6FC5B0079059D /* QuartzCore.framework in Frameworks */,
 				5DADFF4C0EA2F561007ADD60 /* CoreGraphics.framework in Frameworks */,
 				5DA1FCF70F01EEFD001E9C1B /* AudioToolbox.framework in Frameworks */,
+				5D73ADC5289F82B8008F6F60 /* SystemConfiguration.framework in Frameworks */,
 				5DA1FD030F01EF07001E9C1B /* CoreAudio.framework in Frameworks */,
-				5D7B10E40F245B88003A3396 /* libz.dylib in Frameworks */,
 				5D3063AB0FD8B00A009DE600 /* OpenAL.framework in Frameworks */,
 				5D82C8B00FF4C02B0082EBE7 /* CFNetwork.framework in Frameworks */,
 				5D82C8B50FF4C0BF0082EBE7 /* AVFoundation.framework in Frameworks */,
@@ -535,7 +541,6 @@
 				5D7C711C118FF795007F9604 /* Resources-iPad */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
-				5D7B10E30F245B88003A3396 /* libz.dylib */,
 				5D8272900FA9DEE00097DE6A /* Entitlements.plist */,
 			);
 			name = CustomTemplate;
@@ -575,6 +580,8 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5D73ADC4289F82B8008F6F60 /* SystemConfiguration.framework */,
+				5D73ADC3289F82B0008F6F60 /* libz.tbd */,
 				5D82C8B40FF4C0BF0082EBE7 /* AVFoundation.framework */,
 				5D82C8AF0FF4C02B0082EBE7 /* CFNetwork.framework */,
 				5D3063AA0FD8B00A009DE600 /* OpenAL.framework */,
@@ -689,6 +696,8 @@
 		5D5C10261275793C00A4E4E3 /* app */ = {
 			isa = PBXGroup;
 			children = (
+				5D73ADC0289F826F008F6F60 /* Reachability.h */,
+				5D73ADC1289F8270008F6F60 /* Reachability.m */,
 				5D5C10271275794D00A4E4E3 /* MyViewController.mm */,
 				5D5C10281275794D00A4E4E3 /* MyViewController.h */,
 				5D5C10291275794D00A4E4E3 /* MyAppDelegate.mm */,
@@ -1072,6 +1081,12 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0450;
+				TargetAttributes = {
+					1D6058900D05DD3D006BFB54 = {
+						DevelopmentTeam = 7DA5SJEYK8;
+						ProvisioningStyle = Automatic;
+					};
+				};
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "RTSimpleApp" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -1079,9 +1094,6 @@
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
-				Japanese,
-				French,
-				German,
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* CustomTemplate */;
 			projectDirPath = "";
@@ -1250,6 +1262,7 @@
 				5D8E35F214BEE352003BA3DA /* jdcolor.c in Sources */,
 				5D8E35F314BEE352003BA3DA /* jddctmgr.c in Sources */,
 				5D8E35F414BEE352003BA3DA /* jdhuff.c in Sources */,
+				5D73ADC2289F8270008F6F60 /* Reachability.m in Sources */,
 				5D8E35F514BEE352003BA3DA /* jdinput.c in Sources */,
 				5D8E35F614BEE352003BA3DA /* jdmainct.c in Sources */,
 				5D8E35F714BEE352003BA3DA /* jdmarker.c in Sources */,
@@ -1284,15 +1297,15 @@
 		1D6058940D05DD3E006BFB54 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer:";
-				COPY_PHASE_STRIP = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 7DA5SJEYK8;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = RTSimpleApp;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = dynamic;
 			};
 			name = Debug;
@@ -1314,6 +1327,7 @@
 					BOOST_ALL_NO_LIB,
 					PLATFORM_IOS,
 					NDEBUG,
+					GLES_SILENCE_DEPRECATION,
 				);
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
@@ -1326,10 +1340,9 @@
 					"../shared/ClanLib-2.0/Sources",
 					../shared/FliteTTS/include,
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 3.1.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "";
-				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				SYMROOT = "~/build";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1340,18 +1353,17 @@
 		5D8733750FA9A0BC001DB559 /* AdHoc */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				COPY_PHASE_STRIP = YES;
+				ARCHS = "$(ARCHS_STANDARD)";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 7DA5SJEYK8;
 				GCC_AUTO_VECTORIZATION = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_THUMB_SUPPORT = NO;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = RTSimpleApp;
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = dynamic;
 			};
 			name = AdHoc;
@@ -1369,6 +1381,7 @@
 					BOOST_ALL_NO_LIB,
 					_DEBUG,
 					RT_JPG_SUPPORT,
+					GLES_SILENCE_DEPRECATION,
 				);
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
@@ -1381,10 +1394,9 @@
 					"../shared/ClanLib-2.0/Sources",
 					../shared/FliteTTS/include,
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 3.1.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "";
-				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				SYMROOT = "~/build";
 				TARGETED_DEVICE_FAMILY = "1,2";

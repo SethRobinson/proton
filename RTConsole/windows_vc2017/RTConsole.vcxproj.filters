@@ -225,6 +225,9 @@
     <ClInclude Include="..\..\shared\linux\PlatformSetupLinux.h">
       <Filter>Source Files\linux</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\shared\html5\SharedJSLIB.h">
+      <Filter>shared\HTML5</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\flash\app_info_setup.bat">
@@ -256,6 +259,9 @@
     </None>
     <None Include="..\..\shared\flash\app\flash\RTConsoleVersion\Console.as">
       <Filter>shared\flash\app\flash\RTConsoleVersion</Filter>
+    </None>
+    <None Include="..\..\shared\html5\SharedJSLIB.js">
+      <Filter>shared\HTML5</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

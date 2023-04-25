@@ -32,7 +32,7 @@ FileManager * GetFileManager() {return &g_fileManager;}
 	AudioManagerDenshion g_audioManager;
 #else
 	//it's being compiled as a native OSX app
-   #include "Audio/AudioManagerFMOD.h"
+   #include "Audio/AudioManagerFMODStudio.h"
   AudioManagerFMOD g_audioManager; //dummy with no sound
 
 //in theory, CocosDenshion should work for the Mac builds, but right now it seems to want a big chunk of
@@ -49,8 +49,16 @@ FileManager * GetFileManager() {return &g_fileManager;}
 AudioManagerSDL g_audioManager; //sound in windows/WebOS/Linux/html5
 //AudioManager g_audioManager; //to disable sound
 #elif defined ANDROID_NDK
-#include "Audio/AudioManagerAndroid.h"
-AudioManagerAndroid g_audioManager; //sound for android
+
+	#if defined RT_ENABLE_FMOD
+		//FMOD works on android these days, but you'll have to link it right
+		#include "Audio/AudioManagerFMODStudio.h"
+		AudioManagerFMOD g_audioManager; //if we wanted FMOD sound in windows
+	#else
+		#include "Audio/AudioManagerAndroid.h"
+		AudioManagerAndroid g_audioManager; //sound for android
+	#endif
+
 #elif defined PLATFORM_BBX
 #include "Audio/AudioManagerBBX.h"
 //AudioManager g_audioManager; //to disable sound
@@ -69,7 +77,7 @@ AudioManagerSDL g_audioManager; //sound in windows and WebOS
 #include "Audio/AudioManagerFlash.h"
 AudioManagerFlash g_audioManager;
 #elif defined RT_ENABLE_FMOD
-#include "Audio/AudioManagerFMOD.h"
+#include "Audio/AudioManagerFMODStudio.h"
 AudioManagerFMOD g_audioManager; //if we wanted FMOD sound in windows
 #else
 

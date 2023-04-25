@@ -160,6 +160,24 @@ bool FileExists(const string &fName)
 
 }
 
+
+bool FileExistsRaw(const string &fName)
+{
+
+//Same as above but without the virtual file system, for debugging stuff on Android mostly
+
+	FILE *fp = fopen( (fName).c_str(), "rb");
+	if (!fp)
+	{
+		//file not found	
+		return NULL;
+	}
+
+	fclose(fp);
+	return true;
+
+}
+
 //up to you to use SAFE_DELETE_ARRAY
 byte * DecompressRTPackToMemory(byte *pMem, unsigned int *pDecompressedSize)
 {
@@ -220,6 +238,34 @@ byte * LoadFileIntoMemoryBasic(string fileName, unsigned int *length, bool bUseS
 
 	return pData;
 }
+
+
+bool SaveMemoryIntoFileBasic(byte* pData, unsigned int length, std::string fileName, bool bUseSavePath, bool bAddBasePath)
+{
+	if (bAddBasePath)
+	{
+		if (bUseSavePath)
+		{
+			fileName = GetSavePath() + fileName;
+		}
+		else
+		{
+			fileName = GetBaseAppPath() + fileName;
+		}
+	}
+	FILE* fp = fopen(fileName.c_str(), "wb");
+	if (!fp)
+	{
+		return false;
+	}
+
+	fwrite(pData, length, 1, fp);
+	fclose(fp);
+
+	return true;
+
+}
+
 
 bool IsAPackedFile(byte *pFile)
 {

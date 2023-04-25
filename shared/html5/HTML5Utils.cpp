@@ -332,6 +332,10 @@ void RemoveFile( string fileName, bool bAddSavePath)
 		fileName = GetSavePath()+fileName;
 	}
 
+#ifdef _DEBUG
+	LogMsg("Deleting file %s", fileName.c_str());
+#endif
+	
 	if (unlink(fileName.c_str()) == -1)
 	{
 		switch (errno)
@@ -349,7 +353,9 @@ void RemoveFile( string fileName, bool bAddSavePath)
 			LogMsg("Warning: Unable to delete file %s, File system is read only", fileName.c_str());
 			break;
 		default:
-			//LogMsg("Warning: Unable to delete file %s, unknown error", fileName.c_str());
+#ifdef _DEBUG
+			LogMsg("Warning: Unable to delete file %s, unknown error", fileName.c_str());
+#endif
 			//file doesn't exist
 			break;
 		}

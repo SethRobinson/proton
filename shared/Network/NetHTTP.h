@@ -53,6 +53,8 @@ while (1)
 Note:  html5 builds automatically use NetHTTP_HTML5.cpp instead of NetHTTP.cpp.  The usage is the same but internally they use
 emscripten_async_wget2_data.  Due to javascript security issues, you can only download files on website the .html is hosted on, unless
 cross scripting privileges are setup.
+
+If RT_USE_LIBCURL is defined, CURL will be used instead.  (HTTPS is supported then)
 */
 
 #ifndef NetHTTP_h__
@@ -149,6 +151,11 @@ public:
 	}
 	int GetPostDataSize() { return (int)m_postData.size(); }
 
+	void SetExpectedBytes(int bytes)
+	{
+		m_expectedFileBytes = bytes;
+	}
+
 
 private:
 #endif
@@ -166,7 +173,7 @@ private:
 	NetSocket m_netSocket;
 	eState m_state;
 	eError m_error;
-	vector<char> m_downloadData; //holds the actual file/stream of what we've got
+	vector<uint8> m_downloadData; //holds the actual file/stream of what we've got
 	string m_downloadHeader;
 	uint32 m_expectedFileBytes; //0 if content-length is unknown
 	string m_postData; //optional, for if we want to send post data

@@ -4,16 +4,16 @@ mergeInto(LibraryManager.library,
 
 JLIB_EnterString: function(message, defaultText)
 {
- var pMessage = Pointer_stringify(message);
-  var pURL = Pointer_stringify(defaultText);
+        var pMessage = UTF8ToString(message);
+        var pURL = UTF8ToString(defaultText);
 	var person = prompt(pMessage, pURL);
 	
 	if (person == null) return 0;
 	
-	 //console.log("Got "+person);
+	 console.log("Got "+person);
 	 
 	 // Create a pointer using the 'Glue' method and the String value
-    var ptr  = allocate(intArrayFromString(person), 'i8', ALLOC_NORMAL);
+        var ptr = allocateUTF8(person);
     return ptr;
 },
 
@@ -21,13 +21,13 @@ JLIB_EnterString: function(message, defaultText)
 JLIB_GetURL: function ()
 {
     //console.log("Querystring: "+decodeURIComponent(window.location.href));
-    var ptr  = allocate(intArrayFromString(decodeURIComponent(window.location.href)), 'i8', ALLOC_NORMAL);
+    var ptr = allocateUTF8(decodeURIComponent(window.location.href));
     return ptr;
 },
 
 JLIB_OpenURL: function (URLStr)
   {
-   var url = Pointer_stringify(URLStr);
+    var url = UTF8ToString(URLStr);
   
     var OpenPopup = function() 
     {
@@ -59,7 +59,7 @@ JLIB_OpenURL: function (URLStr)
   
   JLIB_OnClickSomethingByID: function (IDStr)
   {
-   var idName = Pointer_stringify(IDStr);
+    var idName = UTF8ToString(IDStr);
   
     var OpenPopup = function() 
     {

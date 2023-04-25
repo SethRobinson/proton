@@ -137,6 +137,7 @@ public:
 	void OnFilterAdd() {m_recursiveFilterReferences++;};
 	void OnFilterRemove() {m_recursiveFilterReferences--;  assert(m_recursiveFilterReferences >= 0 && "Add/remove filters unbalanced?");};
 	void AddEntitiesToVectorRescursively(vector<Entity*> *pEntVec); //get all children entities recursively
+	void GetEntitiesByName(std::vector<Entity*>* pEnts, string name);
 
 private:
 

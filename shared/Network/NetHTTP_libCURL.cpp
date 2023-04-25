@@ -52,7 +52,8 @@ void NetHTTP::Reset(bool bClearPostdata)
 	m_downloadData.clear();
 	m_replyHeader.clear();
 	m_query.clear();
-	
+	m_bHasEncodedPostData = false;
+
 	if (bClearPostdata)
 	{
 		m_postData.clear();
@@ -62,7 +63,6 @@ void NetHTTP::Reset(bool bClearPostdata)
 
 void NetHTTP::Setup(string serverName, int port, string query, eEndOfDataSignal eodSignal)
 {
-	m_bHasEncodedPostData = false;
 	m_endOfDataSignal = eodSignal;
 	m_serverName = serverName;
 	m_port = port;
@@ -72,9 +72,6 @@ void NetHTTP::Setup(string serverName, int port, string query, eEndOfDataSignal 
 bool NetHTTP::SetFileOutput(const string &fName)
 {
 	assert(!m_pFile);
-
-
-	assert(!"Uh, Seth never tested this with the libcurl stuff");
 
 	m_pFile = fopen(fName.c_str(), "wb");
 
@@ -154,11 +151,14 @@ string NetHTTP::BuildHTTPHeader()
 	return "";
 }
 
-#ifdef WINAPI
 void AddText(const char *tex, const char *filename);
 void LogMsgNoCR(const char* traceStr, ...);
+
+
 void dump(const char *text,
 	FILE *stream, unsigned char *ptr, size_t size);
+
+
 
 
 void SimpleDump(const char* text,
@@ -168,14 +168,18 @@ void SimpleDump(const char* text,
 	size_t c;
 	unsigned int width = 0x10;
 
-	LogMsgNoCR("%s, %10.10ld bytes (0x%8.8lx): %s\n",
-		text, (long)size, (long)size, ptr);
+	//this will crash when downloading a file, so maybe bad right now.  (it's a debug mode only thing so no biggie)
+
+	//LogMsg("%s, %10.10ld bytes (0x%8.8lx): %s\n",
+	//	text, (long)size, (long)size, ptr);
 
 	return;
+	
+	/*
 	for (i = 0; i < size; i += width) {
 		LogMsgNoCR("%4.4lx: ", (long)i);
 
-		/* show hex to the left */
+		
 		for (c = 0; c < width; c++) {
 			if (i + c < size)
 				LogMsgNoCR("%02x ", ptr[i + c]);
@@ -183,7 +187,7 @@ void SimpleDump(const char* text,
 				LogMsgNoCR("   ");
 		}
 
-		/* show data on the right */
+		
 		for (c = 0; (c < width) && (i + c < size); c++)
 		{
 			char x = (ptr[i + c] >= 0x20 && ptr[i + c] < 0x80) ? ptr[i + c] : '.';
@@ -191,8 +195,8 @@ void SimpleDump(const char* text,
 		}
 		LogMsgNoCR("\n");
 	}
+	*/
 }
-
 
 
 static int CURLDebugTrace(CURL *handle, curl_infotype type,
@@ -205,7 +209,7 @@ static int CURLDebugTrace(CURL *handle, curl_infotype type,
 
 	switch (type) {
 	case CURLINFO_TEXT:
-		LogMsgNoCR("== Info: %s", data);
+		LogMsg("== Info: %s", data);
 	default: /* in case a new one is introduced to shock us */
 		return 0;
 
@@ -230,10 +234,11 @@ static int CURLDebugTrace(CURL *handle, curl_infotype type,
 	}
 
 	SimpleDump(text, stderr, (unsigned char *)data, size);
+	//LogMsg("more info but can't display it... fix it, Seth");
 	return 0;
 }
 
-#endif
+
 
 size_t NetHTTP::CURLWriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *pThisInstance)
 {
@@ -252,7 +257,7 @@ size_t NetHTTP::CURLWriteMemoryCallback(void *contents, size_t size, size_t nmem
 	pCURLInstance->m_receivedSize += realsize;
 	pCURLInstance->m_pReceiveBuff[pCURLInstance->m_receivedSize] = 0;
 	
-	pCURLInstance->SetProgress(pCURLInstance->m_receivedSize, 0);
+	pCURLInstance->SetProgress(pCURLInstance->m_receivedSize, -1);
 	return realsize;
 }
 
@@ -310,6 +315,39 @@ static int seek_cb(void* userp, curl_off_t offset, int origin)
 	return CURL_SEEKFUNC_OK;
 }
 
+size_t write_data_to_nothing(void* ptr, size_t size, size_t count, void* stream)
+{
+	//just pretend like we care
+	return size * count;
+}
+
+static size_t header_callback(char* buffer, size_t size,
+	size_t nitems, void* userdata)
+{
+	/* received header is nitems * size long in 'buffer' NOT ZERO TERMINATED */
+	/* 'userdata' is set with CURLOPT_HEADERDATA */
+	NetHTTP* pThis = (NetHTTP*)userdata;
+
+	//let's do some questionable string handling to find the content-length tag if it exists
+	string temp;
+	temp.resize(nitems + 1);
+	memcpy(&temp[0], buffer, nitems);
+	temp[nitems] = 0; //terminate it so we can do normal string handling
+	
+	//LogMsg("Got %s", temp.c_str());
+	
+	auto valArray = StringTokenize(temp, ":");
+	if (valArray.size() == 2)
+	{
+		//is this it?
+		if (valArray[0] == "Content-Length")
+		{
+			pThis->SetExpectedBytes(atoi(valArray[1].c_str()));
+		}
+	}
+
+	return nitems * size;
+}
 
 bool NetHTTP::Start()
 {
@@ -342,10 +380,67 @@ bool NetHTTP::Start()
 		LogMsg("Warning: CURL activity already in progress");
 	}
 
+
 	InitCURLIfNeeded();
 	
 	m_pReceiveBuff = (char*)malloc(1);
 	m_receivedSize = 0;
+
+
+	if (m_pFile)
+	{
+		//let's grab the filesize first in this horrible blocking method
+
+		//nevermind, this doesn't work and seems to download the whole thing?!
+
+		/*
+		CURL* curl = curl_easy_init();
+		if (curl)
+		{
+#ifdef _DEBUG
+			curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+			curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, CURLDebugTrace);
+#endif
+			curl_easy_setopt(curl, CURLOPT_NOBODY, 1L); //don't actually load it
+
+			curl_easy_setopt(curl, CURLOPT_URL, finalURL.c_str());
+			//curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data_to_nothing);
+			
+			if (GetPlatformID() == PLATFORM_ID_ANDROID)
+			{
+				//Android needs the physical file copied for this to work, so include it in your assets and do something like this on app startup:
+				//Don't ask me why, but it fails if we don't set the path both ways like this
+				curl_easy_setopt(curl, CURLOPT_CAPATH, GetSavePath().c_str());
+				curl_easy_setopt(curl, CURLOPT_CAINFO, (GetSavePath() + "curl-ca-bundle.crt").c_str());
+			}
+			else
+			{
+				//manually set the cert on windows otherwise it can't find it.  I've only used this curl stuff on android and windows so no idea on other platforms.
+				curl_easy_setopt(curl, CURLOPT_CAINFO, "curl-ca-bundle.crt");
+			}
+
+			
+			CURLcode res = curl_easy_perform(curl);
+
+			if (!res) {
+				
+				curl_off_t cl;
+				res = curl_easy_getinfo(curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, &cl);
+				if (!res) {
+					LogMsg("Download size: %d", cl);
+					m_expectedFileBytes = cl;
+				}
+				else
+				{
+					LogMsg("Failed to understand download size");
+					m_expectedFileBytes = 0;
+				}
+			}
+			curl_easy_cleanup(curl)
+		}
+		;
+		*/
+	}
 
 	m_CURL_handle = curl_easy_init();
 
@@ -357,26 +452,52 @@ bool NetHTTP::Start()
 	m_CURL_bytesSent = 0;
 
 	//to figure out problems, uncomment below
+#ifdef _DEBUG
+	//LogMsg("CURL in debug mode");
 	//curl_easy_setopt(m_CURL_handle, CURLOPT_VERBOSE, 1L);
-#ifdef WINAPI
-	curl_easy_setopt(m_CURL_handle, CURLOPT_DEBUGFUNCTION, CURLDebugTrace);
+	//curl_easy_setopt(m_CURL_handle, CURLOPT_DEBUGFUNCTION, CURLDebugTrace);
 #endif
+
 	curl_easy_setopt(m_CURL_handle, CURLOPT_URL, finalURL.c_str());
 	//curl_easy_setopt(curl_handle, CURLOPT_SSL_VERIFYPEER, 0);
 	curl_easy_setopt(m_CURL_handle, CURLOPT_FOLLOWLOCATION, 1L);
 	curl_easy_setopt(m_CURL_handle, CURLOPT_MAXREDIRS, 5L);
+	curl_easy_setopt(m_CURL_handle, CURLOPT_HEADERFUNCTION,	header_callback);
+	curl_easy_setopt(m_CURL_handle, CURLOPT_HEADERDATA, this);
 
-	curl_easy_setopt(m_CURL_handle, CURLOPT_WRITEFUNCTION, NetHTTP::CURLWriteMemoryCallback);
-	curl_easy_setopt(m_CURL_handle, CURLOPT_WRITEDATA, this);
-	curl_easy_setopt(m_CURL_handle, CURLOPT_USERAGENT, "gametrans-agent/1.0");
+
+	curl_easy_setopt(m_CURL_handle, CURLOPT_USERAGENT, "protoncurl-agent/1.0");
 	curl_easy_setopt(m_CURL_handle, CURLOPT_PRIVATE, this);
-
-	//manually set the certs otherwise it can't find it (a windows only issue?)
-	curl_easy_setopt(m_CURL_handle, CURLOPT_CAINFO, "curl-ca-bundle.crt");
-	
 	//needed to handle moved content (http 301 codes, etc)
 	curl_easy_setopt(m_CURL_handle, CURLOPT_SEEKFUNCTION, seek_cb);
 	curl_easy_setopt(m_CURL_handle, CURLOPT_SEEKDATA, this);
+
+	curl_easy_setopt(m_CURL_handle, CURLOPT_WRITEDATA, this);
+	curl_easy_setopt(m_CURL_handle, CURLOPT_WRITEFUNCTION, NetHTTP::CURLWriteMemoryCallback);
+
+
+	/* ask libcurl to allocate a larger receive buffer */
+	curl_easy_setopt(m_CURL_handle, CURLOPT_BUFFERSIZE, 120000L);
+
+
+	if (GetPlatformID() == PLATFORM_ID_ANDROID)
+	{
+		//Android needs the physical file copied for this to work, so include it in your assets and do something like this on app startup:
+		//Don't ask me why, but it fails if we don't set the path both ways like this
+		curl_easy_setopt(m_CURL_handle, CURLOPT_CAPATH, GetSavePath().c_str());
+		curl_easy_setopt(m_CURL_handle, CURLOPT_CAINFO, (GetSavePath()+"curl-ca-bundle.crt").c_str());
+	} else if (GetPlatformID() ==  PLATFORM_ID_IOS)
+    {
+        curl_easy_setopt(m_CURL_handle, CURLOPT_CAPATH, GetBaseAppPath().c_str());
+        curl_easy_setopt(m_CURL_handle, CURLOPT_CAINFO, (GetBaseAppPath()+"curl-ca-bundle.crt").c_str());
+        
+        
+      } else
+	{
+		//manually set the cert on windows otherwise it can't find it.  I've only used this curl stuff on android and windows so no idea on other platforms.
+		curl_easy_setopt(m_CURL_handle, CURLOPT_CAINFO, "curl-ca-bundle.crt");
+	}
+
 
 	if (!m_postData.empty())
 	{
@@ -398,9 +519,9 @@ bool NetHTTP::Start()
 	}
 	else
 	{
-		
 		//TODO: This probably shouldn't be the default...
-		chunk = curl_slist_append(chunk, "Content-Type: application/json");
+		//chunk = curl_slist_append(chunk, "Content-Type: application/json");
+		chunk = curl_slist_append(chunk, "Content-Type: application/html");
 	}
 
 	/* set our custom set of headers */
@@ -542,6 +663,8 @@ void NetHTTP::Update()
 {
 
 	if (m_CURL_handles_still_running == 0) return;
+	
+	
 	CURLMcode mc = curl_multi_perform(m_CURL_multi_handle, &m_CURL_handles_still_running);
 
 	if (mc != CURLM_OK && mc != CURLM_CALL_MULTI_PERFORM)
@@ -562,10 +685,12 @@ void NetHTTP::Update()
 			NetHTTP *pMe;
 			curl_easy_getinfo(msg->easy_handle, CURLINFO_PRIVATE, &pMe);
 			assert(pMe == this &&"This should be the case");
-
+			 
 		
-			//LogMsg("CURL done, HTTP status: %d, downloaded %d bytes. ", http_status_code, pMe->m_receivedSize);
+#ifdef _DEBUG
+			LogMsg("CURL done, HTTP status: %d, downloaded %d bytes. ", http_status_code, pMe->m_receivedSize);
 			//LogMsg("Data is %s", pMe->m_pReceiveBuff);
+#endif
 
 			if (http_status_code == 404)
 			{
@@ -574,23 +699,20 @@ void NetHTTP::Update()
 
 			SetBuffer(pMe->m_pReceiveBuff, pMe->m_receivedSize);
 			m_downloadData.push_back(0); //useful if used like a string
+			FinishDownload();
 			m_state = STATE_FINISHED;
-			
+
 			curl_multi_remove_handle(m_CURL_multi_handle, msg->easy_handle);
 			curl_easy_cleanup(m_CURL_handle);
 		}
 		else
-
 		{
 	   
 			double dataSize = 0;
-		curl_easy_getinfo(msg->easy_handle, CURLINFO_SIZE_UPLOAD, &dataSize);
+		   curl_easy_getinfo(msg->easy_handle, CURLINFO_SIZE_UPLOAD, &dataSize);
 		//LogMsg("Data sent: %d", dataSize);
-
+		
 		}
-
-
-
 	}
 
 	if (m_CURL_handles_still_running == 0)
@@ -614,11 +736,9 @@ void NetHTTP::FinishDownload()
 	{
 		fclose(m_pFile);
 		m_pFile = NULL;
-		m_state = STATE_FINISHED;
 		return;
 	}
 
-	m_state = STATE_FINISHED;
 }
 
 const byte * NetHTTP::GetDownloadedData()
@@ -648,7 +768,7 @@ void NetHTTP::SetBuffer(const char *pData, int byteSize)
 	memcpy((char*)&m_downloadData[0], pData, byteSize); //never do this at home, kids
 	m_downloadData[byteSize] = 0; //set the NULL too
 
-	if (m_endOfDataSignal == END_OF_DATA_SIGNAL_RTSOFT_MARKER)
+	if (m_endOfDataSignal == END_OF_DATA_SIGNAL_RTSOFT_MARKER && m_pFile == NULL)
 	{
 		//er.. there has to be a better way then this, but whatever, I don't use rtsoft markers much and when I do it's tiny strings
 
@@ -657,22 +777,32 @@ void NetHTTP::SetBuffer(const char *pData, int byteSize)
 		StringReplace(C_END_DOWNLOAD_MARKER_STRING, "", temp);
 		//move it back
 		string crap;
-		m_downloadData = vector<char>(temp.begin(), temp.end());
-		if (m_downloadData[m_downloadData.size() - 1] != 0)
+		m_downloadData = vector<uint8>(temp.begin(), temp.end());
+		if (!m_downloadData.empty()) //make sure we put a null on the end
 		{
-			m_downloadData.push_back(char(0)); //add the null
+			if (m_downloadData[m_downloadData.size() - 1] != 0)
+			{
+				m_downloadData.push_back(char(0)); //add the null
+			}
 		}
 	}
 
+
+	//if we were downloading a file, this closes it up
+
+
+	
 	if (m_pFile)
 	{
 		fwrite(GetDownloadedData(), GetDownloadedBytes(), 1, m_pFile);
 	}
+	
 }
 
 void NetHTTP::SetProgress(int bytesDownloaded, int totalBytes)
 {
-	m_expectedFileBytes = totalBytes;
+	if (totalBytes != -1)
+		m_expectedFileBytes = totalBytes;
 	m_bytesWrittenToFile = bytesDownloaded;
 }
 

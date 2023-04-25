@@ -1,0 +1,15 @@
+# Location of the SDK. This is only used by Gradle.
+# For customization when using a Version Control System, please read the
+# header note.
+
+# Replace this stuff with your own info!
+# appID means your PackageName.  The build system will use this, even
+# those the internal files say RTAndroidApp
+
+
+sdk.dir=D\:\\pro\\androidsdk
+RTappID=com.rtsoft.rtsimpleapp
+RTstoreFile=D:\\projects\\android\\my-release-key.keystore
+RTkeyAlias=rtsoft
+RTkeyPassword=yourkeypassword
+RTstorePassword=yourkeystorepassword

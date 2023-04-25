@@ -268,14 +268,11 @@ void RenderSpinningTriangle()
 void RenderTexturedGLTriangle()
 {
 
-
 	glPushMatrix();
 	//glLoadIdentity();
 	//glTranslatef(0,0,-2);
 	glRotatef(float( (GetBaseApp()->GetGameTick()/10) %360) , 0, 1, 0); //rotate it
 	glDisable(GL_CULL_FACE); //so we can see the back of the triangle too
-
-
 
 	//let's draw a simple triangle 
 	/*
@@ -717,7 +714,6 @@ void SetupScreenInfo(int x, int y, int orientation)
 		
 			g_screenSizeX = x;
 			g_screenSizeY = y;
-
 		}
 
 		RecomputeAspectRatioStuff();
@@ -736,6 +732,7 @@ void ConvertCoordinatesIfRequired(int &xPos, int &yPos)
 	ConvertCoordinatesIfRequired(x, y);
 	xPos = (int)x;
 	yPos = (int)y;
+
 }
 
 void ConvertCoordinatesIfRequired(double &xPos, double &yPos)
@@ -753,8 +750,6 @@ void ConvertCoordinatesIfRequired(float &xPos, float &yPos)
 
 	xPos *= GetProtonPixelScaleFactor();
 	yPos *= GetProtonPixelScaleFactor();
-
-	
 
 	if (GetBaseApp()->GetManualRotationMode())
 	{

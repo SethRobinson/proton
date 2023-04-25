@@ -55,6 +55,13 @@ bool IsEven(int number)
 	return (number & 1) == 0;
 }
 
+char *strcpy_safe(char *dest, const char* src)
+{
+	//fix by iProgramMC to allow overlapping strings
+	size_t sLen = strlen(src);
+	memmove(dest, src, sLen + 1); // also copy the nul character at the end
+	return dest;
+}
 
 string BoolToEnabled(bool bEnabled)
 {

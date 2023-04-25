@@ -58,30 +58,40 @@ void GamepadManager::Update()
 	}
 }
 
-void GamepadManager::AddGamepad( Gamepad * pad )
+void GamepadManager::AddGamepad( Gamepad * pad, eGamepadID customID) //0 means auto assign one
 {
-	pad->SetID((eGamepadID)(m_gamepads.size()));
+
+    if (customID != 0)
+    {
+        assert(!GetGamepadByUniqueID(customID) && "Duplicate ID? Why?");
+        pad->SetID(customID);
+    } else
+    {
+        pad->SetID((eGamepadID)(m_gamepads.size()+1));
+    }
 
 	if (pad->Init())
 	{
 		m_gamepads.push_back(pad);
-		LogMsg("Located gamepad %s", pad->GetName().c_str());
+		LogMsg("Located gamepad %s (ID %d)", pad->GetName().c_str(), pad->GetID());
 		if (m_defaultGamepadID == GAMEPAD_ID_NONE)
 		{
 			m_defaultGamepadID = pad->GetID();
 		}
+		m_sig_gamepad_connected(pad);
+
 	} else
 	{
 		LogMsg("Unable to add pad %s", pad->GetName().c_str());
 		SAFE_DELETE(pad);
 	}
-	
+	//let everyone know we just had a gamepad added, if they care
 }
 
 Gamepad * GamepadManager::GetDefaultGamepad()
 {
 	if (m_defaultGamepadID == GAMEPAD_ID_NONE) return NULL;
-	return m_gamepads[m_defaultGamepadID];
+    return GetGamepadByUniqueID(m_defaultGamepadID);
 }
 
 eGamepadID GamepadManager::GetDefaultGamepadID()
@@ -124,6 +134,30 @@ Gamepad * GamepadManager::GetUnusedGamepad()
 	return NULL;
 }
 
+bool GamepadManager::RemoveGamepadByUniqueID( eGamepadID id)
+{
+    bool bDeletedSomething = false;
+    
+    for (uint32 i=0; i < m_gamepads.size(); i++)
+    {
+        if (m_gamepads[i] && m_gamepads[i]->GetID() == id)
+        {
+            LogMsg("Deleting gamepad %lu", id);
+            delete m_gamepads[i];
+            m_gamepads.erase(m_gamepads.begin()+i);
+            i--;
+            bDeletedSomething = true;
+			m_sig_gamepad_disconnected(id);
+        }
+    }
+    
+    if (!bDeletedSomething)
+    {
+        LogMsg("Failed to delete gamepad id %lu", id);
+    }
+    return bDeletedSomething;
+}
+
 bool GamepadManager::RemoveProviderByName( string name )
 {
 	list<GamepadProvider*>::iterator itor = m_providers.begin();
@@ -150,25 +184,39 @@ void GamepadManager::RemoveGamepadsByProvider( GamepadProvider *provider )
 	{
 		if (m_gamepads[i]->GetProvider() == provider)
 		{
-			if (i == m_defaultGamepadID)
+			if (m_gamepads[i]->GetID()  == m_defaultGamepadID)
 			{
 				m_defaultGamepadID = GAMEPAD_ID_NONE;
 			}
+			int tempID = m_gamepads[i]->GetID();
+			
 			delete m_gamepads[i];
 			m_gamepads.erase(m_gamepads.begin()+i);
+			m_sig_gamepad_disconnected(tempID);
+
 			i--;
 		}
 	}
 }
 
-Gamepad * GamepadManager::GetGamepad( eGamepadID id )
+Gamepad * GamepadManager::GetGamepadByUniqueID( eGamepadID id )
 {
-	if ((int)id < 0 || (int)id >= (int)m_gamepads.size() )
+    for (int i=0; i < m_gamepads.size(); i++)
+    {
+        if (m_gamepads[i]->GetID() == id) return m_gamepads[i];
+    }
+    
+    return NULL;
+}
+
+Gamepad * GamepadManager::GetGamepad( int index )
+{
+	if (index < 0 || index > m_gamepads.size())
 	{
+		LogMsg("GamepadManager::GetGamepad>> Tried to get Gamepad index %d?", index);
 		return NULL;
 	}
-
-	return m_gamepads[id];
+    return m_gamepads[index];
 }
 
 GamepadProvider * GamepadManager::GetProviderByName( string name )

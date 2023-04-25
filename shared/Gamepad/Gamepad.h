@@ -14,19 +14,32 @@
 
 class GamepadProvider;
 
-enum eGamepadID
+
+//you don't have to use these, but you can if you want
+enum eGamepadButtons
 {
-	GAMEPAD_ID_NONE = -1,
-	GAMEPAD_ID_0,
-	GAMEPAD_ID_1,
-	GAMEPAD_ID_2,
-	GAMEPAD_ID_3,
-	GAMEPAD_ID_4,
-	GAMEPAD_ID_5,
-	GAMEPAD_ID_6,
-	GAMEPAD_ID_7,
-	GAMEPAD_ID_8,
+	GP_DPAD_BUTTON_LEFT,  //X on xbox controller
+	GP_DPAD_BUTTON_UP,    //Y on xbox controller
+	GP_DPAD_BUTTON_RIGHT, //B on xbox controller
+	GP_DPAD_BUTTON_DOWN,  //A on xbox controller
+	GP_DPAD_SELECT,
+	GP_DPAD_START,
+	GP_DPAD_LBUTTON,
+	GP_DPAD_RBUTTON,
+	GP_DPAD_LTRIGGER,
+	GP_DPAD_RTRIGGER,
+	GP_DPAD_HAT_UP, //a hat is like the DPAD thingie on a 360 controller
+	GP_DPAD_HAT_RIGHT,
+	GP_DPAD_HAT_DOWN,
+	GP_DPAD_HAT_LEFT,
+	
+	GP_JOYSTICK_BUTTON_LEFT, //you know, like how you can push a joystick "in" and it clicks?
+	GP_JOYSTICK_BUTTON_RIGHT,
+
+    
 };
+#define GAMEPAD_ID_NONE 0
+#define eGamepadID long
 
 #define GAMEPAD_MAX_AXIS 32
 #define GAMEPAD_MAX_BUTTONS 16
@@ -146,6 +159,7 @@ protected:
 	MoveButtonState m_dirButtons[MOVE_BUTTON_DIR_COUNT];
 	ArcadeInputComponent *m_pArcadeComp;
 	bool m_bSendLeftStickAsDirectionsToo = false;
+	float m_stickAsDirectionDeadZone = 0.15f; //how far the stick has to move to register as an 8-way direction (doesn't effect raw stick readings)
 
 };
 

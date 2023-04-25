@@ -82,19 +82,24 @@ public:
 	
 	int GetGamepadCount() {return (int)m_gamepads.size();}
 
-	Gamepad * GetGamepad(eGamepadID id);  //returns NULL if unavailable
-
+	Gamepad * GetGamepad(int index);  //the index in the gamepad array.  out of range will return NULL
+    Gamepad * GetGamepadByUniqueID( eGamepadID id ); //the id we set
+    
 	GamepadProvider * GetProviderByName(string name); //returns NULL if non exists
 
 	bool RemoveProviderByName(string name); //returns true if something was actually removed
 	GamepadProvider * AddProvider(GamepadProvider *provider);  //You new, we handle deleting it.  Returns false on error, and kills deletes it for you
 	
-	void AddGamepad(Gamepad * pad); //You new, we handle deleting it
-
+	void AddGamepad(Gamepad * pad, eGamepadID customID =0); //You new, we handle deleting it.  Passing 0 for customID means auto assign one
+    bool RemoveGamepadByUniqueID(eGamepadID id);
+    
 	//some non-essential helpers for multi player gaming
 	void ResetGamepads(); //set all buttons to off, and mark all as "unused"
 	Gamepad * GetUnusedGamepad(); //returns the next unused gamepad and marks it as used, or NULL if none left
 
+	boost::signal<void(Gamepad*)> m_sig_gamepad_connected; //called when a new gamepad is detected and added
+	boost::signal<void(eGamepadID)> m_sig_gamepad_disconnected; //called when a  gamepad is disconnected (don't assume we'll notice though, depends on the provider)
+	
 protected:
 
 	void RemoveGamepadsByProvider(GamepadProvider *provider);

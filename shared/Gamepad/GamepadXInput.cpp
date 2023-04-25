@@ -1,9 +1,11 @@
 #include "PlatformPrecomp.h"
 #include "GamepadXInput.h"
+#include "GamepadManager.h"
 
 GamepadXInput::GamepadXInput()
 {
 	_lastdwPacketNumber = 0;
+
 }
 
 GamepadXInput::~GamepadXInput()
@@ -18,14 +20,12 @@ bool GamepadXInput::Init()
 
 	ZeroMemory(&state, sizeof(XINPUT_STATE));
 
-	assert(GetID() >= 0 && GetID() < XUSER_MAX_COUNT && "Um, make sure you check for XINput FIRST before any other gamepad types.  A hack sort of");
+	assert( GetGamepadManager()->GetGamepadCount() <= XUSER_MAX_COUNT && "Um, make sure you check for XINput FIRST before any other gamepad types.  A hack sort of");
 	
-	//let's just assume it's plugged in right now
-	//	if (XInputGetState(GetID(), &state) == ERROR_SUCCESS)
 	{
 		m_axisUsedCount = 2;
 		m_name = "XInput Device";
-		m_buttonsUsedCount = 12;
+		m_buttonsUsedCount = 16;
 		SetRightStickAxis(2, 3);
 		//these defaults are actually for a 360 pad.  Probably wrong for other pads..?
 
@@ -45,6 +45,19 @@ bool GamepadXInput::Init()
 		m_buttons[10].m_virtualKey = VIRTUAL_DPAD_LTRIGGER;
 		m_buttons[11].m_virtualKey = VIRTUAL_DPAD_RTRIGGER;
 
+		m_buttons[12].m_virtualKey = VIRTUAL_KEY_DIR_DOWN;
+		m_buttons[13].m_virtualKey = VIRTUAL_KEY_DIR_RIGHT;
+		m_buttons[14].m_virtualKey = VIRTUAL_KEY_DIR_LEFT;
+		m_buttons[15].m_virtualKey = VIRTUAL_KEY_DIR_UP;
+
+	}
+
+	//let's just assume it's plugged in right now
+	if (XInputGetState(GetID()-1, &state) == ERROR_SUCCESS)
+	{
+		LogMsg("Scanning device %d", GetID());
+		//we can learn things about it, it's plugged in right now.  If we learn nothing, that's fine.	
+		m_haveScannedDeviceAbilities = true;
 	}
 
 	return true;
@@ -88,12 +101,20 @@ void GamepadXInput::CheckTrigger(float trigger, int buttonID)
 	}
 }
 
+void GamepadXInput::SendArcadeDirectionByKeyIfChanged(eVirtualKeys key, bool bDown)
+{
+
+	if (key)
+	SendArcadeDirectionByKey(key, bDown);
+}
+
 void GamepadXInput::Update()
 {
 
 	ZeroMemory(&m_state, sizeof(XINPUT_STATE));
-	assert(GetID() >= 0 && GetID() < XUSER_MAX_COUNT && "Um, make sure you check for XINput FIRST before any other gamepad types.  A hack sort of");
-	if (XInputGetState(GetID(), &m_state) == ERROR_SUCCESS)
+	assert(GetID() <= XUSER_MAX_COUNT && "Um, make sure you check for XINput FIRST before any other gamepad types.  A hack sort of");
+	
+	if (XInputGetState(GetID()-1, &m_state) == ERROR_SUCCESS)
 	{
 
 		if (_lastdwPacketNumber == m_state.dwPacketNumber) return; //nothing has changed
@@ -116,29 +137,31 @@ void GamepadXInput::Update()
 		CheckTrigger(m_state.Gamepad.bLeftTrigger, 10);
 		CheckTrigger(m_state.Gamepad.bRightTrigger, 11);
 
-		SetAxis(0, ConvertToProtonStickWithDeadZone(m_state.Gamepad.sThumbLX));
-		SetAxis(1, ConvertToProtonStickWithDeadZone(m_state.Gamepad.sThumbLY*-1.0f));
-		SetAxis(2, ConvertToProtonStickWithDeadZone(m_state.Gamepad.sThumbRX));
-		SetAxis(3, ConvertToProtonStickWithDeadZone(m_state.Gamepad.sThumbRY*-1.0f));
+		SetAxis(0, ConvertToProtonStick(m_state.Gamepad.sThumbLX));
+		SetAxis(1, ConvertToProtonStick(m_state.Gamepad.sThumbLY*-1.0f));
+		SetAxis(2, ConvertToProtonStick(m_state.Gamepad.sThumbRX));
+		SetAxis(3, ConvertToProtonStick(m_state.Gamepad.sThumbRY*-1.0f));
 
-		//hat controls
-		SendArcadeDirectionByKey(VIRTUAL_KEY_DIR_DOWN, m_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN);
-		SendArcadeDirectionByKey(VIRTUAL_KEY_DIR_UP, m_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP);
-		SendArcadeDirectionByKey(VIRTUAL_KEY_DIR_LEFT, m_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT);
-		SendArcadeDirectionByKey(VIRTUAL_KEY_DIR_RIGHT, m_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT);
+		//dpad controls.. note, the stick also maps to these.  If we needed to separate them uhh... hm
+		CheckButton(XINPUT_GAMEPAD_DPAD_DOWN, 12);
+		CheckButton(XINPUT_GAMEPAD_DPAD_RIGHT, 13);
+		CheckButton(XINPUT_GAMEPAD_DPAD_LEFT, 14);
+		CheckButton(XINPUT_GAMEPAD_DPAD_UP, 15);
+
+
+		if (!m_haveScannedDeviceAbilities)
+		{
+			Init();
+		}
+		
 	}
 
 	Gamepad::Update();
 }
 
-float GamepadXInput::ConvertToProtonStickWithDeadZone(float xInputStick)
+float GamepadXInput::ConvertToProtonStick(float xInputStick)
 {
 	xInputStick /= 32767.0f;
-	const float deadZone = 0; //do NOT process the deadzone here, it should be handled elsewhere!
-	if (fabs(xInputStick) < deadZone)
-	{
-		xInputStick = 0;
-	}
 	return xInputStick;
 }
 
