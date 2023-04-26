@@ -314,6 +314,8 @@ bool Surface::LoadRTTexture(byte *pMem)
 
 	if (m_bCreateMipMapsIfNeeded)
 	{
+		/* VitaGL does not support GL_GENERATE_MIPMAP */
+#ifndef PLATFORM_PSP2
 		if (m_mipMapCount == 1)
 		{
 			m_mipMapCount = 8; //guess, exact # doesn't matter, just must be more than 1
@@ -322,6 +324,7 @@ bool Surface::LoadRTTexture(byte *pMem)
 		{
 			glTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_FALSE );
 		}
+#endif
 	}
 CHECK_GL_ERROR();
 	for (int nMipLevel=0; nMipLevel < pTexHeader->mipmapCount; nMipLevel++)
@@ -457,9 +460,10 @@ m_blendingMode = BLENDING_PREMULTIPLIED_ALPHA;
 
 	IncreaseMemCounter(memUsed);
 	SetTextureStates();
-#ifndef PLATFORM_HTML5
-	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_FALSE);
+#if !defined(PLATFORM_HTML5) || !defined(PLATFORM_PSP2)
 	//unknown parm in emscripten's emulated GL1 support
+#else
+	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_FALSE);
 #endif
 	CHECK_GL_ERROR();
 	return true;

@@ -1,22 +1,22 @@
-#include "GamepadVita.h"
+#include "GamepadPSP2.h"
 
-GamepadVita::GamepadVita()
+GamepadPSP2::GamepadPSP2()
 {
 
 }
 
-GamepadVita::~GamepadVita()
+GamepadPSP2::~GamepadPSP2()
 {
 
 }
 
-bool GamepadVita::Init()
+bool GamepadPSP2::Init()
 {
-    m_name = "Vita";
+    m_name = "Playstation Vita";
     m_buttonsUsedCount = 14;
     m_axisUsedCount = 2;
 
-    sceCtrlSetSamplingMode(SCE_CTRL_MODE_ANALOG);
+    sceCtrlSetSamplingMode(SCE_CTRL_MODE_ANALOG_WIDE);
 
     m_buttons[0].m_virtualKey = VIRTUAL_DPAD_BUTTON_LEFT;
     m_buttons[1].m_virtualKey = VIRTUAL_DPAD_BUTTON_UP;
@@ -36,12 +36,12 @@ bool GamepadVita::Init()
     return true;
 }
 
-void GamepadVita::Kill()
+void GamepadPSP2::Kill()
 {
 
 }
 
-void GamepadVita::Update()
+void GamepadPSP2::Update()
 {
     sceCtrlPeekBufferPositive(0, &m_state, 1);
 
@@ -50,10 +50,10 @@ void GamepadVita::Update()
     PressButton(SCE_CTRL_CROSS, 3);
     PressButton(SCE_CTRL_SQUARE, 0);
     
-    //PressButton(SCE_CTRL_UP, 10);
-    //PressButton(SCE_CTRL_RIGHT, 11);
-    //PressButton(SCE_CTRL_DOWN, 12);
-    //PressButton(SCE_CTRL_LEFT, 13);
+    PressButton(SCE_CTRL_UP, 10);
+    PressButton(SCE_CTRL_RIGHT, 11);
+    PressButton(SCE_CTRL_DOWN, 12);
+    PressButton(SCE_CTRL_LEFT, 13);
 
     PressButton(SCE_CTRL_START, 5);
     PressButton(SCE_CTRL_SELECT, 4);
@@ -66,27 +66,25 @@ void GamepadVita::Update()
 	SendArcadeDirectionByKey(VIRTUAL_KEY_DIR_LEFT, m_state.buttons & SCE_CTRL_LEFT);
 	SendArcadeDirectionByKey(VIRTUAL_KEY_DIR_RIGHT, m_state.buttons & SCE_CTRL_RIGHT);
 
-	//SetAxis(0, ConvertToProtonStickWithDeadZone(m_state.lx));
-	//SetAxis(1, ConvertToProtonStickWithDeadZone(m_state.ly * -1.0f));
-	//SetAxis(2, ConvertToProtonStickWithDeadZone(m_state.rx));
-	//SetAxis(3, ConvertToProtonStickWithDeadZone(m_state.ry * -1.0f));
+    float lx, ly, rx, ry;
+
+	lx = ((m_state.lx) / 255.0f) * 2.0 - 1.0;
+	ly = ((m_state.ly) / 255.0f) * 2.0 - 1.0;
+	rx = ((m_state.rx) / 255.0f) * 2.0 - 1.0;
+	ry = ((m_state.ry) / 255.0f) * 2.0 - 1.0;
+
+	SetAxis(0, lx);
+	SetAxis(1, ly);
+	SetAxis(2, rx);
+	SetAxis(3, ry);
+
+    Gamepad::Update();
 }
 
-void GamepadVita::PressButton(int mask, int id)
+void GamepadPSP2::PressButton(int mask, int id)
 {
     if (m_buttons[id].m_bDown != ((m_state.buttons & mask) != 0))
 	{
 		OnButton(m_state.buttons & mask, id);
 	}
-}
-
-float GamepadVita::ConvertToProtonStickWithDeadZone(float stick)
-{
-	stick /= 32767.0f;
-	const float deadZone = 0.15f;
-	if (fabs(stick) < deadZone)
-	{
-		stick = 0;
-	}
-	return stick;
 }

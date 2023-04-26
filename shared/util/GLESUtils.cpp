@@ -295,7 +295,8 @@ void DrawRect(float x, float y, float width, float height, uint32 color, float l
 	GenerateFillRect(color, (x+width)-lineWidth, y+lineWidth, lineWidth, (height-lineWidth*2)); //left side
 }
 
-
+/* GL_LINE_SMOOTH is not supported by vitaGL */
+#ifndef PLATFORM_PSP2
 void DrawEllipse (const int segments, CL_Vec2f vPos, float radianWidth, float radiusHeight, bool vFilled, uint32 color)
 {
 
@@ -335,6 +336,7 @@ void DrawEllipse (const int segments, CL_Vec2f vPos, float radianWidth, float ra
 	glColor4x(1 << 16, 1 << 16, 1 << 16, 1 << 16);
 	glPopMatrix();
 }
+#endif
 
 
 void DrawRect(CL_Vec2f &vPos, CL_Vec2f &vSize, uint32 color, float lineWidth)
@@ -344,7 +346,7 @@ void DrawRect(CL_Vec2f &vPos, CL_Vec2f &vSize, uint32 color, float lineWidth)
 
 //old way using GL_LINES, but doesn't work on the Flash target
 
-#if !defined(PLATFORM_FLASH) && !defined(PLATFORM_HTML5) && !defined(PLATFORM_ANDROID)
+#if !defined(PLATFORM_FLASH) && !defined(PLATFORM_HTML5) && !defined(PLATFORM_ANDROID) && !defined(PLATFORM_PSP2)
 void  DrawLine( GLuint rgba,   float ax, float ay, float bx, float by, float lineWidth )
 {
 	SetupOrtho();

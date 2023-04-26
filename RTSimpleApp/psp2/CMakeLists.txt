@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.10)
 
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   if(DEFINED ENV{VITASDK})
@@ -11,12 +11,11 @@ endif()
 ENABLE_LANGUAGE(C)
 
 set(CMAKE_BUILD_TYPE "Release")
-add_definitions(-DPLATFORM_VITA -DRT_USING_OSMESA)
 
 project(RTSimpleApp)
 
 include("${VITASDK}/share/vita.cmake" REQUIRED)
-include(../../shared/vita/Proton.cmake)
+include(../../shared/psp2/Proton.cmake)
 
 set(VITA_APP_NAME "RTSimpleApp")
 set(VITA_TITLEID  "PROTONSDK")

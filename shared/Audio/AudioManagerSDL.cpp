@@ -62,13 +62,13 @@ AudioHandle AudioManagerSDL::Play( const string fileName )
 bool AudioManagerSDL::Init()
 {
 
-#if defined(PLATFORM_HTML5) || defined(PLATFORM_VITA)
-	//do nothing.
+#if defined(PLATFORM_HTML5) || defined(PLATFORM_PSP2)
+	// do nothing.
 #else
 	SDL_InitSubSystem(SDL_INIT_AUDIO);
 #endif
 
-#ifndef PLATFORM_VITA
+#ifndef PLATFORM_PSP2
 	int i;
 
 	for (i = 0; i < SDL_GetNumAudioDrivers(); ++i) {
@@ -135,7 +135,7 @@ bool AudioManagerSDL::Init()
 	int channels = 2;
 	int bufferSize = 2048;
 	
-#if defined(PLATFORM_HTML5) || defined(PLATFORM_VITA)
+#if defined(PLATFORM_HTML5)
 	int ret = Mix_OpenAudio(0, 0, 0, 0); // we ignore all these..
 	assert(ret == 0);
 #else
@@ -184,7 +184,7 @@ bool AudioManagerSDL::Init()
 	//SDL_PauseAudioDevice(dev, 0); // start audio playing.
 	SDL_PauseAudio(0);
 
-#ifndef PLATFORM_VITA
+#ifndef PLATFORM_PSP2
 	LogMsg("SDL2_mixer initted using %s", SDL_GetCurrentAudioDriver());
 #endif
 	

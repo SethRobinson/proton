@@ -30,7 +30,7 @@
 #include "L_ParticleEffect.h"
 #include "L_ParticleMem.h"
 
-#if !defined(C_GL_MODE) &&  !defined( ANDROID_NDK) && !defined( PLATFORM_BBX) && !defined( RT_WEBOS) && !defined( RT_GLES_ADAPTOR_MODE) && !defined( PLATFORM_VITA)
+#if !defined(C_GL_MODE) &&  !defined( ANDROID_NDK) && !defined( PLATFORM_BBX) && !defined( RT_WEBOS) && !defined( RT_GLES_ADAPTOR_MODE) && !defined( PLATFORM_PSP2)
 	#define RT_USE_POINT_SPRITES
 #endif
 

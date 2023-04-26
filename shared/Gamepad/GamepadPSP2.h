@@ -4,14 +4,14 @@
 #include <psp2/ctrl.h>
 
 #include "Gamepad.h"
-#include "GamepadProviderVita.h"
+#include "GamepadProviderPSP2.h"
 
-class GamepadVita : public Gamepad
+class GamepadPSP2 : public Gamepad
 {
     public:
 
-        GamepadVita();
-        virtual ~GamepadVita();
+        GamepadPSP2();
+        virtual ~GamepadPSP2();
 
         virtual bool Init();
         virtual void Kill();
@@ -20,7 +20,6 @@ class GamepadVita : public Gamepad
     protected:
 
         void PressButton(int mask, int id);
-        float ConvertToProtonStickWithDeadZone(float stick);
 
         SceCtrlData m_state;
 };
