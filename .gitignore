@@ -25,3 +25,10 @@ RTMindWall/
 UGT/
 RTDScroll/
 RTLibretroTest
+RTSlideShow
+shared/android/optional_src/libs/f
+shared/android/optional_src/libs/libcurl_ssl
+shared/android/optional_src/libs/libopenssl
+shared/android/optional_src/libs/fmodstudio
+shared/html5/fmodstudio
+shared/win/fmodstudio
