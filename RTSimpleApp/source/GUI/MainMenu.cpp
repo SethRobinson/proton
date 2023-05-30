@@ -5,6 +5,7 @@
 #include "EnterNameMenu.h"
 #include "ParticleTestMenu.h"
 #include "TouchTestMenu.h"
+#include "UTF16TestMenu.h"
 #include "Entity/CustomInputComponent.h"
 #include "AboutMenu.h"
 #include "Renderer/SoftSurface.h"
@@ -47,6 +48,15 @@ void MainMenuOnSelect(VariantList *pVList) //0=vec2 point of click, 1=entity sen
 		//overlay the debug menu over this one
 		pEntClicked->GetParent()->RemoveComponentByName("FocusInput");
 		DebugMenuCreate(pEntClicked->GetParent());
+	}
+
+	if (pEntClicked->GetName() == "UTF16Test")
+	{
+		//slide it off the screen and then kill the whole menu tree
+		pEntClicked->GetParent()->RemoveComponentByName("FocusInput");
+		SlideScreen(pEntClicked->GetParent(), false);
+		GetMessageManager()->CallEntityFunction(pEntClicked->GetParent(), 500, "OnDelete", NULL);
+		UTF16TestMenuCreate(pEntClicked->GetParent()->GetParent());
 	}
 
 	if (pEntClicked->GetName() == "About")
@@ -119,6 +129,9 @@ Entity * MainMenuCreate(Entity *pParentEnt)
 	pButtonEntity->GetShared()->GetFunction("OnButtonSelected")->sig_function.connect(&MainMenuOnSelect);
 
 	pButtonEntity = CreateTextButtonEntity(pBG, "Debug", x, y, "Debug and music test"); y += ySpacer;
+	pButtonEntity->GetShared()->GetFunction("OnButtonSelected")->sig_function.connect(&MainMenuOnSelect);
+
+	pButtonEntity = CreateTextButtonEntity(pBG, "UTF16Test", x, y, "UTF-16 Render Test"); y += ySpacer;
 	pButtonEntity->GetShared()->GetFunction("OnButtonSelected")->sig_function.connect(&MainMenuOnSelect);
 
 	pButtonEntity = CreateTextButtonEntity(pBG, "About", x, y, "About (scroll bar test)"); y += ySpacer;

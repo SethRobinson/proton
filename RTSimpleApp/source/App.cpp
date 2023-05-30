@@ -202,12 +202,12 @@ else
 
 	LogMsg("Save path is %s", GetSavePath().c_str());
 
-	if (!GetFont(FONT_SMALL)->Load("interface/font_trajan.rtfont")) 
+	if (!GetFont(FONT_SMALL)->Load("interface/font_arial.rtfont")) 
 	{
 		LogMsg("Can't load font 1");
 		return false;
 	}
-	if (!GetFont(FONT_LARGE)->Load("interface/font_trajan_big.rtfont"))
+	if (!GetFont(FONT_LARGE)->Load("interface/font_arial_big.rtfont"))
 	{
 		LogMsg("Can't load font 2");
 		return false;

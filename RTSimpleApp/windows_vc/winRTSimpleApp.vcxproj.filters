@@ -646,6 +646,9 @@
     <ClCompile Include="..\..\shared\Audio\AudioManagerFMODStudio.cpp">
       <Filter>shared\Audio</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\GUI\UTF16TestMenu.cpp">
+      <Filter>source\GUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\App.h">
@@ -1100,6 +1103,9 @@
     </ClInclude>
     <ClInclude Include="..\..\shared\Audio\AudioManagerFMODStudio.h">
       <Filter>shared\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\GUI\UTF16TestMenu.h">
+      <Filter>source\GUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

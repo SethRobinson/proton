@@ -82,7 +82,7 @@ ${COMPPATH}/RenderScissorComponent.cpp
 ${PPATH}/L_Defination.cpp ${PPATH}/L_DroppingEffect.cpp ${PPATH}/L_EffectEmitter.cpp ${PPATH}/L_ExplosionEffect.cpp ${PPATH}/L_MotionController.cpp ${PPATH}/L_Particle.cpp 
 ${PPATH}/L_ParticleEffect.cpp ${PPATH}/L_ParticleMem.cpp ${PPATH}/L_ParticleSystem.cpp ${PPATH}/L_ShootingEffect.cpp ${PPATH}/L_EffectManager.cpp 
 
-${APP}/App.cpp ${APP}/Component/ParticleTestComponent.cpp ${APP}/GUI/DebugMenu.cpp ${APP}/GUI/EnterNameMenu.cpp ${APP}/GUI/MainMenu.cpp 
+${APP}/App.cpp ${APP}/Component/ParticleTestComponent.cpp ${APP}/GUI/DebugMenu.cpp ${APP}/GUI/EnterNameMenu.cpp ${APP}/GUI/UTF16TestMenu.cpp ${APP}/GUI/MainMenu.cpp
 ${APP}/GUI/ParticleTestMenu.cpp ${APP}/GUI/AboutMenu.cpp ${APP}/GUI/TouchTestMenu.cpp ${APP}/Component/TouchTestComponent.cpp
 
         )

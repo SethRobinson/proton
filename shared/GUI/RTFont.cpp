@@ -2,6 +2,7 @@
 
 #include "RTFont.h"
 #include "BaseApp.h"
+#include "util/utf8.h"
 
 RTFont::RTFont()
 {
@@ -190,7 +191,9 @@ void RTFont::MeasureText( rtRectf *pRectOut, const char *pText, int len, float s
 {
 
 	rtRectf dst(0,0,0,0);
-	rtfont_charData *pCharData, *pLastCharData;
+	rtfont_charData *pCharData;
+	uint16 curChar, lastChar;
+	uint8 seqLen;
 	FontStateStack state;
 
 	if (!IsLoaded())
@@ -203,11 +206,35 @@ void RTFont::MeasureText( rtRectf *pRectOut, const char *pText, int len, float s
 	int lines = 0;
 	float curX = 0;
 
-	pLastCharData = NULL;
+	lastChar = 0;
 	pCharData = NULL;
 
 	for (int i=0; i < len; i++)
 	{
+		seqLen = utf8::internal::sequence_length<const char*>(&pText[i]);
+		if (seqLen > 2)
+		{
+			//we do not support these characters, because firstChar and lastChar are shorts
+			i += seqLen - 1;
+			continue;
+		}
+
+		if (seqLen > 1)
+		{
+			try {
+				utf8::utf8to16<uint16*, const char*>(&pText[i], &pText[i + seqLen], &curChar);
+			}
+			catch (...) {
+#ifdef _DEBUG
+				//LogError("Invalid UTF-16 character?!");
+#endif
+
+				i += seqLen - 1;
+				continue;
+			}
+			i += seqLen - 1;
+		}
+		else curChar = pText[i];
 		
 		//OPTIMIZE: We don't really need IsFontCode and to calculate states to simply measure things.. unless later we handle font
 		//changes..
@@ -217,36 +244,36 @@ void RTFont::MeasureText( rtRectf *pRectOut, const char *pText, int len, float s
 			continue;
 		}
 
-		if (pText[i] == '\n')
+		if (curChar == '\n')
 		{
 			lines++;
 			dst.right = rt_max(dst.right, curX);
 			curX = 0;
-			pLastCharData = NULL;
+			lastChar = 0;
 			continue;
 		}
-		if (!m_hasSpaceChar && pText[i] == ' ')
+		if (!m_hasSpaceChar && curChar == ' ')
 		{
 			curX += scale * m_header.blankCharWidth;
-			pLastCharData = NULL;
+			lastChar = 0;
 			continue;
 		}
-		if (byte(pText[i])-m_header.firstChar < 0)
+		if (curChar-m_header.firstChar >= m_chars.size())
 		{
 #ifdef _DEBUG
-			LogMsg("Char %c (%d) is not in our font", pText[i], int(byte(pText[i])));
+			//LogMsg("Char %c (%d) is not in our font", curChar, curChar);
 #endif
-			pLastCharData = NULL;
+			lastChar = 0;
 			continue;
 		}
 
-		if (pLastCharData)
+		if (lastChar)
 		{
-			curX += (GetKerningData(byte(pText[i-1]), pText[i])*scale);
+			curX += (GetKerningData(lastChar, curChar)*scale);
 		}
 
-		pLastCharData = pCharData;
-		pCharData = &m_chars[byte(pText[i])-m_header.firstChar].data;
+		lastChar = curChar;
+		pCharData = &m_chars[curChar-m_header.firstChar].data;
 
 			
 		if (pCharData->xadvance != 0)
@@ -280,7 +307,9 @@ void RTFont::DrawScaled( float x, float y, const string &text, float scale /*= 1
 	}
 	
 	rtRectf dst, src;
-	rtfont_charData *pCharData, *pLastCharData;
+	rtfont_charData *pCharData;
+	uint16 curChar, lastChar;
+	uint8 seqLen;
 	
 	byte curAlpha = GET_ALPHA(color);
 	//remove alpha from current color
@@ -308,48 +337,73 @@ void RTFont::DrawScaled( float x, float y, const string &text, float scale /*= 1
 		}
 	}
 	
-	pLastCharData = NULL;
+	lastChar = 0;
 	pCharData = NULL;
 
 	for (unsigned int i=0; i < text.length(); i++)
 	{
+		seqLen = utf8::internal::sequence_length<const char*>(&text.c_str()[i]);
+		if (seqLen > 2)
+		{ 
+			//we do not support these characters, because firstChar and lastChar are shorts
+			i += seqLen - 1;
+			continue;
+		}
+
+		if (seqLen > 1)
+		{
+			try {
+				utf8::utf8to16<uint16*, const char*>(&text.c_str()[i], &text.c_str()[i + seqLen], &curChar);
+			}
+			catch (...) {
+#ifdef _DEBUG
+				//LogError("Invalid UTF-16 character?!");
+#endif
+
+				i += seqLen - 1;
+				continue;
+			}
+			i += seqLen - 1;
+		}
+		else curChar = text[i];
+		 
 		if (IsFontCode(&text.c_str()[i], pState))
 		{
 			if (text[i+1] != 0) i++; //also advance past the color control code
 			continue;
 		}
 
-		if (text[i] == '\n')
+		if (curChar == '\n')
 		{
 			y += GetLineHeight(scale);
 			x = xStart;
-			pLastCharData = NULL;
+			lastChar = 0;
 			continue;
 		}
-		if (!m_hasSpaceChar && text[i] == ' ')
+		if (!m_hasSpaceChar && curChar == ' ')
 		{
 			x += scale * m_header.blankCharWidth;
-			pLastCharData = NULL;
+			lastChar = 0;
 			continue;
 		}
 		
-		if (byte(text[i])-m_header.firstChar < 0)
+		if (curChar-m_header.firstChar >= m_chars.size())
 		{
 #ifdef _DEBUG
 		//LogMsg("Char %c (%d) is not in our font", text[i], int(text[i]));
 #endif
 
-			pLastCharData = NULL;
+			lastChar = 0;
 			continue;
 		}
 	
-		if (pLastCharData)
+		if (lastChar)
 		{
-			x += (GetKerningData(byte(text[i-1]), text[i])*scale);
+			x += (GetKerningData(lastChar, curChar)*scale);
 		}
 
-		pLastCharData = pCharData;
-		pCharData = &m_chars[byte(text[i])-m_header.firstChar].data;
+		lastChar = curChar;
+		pCharData = &m_chars[curChar-m_header.firstChar].data;
 
 		dst.left = x;
 		dst.top = y;
@@ -422,7 +476,9 @@ void RTFont::DrawScaledSolidColor( float x, float y, const string &text, float s
 	}
 	
 	rtRectf dst, src;
-	rtfont_charData *pCharData, *pLastCharData;
+	rtfont_charData *pCharData;
+	uint16 curChar, lastChar;
+	uint8 seqLen;
 	
 	float xStart = x;
 	FontStateStack myState;
@@ -447,44 +503,69 @@ void RTFont::DrawScaledSolidColor( float x, float y, const string &text, float s
 		}
 	}
 	
-	pLastCharData = NULL;
+	lastChar = 0;
 	pCharData = NULL;
 
 	for (unsigned int i=0; i < text.length(); i++)
 	{
+		seqLen = utf8::internal::sequence_length<const char*>(&text.c_str()[i]);
+		if (seqLen > 2)
+		{
+			//we do not support these characters, because firstChar and lastChar are shorts
+			i += seqLen - 1;
+			continue;
+		}
+
+		if (seqLen > 1)
+		{
+			try {
+				utf8::utf8to16<uint16*, const char*>(&text.c_str()[i], &text.c_str()[i + seqLen], &curChar);
+			}
+			catch (...) {
+#ifdef _DEBUG
+				//LogError("Invalid UTF-16 character?!");
+#endif
+
+				i += seqLen - 1;
+				continue;
+			}
+			i += seqLen - 1;
+		}
+		else curChar = text[i];
+		
 		if (IsFontCode(&text.c_str()[i], pState))
 		{
 			if (text[i+1] != 0) i++; //also advance past the color control code
 			continue;
 		}
 
-		if (text[i] == '\n')
+		if (curChar == '\n')
 		{
 			y += GetLineHeight(scale);
 			x = xStart;
-			pLastCharData = NULL;
+			lastChar = 0;
 			continue;
 		}
-		if (!m_hasSpaceChar && text[i] == ' ')
+		if (!m_hasSpaceChar && curChar == ' ')
 		{
 			x += scale * m_header.blankCharWidth;
-			pLastCharData = NULL;
+			lastChar = 0;
 			continue;
 		}
 		
-		if (byte(text[i])-m_header.firstChar < 0)
+		if (curChar-m_header.firstChar >= m_chars.size())
 		{
-			pLastCharData = NULL;
+			lastChar = 0;
 			continue;
 		}
 	
-		if (pLastCharData)
+		if (lastChar)
 		{
-			x += (GetKerningData(byte(text[i-1]), text[i])*scale);
+			x += (GetKerningData(lastChar, curChar)*scale);
 		}
 
-		pLastCharData = pCharData;
-		pCharData = &m_chars[byte(text[i])-m_header.firstChar].data;
+		lastChar = curChar;
+		pCharData = &m_chars[curChar-m_header.firstChar].data;
 
 		dst.left = x;
 		dst.top = y;
@@ -571,7 +652,7 @@ void RTFont::DrawAlignedSolidColor( float x, float y, const string &text, eAlign
 	DrawScaledSolidColor(x,y, text, scale, color, pState, pBatcher);
 }
 
-#define MAKE_KERNING_KEY(first,second) uint32( (uint32(first)*256)  + uint32(second))
+#define MAKE_KERNING_KEY(first,second) uint32( (uint32(first)*65536)  + uint32(second))
 
 void RTFont::SetKerningData( int first, int second, signed char data )
 {
@@ -860,11 +941,13 @@ unsigned int RTFont::GetColorFromString( const char *pText )
 
 int RTFont::CountCharsThatFitX( float sizeX, const string &text, float scale /*= 1.0f*/ )
 {
-	rtfont_charData *pCharData, *pLastCharData;
+	rtfont_charData *pCharData;
+	uint16 curChar, lastChar;
+	uint8 seqLen;
 
 	int lines = 0;
 	float curX = 0;
-	pLastCharData = NULL;
+	lastChar = 0;
 	pCharData = NULL;
 	int lastGood = 0;
 	FontStateStack state;
@@ -878,33 +961,58 @@ int RTFont::CountCharsThatFitX( float sizeX, const string &text, float scale /*=
 
 		lastGood = i;
 
+		seqLen = utf8::internal::sequence_length<const char*>(&text.c_str()[i]);
+		if (seqLen > 2)
+		{
+			//we do not support these characters, because firstChar and lastChar are shorts
+			i += seqLen - 1;
+			continue;
+		}
+
+		if (seqLen > 1)
+		{
+			try {
+				utf8::utf8to16<uint16*, const char*>(&text.c_str()[i], &text.c_str()[i + seqLen], &curChar);
+			}
+			catch (...) {
+#ifdef _DEBUG
+				//LogError("Invalid UTF-16 character?!");
+#endif
+
+				i += seqLen - 1;
+				continue;
+			}
+			i += seqLen - 1;
+		}
+		else curChar = text[i];
+
 		if (IsFontCode(&text[i], &state))
 		{
 			if (text[i+1] != 0) i++; //also advance past the color control code
 			continue;
 		}
 
-		if (!m_hasSpaceChar && text[i] == ' ')
+		if (!m_hasSpaceChar && curChar == ' ')
 		{
 			curX += scale * m_header.blankCharWidth;
 			continue;
 		}
 	
-		if (byte(text[i])-m_header.firstChar < 0)
+		if (curChar-m_header.firstChar >= m_chars.size())
 		{
 #ifdef _DEBUG
-			LogMsg("Char %c (%d) is not in our font", text[i], int(byte(text[i])));
+			//LogMsg("Char %c (%d) is not in our font", text[i], int(byte(text[i])));
 #endif
 			continue;
 		}
 
-		if (pLastCharData)
+		if (lastChar)
 		{
 			curX += (GetKerningData(byte(text[i-1]), text[i])*scale);
 		}
 
-		pLastCharData = pCharData;
-		pCharData = &m_chars[byte(text[i])-m_header.firstChar].data;
+		lastChar = curChar;
+		pCharData = &m_chars[curChar-m_header.firstChar].data;
 
 		if (pCharData->xadvance != 0)
 		{

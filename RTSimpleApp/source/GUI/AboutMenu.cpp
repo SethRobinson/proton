@@ -75,6 +75,8 @@ void AboutMenuAddScrollContent(Entity *pParent)
 		"Particle Test ``-`7 It shows the built in 2d particle system.  Tap anywhere to cause an explosion.``\n\n"\
 		"Input Test ``- `7This option demonstrates getting input from the user.  The user must tap/click the input field to modify its text.  A native keyboard will pop up if needed.\n\n``"\
 		"Debug and Music Test ``- `7This option lets you groove to some background techno music.  It's an mp3 on iOS, Windows and webOS, or loaded as .ogg on Android.\n\n``"\
+		"UTF-16 Render Test ``- `7This option shows 2 Russian pangrams in small and large fonts, demonstrating UTF-16 character rendering. When using UTF-16, make sure to pass a UTF-8 string to render.``\n"\
+		"`7Also, to render UTF-16 characters, you need a font (`1font_arial.rtfont`` in our case) that includes these characters.``\n\n"\
 		"About (scroll bar test) ``- `7Why, that's this!  It illustrates using a scroll bar.  You can flick up and down.  Hmm, maybe I should make it flick backwards on Windows, as it feels wrong.\n\n``"\
 		"Also, notice that you can add any kind of entity within a scroll box, here is a clickable image:";
 

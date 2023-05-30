@@ -42,53 +42,63 @@ bool FontPacker::WriteHeaderBitMapFontGenerator(FILE *fp, string fntFile, rtfont
 	}
 
 	parms = StringTokenize(t.m_lines[3], "=");
-	int charCount = StringToInt(parms[1]);
+	uint32 charCount = StringToInt(parms[1]);
 
-	header.firstChar = 32;
-	header.lastChar = 255;
+	list<BMFGChar> charList;
+
+	while (string(line = t.GetMultipleLineStrings("char id", "=")).length() > 0)
+	{
+		parms = StringTokenize(line, "=");
+		BMFGChar c;
+		c.id = StringToInt(parms[1]);
+		c.x = StringToInt(parms[2]);
+		c.y = StringToInt(parms[3]);
+		c.width = StringToInt(parms[4]);
+		c.height = StringToInt(parms[5]);
+		c.xoffset = StringToInt(parms[6]);
+		c.yoffset = StringToInt(parms[7]);
+		c.xadvance = StringToInt(parms[8]);
+
+		// Put the chars in the list in ascending order according to their id
+		list<BMFGChar>::iterator insIt(charList.begin());
+		while (insIt != charList.end())
+		{
+			if (insIt->id > c.id)
+			{
+				break;
+			}
+			++insIt;
+		}
+		charList.insert(insIt, c);
+	}
+
+	header.firstChar = charList.front().id;
+	header.lastChar = charList.back().id + 1;
 
 	fwrite(&header, 1, sizeof(rtfont_header), fp);
 	//add the character data
 	rtfont_charData charData;
 
-	int skipped = 0;
-
-	for (int i = 0; i < header.lastChar - header.firstChar; i++)
+	list<BMFGChar>::iterator charIt(charList.begin());
+	for (short i = header.firstChar; i < header.lastChar; ++i)
 	{
-		if ((int)t.m_lines.size() <= i)
-		{
-			//no line here, avoid crash
-			parms.clear();
-		}
-		else
-		{
-			parms = StringTokenize(t.m_lines[(4 + i) - skipped], "=");
-		}
-
-
-		int index = 0;
-
-		if (parms.size() > 1)
-		{
-			index = StringToInt(parms[1]);
-		}
-
-
-		if (index == header.firstChar + i)
+		if (i == charIt->id)
 		{
 			//actually use this
-			charData.bmpPosX = StringToInt(parms[2]);
-			charData.bmpPosY = StringToInt(parms[3]);
-			charData.charSizeX = StringToInt(parms[4]);
-			charData.charSizeY = StringToInt(parms[5]);
-			charData.charBmpOffsetX = StringToInt(parms[6]);
-			charData.charBmpOffsetY = StringToInt(parms[7]);
+			charData.bmpPosX = charIt->x;
+			charData.bmpPosY = charIt->y;
+			charData.charSizeX = charIt->width;
+			charData.charSizeY = charIt->height;
+			charData.charBmpOffsetX = charIt->xoffset;
+			charData.charBmpOffsetY = charIt->yoffset;
 
 			charData.charBmpPosU = 0;
 			charData.charBmpPosV = 0;
 			charData.charBmpPosU2 = 0;
 			charData.charBmpPosV2 = 0;
-			charData.xadvance = StringToInt(parms[8]);
+			charData.xadvance = charIt->xadvance;
+
+			++charIt;
 		}
 		else
 		{
@@ -106,7 +116,6 @@ bool FontPacker::WriteHeaderBitMapFontGenerator(FILE *fp, string fntFile, rtfont
 			charData.charBmpPosU2 = 0;
 			charData.charBmpPosV2 = 0;
 			charData.xadvance = 0;
-			skipped++;
 		}
 
 		fwrite(&charData, 1, sizeof(rtfont_charData), fp);
@@ -156,7 +165,8 @@ bool FontPacker::WriteHeaderBitMapFontGeneratorXML(FILE *fp, string fntFile, rtf
 	header.shadowYOffset = 0;
 
 	xml_node<> *kerningsNode = fontNode->first_node("kernings");
-	int kerningCount = StringToInt(kerningsNode->first_attribute("count")->value());
+	int kerningCount = 0;
+	if (kerningsNode) kerningCount = StringToInt(kerningsNode->first_attribute("count")->value()); //we don't always have kernings present
 	header.kerningPairCount = kerningCount;
 
 	xml_node<> *charsNode = fontNode->first_node("chars");
@@ -239,16 +249,18 @@ bool FontPacker::WriteHeaderBitMapFontGeneratorXML(FILE *fp, string fntFile, rtf
 		fwrite(&charData, 1, sizeof(rtfont_charData), fp);
 	}
 
-	KerningPair k;
+	if (kerningsNode) {
+		KerningPair k;
 
-	//also add kerning data, if applicable
-	for (xml_node<> *kerningNode = kerningsNode->first_node("kerning"); kerningNode; kerningNode = kerningNode->next_sibling("kerning"))
-	{
-		k.first = StringToInt(kerningNode->first_attribute("first")->value());
-		k.second = StringToInt(kerningNode->first_attribute("second")->value());
-		k.amount = StringToInt(kerningNode->first_attribute("amount")->value());
+		//also add kerning data, if applicable
+		for (xml_node<>* kerningNode = kerningsNode->first_node("kerning"); kerningNode; kerningNode = kerningNode->next_sibling("kerning"))
+		{
+			k.first = StringToInt(kerningNode->first_attribute("first")->value());
+			k.second = StringToInt(kerningNode->first_attribute("second")->value());
+			k.amount = StringToInt(kerningNode->first_attribute("amount")->value());
 
-		fwrite(&k, 1, sizeof(KerningPair), fp);
+			fwrite(&k, 1, sizeof(KerningPair), fp);
+		}
 	}
 
 	SAFE_DELETE_ARRAY(pData);
@@ -271,7 +283,7 @@ bool FontPacker::WriteHeader(FILE *fp, string fntFile, rtfont_header &header)
 		//"info" at the front means its a BitMap Font Generator fnt file
 		return WriteHeaderBitMapFontGenerator(fp, fntFile, header);
 	}
-	else if (t.m_lines[0].find("<font") != string::npos)
+	else if (t.m_lines[1].find("<font") != string::npos) //first line is XML version, 2nd is actually <font...
 	{
 		// BitMap Font Generator XML file
 		return WriteHeaderBitMapFontGeneratorXML(fp, fntFile, header);

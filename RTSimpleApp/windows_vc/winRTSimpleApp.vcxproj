@@ -2119,6 +2119,7 @@
     <ClCompile Include="..\source\GUI\MainMenu.cpp" />
     <ClCompile Include="..\source\GUI\ParticleTestMenu.cpp" />
     <ClCompile Include="..\source\GUI\TouchTestMenu.cpp" />
+    <ClCompile Include="..\source\GUI\UTF16TestMenu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\pro\alchemy\sdk\usr\include\AS3.h" />
@@ -2175,6 +2176,7 @@
     <ClInclude Include="..\..\shared\Entity\SelectButtonWithCustomInputComponent.h" />
     <ClInclude Include="..\..\shared\Entity\SliderComponent.h" />
     <ClInclude Include="..\..\shared\Entity\TapSequenceDetectComponent.h" />
+    <ClInclude Include="..\source\GUI\UTF16TestMenu.h" />
     <CustomBuild Include="..\..\shared\Entity\TemplateComponent.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_GL|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_FMOD_GL|Win32'">true</ExcludedFromBuild>
