@@ -1911,6 +1911,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLin
 
 		if (g_fpsLimit != 0)
 		{
+			Sleep(1);
 			while (fpsTimer > GetSystemTimeAccurate())
 			{
 				Sleep(0);
