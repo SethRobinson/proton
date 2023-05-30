@@ -1914,7 +1914,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLin
 			Sleep(1);
 			while (fpsTimer > GetSystemTimeAccurate())
 			{
-				Sleep(0);
+				Sleep(1);
 			}
 			fpsTimer = float(GetSystemTimeAccurate())+(1000.0f/ (float(g_fpsLimit)));
 		}
