@@ -185,7 +185,9 @@ bool FontPacker::WriteHeaderBitMapFontGeneratorXML(FILE *fp, string fntFile, rtf
 			}
 			++insIt;
 		}
-		charList.insert(insIt, c);
+		
+		if (insIt != charList.end())
+			charList.insert(insIt, c);
 	}
 
 	header.firstChar = charList.front().id;
