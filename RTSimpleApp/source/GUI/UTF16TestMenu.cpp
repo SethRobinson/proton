@@ -25,7 +25,7 @@ Entity* UTF16TestMenuCreate(Entity* pParentEnt)
 	AddFocusIfNeeded(pBG);
 
 	//Adding some UTF-16 text in a UTF-8 string
-	string testMsg = u8"Съешь ещё этих мягких французских булок, да выпей же чаю!";
+	string testMsg = "Съешь ещё этих мягких французских булок, да выпей же чаю!";
 	Entity * pTextSmall = CreateTextBoxEntity(pBG, "testTextSmall", CL_Vec2f(20, 20), GetScreenSize() - 40.0f, testMsg);
 	SetupTextEntity(pTextSmall, FONT_SMALL);
 

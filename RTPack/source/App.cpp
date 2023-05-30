@@ -120,7 +120,7 @@ bool App::Update()
 #ifdef RT_NO_PVR
 	mode = "(compiled without PVRTC support)";
 #endif
-	LogMsg("\nRTPack V1.5 by Seth A. Robinson. %s /h for help\n", mode.c_str());
+	LogMsg("\nRTPack V1.6 by Seth A. Robinson. %s /h for help\n", mode.c_str());
 
 	string outputFormat;
 	if (g_mainHarness.ParmExistsWithData("-o", &outputFormat))
