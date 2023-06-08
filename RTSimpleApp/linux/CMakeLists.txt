@@ -8,6 +8,9 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
 endif()
 
+set(ISRASPBERRYPIE FALSE)
+set(RASPBERRYPI_GLES11 OFF)
+
 include(CheckIncludeFile)
 set (CMAKE_REQUIRED_INCLUDES "/opt/vc/include")
 CHECK_INCLUDE_FILE(bcm_host.h ISRASPBERRYPIE)
