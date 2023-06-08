@@ -43,7 +43,7 @@ mkdir ..\bin\interface
 xcopy interface ..\bin\interface /E /F /Y /EXCLUDE:exclude.txt
 
 :Special case, delete the .rttex, for this one example, we only want a .bmp there
-del ..\bin\interface\test.rttex
+:del ..\bin\interface\test.rttex
 
 REM Convert everything to lowercase, otherwise the iphone will choke on the files
 REM for /r %%f in (*.*) do ..\media\LowerCase.bat  %%f
