@@ -1,5 +1,12 @@
 cmake_minimum_required(VERSION 2.6)
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
+endif()
+
+set(ISRASPBERRYPIE FALSE)
+set(RASPBERRYPI_GLES11 OFF)
+
 ENABLE_LANGUAGE(C)
 
 include(CheckIncludeFile)
@@ -18,7 +25,6 @@ set(CMAKE_BUILD_TYPE "Release") #use Release or Debug
 
 project(RTBareBones)
 include(../../shared/linux/Proton.cmake)
-
 proton_include_components(FocusInputComponent)
 proton_include_components(CustomInputComponent ArcadeInputComponent)
 

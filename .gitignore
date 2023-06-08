@@ -32,3 +32,6 @@ shared/android/optional_src/libs/libopenssl
 shared/android/optional_src/libs/fmodstudio
 shared/html5/fmodstudio
 shared/win/fmodstudio
+RTBareBones/linux/build
+RTSimpleApp/linux/build
+RTPack/linux/build

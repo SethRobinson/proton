@@ -3,6 +3,8 @@ if(${PROJECT_NOT_SET})
 message(FATAL_ERROR "project() must be called before including Proton.cmake")
 endif(${PROJECT_NOT_SET})
 
+set(CMAKE_CXX_STANDARD 14) #stops 17's byte definition from screwing with ours.  This solution won't work forever...
+
 string(REPLACE "/shared/linux/Proton.cmake" "" PROTON_ROOT "${CMAKE_CURRENT_LIST_FILE}")
 
 #for raspberry pi's gles1
@@ -289,49 +291,48 @@ function(proton_set_sources)
 	endif(NOT PROTON_USE_INTERNAL_ZLIB)
 	
 	
-
-#	find_package(SDL REQUIRED)
-#	if(SDL_FOUND)
-#		include_directories(${SDL_INCLUDE_DIR})
-#		target_link_libraries(${PROJECT_NAME} ${SDL_LIBRARY})
-#	endif(SDL_FOUND)
-
-if(PROTON_USE_SDL_AUDIO)
-		target_link_libraries(${PROJECT_NAME} SDL2_mixer)
-endif(PROTON_USE_SDL_AUDIO)
+	if(PROTON_USE_SDL_AUDIO)
+			target_link_libraries(${PROJECT_NAME} SDL2_mixer)
+	endif(PROTON_USE_SDL_AUDIO)
 
 
-if(RASPBERRYPI_GLES11)
-#note: GLESv2 has the v1.1 and v2 libraries on rasberry pi, you don't use GLESv1_CM!
-target_link_libraries(${PROJECT_NAME} pthread bcm_host SDL2)
+	if(RASPBERRYPI_GLES11)
+	#note: GLESv2 has the v1.1 and v2 libraries on rasberry pi, you don't use GLESv1_CM!
+	target_link_libraries(${PROJECT_NAME} pthread bcm_host SDL2)
 
-find_library(PI_GLSTUFF brcmGLESv2 /opt/vc/lib)
+	find_library(PI_GLSTUFF brcmGLESv2 /opt/vc/lib)
 
-if (PI_GLSTUFF)
-	#raspian stretch has renamed these files:
-message(STATUS "Linking with libbrecmGLESv2 because we found 'em.  Using Raspbian stretch or newer probably")
-	target_link_libraries(${PROJECT_NAME} brcmGLESv2.so brcmEGL.so)
+	if (PI_GLSTUFF)
+		#raspian stretch has renamed these files:
+	message(STATUS "Linking with libbrecmGLESv2 because we found 'em.  Using Raspbian stretch or newer probably")
+		target_link_libraries(${PROJECT_NAME} brcmGLESv2.so brcmEGL.so)
 
-else()
+	else()
 
-message(STATUS "Linking with GLESv2 and EGL for non-desktop raspbian because lib brcmGLESv2 can't be found")
-target_link_libraries(${PROJECT_NAME} GLESv2 EGL)
+	message(STATUS "Linking with GLESv2 and EGL for non-desktop raspbian because lib brcmGLESv2 can't be found")
+	target_link_libraries(${PROJECT_NAME} GLESv2 EGL)
 
-endif()
+	endif()
+	else(RASPBERRYPI_GLES11)
+		
+		
+		if(RASPBERRYPI_OPENGL)
+		target_link_libraries(${PROJECT_NAME} GL pthread bcm_host SDL2)
+		else(RASPBERRYPI_OPENGL)
+		
+		
+		message(STATUS "Normal linux, forcing SDL2")
+	    find_package(SDL2 REQUIRED)
 
+		include_directories(${SDL2_INCLUDE_DIRS})
+		target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES})
+		
+		target_link_libraries(${PROJECT_NAME} GL)
+		endif(RASPBERRYPI_OPENGL)
+		
+	endif(RASPBERRYPI_GLES11)
 
-else(RASPBERRYPI_GLES11)
-	
-	
-	if(RASPBERRYPI_OPENGL)
-	target_link_libraries(${PROJECT_NAME} GL pthread bcm_host SDL2)
-	else(RASPBERRYPI_OPENGL)
-	target_link_libraries(${PROJECT_NAME} gl)
-	endif(RASPBERRYPI_OPENGL)
-	
-endif(RASPBERRYPI_GLES11)
-
-target_link_libraries(${PROJECT_NAME} rt)
+	target_link_libraries(${PROJECT_NAME} rt)
 endfunction(proton_set_sources)
 
 

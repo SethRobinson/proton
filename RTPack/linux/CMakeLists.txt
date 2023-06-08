@@ -2,6 +2,13 @@
 
 cmake_minimum_required (VERSION 2.6)
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
+endif()
+
+set(ISRASPBERRYPIE FALSE)
+set(RASPBERRYPI_GLES11 OFF)
+
 ENABLE_LANGUAGE(C)
 
 include(CheckIncludeFile)
@@ -10,9 +17,6 @@ CHECK_INCLUDE_FILE(/opt/vc/include/bcm_host.h ISRASPBERRYPIE)
 #if(ISRASPBERRYPIE)
 OPTION(RASPBERRYPI_GLES11 "Compile for Raspberry PI GLES" ON)
 #endif(ISRASPBERRYPIE)
-
-set(CMAKE_BUILD_TYPE "Release") #use Release or Debug
-
 
 #OPTION(RASPBERRYPI_OPENGL "Compile for Rasperry PI OpenGL" ON)
 
