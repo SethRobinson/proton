@@ -1,7 +1,9 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.12)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_HOME_DIRECTORY}/../bin)
 
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
+  set(CMAKE_BUILD_TYPE "Release")
 endif()
 
 set(ISRASPBERRYPIE FALSE)
@@ -21,8 +23,6 @@ endif(ISRASPBERRYPIE)
 
 add_definitions(-DRT_LINUX)
 
-set(CMAKE_BUILD_TYPE "Release") #use Release or Debug
-
 project(RTBareBones)
 include(../../shared/linux/Proton.cmake)
 proton_include_components(FocusInputComponent)
@@ -30,4 +30,5 @@ proton_include_components(CustomInputComponent ArcadeInputComponent)
 
 set(APP "../source")
 proton_set_sources("${APP}/App.cpp")
+
 target_link_libraries(RTBareBones)

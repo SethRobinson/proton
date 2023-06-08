@@ -254,6 +254,11 @@ void AppInputRawKeyboard(VariantList *pVList)
             keyName = "L2";
             break;
 
+		case VIRTUAL_KEY_BACK:
+		keyName = "Escape";
+		GetApp()->OnExitApp(NULL);
+		break;
+
     }
     
     LogMsg("MESSAGE_TYPE_GUI_CHAR_RAW: Hit %d (%s) (%s)", vKey, keyName.c_str(), pressed.c_str());
@@ -378,7 +383,7 @@ void App::Draw()
 
 	if (!m_surf.IsLoaded())
 	{
-		m_surf.LoadFile("interface/test.bmp");
+		m_surf.LoadFile("interface/test.rttex");
 	}
 
 	m_surf.Bind();
