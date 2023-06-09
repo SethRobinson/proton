@@ -4,4 +4,4 @@ call base_setup.bat
 :ssh -v pi@%RASPBERRYIP%
 
 echo Syncing proton base over to the PI, this can take serveral minutes the first time... it isn't crashed, just wait!
-rsync %RSYNC_OPTIONS% shared %LINUXUSER%@%RASPBERRYIP%:~/proton
+wsl rsync -v %RSYNC_OPTIONS% /mnt/d/projects/proton/shared %LINUXUSER%@%RASPBERRYIP%:~/proton

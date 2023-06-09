@@ -164,7 +164,7 @@ bool App::Init()
             if (bScaleScreenActive)
                 SetupFakePrimaryScreenSize(scaleToX,scaleToY); //game will think it's this size, and will be scaled up
 		} 
-else
+else 
 		{
 			//but the phones do
 			SetLockedLandscape(true); //we don't allow portrait mode for this game
