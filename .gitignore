@@ -35,3 +35,6 @@ shared/win/fmodstudio
 RTBareBones/linux/build
 RTSimpleApp/linux/build
 RTPack/linux/build
+RTSimpleApp/linux/build
+RTSimpleApp/build
+RTBareBones/build
