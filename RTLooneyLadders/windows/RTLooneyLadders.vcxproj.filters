@@ -14,18 +14,6 @@
     <Filter Include="source\Component">
       <UniqueIdentifier>{c5ee6b9d-91e5-46a6-85d7-cb986aaf3bd4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\android">
-      <UniqueIdentifier>{845336bf-27ac-4672-ac98-5d03bee881b5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\android\proguard">
-      <UniqueIdentifier>{9309b682-90f9-402c-baf2-269006967726}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\OSX">
-      <UniqueIdentifier>{db91bb80-def0-42db-803d-c0068ed5a580}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\iOS">
-      <UniqueIdentifier>{1867af15-86cb-4ff6-b623-83fa543a4b5e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="shared">
       <UniqueIdentifier>{5747fd1c-7d8f-4e6f-b396-ce398be60c70}</UniqueIdentifier>
     </Filter>
@@ -103,6 +91,30 @@
     </Filter>
     <Filter Include="shared\Gamepad">
       <UniqueIdentifier>{2b065155-1daf-49f0-b521-aa10f5f790d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shared\SDL">
+      <UniqueIdentifier>{7074e19e-0dd4-4b3f-a1af-4a46fcac0d81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\Platform">
+      <UniqueIdentifier>{32da0b48-367e-4065-9bb1-1e55645c53d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\Platform\OSX">
+      <UniqueIdentifier>{db91bb80-def0-42db-803d-c0068ed5a580}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\Platform\iOS">
+      <UniqueIdentifier>{1867af15-86cb-4ff6-b623-83fa543a4b5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\Platform\android">
+      <UniqueIdentifier>{845336bf-27ac-4672-ac98-5d03bee881b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\Platform\android\proguard">
+      <UniqueIdentifier>{9309b682-90f9-402c-baf2-269006967726}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\Platform\Linux">
+      <UniqueIdentifier>{24279f74-f5d5-4962-be01-27b58ee08085}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shared\Linux">
+      <UniqueIdentifier>{a9c1ad94-572f-4fa6-af64-a33715899562}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -385,13 +397,7 @@
     <ClCompile Include="..\..\shared\Audio\AudioManagerAndroid.cpp">
       <Filter>shared\Audio</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\shared\Audio\AudioManagerAudiere.cpp">
-      <Filter>shared\Audio</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\shared\Audio\AudioManagerFMOD.cpp">
-      <Filter>shared\Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\shared\Audio\AudioManagerSDL.cpp">
       <Filter>shared\Audio</Filter>
     </ClCompile>
     <ClCompile Include="..\..\shared\Network\NetHTTP.cpp">
@@ -474,6 +480,27 @@
     </ClCompile>
     <ClCompile Include="..\..\shared\Entity\TouchDragComponent.cpp">
       <Filter>shared\Entity\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\Audio\AudioManagerSDL.cpp">
+      <Filter>shared\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\Audio\AudioManagerAudiere.cpp">
+      <Filter>shared\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\SDL\SDL2Main.cpp">
+      <Filter>shared\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\Gamepad\GamepadProviderPSP2.cpp">
+      <Filter>shared\Gamepad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\Gamepad\GamepadPSP2.cpp">
+      <Filter>shared\Gamepad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\Gamepad\GamepadProviderSDL2.cpp">
+      <Filter>shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\Gamepad\GamepadSDL2.cpp">
+      <Filter>shared\Gamepad</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -762,9 +789,6 @@
     <ClInclude Include="..\..\shared\Audio\AudioManagerOS.h">
       <Filter>shared\Audio</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\shared\Audio\AudioManagerSDL.h">
-      <Filter>shared\Audio</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\shared\Network\NetHTTP.h">
       <Filter>shared\Network</Filter>
     </ClInclude>
@@ -879,37 +903,58 @@
     <ClInclude Include="..\..\shared\Gamepad\GamepadProviderIOSNative.h">
       <Filter>shared\Gamepad</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\shared\Audio\AudioManagerSDL.h">
+      <Filter>shared\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\Audio\AudioManagerAudiere.h">
+      <Filter>shared\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\Gamepad\GamepadProviderPSP2.h">
+      <Filter>shared\Gamepad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\Gamepad\GamepadPSP2.h">
+      <Filter>shared\Gamepad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\Gamepad\GamepadProviderSDL2.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\Gamepad\GamepadSDL2.h">
+      <Filter>shared\Gamepad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\SDL\SDL2Main.h">
+      <Filter>shared\SDL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\android\jni\Android.mk">
-      <Filter>source\android</Filter>
+      <Filter>source\Platform\android</Filter>
     </None>
     <None Include="..\android\AndroidManifest.xml">
-      <Filter>source\android</Filter>
+      <Filter>source\Platform\android</Filter>
     </None>
     <None Include="..\android\app_info_setup.bat">
-      <Filter>source\android</Filter>
+      <Filter>source\Platform\android</Filter>
     </None>
     <None Include="..\android\build.bat">
-      <Filter>source\android</Filter>
+      <Filter>source\Platform\android</Filter>
     </None>
     <None Include="..\android\build.sh">
-      <Filter>source\android</Filter>
+      <Filter>source\Platform\android</Filter>
     </None>
     <None Include="..\android\build.xml">
-      <Filter>source\android</Filter>
+      <Filter>source\Platform\android</Filter>
     </None>
     <None Include="..\android\src\com\rtsoft\RTLooneyLadders\Main.java">
-      <Filter>source\android</Filter>
+      <Filter>source\Platform\android</Filter>
     </None>
     <None Include="..\android\proguard\config.txt">
-      <Filter>source\android\proguard</Filter>
+      <Filter>source\Platform\android\proguard</Filter>
     </None>
     <None Include="..\OSX\RTLooneyLadders-Info.plist">
-      <Filter>source\OSX</Filter>
+      <Filter>source\Platform\OSX</Filter>
     </None>
     <None Include="..\Info.plist">
-      <Filter>source\iOS</Filter>
+      <Filter>source\Platform\iOS</Filter>
     </None>
     <None Include="..\..\shared\iOS\iOSUtils.mm">
       <Filter>shared\iOS</Filter>
@@ -967,13 +1012,16 @@
     <None Include="..\..\shared\Gamepad\GamepadProviderIOSNative.mm">
       <Filter>shared\Gamepad</Filter>
     </None>
+    <None Include="..\linux\linux_compile.sh">
+      <Filter>source\Platform\Linux</Filter>
+    </None>
+    <None Include="..\..\shared\linux\Proton.cmake">
+      <Filter>shared\Linux</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <CustomBuildStep Include="..\..\shared\Entity\TemplateComponent.h">
       <Filter>shared\Entity\Component</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="..\..\shared\Audio\AudioManagerAudiere.h">
-      <Filter>shared\Audio</Filter>
     </CustomBuildStep>
     <CustomBuildStep Include="..\..\shared\Audio\AudioManagerFMOD.h">
       <Filter>shared\Audio</Filter>
@@ -981,5 +1029,10 @@
     <CustomBuildStep Include="..\..\shared\Audio\AudioManagerOS.mm">
       <Filter>shared\Audio</Filter>
     </CustomBuildStep>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\linux\CMakeLists.txt">
+      <Filter>source\Platform\Linux</Filter>
+    </Text>
   </ItemGroup>
 </Project>

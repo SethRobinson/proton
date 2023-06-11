@@ -47,6 +47,8 @@ void OnGamepadButton(VariantList *m_pVList)
 		action = "Released";
 	}
 
+	if (vKey == VIRTUAL_KEY_NONE) return; //who cares
+
 
 	LogMsg("`6Gamepad `w%d``: `#%s`` is `$%s````", gamepadID, ProtonVirtualKeyToString(vKey).c_str(), action.c_str());
 }
@@ -76,6 +78,7 @@ void SetupGameControllers(Entity *pBG)
 
 	for (int i=0; i < GetGamepadManager()->GetGamepadCount(); i++)
 	{
+	
 		Gamepad *pPad = GetGamepadManager()->GetGamepad(i);
 		pPad->m_sig_gamepad_buttons.connect(OnGamepadButton);
 
@@ -126,7 +129,12 @@ void ControllerTestOnRender(VariantList *pVList)
 	CL_Vec2f vFinalPos = pVList->m_variant[0].GetVector2(); //offset we should render to, this changes if the parent entity hierarchy's pos2d var moves around
 	//render out gamepad positions
 
+	//To switch gamepads we're testing...
+	//GetGamepadManager()->SetDefaultGamepad(GetGamepadManager()->GetGamepad(1));
+	
+	
 	Gamepad *pPad =  GetGamepadManager()->GetDefaultGamepad();
+	
 
 	if (!pPad)
 	{

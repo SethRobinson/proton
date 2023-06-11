@@ -13,8 +13,8 @@ Global
 		Common Release|x86 = Common Release|x86
 		Debug GL|x64 = Debug GL|x64
 		Debug GL|x86 = Debug GL|x86
-		Debug WebOS|x64 = Debug WebOS|x64
-		Debug WebOS|x86 = Debug WebOS|x86
+		Debug_GL_SDL|x64 = Debug_GL_SDL|x64
+		Debug_GL_SDL|x86 = Debug_GL_SDL|x86
 		Release GL|x64 = Release GL|x64
 		Release GL|x86 = Release GL|x86
 	EndGlobalSection
@@ -31,10 +31,10 @@ Global
 		{EDF3C631-F9BD-4E50-BD8F-804734B7ECAF}.Debug GL|x64.Build.0 = Debug GL|x64
 		{EDF3C631-F9BD-4E50-BD8F-804734B7ECAF}.Debug GL|x86.ActiveCfg = Debug GL|Win32
 		{EDF3C631-F9BD-4E50-BD8F-804734B7ECAF}.Debug GL|x86.Build.0 = Debug GL|Win32
-		{EDF3C631-F9BD-4E50-BD8F-804734B7ECAF}.Debug WebOS|x64.ActiveCfg = Debug WebOS|x64
-		{EDF3C631-F9BD-4E50-BD8F-804734B7ECAF}.Debug WebOS|x64.Build.0 = Debug WebOS|x64
-		{EDF3C631-F9BD-4E50-BD8F-804734B7ECAF}.Debug WebOS|x86.ActiveCfg = Debug WebOS|Win32
-		{EDF3C631-F9BD-4E50-BD8F-804734B7ECAF}.Debug WebOS|x86.Build.0 = Debug WebOS|Win32
+		{EDF3C631-F9BD-4E50-BD8F-804734B7ECAF}.Debug_GL_SDL|x64.ActiveCfg = Debug_GL_SDL|x64
+		{EDF3C631-F9BD-4E50-BD8F-804734B7ECAF}.Debug_GL_SDL|x64.Build.0 = Debug_GL_SDL|x64
+		{EDF3C631-F9BD-4E50-BD8F-804734B7ECAF}.Debug_GL_SDL|x86.ActiveCfg = Debug_GL_SDL|Win32
+		{EDF3C631-F9BD-4E50-BD8F-804734B7ECAF}.Debug_GL_SDL|x86.Build.0 = Debug_GL_SDL|Win32
 		{EDF3C631-F9BD-4E50-BD8F-804734B7ECAF}.Release GL|x64.ActiveCfg = Release GL|x64
 		{EDF3C631-F9BD-4E50-BD8F-804734B7ECAF}.Release GL|x64.Build.0 = Release GL|x64
 		{EDF3C631-F9BD-4E50-BD8F-804734B7ECAF}.Release GL|x86.ActiveCfg = Release GL|Win32

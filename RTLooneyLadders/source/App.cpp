@@ -41,9 +41,17 @@ AudioManagerOS g_audioManager;
 
 #include "Audio/AudioManagerSDL.h"
 #include "Audio/AudioManagerAndroid.h"
+ 
+#if defined RT_USE_SDL
+
+//let's assume we're using SDL2 for everything actually, so this will happen in the Windows SDL build as well as linux
+#include "Gamepad/GamepadProviderSDL2.h"
+#endif
 
 #if defined RT_USE_SDL_AUDIO
 AudioManagerSDL g_audioManager; //sound in windows and WebOS
+
+
 //AudioManager g_audioManager; //to disable sound
 #elif defined ANDROID_NDK
 //AudioManager g_audioManager; //to disable sound
@@ -103,30 +111,7 @@ bool App::Init()
 	GetBaseApp()->SetDisableSubPixelBlits(false);
 	//SetDefaultAudioClickSound("audio/enter.wav");
 	SetDefaultButtonStyle(Button2DComponent::BUTTON_STYLE_CLICK_ON_TOUCH_RELEASE);
-	SetManualRotationMode(false);
 	
-	//to test at various FPS
-	//SetFPSLimit(30);
-
-	//we'll use a virtual screen size of this, and it will be scaled to any device
-	int scaleToX = 1024;
-	int scaleToY = 768;
-
-	switch (GetEmulatedPlatformID())
-	{
-	case PLATFORM_ID_ANDROID:
-	case PLATFORM_ID_OSX:
-		//if we do this, everything will be stretched/zoomed to fit the screen
-		SetLockedLandscape(false);  //because it's set in the app manifest, we don't have to rotate ourselves
-		SetupFakePrimaryScreenSize(scaleToX,scaleToY); //game will think it's this size, and will be scaled up
-		break;
-
-
-	default:
-		SetLockedLandscape(false); //we don't allow portrait mode for this game
-		SetupFakePrimaryScreenSize(scaleToX,scaleToY); //game will think it's this size, and will be scaled up
-	}
-
 	L_ParticleSystem::init(2000);
 
 	if (m_bInitted)	
@@ -165,7 +150,7 @@ bool App::Init()
 	GetAudioManager()->Preload("audio/click.wav");
 	
 
-#ifdef PLATFORM_WINDOWS
+#if defined( PLATFORM_WINDOWS) && !defined(RT_USE_SDL)
 	//XInput is newer and works better, doesn't require that the controller already be plugged in at start
 	
 	GamepadProviderXInput* pTemp = new GamepadProviderXInput(); //this MUST be added first!
@@ -180,6 +165,15 @@ bool App::Init()
 
 	GetGamepadManager()->m_sig_gamepad_connected.connect(1, boost::bind(&App::OnGamepadConnected, this, _1));
 	GetGamepadManager()->m_sig_gamepad_disconnected.connect(1, boost::bind(&App::OnGamepadDisconnected, this, _1));
+
+#endif
+
+#if defined (RT_USE_SDL)
+
+	//we're going to use SDL for our gamepad support
+	GamepadProviderSDL2* pTemp = new GamepadProviderSDL2(); 
+	GetGamepadManager()->AddProvider(pTemp); //use XInput joysticks
+
 
 #endif
 
@@ -241,6 +235,7 @@ void App::OnGamepadDisconnected(eGamepadID id)
 void App::Kill()
 {
 	m_varDB.Save("save.dat");
+	GetGamepadManager()->ClearProviders();
 	BaseApp::Kill();
 	g_pApp = NULL;
 }
@@ -315,27 +310,12 @@ const char * GetBundleName()
 	return bundleName;
 }
 
+bool App::OnPreInitVideo()
+{
+	if (!BaseApp::OnPreInitVideo()) return false;
 
-#ifdef C_FORCE_BIG_SCREEN_SIZE_FOR_WINDOWS_BUILDS
+	SetupScreenInfo(1024, 768, ORIENTATION_DONT_CARE);
 
-	//below is a sort of hack that allows "release" builds on windows to override the settings of whatever the shared main.cpp is telling
-	//us for window sizes
-	#ifdef _WINDOWS_
-	#include "win/app/main.h"
-	#endif
+	return true;
+}
 
-	bool App::OnPreInitVideo()
-	{
-		if (!BaseApp::OnPreInitVideo()) return false;
-
-	#if defined(_WINDOWS_)
-
-		//comment out this part if you really want to emulate other systems/phone sizes, from settings in main.cpp
-		SetEmulatedPlatformID(PLATFORM_ID_WINDOWS);
-		g_winVideoScreenX = 1024;
-		g_winVideoScreenY = 768;
-		
-	#endif
-		return true;
-	}
-#endif
