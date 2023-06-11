@@ -701,8 +701,8 @@ bool BaseApp::OnPreInitVideo()
 	//extern these vars from main.cpp to change them...
 	
 	//SetEmulatedPlatformID(PLATFORM_ID_WINDOWS);
-    //g_winVideoScreenX = 1024;
-    //g_winVideoScreenY = 768;
+	SetPrimaryScreenSize(1024, 768);
+
 	return true; //no error
 }
 

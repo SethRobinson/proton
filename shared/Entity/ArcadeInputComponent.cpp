@@ -470,6 +470,10 @@ eVirtualKeys StringToProtonVirtualKey(string lowerCaseKeyName)
 	if (lowerCaseKeyName == "up hat button") return VIRTUAL_DPAD_HAT_UP;
 
 	if (lowerCaseKeyName == "down hat button") return VIRTUAL_DPAD_HAT_DOWN;
+	if (lowerCaseKeyName == "left") return VIRTUAL_KEY_DIR_LEFT;
+	if (lowerCaseKeyName == "right") return VIRTUAL_KEY_DIR_RIGHT;
+	if (lowerCaseKeyName == "up") return VIRTUAL_KEY_DIR_UP;
+	if (lowerCaseKeyName == "down") return VIRTUAL_KEY_DIR_DOWN;
 
 	if (lowerCaseKeyName == "left trigger button") return VIRTUAL_DPAD_LTRIGGER;
 
@@ -478,6 +482,8 @@ eVirtualKeys StringToProtonVirtualKey(string lowerCaseKeyName)
 	if (lowerCaseKeyName == "left joystick button") return VIRTUAL_JOYSTICK_BUTTON_LEFT;
 
 	if (lowerCaseKeyName == "right joystick button") return VIRTUAL_JOYSTICK_BUTTON_RIGHT;
+	if (lowerCaseKeyName == "menu button") return VIRTUAL_DPAD_MENU;
+	if (lowerCaseKeyName == "media button") return VIRTUAL_DPAD_MEDIA;
 
 //	if (lowerCaseKeyName == "none" || lowerCaseKeyName == "") return VIRTUAL_KEY_NONE;
 	return VIRTUAL_KEY_NONE;
@@ -499,6 +505,18 @@ string ProtonVirtualKeyToString(eVirtualKeys vKey)
 	{
 	case VIRTUAL_DPAD_BUTTON_LEFT:
 		return "left action button";
+		break;
+	case VIRTUAL_KEY_DIR_LEFT:
+		return "left";
+		break;
+	case VIRTUAL_KEY_DIR_RIGHT:
+		return "right";
+		break;
+	case VIRTUAL_KEY_DIR_UP:
+		return "up";
+		break;
+	case VIRTUAL_KEY_DIR_DOWN:
+		return "down";
 		break;
 	case VIRTUAL_DPAD_BUTTON_RIGHT:
 		return "right action button";
@@ -556,6 +574,12 @@ string ProtonVirtualKeyToString(eVirtualKeys vKey)
 
 	case VIRTUAL_JOYSTICK_BUTTON_RIGHT:
 		return "right joystick button";
+		break;
+	case VIRTUAL_DPAD_MENU:
+		return "menu button";
+		break;
+	case VIRTUAL_DPAD_MEDIA:
+		return "media button";
 		break;
 	case VIRTUAL_KEY_NONE:
 		return "none";

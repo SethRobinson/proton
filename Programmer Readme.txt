@@ -10,4 +10,8 @@ to go find the correct version from <protondir>\shared\win\audiere or
 
 Note:  RTSimpleApp has the 64 bit audiere.dll included now, so use the 64 bit build there for simplicity.
 
+Note: The Debug_GL_SDL configuration uses SDL for both the Audio and renderer/message pump/gamepads, while I normally
+wouldn't use this in a Windows build, it's useful for testing things how they will work for the linux builds, which
+all use SDL2 under the hood.
+
 -Seth (seth@rtsoft.com)

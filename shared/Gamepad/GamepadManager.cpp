@@ -8,22 +8,26 @@ GamepadManager::GamepadManager()
 
 GamepadManager::~GamepadManager()
 {
+	ClearProviders();
+
+}
+void GamepadManager::ClearProviders()
+{
 	list<GamepadProvider*>::iterator itor = m_providers.begin();
-	for (;itor != m_providers.end(); itor++)
+	for (; itor != m_providers.end(); itor++)
 	{
 		(*itor)->Kill();
-		delete *itor;
+		delete* itor;
 	}
 	m_providers.clear();
 
-	for (uint32 i=0; i < m_gamepads.size(); i++)
+	for (uint32 i = 0; i < m_gamepads.size(); i++)
 	{
 		SAFE_DELETE(m_gamepads[i]);
 	}
-	//I know we're exiting and this kind of thing doesn't matter, but I plan to move it somewhere else later and don't want to
-	//miss it -Seth
+
 	m_gamepads.clear();
-	m_defaultGamepadID = GAMEPAD_ID_NONE; 
+	m_defaultGamepadID = GAMEPAD_ID_NONE;
 
 }
 

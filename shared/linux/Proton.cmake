@@ -50,7 +50,7 @@ set(PROTON_ZLIB "${PROTON_UTIL}/zlib")
 set(PROTON_BOOSTSIGNALS "${PROTON_UTIL}/boost/libs/signals/src")
 set(PROTON_CLANMATH "${PROTON_SHARED}/ClanLib-2.0/Sources/Core/Math")
 
-add_definitions(-DRTLINUX -DBOOST_ALL_NO_LIB -DPLATFORM_LINUX)
+add_definitions(-DRTLINUX -DBOOST_ALL_NO_LIB -DPLATFORM_LINUX -DRT_USE_SDL)
 
 IF (CMAKE_BUILD_TYPE MATCHES "Debug")
 add_definitions(-ggdb -D_DEBUG)

@@ -22,11 +22,9 @@ public:
         
 	}
 
-
 	void Setup(GamepadiCade *pPad, char keyDown, char keyUp, int buttonID, eVirtualKeys vKeyToSend);
 	char m_keyDown, m_keyUp;
 	bool m_bPushed;
-
 };
 
 enum eArcadeKeyboardControls

@@ -75,6 +75,8 @@ public:
 	GamepadManager();
 	virtual ~GamepadManager();
 
+	void ClearProviders();
+
 	Gamepad * GetDefaultGamepad(); //just use this for single player games?
 	eGamepadID GetDefaultGamepadID(); //returns the best gamepad they have
 	void Update(); //must be called every frame, handles updates, disconnections, etc

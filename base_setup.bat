@@ -23,10 +23,10 @@ SET JAVA_HOME=D:\pro\jdk-17.0.2
 : Below is used to find the Raspberry pi and command line utils like ssh, don't really need to set this stuff up but it makes various scripts work that Seth uses
 
 :don't want to copy file windows junk. Change -az to -avz for verbose to see what's copying...
-SET RSYNC_OPTIONS=-az --chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r --exclude='*.ncb' --exclude='*.lib' --exclude='*.exe' --exclude='*.dll' --exclude='*.pdb' --exclude='*.obj' --exclude='*.o' --exclude='*.ilk' --exclude='*.so' --exclude='.svn' --exclude='*.pch' --exclude='*.ipch' --exclude='.git'
+SET RSYNC_OPTIONS=-az --chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r --exclude='*.ncb' --exclude='*.lib' --exclude='*.exe' --exclude='*.dll' --exclude='*.pdb' --exclude='*.obj' --exclude='*.o' --exclude='*.ilk' --exclude='*.so' --exclude='*.tlog' --exclude='.svn' --exclude='*.pch' --exclude='*.ipch' --exclude='.git' --exclude='.vs/*' --exclude='windows_vs/x64/*'
 
 :Need to know where your PI is, to ssh to (in my case, it's a local ip)
-SET RASPBERRYIP=192.168.1.70
+SET RASPBERRYIP=192.168.68.191
 :Name we should use when we ssh on
 SET LINUXUSER=pi
 

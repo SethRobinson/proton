@@ -1,7 +1,5 @@
 #include "PlatformSetup.h"
-#include "BaseApp.h"
-
-#include <SDL2/SDL.h>
+#include "SDL2Main.h"
 
 const char * GetAppName();
 
@@ -10,7 +8,6 @@ using namespace std;
 bool g_bAppFinished = false;
 bool g_bIsFullScreen = true;
 SDL_Surface *g_screen = NULL;
-SDL_Joystick *g_pSDLJoystick = NULL;
 CL_Vec3f g_accelHold = CL_Vec3f(0,0,0);
 bool g_leftMouseButtonDown = false; //to help emulate how an iphone works
 bool g_rightMouseButtonDown = false; //to help emulate how an iphone works
@@ -21,6 +18,7 @@ int g_winVideoScreenX = 0;
 int g_winVideoScreenY = 0;
 SDL_GLContext g_glcontext = NULL;
 SDL_Window *g_window = NULL;
+boost::signal<void(VariantList*)> g_sig_SDLEvent; //allow anyone to tap into SDL events
 
 #ifndef C_GL_MODE
 #include "EGL/egl.h"
@@ -102,9 +100,14 @@ void SetPrimaryScreenSize(int width, int height)
 
 bool initSDL_GLES()
 {
+	//Let's allow us to get controller events when we don't have focus.. uh..
+	//Should probably make this configurable
+
+	SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
+
 	// used to get the result value of SDL operations
-	
-	uint32 initFlags = SDL_INIT_TIMER| SDL_INIT_JOYSTICK | SDL_INIT_EVENTS|SDL_INIT_GAMECONTROLLER|SDL_INIT_VIDEO;
+	//Not worrying about SDL_INIT_GAMECONTROLLER for now
+	uint32 initFlags = SDL_INIT_TIMER| SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER| SDL_INIT_EVENTS|SDL_INIT_VIDEO;
 
 #ifdef RT_USE_SDL_AUDIO
 	initFlags = initFlags|SDL_INIT_AUDIO;
@@ -112,7 +115,8 @@ bool initSDL_GLES()
 
 	SDL_Init(initFlags);              // Initialize SDL2
 
-	
+	SDL_JoystickEventState(SDL_ENABLE);
+
 	uint32 videoFlags = SDL_WINDOW_OPENGL;
 
 
@@ -465,40 +469,19 @@ void SDLEventLoop()
 	// starve SDL. 
 	while (SDL_PollEvent(&ev)) 
 	{
+		VariantList v;
+		v.Get(0).Set((Entity*)&ev); //it's not an entity, but this is just a hack to send a pointer that might be 32 or 64 bits, the other side needs to convert it to SDL_Event*
+		g_sig_SDLEvent(&v);
+
 		switch (ev.type) 
 		{
 		case SDL_QUIT:
 			{
 				g_bAppFinished = true;
 			}
-			break; 
-
-		case SDL_JOYAXISMOTION:
-			{
-				int accelerometer = ev.jaxis.axis;
-				float val = float(ev.jaxis.value) / 32768.0f;
-				//updateAccelerometer(accelerometer, val);
-				
-				CL_Vec3f v = CL_Vec3f(0,0,0);
-
-				switch (ev.jaxis.axis)
-				{
-				case 0: //x
-					g_accelHold.x = val;
-					break;
-				case 1: //y
-					g_accelHold.y = val;
-					break;
-				case 2: //z
-					g_accelHold.z = val;
-					break;
-				}
-				GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_ACCELEROMETER, Variant(g_accelHold));
-
-				//LogMsg("Got %s",PrintVector3(v).c_str());
-			}
 			break;
 
+		
 
 		case SDL_WINDOWEVENT:
 			{
@@ -719,6 +702,29 @@ LogMsg("Tapped %.2f, %.2f", xPos, yPos);
 	}
 }
 
+
+void SDLEnterForegound()
+{
+	SDL_RaiseWindow(g_window);
+	
+}
+
+void SDLSetFullScreen()
+{
+	SDL_SetWindowFullscreen(g_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+}
+
+void SDLMaximizeWindow()
+{
+	SDL_MaximizeWindow(g_window);
+}
+
+void SDLRestoreWindow()
+{
+	SDL_RestoreWindow(g_window);
+}
+
+
 #ifdef PLATFORM_LINUX
 
 //linux doesn't have a SDL2_main lib I guess?
@@ -733,8 +739,6 @@ int SDL_main(int argc, char *argv[])
 	uint32 height = 1080;
 
 
-	
-
 	for (int l = 0; argv[l]; l++)
 	{
 		
@@ -746,7 +750,6 @@ int SDL_main(int argc, char *argv[])
 		}
 	}
 
-
 #ifndef C_GL_MODE
  bcm_host_init();
  graphics_get_display_size(0 /* LCD */, &width, &height);
@@ -755,15 +758,14 @@ int SDL_main(int argc, char *argv[])
 
 #endif
 
-		
 	    SetPrimaryScreenSize(width, height);
-
 		SetEmulatedPlatformID(PLATFORM_ID_LINUX);
 		SetForcedOrientation(ORIENTATION_DONT_CARE);
-
-		SetupScreenInfo(g_winVideoScreenX,g_winVideoScreenY, ORIENTATION_DONT_CARE);
 	
 		GetBaseApp()->OnPreInitVideo(); //gives the app level code a chance to override any of these parms if it wants to
+
+		SetupScreenInfo(g_winVideoScreenX, g_winVideoScreenY, ORIENTATION_DONT_CARE);
+
 
 	if (!InitSDL())
 	{
@@ -771,7 +773,6 @@ int SDL_main(int argc, char *argv[])
 		goto cleanup;
 	}
 
-	SDL_JoystickEventState(SDL_IGNORE);
 	
 	//SetupScreenInfo(GetPrimaryGLX(), GetPrimaryGLY(), ORIENTATION_PORTRAIT);
 	SDL_ShowCursor(true);
@@ -801,12 +802,13 @@ int SDL_main(int argc, char *argv[])
 #endif
 		SDLEventLoop();
 
-		if (g_isInForeground) 
-		{
-			GetBaseApp()->Update();
-		}
+		GetBaseApp()->Update();
+		
 
-		GetBaseApp()->Draw();
+		if (g_isInForeground)
+		{
+			GetBaseApp()->Draw();
+		}
  
 		while (!GetBaseApp()->GetOSMessages()->empty())
 		{
@@ -847,26 +849,7 @@ int SDL_main(int argc, char *argv[])
 					break;
 
 				case OSMessage::MESSAGE_SET_ACCELEROMETER_UPDATE_HZ:
-					if( SDL_NumJoysticks() > 0 )
-					{
-						if (m.m_x == 0)
-						{
-							//disable it if needed
-							if (g_pSDLJoystick)
-							{
-								SDL_JoystickClose(g_pSDLJoystick);
-								g_pSDLJoystick = NULL;
-								SDL_JoystickEventState(SDL_IGNORE);
-							}
-						} else
-						{
-							if (!g_pSDLJoystick)
-							{
-								g_pSDLJoystick = SDL_JoystickOpen(0);
-								SDL_JoystickEventState(SDL_ENABLE);
-							}
-						}
-					}
+					
 					break;
 			}
 		}
@@ -901,11 +884,7 @@ int SDL_main(int argc, char *argv[])
 	GetBaseApp()->Kill();
 
 cleanup:
-	if (g_pSDLJoystick)
-	{
-		SDL_JoystickClose(g_pSDLJoystick);
-		g_pSDLJoystick = NULL;
-	}
+	
 	
 	SDL_Quit();
 
