@@ -39,7 +39,7 @@ void GamepadSDL2::InitExtraSDLStuff(SDL_GameController* pController, SDL_Joystic
 
 		}
 
-		if (GetEmulatedPlatformID() == PLATFORM_ID_LINUX)
+		if (GetPlatformID() == PLATFORM_ID_LINUX)
 		{
 			//for whatever reason, a 360 maps incorrectly on raspberry pi os, but correctly on Windows?  Oh well, here's the linux version:
 
