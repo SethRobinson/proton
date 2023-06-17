@@ -1,6 +1,7 @@
 #include "PlatformPrecomp.h"
 #include "MiscUtils.h"
 #include "ResourceUtils.h"
+#include "util/utf8.h"
 
 //taken from Gamedeveloper magazine's InnerProduct (Sean Barrett 2005-03-15)
 
@@ -611,10 +612,24 @@ string GetFileExtension(string fileName)
 
 void TruncateString(string &input, size_t len)
 {
-	if (input.length() > len)
+	if (input.length() <= len) return;
+
+	size_t inputSize = 0;
+	size_t count = 0;
+	for (size_t i = 0; i < input.size(); i++) 
 	{
-		input = input.substr(0, len);
+		i += utf8::internal::sequence_length<const char*>(&input.c_str()[i]) - 1;
+		inputSize++;
+		
+		if (inputSize >= len) 
+		{
+			count = i + 1;
+			break;
+		}
 	}
+	if (count < 1) return;
+
+	input = input.substr(0, count);
 }
 
 bool IsInString(const string &s, const char *search)
@@ -691,11 +706,35 @@ string FilterToValidAscii(const string &input, bool bStrict)
 
 	for (unsigned int i=0; i < input.length(); i++)
 	{
-
+		uint8 seqLen = utf8::internal::sequence_length<const char*>(&input.c_str()[i]);
+		if (seqLen > 1)
+		{ //it's not ASCII for sure
+			i += seqLen - 1;
+			continue;
+		}
 		if ( isOrdinaryChar(input[i], bStrict))
 		{
 			output += input[i];
 		}
+	}
+
+	return output;
+}
+
+string FilterToNumbers(const string& input)
+{
+	string output;
+
+	for (unsigned int i = 0; i < input.length(); i++)
+	{
+		uint8 seqLen = utf8::internal::sequence_length<const char*>(&input.c_str()[i]);
+		if (seqLen > 1) 
+		{ //it's not ASCII for sure
+			i += seqLen - 1;
+			continue;
+		}
+
+		if ((input[i] >= 48 && input[i] <= 57) || (input[i] == 45 && i == 0)) output += input[i];
 	}
 
 	return output;

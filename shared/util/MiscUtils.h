@@ -114,7 +114,8 @@ bool IsInString(const std::string &s, const char *search);
 bool StartsWith(const std::string& text, const std::string& token);
 void RotationToXYMod(float rotation, float *pXMod ,float *pYMod); //given a rotation in degrees, tells you what to flip
 void SetFloatWithTarget(float *p_out_dest, float r_target, float r_amount);
-std::string FilterToValidAscii(const std::string &input, bool bStrict);
+std::string FilterToNumbers(const std::string& input);
+std::string FilterToValidAscii(const std::string& input, bool bStrict);
 bool isOrdinaryChar(char c, bool bStrict);
 int GiveOrTake(int baseNum, int modAmount); //Let's you slightly randomize a #. (5, 2) would return between 3 and 7. (5, give or take 2)
 bool DateIsOlder(int month, int day, int year, int hour, int min, int sec, int monthB, int dayB, int yearB, int hourB, int minB, int secB);

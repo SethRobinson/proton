@@ -915,6 +915,83 @@ void RTFont::OnLoadSurfaces()
 	ReloadFontTextureOnly();
 }
 
+bool RTFont::IsValidChar(uint16 c, bool bStrict) 
+{
+	if (!bStrict)
+	{
+		if (c - m_header.firstChar >= m_chars.size()) return false;
+		if (m_chars[c - m_header.firstChar].data.charSizeX < 1) return false; //we don't actually have this char in font
+
+		return true; //we have this char in font
+	}
+
+	if (
+		(c >= 45 && c <= 46) ||
+		(c >= 48 && c <= 57) ||
+		(c >= 65 && c <= 90) ||
+		(c >= 97 && c <= 122) ||
+		(c >= 192 && c <= 214) ||
+		(c >= 216 && c <= 246) ||
+		(c >= 248 && c <= 255) ||
+		(c >= 256 && c <= 383) ||
+		(c == 402) ||
+		(c >= 506 && c <= 511) ||
+		(c == 902) ||
+		(c >= 904 && c <= 906) ||
+		(c == 908) ||
+		(c >= 910 && c <= 929) ||
+		(c >= 931 && c <= 974) ||
+		(c >= 1025 && c <= 1036) ||
+		(c >= 1038 && c <= 1103) ||
+		(c >= 1105 && c <= 1116) ||
+		(c >= 1118 && c <= 1119) ||
+		(c >= 1168 && c <= 1169)) return true;
+
+	return false;
+}
+
+string RTFont::FilterOutInvalidChars(const string& input, bool bStrict) {
+	string output;
+
+	uint8 seqLen = 0;
+	uint16 curChar = 0, resChar = 0; //curChar is used to check char in font, resChar is actually added to output
+
+	for (size_t i = 0; i < input.length(); i++)
+	{
+		seqLen = utf8::internal::sequence_length<const char*>(&input.c_str()[i]);
+		if (seqLen > 2)
+		{
+			i += seqLen - 1;
+			continue;
+		}
+		if (seqLen < 1) seqLen = 1;
+
+		if (seqLen > 1)
+		{
+			resChar = *(uint16*)&input.c_str()[i];
+			try {
+				utf8::utf8to16<uint16*, const char*>(&input.c_str()[i], &input.c_str()[i + seqLen], &curChar);
+			}
+			catch (...) {
+				i += seqLen - 1;
+				continue;
+			}
+			i += seqLen - 1;
+		}
+		else {
+			curChar = input[i];
+			resChar = curChar;
+		}
+
+		if (IsValidChar(curChar, bStrict))
+		{
+			output.append((char*)&resChar, seqLen);
+		}
+	}
+
+	return output;
+}
+
 unsigned int RTFont::GetColorFromString( const char *pText )
 {
 	if (pText[0] == '`')

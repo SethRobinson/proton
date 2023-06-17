@@ -2,6 +2,7 @@
 
 #include "InputTextRenderComponent.h"
 #include "BaseApp.h"
+#include "util/utf8.h"
 
 #ifdef PLATFORM_HTML5
 #include "html5/SharedJSLIB.h";
@@ -220,6 +221,10 @@ void InputTextRenderComponent::ActivateKeyboard(VariantList *pVList)
 	
 	case INPUT_TYPE_EMAIL:
 		o.m_parm2 = OSMessage::PARM_KEYBOARD_TYPE_EMAIL;
+		break;
+
+	case INPUT_TYPE_ALL:
+		o.m_parm2 = OSMessage::PARM_KEYBOARD_TYPE_ALL;
 		break;
 	}
 
@@ -521,7 +526,20 @@ void InputTextRenderComponent::OnInput( VariantList *pVList )
 
 			//but is it too long for our input box?
 			TruncateString(input, *m_pInputLengthMax);
-			input = FilterToValidAscii(input, *m_pFiltering == FILTERING_STRICT);
+			switch (*m_pInputType) 
+			{
+			case INPUT_TYPE_NUMBERS:
+				input = FilterToNumbers(input);
+				break;
+
+			case INPUT_TYPE_ALL:
+				input = GetBaseApp()->GetFont((eFont)*m_pFontID)->FilterOutInvalidChars(input, *m_pFiltering == FILTERING_STRICT);
+				break;
+
+			default:
+				input = FilterToValidAscii(input, *m_pFiltering == FILTERING_STRICT);
+				break;
+			}
 			if (*m_pHasFocus)
 			{
 				SetLastStringInput( input);
@@ -536,14 +554,29 @@ void InputTextRenderComponent::OnInput( VariantList *pVList )
 #ifdef _DEBUG		
 		//LogMsg("InputTextRender: Got key %u (%c)", pVList->Get(2).GetUINT32(), (char)pVList->Get(2).GetUINT32());
 #endif
-		if (pVList->Get(2).GetUINT32() > 255)
+		if (pVList->Get(2).GetUINT32() >= 500000)
 		{
 			//a proton virtual key, like f1 or something. Ignore
 			break;
 		}
 
 
-		char c = (char)pVList->Get(2).GetUINT32();
+#ifdef PLATFORM_WINDOWS
+		uint16 c = pVList->Get(2).GetUINT32();
+#else
+		uint32 c = 0;
+		uint16 u16c = (uint16)pVList->Get(2).GetUINT32();
+		try 
+		{
+			utf8::utf16to8<uint16*, char*>(&u16c, &u16c + 1, (char*)&c);
+		}
+		catch (...) //Something is wrong here...
+		{
+			break;
+		}
+#endif
+		uint8 seqLen = utf8::internal::sequence_length<char*>((char*)&c);
+		if (seqLen > 2) break; //we don't support these characters...
 		
 		string input = GetLastStringInput();
 
@@ -561,22 +594,48 @@ void InputTextRenderComponent::OnInput( VariantList *pVList )
 			//backspace
 			if (input.length() > 0)
 			{
-				input.erase(input.length()-1, 1);
+				if (input.length() < 2) input.erase(input.length() - 1, 1);
+				else {
+					uint8 countToRemove = utf8::internal::sequence_length<const char*>(&input.c_str()[input.length() - 2]);
+					if (countToRemove < 1) countToRemove = 1;
+					input.erase(input.length() - countToRemove, countToRemove);
+				}
 			}
 			break;
 
 			
 		break;
 
-		default:
-
-			if (input.size() < *m_pInputLengthMax)
+		default: 
+		{
+			size_t inputSize = 0;
+			for (size_t i = 0; i < input.size(); i++) 
 			{
-				input += c;
-			} 
+				i += utf8::internal::sequence_length<const char*>(&input.c_str()[i]) - 1;
+				inputSize++;
+			}
+
+			if (inputSize < *m_pInputLengthMax)
+			{
+				input.append((char*)&c, seqLen);
+			}
+		}
 		}
 	
-		SetLastStringInput( FilterToValidAscii(input, *m_pFiltering == FILTERING_STRICT));
+		switch (*m_pInputType)
+		{
+		case INPUT_TYPE_NUMBERS:
+			SetLastStringInput(FilterToNumbers(input));
+			break;
+
+		case INPUT_TYPE_ALL:
+			SetLastStringInput(GetBaseApp()->GetFont((eFont)*m_pFontID)->FilterOutInvalidChars(input, *m_pFiltering == FILTERING_STRICT));
+			break;
+
+		default:
+			SetLastStringInput(FilterToValidAscii(input, *m_pFiltering == FILTERING_STRICT));
+			break;
+		}
 		break;
 	}	
 }

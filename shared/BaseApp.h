@@ -131,7 +131,8 @@ struct OSMessage
         PARM_KEYBOARD_TYPE_NUMBERS,
         PARM_KEYBOARD_TYPE_URL,
         PARM_KEYBOARD_TYPE_ASCII_FULL,
-        PARM_KEYBOARD_TYPE_EMAIL
+        PARM_KEYBOARD_TYPE_EMAIL,
+        PARM_KEYBOARD_TYPE_ALL
     };
     
     eMessageType m_type;
