@@ -917,12 +917,13 @@ void RTFont::OnLoadSurfaces()
 
 bool RTFont::IsValidChar(uint16 c, bool bStrict) 
 {
+	//check if we have this char in font
+	if (c - m_header.firstChar >= m_chars.size()) return false;
+	if (m_chars[c - m_header.firstChar].data.charSizeX < 1) return false;
+
 	if (!bStrict)
 	{
-		if (c - m_header.firstChar >= m_chars.size()) return false;
-		if (m_chars[c - m_header.firstChar].data.charSizeX < 1) return false; //we don't actually have this char in font
-
-		return true; //we have this char in font
+		return true;
 	}
 
 	if (
