@@ -721,7 +721,7 @@ string FilterToValidAscii(const string &input, bool bStrict)
 	return output;
 }
 
-string FilterToNumbers(const string& input)
+string FilterToNumbers(const string& input, bool bAllowNegative)
 {
 	string output;
 
@@ -734,7 +734,10 @@ string FilterToNumbers(const string& input)
 			continue;
 		}
 
-		if ((input[i] >= 48 && input[i] <= 57) || (input[i] == 45 && i == 0)) output += input[i];
+		if ((input[i] >= 48 && input[i] <= 57) || (input[i] == 45 && i == 0 && bAllowNegative))
+		{
+			output += input[i];
+		}
 	}
 
 	return output;

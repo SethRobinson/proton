@@ -678,16 +678,9 @@ LogMsg("Tapped %.2f, %.2f", xPos, yPos);
 			int vKey = ConvertSDLKeycodeToProtonVirtualKey(ev.key.keysym.sym);
 			GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_CHAR_RAW, (float)vKey, (float)VIRTUAL_KEY_PRESS);
 
-			if (vKey >= SDLK_SPACE && vKey <= SDLK_DELETE || vKey == SDLK_BACKSPACE || vKey == SDLK_RETURN)
+			if (vKey == SDLK_BACKSPACE || vKey == SDLK_RETURN) //SDL Text Input only handles actual chars...
 			{
-				signed char key = vKey;
-
-				if (ev.key.keysym.mod & KMOD_SHIFT || ev.key.keysym.mod & KMOD_CAPS)
-				{
-					key = toupper(key);
-				}
-
-				GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_CHAR, (float)key, (float)VIRTUAL_KEY_PRESS);
+				GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_CHAR, (float)vKey, (float)VIRTUAL_KEY_PRESS);
 			}
 		}
 		break;
@@ -696,6 +689,14 @@ LogMsg("Tapped %.2f, %.2f", xPos, yPos);
 		{
 			int vKey = ConvertSDLKeycodeToProtonVirtualKey(ev.key.keysym.sym);
 			GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_CHAR_RAW, (float)vKey, (float)VIRTUAL_KEY_RELEASE);
+		}
+		break;
+
+		case SDL_TEXTINPUT:
+		{
+			string text = ev.text.text; //SDL Text Input doesn't give us a char, it gives us a null-terminated string...
+
+			GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_PASTE, Variant(text), 0); //pretending user pasted something, this way we will keep filtering in input
 		}
 		break;
 		}
@@ -776,6 +777,7 @@ int SDL_main(int argc, char *argv[])
 	
 	//SetupScreenInfo(GetPrimaryGLX(), GetPrimaryGLY(), ORIENTATION_PORTRAIT);
 	SDL_ShowCursor(true);
+	SDL_StopTextInput();
 	if (!GetBaseApp()->Init())
 	{
 		LogError("Couldn't initialize game. Yeah.\n\nDid everything unzip right?");
@@ -833,9 +835,11 @@ int SDL_main(int argc, char *argv[])
 					break;
 			
 				case OSMessage::MESSAGE_OPEN_TEXT_BOX:
+					SDL_StartTextInput();
 					break;
 				
 				case OSMessage::MESSAGE_CLOSE_TEXT_BOX:
+					SDL_StopTextInput();
 					break;
 					
 				case OSMessage::MESSAGE_SET_FPS_LIMIT:

@@ -88,7 +88,8 @@ Entity * EnterNameMenuCreate(Entity *pParentEnt)
 	pTextRenderComp->GetVar("filtering")->Set(uint32(InputTextRenderComponent::FILTERING_LOOSE));
 
 	//you also need to do this for loose filtering to make sure the best keyboard is chosen on the device
-	pTextRenderComp->GetVar("inputType")->Set(uint32(InputTextRenderComponent::INPUT_TYPE_ASCII_FULL));
+	//right now we allow we allow all letters, including Cyrillic and letters like ÄÖÜÕŠŽ
+	pTextRenderComp->GetVar("inputType")->Set(uint32(InputTextRenderComponent::INPUT_TYPE_ALL));
 
 	//control how many characters the user can enter
 	pTextRenderComp->GetVar("inputLengthMax")->Set(uint32(18));

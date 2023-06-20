@@ -529,7 +529,7 @@ void InputTextRenderComponent::OnInput( VariantList *pVList )
 			switch (*m_pInputType) 
 			{
 			case INPUT_TYPE_NUMBERS:
-				input = FilterToNumbers(input);
+				input = FilterToNumbers(input, *m_pFiltering == FILTERING_STRICT);
 				break;
 
 			case INPUT_TYPE_ALL:
@@ -625,7 +625,7 @@ void InputTextRenderComponent::OnInput( VariantList *pVList )
 		switch (*m_pInputType)
 		{
 		case INPUT_TYPE_NUMBERS:
-			SetLastStringInput(FilterToNumbers(input));
+			SetLastStringInput(FilterToNumbers(input, *m_pFiltering == FILTERING_STRICT));
 			break;
 
 		case INPUT_TYPE_ALL:
