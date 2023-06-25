@@ -154,6 +154,7 @@
     //we send in the "0" as default text, because if we send blank, we won't get backspace messages.
     [_textField setText:[NSString stringWithCString: "00" encoding: [NSString defaultCStringEncoding]]];
     [_textField setAutocorrectionType: UITextAutocorrectionTypeNo];
+    [_textField setSpellCheckingType: UITextSpellCheckingTypeNo];
     [_textField setClearsOnBeginEditing: NO];
     
     m_keyboardType = pMsg->m_parm2;
@@ -161,7 +162,7 @@
     switch (m_keyboardType)
     {
         case OSMessage::PARM_KEYBOARD_TYPE_NUMBERS:
-            m_requestedKeyboardType = UIKeyboardTypeNumbersAndPunctuation;
+            m_requestedKeyboardType = UIKeyboardTypeASCIICapableNumberPad;
             break;
             
         case OSMessage::PARM_KEYBOARD_TYPE_URL:
@@ -170,6 +171,10 @@
             
         case OSMessage::PARM_KEYBOARD_TYPE_EMAIL:
             m_requestedKeyboardType = UIKeyboardTypeEmailAddress;
+            break;
+            
+        case OSMessage::PARM_KEYBOARD_TYPE_ALL:
+            m_requestedKeyboardType = UIKeyboardTypeDefault;
             break;
             
         default:

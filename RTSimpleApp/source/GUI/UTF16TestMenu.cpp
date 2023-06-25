@@ -29,7 +29,7 @@ Entity* UTF16TestMenuCreate(Entity* pParentEnt)
 	Entity * pTextSmall = CreateTextBoxEntity(pBG, "testTextSmall", CL_Vec2f(20, 20), GetScreenSize() - 40.0f, testMsg);
 	SetupTextEntity(pTextSmall, FONT_SMALL);
 
-	CL_Vec2f largeTextPos = { 20, GetSize2DEntity(pTextSmall).y + 30 };
+	CL_Vec2f largeTextPos(20, GetSize2DEntity(pTextSmall).y + 30);
 	CL_Vec2f largeTextBounds = GetScreenSize() - 20.0f;
 	largeTextBounds.y -= largeTextPos.y;
 	Entity* pTextLarge = CreateTextBoxEntity(pBG, "testTextLarge", largeTextPos, largeTextBounds, testMsg);
