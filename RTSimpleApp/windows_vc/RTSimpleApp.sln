@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29519.87
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33801.468
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "winRTSimpleApp", "winRTSimpleApp.vcxproj", "{04D58809-BAE3-4CF4-AD22-15CBF470A0A5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RTSimpleApp", "winRTSimpleApp.vcxproj", "{04D58809-BAE3-4CF4-AD22-15CBF470A0A5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,6 +13,8 @@ Global
 		Debug_GL|x64 = Debug_GL|x64
 		GL_SDL_Debug|Win32 = GL_SDL_Debug|Win32
 		GL_SDL_Debug|x64 = GL_SDL_Debug|x64
+		GL_SDL_Release|Win32 = GL_SDL_Release|Win32
+		GL_SDL_Release|x64 = GL_SDL_Release|x64
 		Release_FMOD_GL|Win32 = Release_FMOD_GL|Win32
 		Release_FMOD_GL|x64 = Release_FMOD_GL|x64
 		Release_GL|Win32 = Release_GL|Win32
@@ -31,6 +33,10 @@ Global
 		{04D58809-BAE3-4CF4-AD22-15CBF470A0A5}.GL_SDL_Debug|Win32.Build.0 = GL_SDL_Debug|Win32
 		{04D58809-BAE3-4CF4-AD22-15CBF470A0A5}.GL_SDL_Debug|x64.ActiveCfg = GL_SDL_Debug|x64
 		{04D58809-BAE3-4CF4-AD22-15CBF470A0A5}.GL_SDL_Debug|x64.Build.0 = GL_SDL_Debug|x64
+		{04D58809-BAE3-4CF4-AD22-15CBF470A0A5}.GL_SDL_Release|Win32.ActiveCfg = GL_SDL_Release|Win32
+		{04D58809-BAE3-4CF4-AD22-15CBF470A0A5}.GL_SDL_Release|Win32.Build.0 = GL_SDL_Release|Win32
+		{04D58809-BAE3-4CF4-AD22-15CBF470A0A5}.GL_SDL_Release|x64.ActiveCfg = GL_SDL_Release|x64
+		{04D58809-BAE3-4CF4-AD22-15CBF470A0A5}.GL_SDL_Release|x64.Build.0 = GL_SDL_Release|x64
 		{04D58809-BAE3-4CF4-AD22-15CBF470A0A5}.Release_FMOD_GL|Win32.ActiveCfg = Release_FMOD_GL|Win32
 		{04D58809-BAE3-4CF4-AD22-15CBF470A0A5}.Release_FMOD_GL|Win32.Build.0 = Release_FMOD_GL|Win32
 		{04D58809-BAE3-4CF4-AD22-15CBF470A0A5}.Release_FMOD_GL|x64.ActiveCfg = Release_FMOD_GL|x64
