@@ -15,6 +15,8 @@
 #include "errno.h"
 #include "util/MiscUtils.h"
 #include <shlobj.h>
+#include <iomanip>
+#include <sstream>
  
 using namespace std;
 
@@ -443,6 +445,47 @@ void GetDateAndTime(int *monthOut, int *dayOut, int *yearOut, int *hourOut, int 
 	*hourOut = today.tm_hour;
 	*minOut = today.tm_min;
 	*secOut = today.tm_sec;
+}
+
+
+string GetTimeAsString()
+{
+	time_t ltime;
+	time(&ltime);
+
+	tm today = *localtime(&ltime);
+
+	stringstream stTemp;
+
+	int hour = today.tm_hour;
+	bool isPM = false;
+
+	if (hour > 12)
+	{
+		hour = hour - 12;
+		isPM = true;
+	}
+	else if (hour == 12)
+	{
+		isPM = true;
+	}
+	else if (hour == 0) // midnight
+	{
+		hour = 12; // 12 AM
+	}
+
+	stTemp << hour << ":" << setw(2) << setfill('0') << today.tm_min;
+
+	if (isPM)
+	{
+		stTemp << " PM";
+	}
+	else
+	{
+		stTemp << " AM";
+	}
+
+	return stTemp.str();
 }
 
 bool CheckDay(const int year, const int month, const int day)

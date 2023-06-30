@@ -623,6 +623,18 @@ bool IsInString(const string &s, const char *search)
 	return false;
 }
 
+bool IsInStringCaseInsensitive(const std::string& s, const char* search)
+{
+	std::string s_lower;
+	std::transform(s.begin(), s.end(), std::back_inserter(s_lower), ::tolower);
+
+	std::string search_lower(search);
+	std::transform(search_lower.begin(), search_lower.end(), search_lower.begin(), ::tolower);
+
+	if (s_lower.find(search_lower) != std::string::npos) return true;
+	return false;
+}
+
 bool StartsWith(const std::string& text, const std::string& token)
 {
 	if (text.length() < token.length())

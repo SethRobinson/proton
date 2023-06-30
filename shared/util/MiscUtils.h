@@ -111,6 +111,7 @@ std::string GetFileExtension(std::string fileName);
 std::string ModifyFileExtension(const std::string fileName, const std::string extension);
 void TruncateString(std::string &input, size_t len);
 bool IsInString(const std::string &s, const char *search);
+bool IsInStringCaseInsensitive(const std::string& s, const char* search);
 bool StartsWith(const std::string& text, const std::string& token);
 void RotationToXYMod(float rotation, float *pXMod ,float *pYMod); //given a rotation in degrees, tells you what to flip
 void SetFloatWithTarget(float *p_out_dest, float r_target, float r_amount);

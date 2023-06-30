@@ -117,7 +117,7 @@ EntityComponent * SlideScreen(Entity *pEnt, bool bIn, int speedMS, int delayToSt
 		vEndPos = CL_Vec2f(vOrigPos.x,vOrigPos.y);
 	} else
 	{
-		vEndPos = CL_Vec2f(GetScreenSizeXf(),vOrigPos.y);
+		vEndPos = CL_Vec2f(vOrigPos.x+GetScreenSizeXf(),vOrigPos.y);
 	}
 
 	return SetupInterpolateComponent(pEnt, "", "pos2d", vEndPos, speedMS, delayToStartMS);
@@ -137,7 +137,7 @@ EntityComponent * SlideScreenBackwards(Entity *pEnt, bool bIn, int speedMS, int 
 		vEndPos = CL_Vec2f(vOrigPos.x,vOrigPos.y);
 	} else
 	{
-		vEndPos = CL_Vec2f(-GetScreenSizeXf(),vOrigPos.y);
+		vEndPos = CL_Vec2f(vOrigPos.x -GetScreenSizeXf(),vOrigPos.y);
 	}
 
 	return SetupInterpolateComponent(pEnt, "", "pos2d", vEndPos, speedMS, delayToStartMS);
