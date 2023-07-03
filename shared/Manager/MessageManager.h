@@ -7,6 +7,37 @@
 //  Programmer(s):  Seth A. Robinson (seth@rtsoft.com)
 //  ***************************************************************
 
+/*
+
+This allows you to call a function after a delay.  To call a static function:
+
+void DoSomething()
+{
+    LogMsg("Doing something");
+}
+
+
+GetMessageManager()->CallStaticFunctionVoid(DoSomething, 1000);
+
+
+Or, if you want to send parms you have to do it this way:
+
+
+void DoSomething(VariantList* pVarList)
+{
+    LogMsg("Doing something, here's the string I was sent: %s", pVarList->Get(0).GetString().c_str());
+}
+
+
+ VariantList vList;
+ vList.Get(0).Set("(a cool string)");
+ GetMessageManager()->CallStaticFunction(DoSomething,  1000, &vList);
+
+ 
+
+
+*/
+
 #ifndef MessageManager_h__
 #define MessageManager_h__
 
@@ -200,12 +231,15 @@ enum eMessageType
 
 	MESSAGE_TYPE_IAP_ITEM_INFO_RESULT, // IAP info result
     MESSAGE_TYPE_HTML5_GOT_UPLOAD,
-
+    MESSAGE_TYPE_CALL_STATIC_FUNCTION_VOID,
     MESSAGE_USER = 1000, //users can add their own messages starting here
     
 };
 
 typedef void(*PtrFuncVarList)(VariantList *);
+
+typedef void(*PtrFunc)(void);
+
 
 class Message: public boost::signals::trackable
 {
@@ -303,6 +337,8 @@ public:
     void AddComponent( Entity *pEnt, int timeMS, EntityComponent *pComp, eTimingSystem timing = GetTiming());
     
     void CallStaticFunction( PtrFuncVarList pFunctionWithVList, int timeMS, const VariantList *v = NULL, eTimingSystem timing = GetTiming() );
+
+    void CallStaticFunctionVoid(PtrFunc pFunction, int timeMS, eTimingSystem timing = GetTiming());
     
     void DeleteMessagesByFunctionCallName( const string &name, eTimingSystem timing = GetTiming());
     void DeleteMessagesToComponent( EntityComponent *pComponent); //kills messages on both timers

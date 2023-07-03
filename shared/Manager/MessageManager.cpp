@@ -298,7 +298,14 @@ void MessageManager::Deliver(Message *m)
 					case MESSAGE_TYPE_CALL_STATIC_FUNCTION:
 						(m->GetFunctionPointer())(&m->GetVariantList());
 						break;
-				
+					case MESSAGE_TYPE_CALL_STATIC_FUNCTION_VOID:
+					{
+						PtrFunc pFunc = (PtrFunc)m->GetFunctionPointer();
+						//now call the function
+						pFunc();
+					}
+						break;
+
 					default:
 						//LogError("Message delivery error");
 						;
@@ -385,6 +392,15 @@ void MessageManager::CallStaticFunction(PtrFuncVarList pFunctionWithVList, int t
 	Message *m = new Message(MESSAGE_CLASS_ENTITY, timing, MESSAGE_TYPE_CALL_STATIC_FUNCTION);
 	m->Set(v);
 	m->SetFunctionPointer(pFunctionWithVList);
+	m->SetDeliveryTime(timeMS);
+	Send(m);
+}
+
+void MessageManager::CallStaticFunctionVoid(PtrFunc pFunction, int timeMS, eTimingSystem timing)
+{
+	Message* m = new Message(MESSAGE_CLASS_ENTITY, timing, MESSAGE_TYPE_CALL_STATIC_FUNCTION_VOID);
+	
+	m->SetFunctionPointer((PtrFuncVarList)pFunction);
 	m->SetDeliveryTime(timeMS);
 	Send(m);
 }

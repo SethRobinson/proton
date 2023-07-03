@@ -647,7 +647,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			if (Width != GetPrimaryGLX() || Height != GetPrimaryGLY())
 			{
-				LogMsg("Got new size: %d, %d.  Have focus is %d, minimized: %d, fullscreen: %d", Width, Height, g_bHasFocus, g_bIsMinimized, g_bIsFullScreen);
+				//LogMsg("Got new size: %d, %d.  Have focus is %d, minimized: %d, fullscreen: %d", Width, Height, g_bHasFocus, g_bIsMinimized, g_bIsFullScreen);
 				
 				if (Width == 0 && Height == 0)
 				{

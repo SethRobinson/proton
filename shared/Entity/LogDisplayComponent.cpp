@@ -343,10 +343,11 @@ void SetConsole(bool bOn, bool bEnableScrollbars)
 	} else
 	{
 		pConsole = GetEntityRoot()->AddEntity(new Entity("ConsoleEnt"));
-		pConsole->GetVar("pos2d")->Set(CL_Vec2f(GetScreenSizeXf()/2, 80));
-		pConsole->GetVar("size2d")->Set(CL_Vec2f(GetScreenSizeXf()/2, GetScreenSizeYf()/2));
-
+		SetAlignmentEntity(pConsole, ALIGNMENT_UPPER_LEFT);
+		pConsole->GetVar("pos2d")->Set(CL_Vec2f(10, 40));
+		pConsole->GetVar("size2d")->Set(CL_Vec2f(GetScreenSizeXf()-20, GetScreenSizeYf()-70));
 		EntityComponent *pComp = new LogDisplayComponent;
+		
 		if (bEnableScrollbars)
 		{
 			pComp->GetVar("enableScrolling")->Set(uint32(1));

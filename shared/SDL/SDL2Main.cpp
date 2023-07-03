@@ -1,6 +1,9 @@
 #include "PlatformSetup.h"
 #include "SDL2Main.h"
 
+#ifdef WIN32
+#include <direct.h>
+#endif
 const char * GetAppName();
 
 using namespace std;
@@ -724,6 +727,26 @@ void SDLRestoreWindow()
 	SDL_RestoreWindow(g_window);
 }
 
+#ifdef WIN32
+
+
+string GetExePath()
+{
+	// Get path to executable:
+	TCHAR szDllName[_MAX_PATH];
+	TCHAR szDrive[_MAX_DRIVE];
+	TCHAR szDir[_MAX_DIR];
+	TCHAR szFilename[256];
+	TCHAR szExt[256];
+	GetModuleFileName(0, szDllName, _MAX_PATH);
+	_splitpath(szDllName, szDrive, szDir, szFilename, szExt);
+
+	return string(szDrive) + string(szDir);
+}
+
+
+#endif
+
 
 #ifdef PLATFORM_LINUX
 
@@ -737,6 +760,16 @@ int SDL_main(int argc, char *argv[])
 
 	uint32 width = 1920;
 	uint32 height = 1080;
+
+
+#ifdef WIN32
+	//first make sure our working directory is the .exe dir
+	_chdir(GetExePath().c_str());
+#endif
+
+
+	srand((unsigned)time(NULL));
+	RemoveFile("log.txt", false);
 
 
 	for (int l = 0; argv[l]; l++)
