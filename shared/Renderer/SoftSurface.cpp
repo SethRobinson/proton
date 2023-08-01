@@ -87,7 +87,7 @@ bool SoftSurface::Init( int sizex, int sizey, eSurfaceType type, bool bRememberO
 	
 	int dataSize = sizex*sizey*m_bytesPerPixel;
 	assert(!m_pPixels);
-	m_pPixels = new byte[dataSize];
+	m_pPixels = new uint8[dataSize];
 	m_usedPitch = sizex*m_bytesPerPixel;
 	m_pitchOffset = 0;
 	if (!m_pPixels)
@@ -117,7 +117,7 @@ void SoftSurface::FillColor( glColorBytes color )
 		
 	} else if (m_surfaceType == SURFACE_RGB)
 	{
-		byte *pSurf = m_pPixels;
+		uint8 *pSurf = m_pPixels;
 
 		for (int n=0; n < m_width*m_height; n+=1)
 		{
@@ -172,7 +172,7 @@ bool SoftSurface::SetPaletteFromBMP(const string fName, eColorKeyType colorKey)
 
 	//new way
 
-	byte *pPaletteData = f.GetAsBytes()+14+sizeof(BMPImageHeader);
+	uint8 *pPaletteData = f.GetAsBytes()+14+sizeof(BMPImageHeader);
 
 	int colors = 256;
 	uint32 colorsUsed;
@@ -244,7 +244,7 @@ void SoftSurface::CheckDinkColorKey()
 }
 //Special version that can modified checkerboard patterns to 32 bit shadows instead.  Changes by Dan Walma released under CC0 ( http://www.dinknetwork.com/forum.cgi?MID=200849#200860 )
 
-bool SoftSurface::LoadBMPTextureCheckerBoardFix(byte *pMem)
+bool SoftSurface::LoadBMPTextureCheckerBoardFix(uint8 *pMem)
 {
 	BMPImageHeader *pBmpImageInfo = (BMPImageHeader*)&pMem[14];
 	//get around alignment issues
@@ -260,7 +260,7 @@ bool SoftSurface::LoadBMPTextureCheckerBoardFix(byte *pMem)
 	//LogMsg("mem cpy of image data pointer");
 
 	memcpy(&offsetToImageData, &pMem[10], 2);
-	byte *pPixelData = &pMem[offsetToImageData];
+	uint8 *pPixelData = &pMem[offsetToImageData];
 
 	m_width = bmpImageInfoCopy.Width;
 	m_height = bmpImageInfoCopy.Height;
@@ -338,7 +338,7 @@ bool SoftSurface::LoadBMPTextureCheckerBoardFix(byte *pMem)
 	int dataSize = (m_usedPitch + m_pitchOffset)*m_height;
 	assert(!m_pPixels);
 
-	m_pPixels = new byte[dataSize*m_bytesPerPixel];
+	m_pPixels = new uint8[dataSize*m_bytesPerPixel];
 	if (!m_pPixels) return false;
 	if (m_height < 0)
 	{
@@ -365,7 +365,7 @@ bool SoftSurface::LoadBMPTextureCheckerBoardFix(byte *pMem)
 		assert(bmpImageInfoCopy.Compression == BMP_COMPRESSION_NONE);
 
 		//load the palette info.  Note:  Bitmaps are BGR format
-		byte *pPaletteData = (byte*)pBmpImageInfo + bmpImageInfoCopy.Size;
+		uint8 *pPaletteData = (uint8*)pBmpImageInfo + bmpImageInfoCopy.Size;
 		LoadPaletteDataFromBMPMemory(pPaletteData, colors);
 
 
@@ -381,8 +381,8 @@ bool SoftSurface::LoadBMPTextureCheckerBoardFix(byte *pMem)
 			for (int x = 0; x < m_width; x++)
 			{
 				//first calculate the byte where the bit we want would be in.. fast?  No, but so what, who even uses 1-bit bmps!
-				byte *pByte = &pPixelData[(m_height - y - 1)*totalPitch + (x / 8)];
-				byte colorIndex = 0;
+				uint8 *pByte = &pPixelData[(m_height - y - 1)*totalPitch + (x / 8)];
+				uint8 colorIndex = 0;
 
 				if (*pByte & 1 << (x % 8)) //first figuring out which bit we want (the x%8 figures it out) from pByte, then shifting and getting it
 				{
@@ -415,11 +415,11 @@ bool SoftSurface::LoadBMPTextureCheckerBoardFix(byte *pMem)
 			//looks like they don't use all the colors available
 			colors = bmpImageInfoCopy.ColorsUsed;
 		}
-		byte *pPaletteData = (byte*)pBmpImageInfo + bmpImageInfoCopy.Size;
+		uint8 *pPaletteData = (uint8*)pBmpImageInfo + bmpImageInfoCopy.Size;
 		LoadPaletteDataFromBMPMemory(pPaletteData, colors);
 		if (bmpImageInfoCopy.Compression == BMP_COMPRESSION_RLE8)
 		{
-			byte* lTempData = new byte[bmpImageInfoCopy.Size];
+			uint8* lTempData = new uint8[bmpImageInfoCopy.Size];
 
 			if (!RLE8BitDecompress(m_pPixels, pPixelData, dataSize, bmpImageInfoCopy.Size))
 			{
@@ -445,7 +445,7 @@ bool SoftSurface::LoadBMPTextureCheckerBoardFix(byte *pMem)
 
 			CheckDinkColorKey();
 
-			byte pByte;
+			uint8 pByte;
 
 			for (int y = 0; y < m_height; y++)
 			{
@@ -484,7 +484,7 @@ bool SoftSurface::LoadBMPTextureCheckerBoardFix(byte *pMem)
 		{
 			for (int x = 0; x < m_width; x++)
 			{
-				byte *pByte = &pPixelData[(m_height - y - 1)*totalPitch + x * 2];
+				uint8 *pByte = &pPixelData[(m_height - y - 1)*totalPitch + x * 2];
 
 				uint16 color = *(uint16*)pByte;
 				uint8 red = (color >> 10) & 31;
@@ -526,7 +526,7 @@ bool SoftSurface::LoadBMPTextureCheckerBoardFix(byte *pMem)
 		{
 			for (int x = 0; x < m_width; x++)
 			{
-				byte *pSrc = &pPixelData[((m_height - y - 1)*totalPitch) + x * 3];
+				uint8 *pSrc = &pPixelData[((m_height - y - 1)*totalPitch) + x * 3];
 				pImg[y*m_width + x] = GetFinalRGBAColorWithColorKey(glColorBytes(pSrc[2], pSrc[1], pSrc[0], 255));
 			}
 		}
@@ -558,7 +558,7 @@ bool SoftSurface::LoadBMPTextureCheckerBoardFix(byte *pMem)
 		{
 			for (int x = 0; x < m_width; x++)
 			{
-				byte *pSrc = &pPixelData[(m_height - y - 1)*totalPitch + x * 4];
+				uint8 *pSrc = &pPixelData[(m_height - y - 1)*totalPitch + x * 4];
 				pImg[y*m_width + x] = GetFinalRGBAColorWithColorKey(glColorBytes(pSrc[2], pSrc[1], pSrc[0], pSrc[3]));
 			}
 		}
@@ -615,7 +615,7 @@ void ReadDataFromInputStream(png_structp png_ptr, png_bytep outBytes,
 	inputStream.second -= length;
 }
 
-bool SoftSurface::LoadPNGTexture(byte *pMem, int inputSize, bool bApplyCheckerBoardFix)
+bool SoftSurface::LoadPNGTexture(uint8 *pMem, int inputSize, bool bApplyCheckerBoardFix)
 {
 	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 
@@ -685,7 +685,7 @@ bool SoftSurface::LoadPNGTexture(byte *pMem, int inputSize, bool bApplyCheckerBo
 		return false;
 	}
 	
-	m_pPixels = new byte[m_width*m_height*m_bytesPerPixel];
+	m_pPixels = new uint8[m_width*m_height*m_bytesPerPixel];
 	glColorBytes *pImg = (glColorBytes*)m_pPixels;
 
 	png_bytep* row_pointers = new png_bytep[m_height];
@@ -706,7 +706,7 @@ bool SoftSurface::LoadPNGTexture(byte *pMem, int inputSize, bool bApplyCheckerBo
 			{
 				for (int x = 0; x < m_width; x++)
 				{
-					byte pSrc = row_pointers[y][x];
+					uint8 pSrc = row_pointers[y][x];
 					pImg[y*m_width + x] = GetFinalRGBAColorWithColorKey(glColorBytes(pSrc, pSrc, pSrc, 255));
 				}
 			}
@@ -727,7 +727,7 @@ bool SoftSurface::LoadPNGTexture(byte *pMem, int inputSize, bool bApplyCheckerBo
 			{
 				for (int x = 0; x < m_width; x++)
 				{
-					byte *pSrc = &row_pointers[y][x * 3];
+					uint8 *pSrc = &row_pointers[y][x * 3];
 					pImg[y*m_width + x] = GetFinalRGBAColorWithColorKey(glColorBytes(pSrc[0], pSrc[1], pSrc[2], 255));
 				}
 			}
@@ -748,7 +748,7 @@ bool SoftSurface::LoadPNGTexture(byte *pMem, int inputSize, bool bApplyCheckerBo
 			{
 				for (int x = 0; x < m_width; x++)
 				{
-					byte *pSrc = &row_pointers[y][x * 4];
+					uint8 *pSrc = &row_pointers[y][x * 4];
 					pImg[y*m_width + x] = GetFinalRGBAColorWithColorKey(glColorBytes(pSrc[0], pSrc[1], pSrc[2], pSrc[3]));
 				}
 			}
@@ -979,7 +979,7 @@ void SoftSurface::FadeCheckerboardAlphaPixel(glColorBytes * aDestination, const 
 	}
 }
 
-bool SoftSurface::LoadBMPTexture(byte *pMem)
+bool SoftSurface::LoadBMPTexture(uint8 *pMem)
 {
 
 	BMPImageHeader *pBmpImageInfo = (BMPImageHeader*)&pMem[14];
@@ -999,7 +999,7 @@ bool SoftSurface::LoadBMPTexture(byte *pMem)
 	//LogMsg("mem cpy of image data pointer");
 
 	memcpy(&offsetToImageData, &pMem[10], 2);
-	byte *pPixelData = &pMem[offsetToImageData];
+	uint8 *pPixelData = &pMem[offsetToImageData];
 
 	m_width = bmpImageInfoCopy.Width;
 	m_height =  bmpImageInfoCopy.Height;
@@ -1084,7 +1084,7 @@ bool SoftSurface::LoadBMPTexture(byte *pMem)
 
 	int dataSize = (m_usedPitch+m_pitchOffset)*m_height;
 	assert(!m_pPixels);
-	m_pPixels = new byte[dataSize*m_bytesPerPixel];
+	m_pPixels = new uint8[dataSize*m_bytesPerPixel];
 	if (!m_pPixels) return false;
 	if (m_height < 0)
 	{
@@ -1111,7 +1111,7 @@ bool SoftSurface::LoadBMPTexture(byte *pMem)
 		assert(bmpImageInfoCopy.Compression == BMP_COMPRESSION_NONE);
 
 		//load the palette info.  Note:  Bitmaps are BGR format
-		byte *pPaletteData = (byte*)pBmpImageInfo + bmpImageInfoCopy.Size;
+		uint8 *pPaletteData = (uint8*)pBmpImageInfo + bmpImageInfoCopy.Size;
 		LoadPaletteDataFromBMPMemory(pPaletteData, colors);
 
 		glColorBytes *pImg = (glColorBytes*)m_pPixels;
@@ -1126,8 +1126,8 @@ bool SoftSurface::LoadBMPTexture(byte *pMem)
 			for (int x=0; x < m_width; x++)
 			{
 				//first calculate the byte where the bit we want would be in.. fast?  No, but so what, who even uses 1-bit bmps!
-				byte *pByte = &pPixelData[(m_height-y-1)*totalPitch+(x/8)];
-				byte colorIndex = 0;
+				uint8 *pByte = &pPixelData[(m_height-y-1)*totalPitch+(x/8)];
+				uint8 colorIndex = 0;
 
 				if (*pByte & 1<< (x%8) ) //first figuring out which bit we want (the x%8 figures it out) from pByte, then shifting and getting it
 				{
@@ -1174,7 +1174,7 @@ bool SoftSurface::LoadBMPTexture(byte *pMem)
 
 		//load the palette info.  Note:  Bitmaps are BGR format
 
-		byte *pPaletteData = (byte*)pBmpImageInfo + bmpImageInfoCopy.Size;
+		uint8 *pPaletteData = (uint8*)pBmpImageInfo + bmpImageInfoCopy.Size;
 		LoadPaletteDataFromBMPMemory(pPaletteData, colors);
 
 	}else if (srcBytesPerPixel == 2)
@@ -1193,7 +1193,7 @@ bool SoftSurface::LoadBMPTexture(byte *pMem)
 		{
 			for (int x=0; x < m_width; x++)
 			{
-				byte *pByte = &pPixelData[(m_height-y-1)*totalPitch+x*2];
+				uint8 *pByte = &pPixelData[(m_height-y-1)*totalPitch+x*2];
 
 				uint16 color = *(uint16*)pByte;
 				uint8 red = ( color >> 10 ) & 31;
@@ -1233,7 +1233,7 @@ bool SoftSurface::LoadBMPTexture(byte *pMem)
 		{
 			for (int x=0; x < m_width; x++)
 			{
-				byte *pSrc = &pPixelData[ ((m_height-y-1)*totalPitch)+x*3];
+				uint8 *pSrc = &pPixelData[ ((m_height-y-1)*totalPitch)+x*3];
 				pImg[y*m_width+x] = GetFinalRGBAColorWithColorKey(glColorBytes(pSrc[2], pSrc[1], pSrc[0], 255));
 			}
 		}
@@ -1267,7 +1267,7 @@ bool SoftSurface::LoadBMPTexture(byte *pMem)
 			{
 				for (int x = 0; x < m_width; x++)
 				{
-					byte* pSrc = &pPixelData[(m_height - y - 1) * totalPitch + x * 4];
+					uint8* pSrc = &pPixelData[(m_height - y - 1) * totalPitch + x * 4];
 					pImg[y * m_width + x] = GetFinalRGBAColorWithColorKey(glColorBytes(pSrc[3], pSrc[2], pSrc[1], pSrc[0]));
 				}
 			}
@@ -1280,7 +1280,7 @@ bool SoftSurface::LoadBMPTexture(byte *pMem)
 			{
 				for (int x = 0; x < m_width; x++)
 				{
-					byte* pSrc = &pPixelData[(m_height - y - 1) * totalPitch + x * 4];
+					uint8* pSrc = &pPixelData[(m_height - y - 1) * totalPitch + x * 4];
 					pImg[y * m_width + x] = GetFinalRGBAColorWithColorKey(glColorBytes(pSrc[2], pSrc[1], pSrc[0], pSrc[3]));
 				}
 			}
@@ -1317,7 +1317,7 @@ bool SoftSurface::LoadBMPTexture(byte *pMem)
 
 
 #define GL_RGBA8 0x8058
-bool SoftSurface::LoadRTTexture(byte *pMem)
+bool SoftSurface::LoadRTTexture(uint8 *pMem)
 {
 	rttex_header *pTexHeader = (rttex_header*)pMem;
 	rttex_mip_header *pMipSection;
@@ -1329,7 +1329,7 @@ bool SoftSurface::LoadRTTexture(byte *pMem)
 	int texType = pTexHeader->format;
 	m_originalWidth = pTexHeader->originalWidth;
 	m_originalHeight = pTexHeader->originalHeight;
-	byte *pCurPos = pMem + sizeof(rttex_header);
+	uint8 *pCurPos = pMem + sizeof(rttex_header);
 
 #define GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG			0x8C00 //35840
 #define GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG			0x8C03 //35843
@@ -1337,7 +1337,7 @@ bool SoftSurface::LoadRTTexture(byte *pMem)
 
 	pMipSection = (rttex_mip_header*)pCurPos;
 	pCurPos += sizeof(rttex_mip_header);
-	byte *pTextureData =  (byte*)pCurPos ;
+	uint8 *pTextureData =  (uint8*)pCurPos ;
 
 	//only load the first image, not the mipmaps, if we have any
 	if (pTexHeader->format < GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG || pTexHeader->format > GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG) //doesn't look like a compressed texture
@@ -1395,7 +1395,7 @@ bool SoftSurface::LoadRTTexture(byte *pMem)
 	return true;
 }
 
-bool SoftSurface::LoadFileFromMemory( byte *pMem, eColorKeyType colorKey, int inputSize, bool bAddAlphaChannelIfPadded, bool bApplyCheckerboardFix)
+bool SoftSurface::LoadFileFromMemory( uint8 *pMem, eColorKeyType colorKey, int inputSize, bool bAddAlphaChannelIfPadded, bool bApplyCheckerboardFix)
 {
 	
 	Kill();
@@ -1464,7 +1464,7 @@ void SoftSurface::IncreaseMemCounter(int mem)
 
 //based on source by Codehead 08/11/04 taken from http://gpwiki.org/index.php/LoadBMPCpp
 
-bool SoftSurface::RLE8BitDecompress(byte *pDst, byte *pSrc, int dstSize, int imageInfoSize)
+bool SoftSurface::RLE8BitDecompress(uint8 *pDst, uint8 *pSrc, int dstSize, int imageInfoSize)
 {
 	unsigned char bOpCode,bVal;
 	int iCount,iPos,iIndex;
@@ -1613,7 +1613,7 @@ void SoftSurface::PreMultiplyAlpha()
 
 }
 
-void SoftSurface::LoadPaletteDataFromBMPMemory(byte *pPaletteData, int colors)
+void SoftSurface::LoadPaletteDataFromBMPMemory(uint8 *pPaletteData, int colors)
 {
 	glColorBytes colorKeyColor = GetColorKeyColor();
 	SetUsesAlpha(false);
@@ -1659,8 +1659,8 @@ void SoftSurface::LoadPaletteDataFromBMPMemory(byte *pPaletteData, int colors)
 
 void SoftSurface::BlitRGBAFrom8Bit( int dstX, int dstY, SoftSurface *pSrc, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/ )
 {
-	byte *pDestImage = GetPointerToPixel(dstX, dstY);
-	byte *pSrcImage = pSrc->GetPointerToPixel(srcX, srcY);
+	uint8 *pDestImage = GetPointerToPixel(dstX, dstY);
+	uint8 *pSrcImage = pSrc->GetPointerToPixel(srcX, srcY);
 
 	int colorKey = pSrc->GetColorKeyPaletteIndex();
 
@@ -1740,8 +1740,8 @@ void SoftSurface::BlitRGBAFrom8Bit( int dstX, int dstY, SoftSurface *pSrc, int s
 void SoftSurface::BlitRGBAFromRGBA( int dstX, int dstY, SoftSurface *pSrc, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/ )
 {
 
-	byte *pDestImage = GetPointerToPixel(dstX, dstY);
-	byte *pSrcImage = pSrc->GetPointerToPixel(srcX, srcY);
+	uint8 *pDestImage = GetPointerToPixel(dstX, dstY);
+	uint8 *pSrcImage = pSrc->GetPointerToPixel(srcX, srcY);
 
 	if ((pSrc->GetAutoPremultiplyAlpha() || pSrc->GetHasPremultipliedAlpha()))
 	{
@@ -1811,7 +1811,7 @@ void SoftSurface::BlitRGBAFromRGBA( int dstX, int dstY, SoftSurface *pSrc, int s
 							tempSrc = ((float)pSrcImage[i] / 255.0f) * srcAlpha;
 							c = ((float)pDestImage[i] / 255.0f) * destAlpha + ((float)pSrcImage[i] / 255.0f) * srcAlpha;
 							if (c > 1.0f) c = 1.0f;
-							pDestImage[i] = (byte)(c * 255.0f);
+							pDestImage[i] = (uint8)(c * 255.0f);
 						}
 					}
 				
@@ -1830,8 +1830,8 @@ void SoftSurface::BlitRGBAFromRGBA( int dstX, int dstY, SoftSurface *pSrc, int s
 void SoftSurface::BlitRGBFromRGBA( int dstX, int dstY, SoftSurface *pSrc, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/ )
 {
 
-	byte *pDestImage = GetPointerToPixel(dstX, dstY);
-	byte *pSrcImage = pSrc->GetPointerToPixel(srcX, srcY);
+	uint8 *pDestImage = GetPointerToPixel(dstX, dstY);
+	uint8 *pSrcImage = pSrc->GetPointerToPixel(srcX, srcY);
 
 	int bytesPerPixelSource = pSrc->GetBytesPerPixel();
 
@@ -1863,8 +1863,8 @@ void SoftSurface::BlitRGBFromRGBA( int dstX, int dstY, SoftSurface *pSrc, int sr
 void SoftSurface::BlitRGBAFromRGB(int dstX, int dstY, SoftSurface *pSrc, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/)
 {
 
-	byte *pDestImage = GetPointerToPixel(dstX, dstY);
-	byte *pSrcImage = pSrc->GetPointerToPixel(srcX, srcY);
+	uint8 *pDestImage = GetPointerToPixel(dstX, dstY);
+	uint8 *pSrcImage = pSrc->GetPointerToPixel(srcX, srcY);
 
 	int bytesPerPixelSource = pSrc->GetBytesPerPixel();
 
@@ -1882,8 +1882,8 @@ void SoftSurface::BlitRGBAFromRGB(int dstX, int dstY, SoftSurface *pSrc, int src
 void SoftSurface::BlitRGBFromRGB( int dstX, int dstY, SoftSurface *pSrc, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/ )
 {
 
-	byte *pDestImage = GetPointerToPixel(dstX, dstY);
-	byte *pSrcImage = pSrc->GetPointerToPixel(srcX, srcY);
+	uint8 *pDestImage = GetPointerToPixel(dstX, dstY);
+	uint8 *pSrcImage = pSrc->GetPointerToPixel(srcX, srcY);
 
 	for (int y=0; y < srcHeight; y++)
 	{
@@ -1912,7 +1912,7 @@ int SoftSurface::RGBAToPalette(const glColorBytes &color)
 void SoftSurface::Blit8BitFromRGBA( int dstX, int dstY, SoftSurface *pSrc, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/ )
 {
 
-	byte *pDestImage = GetPointerToPixel(dstX, dstY);
+	uint8 *pDestImage = GetPointerToPixel(dstX, dstY);
 	glColorBytes *pSrcImage = (glColorBytes*)pSrc->GetPointerToPixel(srcX, srcY);
 
 		for (int y=0; y < srcHeight; y++)
@@ -1931,8 +1931,8 @@ void SoftSurface::Blit8BitFromRGBA( int dstX, int dstY, SoftSurface *pSrc, int s
 void SoftSurface::Blit8BitFrom8Bit( int dstX, int dstY, SoftSurface *pSrc, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/ )
 {
 
-	byte *pDestImage = GetPointerToPixel(dstX, dstY);
-	byte *pSrcImage = pSrc->GetPointerToPixel(srcX, srcY);
+	uint8 *pDestImage = GetPointerToPixel(dstX, dstY);
+	uint8 *pSrcImage = pSrc->GetPointerToPixel(srcX, srcY);
 
 	if ((pSrc->GetAutoPremultiplyAlpha()))
 	{
@@ -1991,8 +1991,8 @@ void SoftSurface::FlipRedAndBlue()
 	}
 	else
 	{
-		byte *pSrcImage = (byte*)GetPointerToPixel(0, 0);
-		byte tempRed;
+		uint8 *pSrcImage = (uint8*)GetPointerToPixel(0, 0);
+		uint8 tempRed;
 
 		for (int y = 0; y < GetHeight(); y++)
 		{
@@ -2011,7 +2011,7 @@ void SoftSurface::FlipRedAndBlue()
 
 
 
-void SoftSurface::RemoveTrueBlack(byte minimumLuma)
+void SoftSurface::RemoveTrueBlack(uint8 minimumLuma)
 {
 	if (GetSurfaceType() == SURFACE_RGBA)
 	{
@@ -2019,7 +2019,7 @@ void SoftSurface::RemoveTrueBlack(byte minimumLuma)
 	}
 	else
 	{
-		byte *pSrcImage = (byte*)GetPointerToPixel(0, 0);
+		uint8 *pSrcImage = (uint8*)GetPointerToPixel(0, 0);
 	
 		for (int y = 0; y < GetHeight(); y++)
 		{
@@ -2055,9 +2055,9 @@ void SoftSurface::FlipY()
 {
 	if (m_surfaceType == SURFACE_NONE) return;
 
-	byte *pData = GetPixelData();
-	byte *pDataReverse;
-	byte *pTmp = new byte[GetPitch()];
+	uint8 *pData = GetPixelData();
+	uint8 *pDataReverse;
+	uint8 *pTmp = new uint8[GetPitch()];
 	
 	const int pitch = GetPitch();
 
@@ -2325,7 +2325,7 @@ void SoftSurface::Rotate90Degrees( bool bRotateLeft )
 
 	//create new buffer the same size (memory-wise) as our current one
 	int dataSize = m_width*m_height*m_bytesPerPixel;
-	byte *pTemp = new byte[dataSize];
+	uint8 *pTemp = new uint8[dataSize];
 
 	int targetWidth = m_height;
 	int targetHeight = m_width; //flip those around
@@ -2417,7 +2417,7 @@ void SoftSurface::WriteBMPOut( string fileName )
 	{
 		for (int x=0; x < m_width; x++)
 		{
-			byte *pSrc = &m_pPixels[y*imagePitch+x*m_bytesPerPixel];
+			uint8 *pSrc = &m_pPixels[y*imagePitch+x*m_bytesPerPixel];
 			
 			if (m_bytesPerPixel == 4)
 			{
@@ -2475,7 +2475,7 @@ void SoftSurface::Scale( int newX, int newY )
 
 	//create new buffer the same size (memory-wise) as our current one
 	int dataSize = newX*newY*m_bytesPerPixel;
-	byte *pTemp = new byte[dataSize];
+	uint8 *pTemp = new uint8[dataSize];
 
 	int targetWidth = newX;
 	int targetHeight = newY;
@@ -2517,7 +2517,7 @@ float SoftSurface::GetAverageLumaFromRect(const CL_Vec2i vAreaPos, const CL_Vec2
 	assert(vAreaPos.x + vAreaSize.x < GetWidth() && "Area too wide");
 	assert(vAreaPos.y + vAreaSize.y < GetHeight() && "Area too tall");
 
-	byte *pPixels = GetPointerToPixel(0, 0);
+	uint8 *pPixels = GetPointerToPixel(0, 0);
 
 	float totalLuma = 0;
 
@@ -2547,7 +2547,7 @@ float SoftSurface::GetAverageComplexityFromRect(const CL_Vec2i vAreaPos, const C
 	assert(vAreaPos.x + vAreaSize.x < GetWidth() && "Area too wide");
 	assert(vAreaPos.y + vAreaSize.y < GetHeight() && "Area too tall");
 
-	byte *pPixels = GetPointerToPixel(0, 0);
+	uint8 *pPixels = GetPointerToPixel(0, 0);
 
 	long totalComplexity = 0;
 

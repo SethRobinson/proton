@@ -19,7 +19,7 @@ struct rtfont_header
 	short blankCharWidth;
 	short fontStateCount; //how many FontState data thingies are coming
 	short kerningPairCount;
-	byte reserved[124];
+	uint8 reserved[124];
 };
 
 struct rtfont_charData

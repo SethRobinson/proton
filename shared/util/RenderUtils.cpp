@@ -932,7 +932,7 @@ uint32 ColorCombine(uint32 c1, uint32 c2, float alphaMod)
 	}
 
 	//LogMsg("%s and %s make %s", PrintColor(c1).c_str(), PrintColor(c2).c_str(), PrintColor(MAKE_RGBA(r,g,b, byte(float(a)*alphaMod))).c_str());
-	return MAKE_RGBA(r,g,b, byte(float(a)*alphaMod)) ;
+	return MAKE_RGBA(r,g,b, uint8(float(a)*alphaMod)) ;
 }
 
 void  ScreenToWorld(CL_Vec2f pt, CL_Vec3f *pReturnA, float dist)

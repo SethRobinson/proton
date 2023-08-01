@@ -134,7 +134,7 @@ CL_Vec2f GetAlignmentOffset(const CL_Vec2f &vSize, eAlignment alignment)
 }
 
 
-unsigned int DecryptPiece(byte *data, unsigned int size, int key)
+unsigned int DecryptPiece(uint8 *data, unsigned int size, int key)
 {
 	unsigned int i_checksum = 0;
 
@@ -152,11 +152,11 @@ unsigned int DecryptPiece(byte *data, unsigned int size, int key)
 //#define C_EXTRA_DEBUG_CHECKS
 
 #endif
-unsigned int EncryptPiece(byte *data, unsigned int size, int key)
+unsigned int EncryptPiece(uint8 *data, unsigned int size, int key)
 {
 
 #ifdef C_EXTRA_DEBUG_CHECKS
-	vector<byte> debugBuff;
+	vector<uint8> debugBuff;
 	debugBuff.resize(size);
 	memcpy(&debugBuff[0], data, size);
 #endif
@@ -171,7 +171,7 @@ unsigned int EncryptPiece(byte *data, unsigned int size, int key)
 
 #ifdef C_EXTRA_DEBUG_CHECKS
 	//make sure we can decrypt it accurately
-	vector<byte> debugEncrypted;
+	vector<uint8> debugEncrypted;
 	debugEncrypted.resize(size);
 	memcpy(&debugEncrypted[0], data, size);
 

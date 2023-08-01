@@ -26,7 +26,7 @@ NetHTTP myNet;
 //optionally also add any number of "post" data pieces that you want the .php to handle:
 
 string anyData = "somedata";
-myNet.AddPostData("name", (byte*)&data[0], data.length());
+myNet.AddPostData("name", (uint8*)&data[0], data.length());
 
 For a PUT, use AddPutData instead.
 
@@ -99,7 +99,7 @@ public:
 	};
 
 	void Setup(string serverName, int port, string query, eEndOfDataSignal eodSignal = END_OF_DATA_SIGNAL_RTSOFT_MARKER);
-	bool AddPostData(const string &name, const byte *pData, int len=-1);
+	bool AddPostData(const string &name, const uint8 *pData, int len=-1);
 	bool AddPutData(const string data); //can only be set once.  Can't be used with AddPostData
 	bool SetFileOutput(const string &fName); //call this before Start, allows you to save to a file instead of memory
 
@@ -110,7 +110,7 @@ public:
 
 	int GetDownloadedBytes();
 	int GetExpectedBytes() {return m_expectedFileBytes;} //0 if unknown
-	const byte * GetDownloadedData();
+	const uint8 * GetDownloadedData();
 	void Update();
 	void Reset(bool bClearPostData=true); //completely clears it out so it can be used again
 

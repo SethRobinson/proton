@@ -124,14 +124,14 @@ Stolen from CodeProject
 **/
 
 
-void DecToHexString ( uint32 value, byte * pOut, int16 charArrayMaxSize) 
+void DecToHexString ( uint32 value, uint8 * pOut, int16 charArrayMaxSize) 
 { 
-	static byte  digit; 
+	static uint8  digit; 
 	static int  i; 
 
 	for (i = charArrayMaxSize - 1; i >= 0; i--) 
 	{ 
-		digit = byte((value & 0x0f) + 0x30);
+		digit = uint8((value & 0x0f) + 0x30);
 		if (digit > 0x39) digit += 0x07; 
 		pOut[i] = digit; 
 		value >>= 4; 
@@ -139,7 +139,7 @@ void DecToHexString ( uint32 value, byte * pOut, int16 charArrayMaxSize)
 } 
 
 
-void URLEncoder::encodeData(const byte *pData, int len, string &finalReturn)
+void URLEncoder::encodeData(const uint8 *pData, int len, string &finalReturn)
 {
 	char tmp[6];
 	tmp[0] = '%';
@@ -160,7 +160,7 @@ void URLEncoder::encodeData(const byte *pData, int len, string &finalReturn)
 			buff.push_back('+');
 		}else 
 		{
-			DecToHexString(pData[i], (byte*)&tmp[1], 2); //SETH, this should be faster than sprintf.  start after the % part
+			DecToHexString(pData[i], (uint8*)&tmp[1], 2); //SETH, this should be faster than sprintf.  start after the % part
 			//sprintf(tmp,"%%%02x",pData[i]); //SETH added 02 for leading zeros, serious bug fix.  Sent fix to author
 			buff.push_back(tmp[0]);
 			buff.push_back(tmp[1]);
@@ -212,10 +212,10 @@ string URLDecoder::decode(string str)
 	return ret;
 }
 
-vector<byte> URLDecoder::decodeData(const string str) 
+vector<uint8> URLDecoder::decodeData(const string str) 
 {
 	int len = (int)str.length();
-	vector<byte> outBuff;
+	vector<uint8> outBuff;
 	outBuff.reserve(len);
 	char hex[4];			
 	hex[2] = '\0';		
@@ -230,7 +230,7 @@ vector<byte> URLDecoder::decodeData(const string str)
 			hex[0] = str[++i];
 			hex[1] = str[++i];
 			//int hex_i = atoi(hex);
-			outBuff.push_back(byte(convertToDec(hex)));
+			outBuff.push_back(uint8(convertToDec(hex)));
 		}  else 
 		{
 			outBuff.push_back(str[i]);
@@ -356,7 +356,7 @@ string GetSimpleGUIDAsString()
 	for (int i=0; i < 4; i++)
 	{
 		memset(temp, 0, 32);
-		DecToHexString(guid[i], (byte*)temp, 8);
+		DecToHexString(guid[i], (uint8*)temp, 8);
 		final += string(temp);
 	}
 

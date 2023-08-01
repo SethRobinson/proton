@@ -81,7 +81,7 @@ void JPGSurfaceLoader::output_message(j_common_ptr cinfo)
 	LogError("JPEG FATAL ERROR: %s",temp1);
 }
 
-bool JPGSurfaceLoader::LoadFromMem( byte *pMem, int inputSize, SoftSurface *pSurf, bool bAddAlphaChannelIfNotPowerOfTwo )
+bool JPGSurfaceLoader::LoadFromMem( uint8 *pMem, int inputSize, SoftSurface *pSurf, bool bAddAlphaChannelIfNotPowerOfTwo )
 {
 	// allocate and initialize JPEG decompression object
 	struct jpeg_decompress_struct cinfo;

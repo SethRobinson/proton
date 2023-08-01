@@ -248,7 +248,8 @@ void Gamepad::ConnectToArcadeComponent( ArcadeInputComponent *pComp, bool bSendB
 	if (m_pArcadeComp)
 	{
 		LogMsg("Gamepad %s disconnecting itself from old arcade component so we can connect to the new one", GetName().c_str());
-		m_pArcadeComp->GetFunction("OnDelete")->sig_function.disconnect(boost::bind(&Gamepad::OnArcadeCompDestroyed, this, _1));
+		//m_pArcadeComp->GetFunction("OnDelete")->sig_function.disconnect(boost::bind(&Gamepad::OnArcadeCompDestroyed, this, _1));
+		arcade_comp_conn.disconnect();
 		m_pArcadeComp = NULL;
 	}
 
@@ -261,7 +262,7 @@ void Gamepad::ConnectToArcadeComponent( ArcadeInputComponent *pComp, bool bSendB
 
 		m_pArcadeComp = pComp;
 		//we should get notified if this component is destroyed
-		pComp->GetFunction("OnDelete")->sig_function.connect(1, boost::bind(&Gamepad::OnArcadeCompDestroyed, this, _1));
+		arcade_comp_conn = pComp->GetFunction("OnDelete")->sig_function.connect(1, boost::bind(&Gamepad::OnArcadeCompDestroyed, this, _1));
 
 		if (bSendPadEventsAsFourDirections)
 		{

@@ -48,7 +48,7 @@ return;
 	int charCount =  pHeader->lastChar - pHeader->firstChar;
 	rtfont_charData *pSrcChar = (rtfont_charData*) (f.GetAsBytes()+sizeof(rtfont_header) );
 	pSrcChar += charCount;
-	byte *pSrcBytes = (byte*)pSrcChar;
+	uint8 *pSrcBytes = (uint8*)pSrcChar;
 	pSrcBytes += sizeof(KerningPair)* pHeader->kerningPairCount;
 	pSrcBytes += 8*m_header.fontStateCount;
 
@@ -97,7 +97,7 @@ bool RTFont::Load( string fileName, bool bAddBasePath)
 		pSrcChar += 1;
 	}
 
-	byte *pSrcBytes = (byte*)pSrcChar;
+	uint8 *pSrcBytes = (uint8*)pSrcChar;
 
 	KerningPair k;
 	for (int i=0; i < pHeader->kerningPairCount; i++)
@@ -311,7 +311,7 @@ void RTFont::DrawScaled( float x, float y, const string &text, float scale /*= 1
 	uint16 curChar, lastChar;
 	uint8 seqLen;
 	
-	byte curAlpha = GET_ALPHA(color);
+	uint8 curAlpha = GET_ALPHA(color);
 	//remove alpha from current color
 	color -= curAlpha; //yes, you can do this, because alpha is at the first 8 bits
 	float xStart = x;
@@ -874,7 +874,7 @@ CL_Vec2f RTFont::DrawWrapped(rtRect &r, const string &txt, bool centerX, bool ce
 void RTFont::DrawScaledFakeToUpdateState( const string &text, unsigned int color, FontStateStack *pState)
 {
 
-	byte curAlpha = GET_ALPHA(color);
+	uint8 curAlpha = GET_ALPHA(color);
 	//remove alpha from current color
 	color -= curAlpha; //yes, you can do this, because alpha is at the first 8 bits
 	FontStateStack myState;
@@ -1008,7 +1008,7 @@ int RTFont::CountCharsThatFitX( float sizeX, const string &text, float scale /*=
 
 		if (lastChar)
 		{
-			curX += (GetKerningData(byte(text[i-1]), text[i])*scale);
+			curX += (GetKerningData(uint8(text[i-1]), text[i])*scale);
 		}
 
 		lastChar = curChar;

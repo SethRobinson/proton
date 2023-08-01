@@ -169,6 +169,7 @@ void ForceVideoUpdate(); //force an early gl flip or whatever, sometimes useful.
 void SystemSleep(int sleepMS); //sleep or utime or SDL_Delay, depending on platform.  Not implemented on every platform
 std::string GetDateAndTimeAsString(); //only supported on linux and win
 std::string GetTimeAsString(); //only win I think
+bool IsCurrentTimeSameOrLaterThanThis(std::string strTime); //only win I think
 void GetDateAndTime(int *monthOut, int *dayOut, int *yearOut, int *hourOut, int *minOut, int *secOut);
 int GetTouchesReceived(); //applicable to HTML5 only right now
 bool IsStillLoadingPersistentData(); //applicable to HTML5 only right now

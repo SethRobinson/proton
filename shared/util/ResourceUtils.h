@@ -12,9 +12,9 @@
 #endif
 
 //NOTE: Use must SAFE_DELETE_ARRAY() the return from this..
-byte * LoadFileIntoMemory(std::string fileName, unsigned int *p_ui_size, bool bUseSavePath = false); //automatically decompresses if needed
-byte * LoadFileIntoMemoryBasic(std::string fileName, unsigned int *length, bool bUseSavePath = false, bool bAddBasePath = true); //won't try to automatically decompress
-bool SaveMemoryIntoFileBasic(byte* pData, unsigned int length, std::string fileName, bool bUseSavePath = false, bool bAddBasePath = true);
+uint8 * LoadFileIntoMemory(std::string fileName, unsigned int *p_ui_size, bool bUseSavePath = false); //automatically decompresses if needed
+uint8 * LoadFileIntoMemoryBasic(std::string fileName, unsigned int *length, bool bUseSavePath = false, bool bAddBasePath = true); //won't try to automatically decompress
+bool SaveMemoryIntoFileBasic(uint8* pData, unsigned int length, std::string fileName, bool bUseSavePath = false, bool bAddBasePath = true);
 
 bool FileExists(const std::string &fName);
 bool FileExistsRaw(const string& fName);
@@ -23,12 +23,12 @@ std::string SeparateStringSTL(std::string input, int index, char delimiter);
 bool SeparateString (const char str[], int num, char delimiter, char *return1);
 void StringReplace(const std::string& what, const std::string& with, std::string& in);
 bool CompressFile(std::string fName);
-bool IsAPackedFile(byte *pFile);
-bool IsARTFile(byte *pFile); //not full proof, but helps with catching errors
+bool IsAPackedFile(uint8 *pFile);
+bool IsARTFile(uint8 *pFile); //not full proof, but helps with catching errors
 rtpack_header BuildRTPackHeader(int size, int compressedSize);
 
-byte * zlibDeflateToMemory(byte *pInput, int sizeBytes, int *pSizeCompressedOut); //you must SAFE_DELETE_ARRAY what it returns
-byte * zLibInflateToMemory(byte *pInput, unsigned int compressedSize, unsigned int decompressedSize); //you must SAFE_DELETE_ARRAY what it returns
+uint8 * zlibDeflateToMemory(uint8 *pInput, int sizeBytes, int *pSizeCompressedOut); //you must SAFE_DELETE_ARRAY what it returns
+uint8 * zLibInflateToMemory(uint8 *pInput, unsigned int compressedSize, unsigned int decompressedSize); //you must SAFE_DELETE_ARRAY what it returns
 
 //some helpers with file handling
 bool LoadFromFile(std::string &str, FILE *fp);
@@ -50,8 +50,8 @@ bool SaveToFile(const std::string &str, FILE *fp);
 //same thing but for mem
 
 bool IsPowerOf2(int n);
-byte * DecompressRTPackToMemory(byte *pMem, unsigned int *pDecompressedSize=NULL);
-byte * CompressMemoryToRTPack(byte *pSourceMem, unsigned int sourceByteSize, unsigned int *pCompressedSizeOut);
+uint8 * DecompressRTPackToMemory(uint8 *pMem, unsigned int *pDecompressedSize=NULL);
+uint8 * CompressMemoryToRTPack(uint8 *pSourceMem, unsigned int sourceByteSize, unsigned int *pCompressedSizeOut);
 
 int GetFileSize(const std::string &fName);
 std::string AddIPADToFileName(std::string file); //appends _ipad to a file name if we are indeed running on an ipad (or large screen)

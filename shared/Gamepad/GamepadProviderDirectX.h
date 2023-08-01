@@ -43,7 +43,17 @@ From there, you can use GetGamepadManager()->GetDefaultGamepad() and connect sig
 #include "GamepadProvider.h"
 
 #define DIRECTINPUT_VERSION 0x0800
-#include <dinput.h>
+
+#if defined(_MSVC_LANG) && _MSVC_LANG <= 201402L
+	
+
+
+  #include <dinput.h>
+#else
+	#define byte rpc_byte
+	#include <dinput.h>
+	#undef byte
+#endif
 
 #if DIRECTINPUT_HEADER_VERSION < 0x0800
 #error Found DirectX headers older than 8.0. Please download a newer directx, and make sure its FIRST in the include path and library path (Tools->Options->Directories in MSVC).

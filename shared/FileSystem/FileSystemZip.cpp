@@ -132,7 +132,7 @@ vector<string> FileSystemZip::GetContents()
 }
 
 
-byte * FileSystemZip::Get( string fileName, int *pSizeOut )
+uint8 * FileSystemZip::Get( string fileName, int *pSizeOut )
 {
 	zipCacheMap::iterator itor = m_cache.find(m_rootDir+fileName);
 
@@ -175,7 +175,7 @@ byte * FileSystemZip::Get( string fileName, int *pSizeOut )
 	
 
 	//let's allocate our own memory and pass the pointer back to them.
-	byte *pBytes = new byte[file_info.uncompressed_size+1]; //the extra is because I will add a null later, helps when processing
+	uint8 *pBytes = new uint8[file_info.uncompressed_size+1]; //the extra is because I will add a null later, helps when processing
 	//text files and can't hurt
 	
 	

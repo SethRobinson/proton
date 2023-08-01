@@ -28,8 +28,8 @@ CL_Vec2f GetAlignmentOffset(const CL_Vec2f &vSize, eAlignment alignment);
 void ApplyPadding(CL_Rectf *pR, const CL_Vec2f &vPadding);
 void ApplyPadding(CL_Rectf *pR, const CL_Rectf &vPadding);
 void ApplyOffset(CL_Rectf *pR, const CL_Vec2f &vOffset);
-unsigned int EncryptPiece(byte *data, unsigned int size, int key);
-unsigned int DecryptPiece(byte *data, unsigned int size, int key);
+unsigned int EncryptPiece(uint8 *data, unsigned int size, int key);
+unsigned int DecryptPiece(uint8 *data, unsigned int size, int key);
 CL_Rectf ScaleRect(const CL_Rectf &r, float scale);
 CL_Rectf ScaleRect2D(const CL_Rectf &r, CL_Vec2f vScale);
 

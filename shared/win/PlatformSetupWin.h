@@ -1,10 +1,13 @@
 #pragma once
+#define byte rpc_byte
 #include <winsock2.h>
 #include <ws2tcpip.h> //needed for ipv6 stuff
+
 #include <windows.h>
+
 #include <TCHAR.h>
 #include "time.h"
-
+#undef byte
 #ifndef PLATFORM_WINDOWS
 #define PLATFORM_WINDOWS
 #endif
@@ -149,9 +152,19 @@ typedef  __int64            sint64;       /* Signed 64 bit value */
 #define _SINT64_DEFINED
 #endif
 
+#ifndef _UINT8_DEFINED
+typedef  unsigned char      uint8;        /* byte type */
+#define  _UINT8_DEFINED
+#endif
+
+#if defined(_MSVC_LANG) && _MSVC_LANG <= 201402L
+
+    //the old way that won't work with C++17+, but fixes older projects that need "byte" defined on windows
 #ifndef _BYTE_DEFINED
-typedef  unsigned char      byte;        /* byte type */
-#define  _BYTE_DEFINED
+	typedef  unsigned char      byte;        /* byte type */
+	#define  _BYTE_DEFINED
+#endif
+
 #endif
 
 

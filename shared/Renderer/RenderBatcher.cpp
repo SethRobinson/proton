@@ -229,7 +229,7 @@ void RenderBatcher::BlitRawImage(int x, int y, SoftSurface &soft)
 	}
 }
 
-void RenderBatcher::BlitRawImage(int dstX, int dstY,  byte *pRaw, int width, int height, bool bNeedsAlpha )
+void RenderBatcher::BlitRawImage(int dstX, int dstY,  uint8 *pRaw, int width, int height, bool bNeedsAlpha )
 {
 	static vector<CL_Vec3s> vertBuff;  //vertex of shorts
 	static int lastSize = 0;

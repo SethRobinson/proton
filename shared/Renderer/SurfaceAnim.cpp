@@ -59,7 +59,7 @@ void SurfaceAnim::BlitAnim(float x, float y, int frameX, int frameY, unsigned in
 	BlitEx(dst, src, rgba, rotationDegrees, vRotationPt);
 }
 
-bool SurfaceAnim::LoadFileFromMemory( byte *pMem, int inputSize )
+bool SurfaceAnim::LoadFileFromMemory( uint8 *pMem, int inputSize )
 {
 	if (!Surface::LoadFileFromMemory(pMem, inputSize)) return false;
 

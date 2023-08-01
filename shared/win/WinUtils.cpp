@@ -17,6 +17,7 @@
 #include <shlobj.h>
 #include <iomanip>
 #include <sstream>
+#include <shellapi.h>
  
 using namespace std;
 
@@ -486,6 +487,62 @@ string GetTimeAsString()
 	}
 
 	return stTemp.str();
+}
+
+//Need to send "2:34 PM" or "4:00 AM" etc
+bool IsCurrentTimeSameOrLaterThanThis(string strTime)
+{
+	// Get current time
+	time_t ltime;
+	time(&ltime);
+	tm today = *localtime(&ltime);
+
+	// Convert to 12 hour format
+	int currentHour = today.tm_hour;
+	int currentMinute = today.tm_min;
+	bool currentIsPM = false;
+
+	if (currentHour >= 12)
+	{
+		if (currentHour > 12)
+			currentHour -= 12;
+		currentIsPM = true;
+	}
+	else if (currentHour == 0) // midnight
+	{
+		currentHour = 12; // 12 AM
+	}
+
+	// Parse input time
+	int inputHour;
+	int inputMinute;
+	bool inputIsPM = false;
+
+	if (strTime.find("PM") != string::npos)
+	{
+		inputIsPM = true;
+	}
+
+	// Assume a space before AM or PM, remove it with AM or PM
+	strTime = strTime.substr(0, strTime.size() - 3);
+	stringstream ss(strTime);
+	ss >> inputHour;
+	char ch; // to skip the colon
+	ss >> ch >> inputMinute;
+
+	// Compare times
+	if (inputIsPM != currentIsPM)
+	{
+		return currentIsPM;
+	}
+	else if (currentHour != inputHour)
+	{
+		return currentHour > inputHour;
+	}
+	else
+	{
+		return currentMinute >= inputMinute;
+	}
 }
 
 bool CheckDay(const int year, const int month, const int day)

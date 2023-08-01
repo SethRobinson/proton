@@ -5,7 +5,10 @@
 #include "main.h"
 #include "WebOS/SDLMain.h"
 #include "BaseApp.h"
+
+#define byte rpc_byte
 #include "shellscalingapi.h" //for DPI awareness, this means Win7+ from now on
+#undef byte
 
 //avoid needing to define _WIN32_WINDOWS > 0x0400.. although I guess we could in PlatformPrecomp's win stuff...
 #ifndef WM_MOUSEWHEEL
@@ -18,7 +21,9 @@
 #endif
 
 #ifndef RT_WEBOS
+
 	#include <direct.h>
+
 #endif
 
 #ifdef _DEBUG

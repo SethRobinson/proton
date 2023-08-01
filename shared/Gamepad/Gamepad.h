@@ -160,7 +160,7 @@ protected:
 	ArcadeInputComponent *m_pArcadeComp;
 	bool m_bSendLeftStickAsDirectionsToo = false;
 	float m_stickAsDirectionDeadZone = 0.15f; //how far the stick has to move to register as an 8-way direction (doesn't effect raw stick readings)
-
+	boost::signals::connection arcade_comp_conn;
 };
 
 #endif // Gamepad_h__

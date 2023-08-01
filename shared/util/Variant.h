@@ -384,7 +384,7 @@ private:
 	
 	union
 	{
-		byte m_var[C_VAR_SPACE_BYTES]; //large enough so we can use the space for all the datatypes we care about
+		uint8 m_var[C_VAR_SPACE_BYTES]; //large enough so we can use the space for all the datatypes we care about
 		
 		//don't actually use these, these unions help me look at vars when debugging easier
 		float m_as_floats[4];
@@ -459,8 +459,8 @@ class VariantList
 			}
 		}
 
-		byte * SerializeToMem(uint32 *pSizeOut, byte *pDest); //pass in NULL for dest and it will new[] the memory itself
-		bool SerializeFromMem(byte *pSrc, int length, int *pBytesReadOut = NULL); //length seems to be unused..
+		uint8 * SerializeToMem(uint32 *pSizeOut, uint8 *pDest); //pass in NULL for dest and it will new[] the memory itself
+		bool SerializeFromMem(uint8 *pSrc, int length, int *pBytesReadOut = NULL); //length seems to be unused..
 		Variant m_variant[C_MAX_VARIANT_LIST_PARMS]; //non-dynamic for speed
 		void GetVariantListStartingAt(VariantList *pOut, int startIndex); //shift variables over to the right, deleting some.  0 based index
 		std::string GetContentsAsDebugString();

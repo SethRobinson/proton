@@ -433,7 +433,7 @@ int GetSizeOfData(Variant::eType type)
 	return 0;
 }
 
-byte * VariantList::SerializeToMem( uint32 *pSizeOut, byte *pDest )
+uint8 * VariantList::SerializeToMem( uint32 *pSizeOut, uint8 *pDest )
 {
 	int varsUsed = 0;
 	int memNeeded = 0;
@@ -463,18 +463,18 @@ byte * VariantList::SerializeToMem( uint32 *pSizeOut, byte *pDest )
 
 	if (!pDest)
 	{
-		pDest = new byte[totalSize]; //1 is to write how many are coming
+		pDest = new uint8[totalSize]; //1 is to write how many are coming
 	}
 
 	//write it
 
 	
-	byte *pCur = pDest;
+	uint8 *pCur = pDest;
 
-	pCur[0] = byte(varsUsed);
+	pCur[0] = uint8(varsUsed);
 	pCur++;
 
-	byte type;
+	uint8 type;
 
 	for (int i=0; i < C_MAX_VARIANT_LIST_PARMS; i++)
 	{
@@ -514,15 +514,15 @@ byte * VariantList::SerializeToMem( uint32 *pSizeOut, byte *pDest )
 
 
 
-bool VariantList::SerializeFromMem(byte *pSrc, int bufferSize, int *pBytesReadOut )
+bool VariantList::SerializeFromMem(uint8 *pSrc, int bufferSize, int *pBytesReadOut )
 {
-	byte *pStartPos = pSrc;
-	byte count = pSrc[0]; pSrc++;
+	uint8 *pStartPos = pSrc;
+	uint8 count = pSrc[0]; pSrc++;
 
 	for (int i=0; i < count; i++)
 	{
-		byte index = pSrc[0]; pSrc++;
-		byte type = pSrc[0]; pSrc++;
+		uint8 index = pSrc[0]; pSrc++;
+		uint8 type = pSrc[0]; pSrc++;
 
 		switch(type)
 		{

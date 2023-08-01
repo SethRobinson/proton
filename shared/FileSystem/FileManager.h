@@ -29,7 +29,7 @@ public:
 	~FileInstance();
 
 	bool IsLoaded() {return m_pData != NULL;}
-	byte * GetAsBytes() {return m_pData;}
+	uint8 * GetAsBytes() {return m_pData;}
 	char * GetAsChars() {return (char*)m_pData;}
 	int GetSize() {return m_size;}
 	bool Load(std::string fileName, bool bAddBasePath = true);
@@ -38,7 +38,7 @@ private:
 	
 	void Kill();
 
-	byte *m_pData;
+	uint8 *m_pData;
 	int m_size;
 
 };
@@ -64,7 +64,7 @@ public:
 	 *
 	 * The caller is responsible for freeing the returned memory later.
 	 */
-	byte * Get(std::string fileName, int *pSizeOut, bool bAddBasePath = true, bool bAutoDecompress = true); //you must SAFE_DELETE_ARRAY() what it returns...
+	uint8 * Get(std::string fileName, int *pSizeOut, bool bAddBasePath = true, bool bAutoDecompress = true); //you must SAFE_DELETE_ARRAY() what it returns...
 	StreamingInstance * GetStreaming(std::string fileName, int *pSizeOut, bool bAddBasePath = true); //pSizeOut currently always set to 0.  Returns null on fail. You must DELETE !
 	void MountFileSystem(FileSystem* pFileSystem);
 	bool FileExists(std::string fileName, bool bAddBasePath = true);

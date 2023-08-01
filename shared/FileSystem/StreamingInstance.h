@@ -20,7 +20,7 @@ public:
 	virtual bool ReadLineOfText(string &textOut);
 	virtual bool ReadLineOfText( char *pBuffer, int bufferSize );
 	virtual bool IsFinished() = 0;
-	virtual int Read(byte * pBufferOut, int maxBytesToRead) = 0;
+	virtual int Read(uint8 * pBufferOut, int maxBytesToRead) = 0;
 	virtual void SeekFromStart(int byteCount);
 	
 	//some helpers that use Read() to return certain types

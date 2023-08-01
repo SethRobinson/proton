@@ -33,7 +33,7 @@ public:
 	void SetRootDirectory(string rootDir);
 
 
-	virtual byte * Get( string fileName, int *pSizeOut);
+	virtual uint8 * Get( string fileName, int *pSizeOut);
 	virtual StreamingInstance * GetStreaming(string fileName, int *pSizeOut); //pSizeOut currently always set to 0.  Returns null on fail. You must DELETE !
 	virtual bool FileExists(string fileName);
 	virtual int GetFileSize( string fileName );

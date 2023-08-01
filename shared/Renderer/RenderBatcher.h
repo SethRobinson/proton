@@ -52,7 +52,7 @@ public:
 	void BlitEx(Surface *pSurf, rtRectf dst, rtRectf src, unsigned int rgba = MAKE_RGBA(255,255,255,255));
 	void Flush(eFlushMode mode = FLUSH_SETUP_RENDER_UNSETUP);
 
-	void BlitRawImage(int dstX, int dstY, byte *pRaw, int width, int height, bool bNeedsAlpha);
+	void BlitRawImage(int dstX, int dstY, uint8 *pRaw, int width, int height, bool bNeedsAlpha);
 	void BlitRawImage(int x, int y, SoftSurface &soft);
 
 	void glDrawArrays(const CL_Vec3f *pVerts, const CL_Vec3f *vNormals, const CL_Vec2f *TexCords, glColorBytes glColorByte,

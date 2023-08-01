@@ -307,7 +307,7 @@ string DataToByteHexDisplay(string data, int maxNumCharsToShow)
 	return hexData;
 }
 
-string DataToByteHexDisplay(byte *pData, int maxNumCharsToShow)
+string DataToByteHexDisplay(uint8 *pData, int maxNumCharsToShow)
 {
 
 	string hexData = "Hex data: ";

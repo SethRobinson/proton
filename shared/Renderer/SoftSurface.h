@@ -66,9 +66,9 @@ public:
 	bool Init(int sizex, int sizey, eSurfaceType type, bool bRememberOriginalData = false);
 	void Kill();
 	void FillColor(glColorBytes color);
-	byte * GetPixelData() {return m_pPixels;}
+	uint8 * GetPixelData() {return m_pPixels;}
 	bool LoadFile(string fName, eColorKeyType colorKey, bool addBasePath = true, bool bApplyCheckerboardFix = false);
-	bool LoadFileFromMemory( byte *pMem, eColorKeyType colorKey, int inputSize = 0, bool bAddAlphaChannelIfNotPowerOfTwo =false, bool bApplyCheckerboardFix =false );
+	bool LoadFileFromMemory( uint8 *pMem, eColorKeyType colorKey, int inputSize = 0, bool bAddAlphaChannelIfNotPowerOfTwo =false, bool bApplyCheckerboardFix =false );
 	void Blit(int dstX, int dstY, SoftSurface *pSrc, int srcX = 0, int srcY = 0, int srcWidth = 0, int srcHeight = 0); //paste an image over ours
 	void SetCustomColorKey(glColorBytes color) { m_customColorKey = color; }
 
@@ -87,7 +87,7 @@ public:
 		} else assert(!"uh");
 	}
 	
-	void SetPixel( int x, int y, byte color )
+	void SetPixel( int x, int y, uint8 color )
 	{
 		assert(m_surfaceType == SURFACE_PALETTE_8BIT);
 		assert(x < m_width && y < m_height);
@@ -150,7 +150,7 @@ public:
 	float GetAverageComplexityFromRect(const CL_Vec2i vAreaPos, const CL_Vec2i vAreaSize); //measures variation between pixels
 	void FlipRedAndBlue(); //I needed this to fix colors before sending camera capture to an OGL surface
 
-	void RemoveTrueBlack(byte minimumLuma);
+	void RemoveTrueBlack(uint8 minimumLuma);
 private:
 
 	SoftSurface(const SoftSurface&); //don't allow copy operation.  Use Blit or Surface::CreateFromSoftSurface instead
@@ -167,7 +167,7 @@ private:
 
 		return color;
 	}
-	byte * GetPointerToPixel(int x, int y)
+	uint8 * GetPointerToPixel(int x, int y)
 	{
 		switch(m_surfaceType)
 		{
@@ -185,32 +185,32 @@ private:
 	}
 
 	void Blit8BitFrom8Bit( int dstX, int dstY, SoftSurface *pSrc, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/ );
-	void LoadPaletteDataFromBMPMemory(byte *pPaletteData, int colors);
+	void LoadPaletteDataFromBMPMemory(uint8 *pPaletteData, int colors);
 	void IncreaseMemCounter(int mem);
 	void Blit8BitFromRGBA( int dstX, int dstY, SoftSurface *pSrc, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/ );
 	int RGBAToPalette(const glColorBytes &color);
-	bool RLE8BitDecompress(byte *pDst, byte *pSrc, int dstSize, int srcSize);
+	bool RLE8BitDecompress(uint8 *pDst, uint8 *pSrc, int dstSize, int srcSize);
 	void PreMultiplyAlpha();
 	void ConvertCheckboardToAlpha(glColorBytes * pImg);
 	bool IsCheckerboardAlphaShadowPixel(const glColorBytes * aPixel);
 	bool IsCheckerboardSolidShadowPixel(glColorBytes * pImg, int x, int y, const glColorBytes & aPixel);
 	void FadeCheckerboardAlphaPixel(glColorBytes * aDestination, const glColorBytes& aSource);
-	bool LoadBMPTexture(byte *pMem);
-	bool LoadBMPTextureCheckerBoardFix(byte *pMem);
+	bool LoadBMPTexture(uint8 *pMem);
+	bool LoadBMPTextureCheckerBoardFix(uint8 *pMem);
 #ifdef RT_PNG_SUPPORT
-	bool LoadPNGTexture(byte *pMem, int inputSize, bool bApplyCheckerBoardFix);
+	bool LoadPNGTexture(uint8 *pMem, int inputSize, bool bApplyCheckerBoardFix);
 	void LoadPaletteDataFromPNG(png_structp png_ptr, png_infop info_ptr);
 	void ParseRGBA(const png_structp& png_ptr, const png_infop& info_ptr);
 #endif
 	
-	bool LoadRTTexture(byte *pMem);
+	bool LoadRTTexture(uint8 *pMem);
 	void BlitRGBFromRGBA( int dstX, int dstY, SoftSurface *pSrc, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/ );
 	void BlitRGBAFromRGB(int dstX, int dstY, SoftSurface *pSrc, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/);
 	void BlitRGBFromRGB(int dstX, int dstY, SoftSurface *pSrc, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/);
 
 	eSurfaceType m_surfaceType;
 	int m_width, m_height;
-	byte *m_pPixels;
+	uint8 *m_pPixels;
 	int m_bytesPerPixel;
 	int m_usedPitch; //read this many per line
 	int m_pitchOffset; //filler to add to pitch for 32 bit byte boundries, bmp's need to know this, 0 if unused

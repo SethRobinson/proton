@@ -69,7 +69,7 @@ public:
 	virtual ~Surface();
 	
 	bool LoadFile(string fName, bool bAddBasePath = true); //will autodetect what kind of file it is
-	virtual bool LoadFileFromMemory( byte *pMem, int inputSize=0 ); //will autodetect what kind of file it is
+	virtual bool LoadFileFromMemory( uint8 *pMem, int inputSize=0 ); //will autodetect what kind of file it is
 	void Bind();
 	bool IsLoaded() {return m_glTextureID != NO_TEXTURE_LOADED || !m_textureLoaded.empty();}
 	bool UsesAlpha() {return m_bUsesAlpha;}
@@ -109,7 +109,7 @@ public:
 	bool IsRenderTarget() {return m_frameBuffer != 0;}
 	void CopyFromScreen(); //grabs whatever is currently in the gl buffer and creates a new texture with it
 	void FillRandomCrap();
-	void UpdateSurfaceRect(rtRect dstRect, byte *pPixelData, bool bUpsideDownMode = true);
+	void UpdateSurfaceRect(rtRect dstRect, uint8 *pPixelData, bool bUpsideDownMode = true);
 	void FillColor(glColorBytes color);
 	virtual void Kill();
 	void OnLoadSurfaces();
@@ -142,12 +142,12 @@ protected:
 
 private:
 
-	bool LoadBMPTexture(byte *pMem); //handles 32 bit (alpha ok) and 24 bit, no alpha
-	bool LoadRTTexture(byte *pMem); //must be created with the RTPack.exe utility
+	bool LoadBMPTexture(uint8 *pMem); //handles 32 bit (alpha ok) and 24 bit, no alpha
+	bool LoadRTTexture(uint8 *pMem); //must be created with the RTPack.exe utility
 	void IncreaseMemCounter(int mem);
 	void SetTextureStates();
 	void PrepareGLForNewTexture();
-		void PreMultiplyAlpha(byte *pBytes, int width, int height, int format);
+		void PreMultiplyAlpha(uint8 *pBytes, int width, int height, int format);
 	void OnEnterForeground(VariantList *pVList); //only wired up in Windows currently, don't need it anywhere
 	//else, windows is a special case
 	GLuint m_glTextureID;

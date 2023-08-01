@@ -94,10 +94,10 @@ LogMsg("Failed to stream %s, it won't open", fileName.c_str());
 
 }
 
-byte * FileManager::Get( string fileName, int *pSizeOut, bool bAddBasePath, bool bAutoDecompress)
+uint8 * FileManager::Get( string fileName, int *pSizeOut, bool bAddBasePath, bool bAutoDecompress)
 {
 	
-		byte * pData = NULL;
+		uint8 * pData = NULL;
 
 		//first check any mounted systems in reverse order of the mounting
 		list<FileSystem*>::reverse_iterator itor = m_fileSystems.rbegin();
@@ -134,7 +134,7 @@ byte * FileManager::Get( string fileName, int *pSizeOut, bool bAddBasePath, bool
 			*pSizeOut = ftell(fp);
 			fseek(fp, 0, SEEK_SET);
 
-			pData = (byte*)new byte[( (*pSizeOut) +1)];
+			pData = (uint8*)new uint8[( (*pSizeOut) +1)];
 			if (!pData)
 			{
 				LogError("Out of memory opening %s?", fileName.c_str());
@@ -151,7 +151,7 @@ byte * FileManager::Get( string fileName, int *pSizeOut, bool bAddBasePath, bool
 		{
 			//let's decompress it to memory before passing it back
 			unsigned int decompressedSize;
-			byte *pDecompressedData = DecompressRTPackToMemory(pData, &decompressedSize);
+			uint8 *pDecompressedData = DecompressRTPackToMemory(pData, &decompressedSize);
 			*pSizeOut = decompressedSize;
 			SAFE_DELETE_ARRAY(pData);
 			return pDecompressedData;
@@ -254,7 +254,7 @@ bool FileManager::Copy(string srcFile, string dstFile, bool bAddBasePath)
 	}
 
 	const int bufferSize = 512;
-	byte buff[bufferSize];
+	uint8 buff[bufferSize];
 
 	FILE *fp = fopen(dstFile.c_str(), "wb");
 	if (!fp)

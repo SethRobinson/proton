@@ -98,8 +98,18 @@ public:
 		typedef  __gnu_cxx::hash_map<string, FunctionObject*> functionList;
 
 		#else
+			
+#if defined(_MSVC_LANG) && _MSVC_LANG <= 201402L
+				// C++14 code
 				typedef stdext::hash_map<string, Variant*> dataList;
 				typedef stdext::hash_map<string, FunctionObject*> functionList;
+
+#else 
+				// C++17 or higher code
+				typedef std::unordered_map<std::string, Variant*> dataList;
+				typedef std::unordered_map<std::string, FunctionObject*> functionList;
+#endif
+
 		#endif
 
 	#endif

@@ -85,7 +85,7 @@ bool NetHTTP::SetFileOutput(const string &fName)
 	return true;
 }
 
-bool NetHTTP::AddPostData( const string &name, const byte *pData, int len/*=-1*/ )
+bool NetHTTP::AddPostData( const string &name, const uint8 *pData, int len/*=-1*/ )
 {
 	if (m_postData.length() != 0)
 	{
@@ -98,7 +98,7 @@ bool NetHTTP::AddPostData( const string &name, const byte *pData, int len/*=-1*/
 
 	if (!name.empty())
 	{
-		encoder.encodeData((const byte*)name.c_str(), name.length(), m_postData);
+		encoder.encodeData((const uint8*)name.c_str(), name.length(), m_postData);
 		m_postData += '=';
 		if (len == -1) len = strlen((const char*) pData);
 
@@ -121,7 +121,7 @@ bool NetHTTP::AddPostData( const string &name, const byte *pData, int len/*=-1*/
 
 	string encoded;
 	encoder.encodeData(pData, len, encoded);
-	vector<byte> decoded = decoder.decodeData(encoded);
+	vector<uint8> decoded = decoder.decodeData(encoded);
 	int sizeOfDecoded = decoded.size();
 	LogMsg("Size of decoded should be %u", decoded.size());
 	assert(memcmp(pData, &decoded[0], len) == 0 && "Encryption of string error, they don't match");
@@ -133,7 +133,7 @@ bool NetHTTP::AddPostData( const string &name, const byte *pData, int len/*=-1*/
 
 bool NetHTTP::AddPutData( const string data )
 {
-	return AddPostData("",  (byte*)data.c_str(),data.size());
+	return AddPostData("",  (uint8*)data.c_str(),data.size());
 }
 
 string NetHTTP::BuildHTTPHeader()
@@ -449,13 +449,13 @@ void NetHTTP::FinishDownload()
 	m_state = STATE_FINISHED;
 }
 
-const byte * NetHTTP::GetDownloadedData()
+const uint8 * NetHTTP::GetDownloadedData()
 {
 	if (m_downloadData.empty())
 	{
 		return NULL; 
 	}
-	return (const byte*)&m_downloadData[0];
+	return (const uint8*)&m_downloadData[0];
 }
 
 int NetHTTP::GetDownloadedBytes()

@@ -52,7 +52,7 @@ std::string BoolToEnabled(bool bEnabled);
 char *float_to_money( double num, char *buf, int dec); //for legacy code..
 std::string FloatToMoney(float f, int decimalsOfCents = 0);
 std::string DataToByteHexDisplay(std::string data, int maxNumCharsToShow);
-std::string DataToByteHexDisplay(byte *pData, int maxNumCharsToShow);
+std::string DataToByteHexDisplay(uint8 *pData, int maxNumCharsToShow);
 std::string IntToMoneyBillions(int bil, int n);
 std::string IntToTime(uint32 ms, bool bTextFormat = false); //converts 18000 (ms) to 3:00, suitable for a game "time left" display.  if bTextformat, it would say "3 min" instead.
 std::string IntToTimeSeconds(uint32 seconds, bool bTextFormat = false , bool showDays = false); //converts 180 (seconds) to 3:00, suitable for a game "time left" display.  if bTextformat, it would say "3 min" instead.

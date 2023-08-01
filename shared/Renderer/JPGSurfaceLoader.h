@@ -24,7 +24,7 @@ public:
 	JPGSurfaceLoader();
 	virtual ~JPGSurfaceLoader();
 
-	bool LoadFromMem(byte *pMem, int inputSize, SoftSurface *pSurf, bool bAddAlphaChannelIfPadded );
+	bool LoadFromMem(uint8 *pMem, int inputSize, SoftSurface *pSurf, bool bAddAlphaChannelIfPadded );
 	bool SaveToFile(SoftSurface *pSource, string fileName, int quality);  //quality is 1 to 100, 100 being the best image (and least compression)
 	
 	static void init_source (j_decompress_ptr cinfo);

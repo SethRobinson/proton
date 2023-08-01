@@ -69,7 +69,7 @@ void Surface::Kill()
 	}
 }
 
-bool Surface::LoadBMPTexture(byte *pMem)
+bool Surface::LoadBMPTexture(uint8 *pMem)
 {
 	
 	BMPImageHeader *pBmpImageInfo = new BMPImageHeader;
@@ -81,7 +81,7 @@ bool Surface::LoadBMPTexture(byte *pMem)
 	unsigned short offsetToImageData;
 	
 	memcpy(&offsetToImageData, &pMem[10], 2);
-	byte *pPixelData = &pMem[offsetToImageData];
+	uint8 *pPixelData = &pMem[offsetToImageData];
 	
 #ifdef _DEBUG
 LogMsg("Checking pixel data..");
@@ -127,7 +127,7 @@ LogMsg("Checking pixel data..");
 	{
 		//convert BGRA to RGBA.  I think there is actually an undocumented parm to make the iphone except RGBA but whatever
 		int pixelCount = m_texWidth*m_texHeight;
-		byte temp;
+		uint8 temp;
 		for (int i=0; i < pixelCount; i++)
 		{
 		  temp = *pPixelData;
@@ -141,7 +141,7 @@ LogMsg("Checking pixel data..");
 			colorFormat = GL_RGB;		
 			//convert BGR to RGB. 
 			int pixelCount = m_texWidth*m_texHeight;
-			byte temp;
+			uint8 temp;
 			for (int i=0; i < pixelCount; i++)
 			{
 				temp = *pPixelData;
@@ -211,7 +211,7 @@ void Surface::PrepareGLForNewTexture()
 	#define GL_UNSIGNED_SHORT_4_4_4_4         0x8033
 #endif
 
-int GetIntFromMemImplementation(byte *pMem)
+int GetIntFromMemImplementation(uint8 *pMem)
 {
 	int temp;
 	assert(sizeof(int) == 4);
@@ -219,9 +219,9 @@ int GetIntFromMemImplementation(byte *pMem)
 	return temp;
 }
 
-#define GetIntFromMem(var) GetIntFromMemImplementation( (byte*)var)
+#define GetIntFromMem(var) GetIntFromMemImplementation( (uint8*)var)
 
-void Surface::PreMultiplyAlpha(byte *pBytes, int width, int height, int format)
+void Surface::PreMultiplyAlpha(uint8 *pBytes, int width, int height, int format)
 {
  	assert(format == GL_UNSIGNED_SHORT_4_4_4_4  || format == GL_UNSIGNED_BYTE && "This doesn't make sense premuliplying something that has no alpha!");
    
@@ -288,7 +288,7 @@ void Surface::PreMultiplyAlpha(byte *pBytes, int width, int height, int format)
 
 }
 
-bool Surface::LoadRTTexture(byte *pMem)
+bool Surface::LoadRTTexture(uint8 *pMem)
 {
 	CHECK_GL_ERROR();
 	rttex_header *pTexHeader = (rttex_header*)pMem;
@@ -300,7 +300,7 @@ bool Surface::LoadRTTexture(byte *pMem)
 	m_originalWidth = pTexHeader->originalWidth;
 	m_originalHeight = pTexHeader->originalHeight;
 	m_mipMapCount = pTexHeader->mipmapCount;
-	byte *pCurPos = pMem + sizeof(rttex_header);
+	uint8 *pCurPos = pMem + sizeof(rttex_header);
 
 	int memUsed = 0;
 #ifdef _DEBUG
@@ -331,14 +331,14 @@ CHECK_GL_ERROR();
 	{
 		pMipSection = (rttex_mip_header*)pCurPos;
 		pCurPos += sizeof(rttex_mip_header);
-		byte *pTextureData =  pCurPos ;
+		uint8 *pTextureData =  pCurPos ;
 		memUsed += pMipSection->dataSize;
 
 		//actually, let's move the texture data into something byte aligned.. it shouldn't need this but if I don't,
 		//crashes in release mode on iPhone 3GS and older when using xcode 4 and targetting OS 3.2+.  It should already be
 		//int aligned (at least for mip 0..) so I don't know why this is required.  -Seth
 
-		pTextureData = new byte[pMipSection->dataSize];
+		pTextureData = new uint8[pMipSection->dataSize];
 		memcpy(pTextureData, pCurPos,pMipSection->dataSize );
 		//let's do it manually now
 		int width = GetIntFromMem(&pMipSection->width);
@@ -469,7 +469,7 @@ m_blendingMode = BLENDING_PREMULTIPLIED_ALPHA;
 	return true;
 }
 
-bool Surface::LoadFileFromMemory(byte *pMem, int inputSize)
+bool Surface::LoadFileFromMemory(uint8 *pMem, int inputSize)
 {
 	Kill();
 
@@ -503,7 +503,7 @@ bool Surface::LoadFileFromMemory(byte *pMem, int inputSize)
 	}
 
 
-	byte png_signature[8] = { 137, 80, 78, 71, 13, 10, 26, 10 };
+	uint8 png_signature[8] = { 137, 80, 78, 71, 13, 10, 26, 10 };
 
 
 	if (*((uint16*)pMem) == C_JPG_HEADER_MARKER || memcmp(pMem, png_signature, 8) == 0)
@@ -936,7 +936,7 @@ enum eBlitMode
 	BLIT_MODE_ROTATE_LEFT
 };
 
-void BlitBmp(int posX, int posY, byte *pDest, int dstX, int dstY, int dstPixelType, byte *pSrc, int srcX, int srcY, int srcPixelType, eBlitMode mode)
+void BlitBmp(int posX, int posY, uint8 *pDest, int dstX, int dstY, int dstPixelType, uint8 *pSrc, int srcX, int srcY, int srcPixelType, eBlitMode mode)
 {
 	assert(dstPixelType == GL_RGBA && srcPixelType == GL_RGBA);
 
@@ -947,7 +947,7 @@ void BlitBmp(int posX, int posY, byte *pDest, int dstX, int dstY, int dstPixelTy
 
 	//return;
 
-	byte *pDstCur = pDest+(  (posY+ (dstY-srcY)   )*dstPitch)+posX;
+	uint8 *pDstCur = pDest+(  (posY+ (dstY-srcY)   )*dstPitch)+posX;
 
 	for (int y=0; y < srcY; y++)
 	{
@@ -964,7 +964,7 @@ void Surface::CopyFromScreen()
 
 	int bytesPerPix = 4;
 
-	byte * pBuff = new byte [readX*readY*bytesPerPix];
+	uint8 * pBuff = new uint8 [readX*readY*bytesPerPix];
 
 	//rotate it before we copy it
 	int srcY = 0;
@@ -991,7 +991,7 @@ void Surface::FillRandomCrap()
 		int height = GetHeight();
 		int bytesPerPixel = 4;
 
-		byte *pBuf = new byte[width*height*bytesPerPixel];
+		uint8 *pBuf = new uint8[width*height*bytesPerPixel];
 
 		glColorBytes *pPixel = (glColorBytes*)pBuf;
 		
@@ -1017,7 +1017,7 @@ void Surface::FillColor(glColorBytes color)
 	int height = GetHeight();
 	int bytesPerPixel = 4;
 
-	byte *pBuf = new byte[width*height*bytesPerPixel];
+	uint8 *pBuf = new uint8[width*height*bytesPerPixel];
 	
 	glColorBytes *pPixel = (glColorBytes*)pBuf;
 	for (int i=0; i < width*height; i++)
@@ -1030,7 +1030,7 @@ void Surface::FillColor(glColorBytes color)
 	delete [] pBuf;
 }
 
-void Surface::UpdateSurfaceRect(rtRect dstRect, byte *pPixelData, bool bUpsideDownMode)
+void Surface::UpdateSurfaceRect(rtRect dstRect, uint8 *pPixelData, bool bUpsideDownMode)
 {
 	Bind();
 	int yStart = dstRect.top;
@@ -1122,7 +1122,7 @@ bool Surface::InitBlankSurface( int x, int y)
 	
 	m_bUsesAlpha = (colorFormat == GL_RGBA);
 	
-	byte *pPixelData = NULL;
+	uint8 *pPixelData = NULL;
 	
 	int dataSize = m_texWidth*m_texHeight*bytesPerPixel;
 
@@ -1130,7 +1130,7 @@ bool Surface::InitBlankSurface( int x, int y)
 
 if (bClearFirst)
 {
-	pPixelData = new byte[dataSize];
+	pPixelData = new uint8[dataSize];
 	assert(pPixelData);
 	if (!pPixelData)
 	{
@@ -1291,7 +1291,7 @@ bool Surface::InitFromSoftSurface( SoftSurface *pSurf, bool bCreateSurface, int 
 		}
 
 		s.Init(m_texWidth, m_texHeight, tempSurfType);
-		byte *pPixelData = s.GetPixelData();
+		uint8 *pPixelData = s.GetPixelData();
 
 		assert(pPixelData);
 		if (!pPixelData)

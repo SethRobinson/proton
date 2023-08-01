@@ -22,7 +22,7 @@ public:
 	
 	virtual bool Open(string fName);
 	virtual bool IsFinished();
-	virtual int Read(byte * pBufferOut, int maxBytesToRead);
+	virtual int Read(uint8 * pBufferOut, int maxBytesToRead);
 	virtual void Close();
 	virtual void SeekFromStart(int byteCount);
 
@@ -37,12 +37,12 @@ private:
 
 	static const int BUFFER_SIZE = 1024*8;
 
-	int FillBufferWithCachedBytes(byte *pBufferOut, int maxBytesToRead);
+	int FillBufferWithCachedBytes(uint8 *pBufferOut, int maxBytesToRead);
 	bool OpenFileAtCurrentLocation();
 	unzFile m_uf;
 	unz_file_info m_file_info;
 
-	byte m_buffer[BUFFER_SIZE];
+	uint8 m_buffer[BUFFER_SIZE];
 	int m_bufferCurIndex;
 	int m_bufferBytesLeft;
 	bool m_bIsFinished;

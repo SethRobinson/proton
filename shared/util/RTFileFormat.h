@@ -11,8 +11,8 @@
 struct RTFileHeader
 {
 	char fileTypeID[C_RTFILE_PACKAGE_HEADER_BYTE_SIZE];
-	byte version;
-	byte reserved[1];
+	uint8 version;
+	uint8 reserved[1];
 };
 
 
@@ -29,8 +29,8 @@ struct rtpack_header
 	RTFileHeader rtFileHeader;
 	unsigned int compressedSize;
 	unsigned int decompressedSize;
-	byte compressionType; //one of eCompressionType
-	byte reserved[15];
+	uint8 compressionType; //one of eCompressionType
+	uint8 reserved[15];
 };
 
 #define RT_FORMAT_EMBEDDED_FILE 20000000

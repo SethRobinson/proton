@@ -45,6 +45,8 @@ GamepadProvider * GamepadManager::AddProvider( GamepadProvider *provider )
 		LogMsg("Gamepad provider %s initialized.", provider->GetName().c_str());
 	}
 
+	Update(); //important, because the XInput provider doesn't scan pads until the first Update
+
 	return provider;
 }
 

@@ -179,7 +179,7 @@ bool FileExistsRaw(const string &fName)
 }
 
 //up to you to use SAFE_DELETE_ARRAY
-byte * DecompressRTPackToMemory(byte *pMem, unsigned int *pDecompressedSize)
+uint8 * DecompressRTPackToMemory(uint8 *pMem, unsigned int *pDecompressedSize)
 {
 	assert(IsAPackedFile(pMem));
 
@@ -190,13 +190,13 @@ return NULL;
 
 #else
 	rtpack_header *pHeader = (rtpack_header*)pMem;
-	byte *pDeCompressed = zLibInflateToMemory( pMem+sizeof(rtpack_header), pHeader->compressedSize, pHeader->decompressedSize);
+	uint8 *pDeCompressed = zLibInflateToMemory( pMem+sizeof(rtpack_header), pHeader->compressedSize, pHeader->decompressedSize);
 	*pDecompressedSize = pHeader->decompressedSize;
 	return pDeCompressed;
 #endif
 }
 
-byte * LoadFileIntoMemoryBasic(string fileName, unsigned int *length, bool bUseSavePath, bool bAddBasePath)
+uint8 * LoadFileIntoMemoryBasic(string fileName, unsigned int *length, bool bUseSavePath, bool bAddBasePath)
 {
 	*length = 0;
 
@@ -222,7 +222,7 @@ byte * LoadFileIntoMemoryBasic(string fileName, unsigned int *length, bool bUseS
 	*length = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
-	byte *pData = new byte[(*length) +1];
+	uint8 *pData = new uint8[(*length) +1];
 	
 	if (!pData)
 	{
@@ -240,7 +240,7 @@ byte * LoadFileIntoMemoryBasic(string fileName, unsigned int *length, bool bUseS
 }
 
 
-bool SaveMemoryIntoFileBasic(byte* pData, unsigned int length, std::string fileName, bool bUseSavePath, bool bAddBasePath)
+bool SaveMemoryIntoFileBasic(uint8* pData, unsigned int length, std::string fileName, bool bUseSavePath, bool bAddBasePath)
 {
 	if (bAddBasePath)
 	{
@@ -267,12 +267,12 @@ bool SaveMemoryIntoFileBasic(byte* pData, unsigned int length, std::string fileN
 }
 
 
-bool IsAPackedFile(byte *pFile)
+bool IsAPackedFile(uint8 *pFile)
 {
 	return (strncmp((char*)pFile, C_RTFILE_PACKAGE_HEADER, C_RTFILE_PACKAGE_HEADER_BYTE_SIZE) == 0);
 }
 
-bool IsARTFile(byte *pFile)
+bool IsARTFile(uint8 *pFile)
 {
 	//not so safe... so don't count on this
 	return (strncmp((char*)pFile, "RT", 2) == 0);
@@ -281,7 +281,7 @@ bool IsARTFile(byte *pFile)
 bool CompressFile(string fName)
 {
 	unsigned int size;
-	byte *pInput = LoadFileIntoMemoryBasic(fName, &size, false, false); //the basic means don't try to decompress it
+	uint8 *pInput = LoadFileIntoMemoryBasic(fName, &size, false, false); //the basic means don't try to decompress it
 
 	if (size >= C_RTFILE_PACKAGE_HEADER_BYTE_SIZE && IsAPackedFile(pInput))
 	{
@@ -298,7 +298,7 @@ bool CompressFile(string fName)
 	return false;
 #else
 	int compressedSize; 
-	byte *pCompressedFile = zlibDeflateToMemory(pInput, size, &compressedSize);
+	uint8 *pCompressedFile = zlibDeflateToMemory(pInput, size, &compressedSize);
 	SAFE_DELETE_ARRAY(pInput); //done with that part
 
 	rtpack_header header =  BuildRTPackHeader(size, compressedSize);
@@ -326,7 +326,7 @@ bool CompressFile(string fName)
 
 
 
-byte * CompressMemoryToRTPack(unsigned char *pSourceMem, unsigned int sourceByteSize, unsigned int *pCompressedSizeOut)
+uint8 * CompressMemoryToRTPack(unsigned char *pSourceMem, unsigned int sourceByteSize, unsigned int *pCompressedSizeOut)
 {
 	*pCompressedSizeOut = 0;
 #ifdef _DEBUG
@@ -336,7 +336,7 @@ byte * CompressMemoryToRTPack(unsigned char *pSourceMem, unsigned int sourceByte
 	}
 #endif
 
-	byte *pDest = 0;
+	uint8 *pDest = 0;
 
 #ifdef C_NO_ZLIB
 
@@ -344,7 +344,7 @@ byte * CompressMemoryToRTPack(unsigned char *pSourceMem, unsigned int sourceByte
 	return NULL;
 #else
 	int compressedSize;
-	byte *pCompressedFile = zlibDeflateToMemory(pSourceMem, sourceByteSize, &compressedSize);
+	uint8 *pCompressedFile = zlibDeflateToMemory(pSourceMem, sourceByteSize, &compressedSize);
 	
 	rtpack_header header = BuildRTPackHeader(sourceByteSize, compressedSize);
 
@@ -352,7 +352,7 @@ byte * CompressMemoryToRTPack(unsigned char *pSourceMem, unsigned int sourceByte
 	int headerSize = sizeof(rtpack_header);
 
 	//save out the real file... to memory
-	pDest = new byte[compressedSize + headerSize + 1]; //the 1 is for a secret extra null on the end, helps with text processing
+	pDest = new uint8[compressedSize + headerSize + 1]; //the 1 is for a secret extra null on the end, helps with text processing
 
 	//copy crap to memory
 	memcpy(pDest, &header, headerSize);
@@ -386,7 +386,7 @@ rtpack_header BuildRTPackHeader(int size, int compressedSize)
 
 
 //you must SAFE_DELETE_ARRAY what it returns
-byte * zlibDeflateToMemory(byte *pInput, int sizeBytes, int *pSizeCompressedOut)
+uint8 * zlibDeflateToMemory(uint8 *pInput, int sizeBytes, int *pSizeCompressedOut)
 {
 	z_stream strm;
 	int ret;
@@ -403,7 +403,7 @@ byte * zlibDeflateToMemory(byte *pInput, int sizeBytes, int *pSizeCompressedOut)
 
 #define ZLIB_PADDING_BYTES (1024*5)
 
-	byte *pOut = (byte*) new byte[sizeBytes + ZLIB_PADDING_BYTES];  //some extra padding in case the compressed version is larger than the decompressed version for some reason
+	uint8 *pOut = (uint8*) new uint8[sizeBytes + ZLIB_PADDING_BYTES];  //some extra padding in case the compressed version is larger than the decompressed version for some reason
 	if (!pOut) return 0;
 	strm.avail_in = sizeBytes;
 	strm.next_in = pInput;
@@ -421,7 +421,7 @@ byte * zlibDeflateToMemory(byte *pInput, int sizeBytes, int *pSizeCompressedOut)
 }
 
 //you must SAFE_DELETE_ARRAY what it returns
-byte * zLibInflateToMemory(byte *pInput, unsigned int compressedSize, unsigned int decompressedSize)
+uint8 * zLibInflateToMemory(uint8 *pInput, unsigned int compressedSize, unsigned int decompressedSize)
 {
 	int ret;
 	z_stream strm;
@@ -434,7 +434,7 @@ byte * zLibInflateToMemory(byte *pInput, unsigned int compressedSize, unsigned i
 	ret = inflateInit(&strm);
 	if (ret != Z_OK)
 		return 0;
-	byte *pDestBuff = new byte[decompressedSize+1]; //room for extra null at the end;
+	uint8 *pDestBuff = new uint8[decompressedSize+1]; //room for extra null at the end;
 	if (!pDestBuff)
 	{
 		return 0;
@@ -490,11 +490,11 @@ void AppendStringToFile(const string filename, const string text)
 }
 
 //You must SAFE_DELETE_ARRAY the pointer it returns at some point!
-byte * LoadFileIntoMemory(string fileName, unsigned int *p_ui_size, bool bUseSavePath)
+uint8 * LoadFileIntoMemory(string fileName, unsigned int *p_ui_size, bool bUseSavePath)
 {
 	assert(p_ui_size && "You need to send in a valid int to be filled with the size, not a NULL.");
 
-	byte *p_resource = LoadFileIntoMemoryBasic(fileName, p_ui_size, bUseSavePath, false);
+	uint8 *p_resource = LoadFileIntoMemoryBasic(fileName, p_ui_size, bUseSavePath, false);
 
 	if (!p_resource)
 	{

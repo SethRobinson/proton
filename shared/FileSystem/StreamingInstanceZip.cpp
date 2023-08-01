@@ -92,7 +92,7 @@ bool StreamingInstanceZip::IsFinished()
 	return m_bIsFinished;
 }
 
-int StreamingInstanceZip::FillBufferWithCachedBytes(byte *pBufferOut, int maxBytesToRead)
+int StreamingInstanceZip::FillBufferWithCachedBytes(uint8 *pBufferOut, int maxBytesToRead)
 {
 	maxBytesToRead = rt_min(maxBytesToRead, m_bufferBytesLeft);
 
@@ -102,7 +102,7 @@ int StreamingInstanceZip::FillBufferWithCachedBytes(byte *pBufferOut, int maxByt
 	return maxBytesToRead;
 }
 
-int StreamingInstanceZip::Read( byte * pBufferOut, int maxBytesToRead )
+int StreamingInstanceZip::Read( uint8 * pBufferOut, int maxBytesToRead )
 {
 	if (m_bIsFinished) return 0;
 

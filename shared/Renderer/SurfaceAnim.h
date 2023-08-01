@@ -40,7 +40,7 @@ public:
 	float GetFrameWidth() {return m_frameWidth;}
 	float GetFrameHeight() {return m_frameHeight;}
 	CL_Vec2f GetFrameSize() {return CL_Vec2f(GetFrameWidth(), GetFrameHeight());}
-	virtual bool LoadFileFromMemory( byte *pMem, int inputSize =0 ); //override it so we can set the frame size
+	virtual bool LoadFileFromMemory( uint8 *pMem, int inputSize =0 ); //override it so we can set the frame size
 	virtual bool InitBlankSurface( int x, int y); //override it so we can set the frame size
 	virtual bool InitFromSoftSurface(SoftSurface *pSurf); //override it so we can set the frame size
 	float GetAspectRatio();

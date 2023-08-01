@@ -496,10 +496,10 @@
     <ClCompile Include="..\..\shared\Gamepad\GamepadPSP2.cpp">
       <Filter>shared\Gamepad</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\shared\Gamepad\GamepadProviderSDL2.cpp">
-      <Filter>shared</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\shared\Gamepad\GamepadSDL2.cpp">
+      <Filter>shared\Gamepad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\Gamepad\GamepadProviderSDL2.cpp">
       <Filter>shared\Gamepad</Filter>
     </ClCompile>
   </ItemGroup>
@@ -915,14 +915,14 @@
     <ClInclude Include="..\..\shared\Gamepad\GamepadPSP2.h">
       <Filter>shared\Gamepad</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\shared\Gamepad\GamepadProviderSDL2.h">
-      <Filter>shared</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\shared\Gamepad\GamepadSDL2.h">
       <Filter>shared\Gamepad</Filter>
     </ClInclude>
     <ClInclude Include="..\..\shared\SDL\SDL2Main.h">
       <Filter>shared\SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\Gamepad\GamepadProviderSDL2.h">
+      <Filter>shared\Gamepad</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

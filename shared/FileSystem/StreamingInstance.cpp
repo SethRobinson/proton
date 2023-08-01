@@ -25,7 +25,7 @@ bool StreamingInstance::ReadLineOfText( string &textOut )
 
 	while(1)
 	{
-		if (!Read((byte*)&buffer[cur], 1))
+		if (!Read((uint8*)&buffer[cur], 1))
 		{
 			//eof I guess
 			buffer[cur] =0;
@@ -64,7 +64,7 @@ bool StreamingInstance::ReadLineOfText( char *buffer, int bufferSize )
 
 	while(1)
 	{
-		if (!Read((byte*)&buffer[cur], 1))
+		if (!Read((uint8*)&buffer[cur], 1))
 		{
 			//eof I guess
 			buffer[cur] =0;
@@ -104,13 +104,13 @@ void StreamingInstance::SeekFromStart( int byteCount )
 int32 StreamingInstance::ReadInt32()
 {
 	int tmp;
-	Read((byte*)&tmp, sizeof(int32));
+	Read((uint8*)&tmp, sizeof(int32));
 	return tmp;
 }
 
 float StreamingInstance::ReadFloat32()
 {
 	float tmp;
-	Read((byte*)&tmp, sizeof(int32));
+	Read((uint8*)&tmp, sizeof(int32));
 	return tmp;
 }

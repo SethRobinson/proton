@@ -314,7 +314,9 @@ void LogDisplayComponent::SetConsole( Console *pConsole )
 	if (m_pActiveConsole)
 	{
 		//remove any old signals we had
-		m_pActiveConsole->m_sig_on_text_added.disconnect(boost::bind(&LogDisplayComponent::OnTextAdded, this));
+		//m_pActiveConsole->m_sig_on_text_added.disconnect(boost::bind(&LogDisplayComponent::OnTextAdded, this));
+		//m_pActiveConsole->m_sig_on_text_added.disconnect(func);
+		m_conn.disconnect();
 	}
 	SAFE_DELETE(m_pInternalConsole);
 	m_pActiveConsole = pConsole;
@@ -325,7 +327,9 @@ void LogDisplayComponent::SetConsole( Console *pConsole )
 	{
 		m_bUsingCustomConsole = false;
 	}
-	m_pActiveConsole->m_sig_on_text_added.connect(boost::bind(&LogDisplayComponent::OnTextAdded, this));
+	//m_pActiveConsole->m_sig_on_text_added.connect(boost::bind(&LogDisplayComponent::OnTextAdded, this));
+	
+	m_conn = m_pActiveConsole->m_sig_on_text_added.connect(boost::bind(&LogDisplayComponent::OnTextAdded, this));
 
 }
 

@@ -20,7 +20,7 @@ public:
 	FileSystem();
 	virtual ~FileSystem();
 
-	virtual byte *Get( std::string fileName, int *pSizeOut) = 0;
+	virtual uint8 *Get( std::string fileName, int *pSizeOut) = 0;
 	virtual StreamingInstance * GetStreaming(std::string fileName, int *pSizeOut) = 0; //pSizeOut currently always set to 0.  Returns null on fail. You must DELETE !
 	virtual bool FileExists(std::string fileName) = 0;
 	virtual int GetFileSize(std::string fileName) = 0;

@@ -35,7 +35,7 @@ bool StreamingInstanceFile::Open( string fName )
 
 
 //returns how many bytes were read
-int StreamingInstanceFile::Read(byte * pBufferOut, int maxBytesToRead)
+int StreamingInstanceFile::Read(uint8 * pBufferOut, int maxBytesToRead)
 {
 	if (!m_fp)
 	{
