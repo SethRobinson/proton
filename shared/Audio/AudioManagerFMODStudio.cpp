@@ -632,6 +632,7 @@ void AudioManagerFMOD::SetVol( AudioHandle soundID, float vol )
 	assert(system);
 	if (soundID == AUDIO_HANDLE_BLANK) return;
 	FMOD::Channel *pChannel = (FMOD::Channel*) soundID;
+	pChannel->setVolumeRamp(false);
 	pChannel->setVolume(vol);
 }
 
