@@ -99,8 +99,8 @@ public:
 	void ResetGamepads(); //set all buttons to off, and mark all as "unused"
 	Gamepad * GetUnusedGamepad(); //returns the next unused gamepad and marks it as used, or NULL if none left
 
-	boost::signal<void(Gamepad*)> m_sig_gamepad_connected; //called when a new gamepad is detected and added
-	boost::signal<void(eGamepadID)> m_sig_gamepad_disconnected; //called when a  gamepad is disconnected (don't assume we'll notice though, depends on the provider)
+	boost::signals2::signal<void(Gamepad*)> m_sig_gamepad_connected; //called when a new gamepad is detected and added
+	boost::signals2::signal<void(eGamepadID)> m_sig_gamepad_disconnected; //called when a  gamepad is disconnected (don't assume we'll notice though, depends on the provider)
 	
 protected:
 

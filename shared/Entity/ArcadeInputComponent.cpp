@@ -4,7 +4,7 @@
 #include "Entity/EntityUtils.h"
 #include "BaseApp.h"
 
-void MoveButtonState::OnPress(int timeToAddMS, boost::signal<void (VariantList*)> *pCustomSignal, bool bSendChange)
+void MoveButtonState::OnPress(int timeToAddMS, boost::signals2::signal<void (VariantList*)> *pCustomSignal, bool bSendChange)
 {
 	VariantList v;
 
@@ -31,7 +31,7 @@ void MoveButtonState::OnPress(int timeToAddMS, boost::signal<void (VariantList*)
 	m_releaseTimer += timeToAddMS;
 }
 
-void MoveButtonState::OnPressToggle(bool bDown, boost::signal<void (VariantList*)> *pCustomSignal, bool bSendChange)
+void MoveButtonState::OnPressToggle(bool bDown, boost::signals2::signal<void (VariantList*)> *pCustomSignal, bool bSendChange)
 {
 	VariantList v;
 
@@ -64,7 +64,7 @@ void MoveButtonState::OnPressToggle(bool bDown, boost::signal<void (VariantList*
 		ReleaseIfNeeded(pCustomSignal, bSendChange);
 	}
 }
-void MoveButtonState::Update(boost::signal<void (VariantList*)> *pCustomSignal)
+void MoveButtonState::Update(boost::signals2::signal<void (VariantList*)> *pCustomSignal)
 {
 	if (m_bIsDown && m_releaseTimer < GetTick(TIMER_SYSTEM))
 	{
@@ -73,7 +73,7 @@ void MoveButtonState::Update(boost::signal<void (VariantList*)> *pCustomSignal)
 	}
 }
 
-void MoveButtonState::ReleaseIfNeeded(boost::signal<void (VariantList*)> *pCustomSignal, bool bSendChange)
+void MoveButtonState::ReleaseIfNeeded(boost::signals2::signal<void (VariantList*)> *pCustomSignal, bool bSendChange)
 {
 	if (m_bIsDown)
 	{

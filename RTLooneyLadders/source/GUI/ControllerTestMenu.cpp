@@ -59,7 +59,7 @@ void DisconnectGameControllers()
 	for (int i=0; i < GetGamepadManager()->GetGamepadCount(); i++)
 	{
 		Gamepad *pPad = GetGamepadManager()->GetGamepad(i);
-		pPad->m_sig_gamepad_buttons.disconnect(OnGamepadButton);
+		pPad->m_sig_gamepad_buttons.disconnect(&OnGamepadButton);
 	}
 }
 

@@ -51,10 +51,12 @@ void NetHTTP::Reset(bool bClearPostdata)
 	m_downloadData.clear();
 	m_replyHeader.clear();
 	m_query.clear();
+
 	if (bClearPostdata)
 	{
 		m_contentType = "";
 		m_postData.clear();
+		m_bForcePost = false;
 		
 	}
 	m_bytesWrittenToFile = 0;
@@ -140,7 +142,7 @@ string NetHTTP::BuildHTTPHeader()
 {
 	string header, stCommand;
 
-	if (m_postData.length() > 0)
+	if (m_postData.length() > 0 || m_bForcePost)
 	{
 		stCommand = "POST";
 	} else
@@ -162,7 +164,7 @@ string NetHTTP::BuildHTTPHeader()
 	header += "Accept: */*\r\n";
 	header += "Host: " + m_serverName + "\r\n";
 
-	if (m_postData.length() > 0)
+	if (m_postData.length() > 0 || m_bForcePost)
 	{
 		header += "Content-Type: application/x-www-form-urlencoded\r\n";
 		header += "Content-Length: "+toString(m_postData.length())+"\r\n";
@@ -188,7 +190,7 @@ bool NetHTTP::Start()
 	//take on the post data if applicable
 	
 #ifdef _DEBUG
-LogMsg("Opening %s on port %d", m_serverName.c_str(), m_port);
+LogMsg("Opening '%s' on port %d", m_serverName.c_str(), m_port);
 #endif
 	if (!m_netSocket.Init(m_serverName, m_port))
 	{

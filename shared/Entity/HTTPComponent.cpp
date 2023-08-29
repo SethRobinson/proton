@@ -69,7 +69,8 @@ void HTTPComponent::OnAdd(Entity *pEnt)
 
 void HTTPComponent::InitAndStart(VariantList *pVList)
 {
-	assert(m_state == STATE_FINISHED || m_state == STATE_IDLE);
+	assert(m_state == STATE_FINISHED || m_state == STATE_IDLE || m_state == STATE_CONNECTED); //STATE_CONNECTED gets set after an initial OS check to see if the internet
+	//is available, this is a carry over from iOS issues, probably not needed these days
 
 	if (m_state == STATE_FINISHED)
 	{
@@ -87,7 +88,17 @@ void HTTPComponent::InitAndStart(VariantList *pVList)
 	m_netHTTP.Setup(pVList->m_variant[0].GetString(),pVList->m_variant[1].GetUINT32(),  pVList->m_variant[2].GetString(), endOfDataSignal);
 	m_state = STATE_CHECKING_CONNECTION;
 
-	PrepareConnection(NULL);
+	//old iOS stuff needed this pre-check, but I doubt it's needed anymore.  If calls fail only the first time in the app, uh, add this back
+	//PrepareConnection(NULL);
+
+	//fake it
+	m_state = STATE_CONNECTED;
+	if (!m_fileName.empty())
+	{
+		m_netHTTP.SetFileOutput(m_fileName);
+	}
+	m_netHTTP.Start();
+
 }
 
 void HTTPComponent::PrepareConnection(VariantList *pVList)

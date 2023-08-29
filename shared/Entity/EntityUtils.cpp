@@ -2356,6 +2356,12 @@ void SetPos2DEntity(Entity *pEnt, const CL_Vec2f &vPos) { pEnt->GetVar("pos2d")-
 CL_Vec2f GetScale2DEntity(Entity *pEnt) {return pEnt->GetVar("scale2d")->GetVector2();}
 void SetScale2DEntity(Entity *pEnt, const CL_Vec2f &vScale) { pEnt->GetVar("scale2d")->Set(vScale);}
 
+void SetSmoothingEntity(Entity* pEnt, bool bSmoothing)
+{
+	((OverlayRenderComponent*)pEnt->GetComponentByName("OverlayRender"))->GetSurfaceAnim()->SetSmoothing(bSmoothing);
+
+}
+
 void SetProgressBarPercent(Entity *pEnt, float progressPercent)
 {
 	EntityComponent *pComp = pEnt->GetComponentByName("ProgressBar");
@@ -2423,11 +2429,34 @@ void OnShowTextMessage(VariantList *pVList)
 
 }
 
+//slides in
 void ShowTextMessage(string msg, int timeMS, int delayBeforeStartingMS)
 {
 	VariantList vList(msg, (uint32)timeMS);
 	GetMessageManager()->CallStaticFunction(OnShowTextMessage, delayBeforeStartingMS, &vList, TIMER_SYSTEM);
 }
+
+void ShowTextMessageSimple(string msg, int timeMS)
+{
+	
+	Entity* pEnt = CreateTextLabelEntity(NULL, "", 0, 0, msg);
+	SetupTextEntity(pEnt, FONT_LARGE, 0.66f);
+
+	//now that we know the size of the text, let's create a black bg, then attach the text to it.
+	Entity* pRect = CreateOverlayRectEntity(NULL, GetScreenSize() / 2, GetSize2DEntity(pEnt), MAKE_RGBA(0, 0, 0, 170));
+	SetAlignmentEntity(pRect, ALIGNMENT_UPPER_CENTER);
+	pRect->AddEntity(pEnt);
+
+	AddFocusIfNeeded(pRect);
+	FadeOutAndKillEntity(pRect, true, 1000, timeMS);
+	
+	//hack to make sure we're on the top of the screen.. maybe we should do it every frame..
+	VariantList v(pRect);
+	GetMessageManager()->CallEntityFunction(pRect, timeMS + 1, "MoveToTop", &v, TIMER_SYSTEM);
+	pRect->GetFunction("MoveToTop")->sig_function.connect(MoveEntityToTop);
+
+}
+
 
 
 void SetupEntityToEatInput(Entity *pEnt)

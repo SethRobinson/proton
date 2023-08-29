@@ -13,7 +13,6 @@
 #define BOOST_SIGNALS2_SLOT_CALL_ITERATOR_HPP
 
 #include <boost/assert.hpp>
-#include <boost/aligned_storage.hpp>
 #include <boost/core/no_exceptions_support.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/optional.hpp>
@@ -24,6 +23,7 @@
 #include <boost/signals2/detail/unique_lock.hpp>
 #include <boost/type_traits/add_const.hpp>
 #include <boost/type_traits/add_reference.hpp>
+#include <boost/type_traits/aligned_storage.hpp>
 #include <boost/weak_ptr.hpp>
 
 namespace boost {
@@ -78,12 +78,12 @@ namespace boost {
         : public boost::iterator_facade<slot_call_iterator_t<Function, Iterator, ConnectionBody>,
         typename Function::result_type,
         boost::single_pass_traversal_tag,
-        typename boost::add_const<typename boost::add_reference<typename Function::result_type>::type>::type >
+        typename boost::add_reference<typename boost::add_const<typename Function::result_type>::type>::type >
       {
         typedef boost::iterator_facade<slot_call_iterator_t<Function, Iterator, ConnectionBody>,
           typename Function::result_type,
           boost::single_pass_traversal_tag,
-          typename boost::add_const<typename boost::add_reference<typename Function::result_type>::type>::type >
+          typename boost::add_reference<typename boost::add_const<typename Function::result_type>::type>::type >
         inherited;
 
         typedef typename Function::result_type result_type;
@@ -149,21 +149,11 @@ namespace boost {
           {
             return;
           }
-          if(iter == end)
-          {
-            if(callable_iter != end)
-            {
-              lock_type lock(**callable_iter);
-              set_callable_iter(lock, end);
-              return;
-            }
-          }
-          // we're only locking the first connection body,
-          // but it doesn't matter they all use the same mutex
-          lock_type lock(**iter);
+  
           for(;iter != end; ++iter)
           {
             cache->tracked_ptrs.clear();
+            lock_type lock(**iter);
             (*iter)->nolock_grab_tracked_objects(lock, std::back_inserter(cache->tracked_ptrs));
             if((*iter)->nolock_nograb_connected())
             {
@@ -178,9 +168,14 @@ namespace boost {
               break;
             }
           }
+          
           if(iter == end)
           {
-            set_callable_iter(lock, end);
+            if(callable_iter != end)
+            {
+              lock_type lock(**callable_iter);
+              set_callable_iter(lock, end);
+            }
           }
         }
 

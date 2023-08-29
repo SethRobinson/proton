@@ -170,4 +170,16 @@ protected:
 
 bool CheckIfOtherAudioIsPlaying(); //are they playing ipod stuff before the app was run?  Should call this before playing your own.
 
+//can be scheduled easier.
+
+/*
+
+VariantList vList;
+vList.Get(0).Set(sfx);
+GetMessageManager()->CallStaticFunction(PlaySound, timeMS, &vList);
+
+*/
+
+void PlaySound(VariantList* pVList);
+
 #endif // AudioManager_h__

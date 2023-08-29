@@ -302,6 +302,7 @@ void ScaleEntity(Entity *pEnt, CL_Vec2f vScaleStart, CL_Vec2f vScaleEnd, int tim
 
 void FadeEntity(Entity *pEnt, bool bRecursive, float alpha, int timeMS, int delayBeforeFadingMS = 0, bool bAllowMultipleFadesActiveAtOnce = false);
 Entity * FadeScreen( Entity *pParent, float defaultStartAlpha, float targetAlpha, int fadeDurationMS, bool bDeleteWhenDone);
+void SetSmoothingEntity(Entity* pEnt, bool bSmoothing); //enable/disable bilinear filtering on image.  Probably has to be loaded first
 
 //if pVStartingPos isn't null, the position where the rect starts as compared to the 0,0 of the parent entity is returned in it
 CL_Rectf MeasureEntityAndChildren(Entity *pEnt, CL_Vec2f *pVStartingPos = NULL, bool bFirst = true);
@@ -391,7 +392,7 @@ void CopyPropertiesToEntity(Entity *pToEnt, Entity *pFromEnt, const string varNa
 
 //Draw a text message on the screen, then (by default) kill it 3 seconds later.  Useful for quick debugging messages sometimes
 void ShowTextMessage(string msg, int timeMS=1500, int delayBeforeStartingMS = 0);
-
+void ShowTextMessageSimple(string msg, int timeMS = 1500); //like above but no fancy slide in
 bool EntityHasInputFocus(Entity *pEnt); //returns true if this entity can currently receive input
 void SetupEntityToEatInput(Entity *pEnt); //assign to a background, and no clicks will live past it
 void ActivateTextInputEntity(Entity *pEnt); //gives focus to an entity that has an InputTextRender component in it

@@ -9,11 +9,11 @@ Variant::~Variant()
 	SAFE_DELETE(m_pSig_onChanged);
 }
 
-boost::signal<void (Variant*)> * Variant::GetSigOnChanged()
+boost::signals2::signal<void (Variant*)> * Variant::GetSigOnChanged()
 {
 	if (!m_pSig_onChanged)
 	{
-		m_pSig_onChanged = new boost::signal<void (Variant*)>;
+		m_pSig_onChanged = new boost::signals2::signal<void (Variant*)>;
 	}
 	return m_pSig_onChanged;
 }

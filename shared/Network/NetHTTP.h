@@ -113,6 +113,7 @@ public:
 	const uint8 * GetDownloadedData();
 	void Update();
 	void Reset(bool bClearPostData=true); //completely clears it out so it can be used again
+	void SetForcePost(bool bNew) { m_bForcePost = bNew; } //always send as POST, even if not sending data.  Note: I didn't set this up for NetHTTP_libCURL.cpp yet
 
 protected:
 
@@ -184,6 +185,7 @@ private:
 	string m_fileName;
 	string m_contentType;
 	bool m_bHasEncodedPostData = false; //used by the libcurl implementation
+	bool m_bForcePost = false; //always post, even if not sending data
 	
 };
 

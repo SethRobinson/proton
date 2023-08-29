@@ -10,7 +10,7 @@
 #ifndef GamepadProvider_h__
 #define GamepadProvider_h__
 
-class GamepadProvider: public boost::signals::trackable
+class GamepadProvider: public boost::signals2::trackable
 {
 public:
 	GamepadProvider();
@@ -20,8 +20,8 @@ public:
 	virtual void Kill()=0;
 	virtual void Update()=0;
 
-	boost::signal<void(GamepadProvider*)> m_sig_failed_to_connect; //only used by iCade at the moment
-	boost::signal<void(GamepadProvider*, VariantList*)> m_sig_status; //could be useful for sending pad plugged in/unplugged messages.  Not used yet
+	boost::signals2::signal<void(GamepadProvider*)> m_sig_failed_to_connect; //only used by iCade at the moment
+	boost::signals2::signal<void(GamepadProvider*, VariantList*)> m_sig_status; //could be useful for sending pad plugged in/unplugged messages.  Not used yet
 
 protected:
 	

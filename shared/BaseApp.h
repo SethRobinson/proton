@@ -281,43 +281,43 @@ public:
      *   - For \link eMessageType::MESSAGE_TYPE_GUI_PASTE MESSAGE_TYPE_GUI_PASTE\endlink this
      *     parameter contains the contents of the clipboard as a \c string.
      */
-    boost::signal<void (VariantList*)> m_sig_input;
+    boost::signals2::signal<void (VariantList*)> m_sig_input;
     /**
      * "Move" touch messages.
      * Used if eInputMode::INPUT_MODE_SEPARATE_MOVE_TOUCHES was set. Otherwise they are signaled
      * via \c BaseApp::m_sig_input.
      */
-    boost::signal<void (VariantList*)> m_sig_input_move;
+    boost::signals2::signal<void (VariantList*)> m_sig_input_move;
     /**
      * Messages from the platform itself.
      * To get the type of the message use code like this:
      * \code eMessageType mType = (eMessageType)(int)pVList->m_variant[0].GetFloat(); \endcode
      */
-    boost::signal<void (VariantList*)> m_sig_os;
+    boost::signals2::signal<void (VariantList*)> m_sig_os;
     /**
      * Update signal for the game logic.
      * Called once per frame, usually.
      */
-    boost::signal<void (VariantList*)> m_sig_update;
+    boost::signals2::signal<void (VariantList*)> m_sig_update;
     /**
      * Signal for doing rendering.
      * Called once per frame. You should render but not do game logic here.
      */
-    boost::signal<void (VariantList*)> m_sig_render;
+    boost::signals2::signal<void (VariantList*)> m_sig_render;
     /**
      * Early signal that we are about to enter background.
      * Don't mess with video here. Useful for shutting down audio on android.
      */
-    boost::signal<void (VariantList*)> m_sig_pre_enterbackground;
-    boost::signal<void (VariantList*)> m_sig_enterbackground; ///< Game lost focus
-    boost::signal<void (VariantList*)> m_sig_enterforeground; ///< Game restored focus
-    boost::signal<void (VariantList*)> m_sig_accel; ///< Accelerometer data from iphone
-    boost::signal<void (VariantList*)> m_sig_trackball; ///< Used for android trackball move data
+    boost::signals2::signal<void (VariantList*)> m_sig_pre_enterbackground;
+    boost::signals2::signal<void (VariantList*)> m_sig_enterbackground; ///< Game lost focus
+    boost::signals2::signal<void (VariantList*)> m_sig_enterforeground; ///< Game restored focus
+    boost::signals2::signal<void (VariantList*)> m_sig_accel; ///< Accelerometer data from iphone
+    boost::signals2::signal<void (VariantList*)> m_sig_trackball; ///< Used for android trackball move data
     /**
      * For arcade movement controls like left/right/up/down.
      * If MovementInputComponent is used, trackball/wasd are converted to send through this as well.
      */
-    boost::signal<void (VariantList*)> m_sig_arcade_input;
+    boost::signals2::signal<void (VariantList*)> m_sig_arcade_input;
     /**
      * For raw data from keyboards that give pressed/released messages.
      * Generally you would convert them into arcade messages.
@@ -327,27 +327,27 @@ public:
      * - 1: VIRTUAL_KEY_PRESS or VIRTUAL_KEY_RELEASE as a uint32 depending on whether
      *   the event was a key press or release.
      */
-    boost::signal<void (VariantList*)> m_sig_raw_keyboard;
+    boost::signals2::signal<void (VariantList*)> m_sig_raw_keyboard;
     
     /**
      - 0: the eSystemType, as float.  Should be cast to (eMessageType)(int)
      * Signal to notify about hardware messages.  Currently there are only two,
      * MESSAGE_TYPE_HW_TOUCH_KEYBOARD_WILL_SHOW and MESSAGE_TYPE_HW_TOUCH_KEYBOARD_WILL_HIDE
      */
-    boost::signal<void (VariantList*)> m_sig_hardware;
+    boost::signals2::signal<void (VariantList*)> m_sig_hardware;
     
-	boost::signal<void(void)> m_sig_onScreenSizeChanged;
+	boost::signals2::signal<void(void)> m_sig_onScreenSizeChanged;
 
     /**
      * Signal to notify that it's time to release surfaces.
      * Sent for example when the app goes to background.
      */
-    boost::signal<void (void)> m_sig_unloadSurfaces;
-    boost::signal<void (void)> m_sig_loadSurfaces; ///< Signal to notify that it's time to reload surfaces.
+    boost::signals2::signal<void (void)> m_sig_unloadSurfaces;
+    boost::signals2::signal<void (void)> m_sig_loadSurfaces; ///< Signal to notify that it's time to reload surfaces.
     
-    boost::signal<void (VariantList*)> m_sig_joypad_events; //only used for the android Moga game controller implementation
+    boost::signals2::signal<void (VariantList*)> m_sig_joypad_events; //only used for the android Moga game controller implementation
     
-    boost::signal<void (VariantList*)> m_sig_native_input_state_changed; //first part is a uint32 that is 1 if input box is open, 0 if closed.  Useful for turning off WASD while inputting a name on desktops
+    boost::signals2::signal<void (VariantList*)> m_sig_native_input_state_changed; //first part is a uint32 that is 1 if input box is open, 0 if closed.  Useful for turning off WASD while inputting a name on desktops
     
     deque <OSMessage> * GetOSMessages() {return &m_OSMessages;}
     void AddOSMessage(OSMessage &m);

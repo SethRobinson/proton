@@ -84,11 +84,11 @@ public:
 		m_keyType = type;
 	}
 
-	void ReleaseIfNeeded(boost::signal<void (VariantList*)> *pCustomSignal, bool bSendChange = true);
-	void OnPress(int releaseTime, boost::signal<void (VariantList*)> *pCustomSignal, bool bSendChange = true);
+	void ReleaseIfNeeded(boost::signals2::signal<void (VariantList*)> *pCustomSignal, bool bSendChange = true);
+	void OnPress(int releaseTime, boost::signals2::signal<void (VariantList*)> *pCustomSignal, bool bSendChange = true);
 
-	void Update(boost::signal<void (VariantList*)> *pCustomSignal);
-	void OnPressToggle(bool bDown, boost::signal<void (VariantList*)> *pCustomSignal, bool bSendChange = true);
+	void Update(boost::signals2::signal<void (VariantList*)> *pCustomSignal);
+	void OnPressToggle(bool bDown, boost::signals2::signal<void (VariantList*)> *pCustomSignal, bool bSendChange = true);
 	bool m_bIsDown;
 	unsigned int m_releaseTimer;
 	eVirtualKeys m_keyType;
@@ -171,7 +171,7 @@ CL_Vec2f *m_pPos2d;
 	uint32 *m_pTrackballMode;
 	CL_Vec2f m_trackball;
 	
-	boost::signal<void (VariantList*)> *m_customSignal; //if not null, messages will be sent here
+	boost::signals2::signal<void (VariantList*)> *m_customSignal; //if not null, messages will be sent here
 };
 
 void AddKeyBinding(EntityComponent *pComp, string name, uint32 inputcode, uint32 outputcode, bool bAlsoSendAsNormalRawKey = false, uint32 modifiersRequired = 0);

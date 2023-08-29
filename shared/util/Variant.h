@@ -19,8 +19,9 @@
 
 #else
 
-#include "util/boost/boost/signal.hpp"
+#include "util/boost/boost/signals2.hpp"
 #include "util/boost/boost/bind.hpp"
+using namespace boost::placeholders;
 
 #endif
 
@@ -89,7 +90,7 @@ public:
 		SAFE_DELETE(m_pSig_onChanged);
 	}
 
-	boost::signal<void (Variant*)> * GetSigOnChanged();
+	boost::signals2::signal<void (Variant*)> * GetSigOnChanged();
 	
 	void Set(const Variant &v);
 	void SetVariant( Variant *pVar ) /*needed this because boost was confused... */;
@@ -392,7 +393,7 @@ private:
 		int32 m_as_int32s[4];
 	};
 	string m_string;
-	boost::signal<void (Variant*)> *m_pSig_onChanged; //not initialized unless used
+	boost::signals2::signal<void (Variant*)> *m_pSig_onChanged; //not initialized unless used
 
 };
 
@@ -414,7 +415,7 @@ inline Variant operator-(Variant lhs, const Variant& rhs);
 
 //a VariantList holds a group of variants, we pass these when we don't know in advance how many variants we want to use
 
-#define C_MAX_VARIANT_LIST_PARMS 6
+#define C_MAX_VARIANT_LIST_PARMS 8
 
 /*
 //example of memory serialization of a VariantList

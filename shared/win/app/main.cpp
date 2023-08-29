@@ -1916,10 +1916,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLin
 
 		if (g_fpsLimit != 0)
 		{
-			Sleep(1);
 			while (fpsTimer > GetSystemTimeAccurate())
 			{
-				Sleep(1);
+				
+				Sleep(0); //sleep(1) makes dink smallwood run at 35 fps instead of 60, uhh...
 			}
 			fpsTimer = float(GetSystemTimeAccurate())+(1000.0f/ (float(g_fpsLimit)));
 		}
@@ -2029,7 +2029,7 @@ skipRender:
 				LogMsg("Error?");
 			}
 		}
-		Sleep(0);
+	//	Sleep(0);
 	}
 
 cleanup:

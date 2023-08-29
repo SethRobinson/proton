@@ -13,7 +13,7 @@
 #endif
 
 
-#define snprintf _snprintf
+//#define snprintf _snprintf <-- Bad, causes errors in latest boost
 
 #ifndef _CONSOLE
 #ifdef C_GL_MODE

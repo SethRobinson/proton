@@ -20,11 +20,11 @@ class Variant;
 
 #define C_VARIANT_DB_FILE_VERSION 1
 
-class FunctionObject
+class FunctionObject : public boost::signals2::trackable
 {
 public:
 
-	boost::signal<void (VariantList*)> sig_function;
+	boost::signals2::signal<void (VariantList*)> sig_function;
 };
 
 #ifdef PLATFORM_BBX

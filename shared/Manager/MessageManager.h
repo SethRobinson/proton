@@ -241,7 +241,7 @@ typedef void(*PtrFuncVarList)(VariantList *);
 typedef void(*PtrFunc)(void);
 
 
-class Message: public boost::signals::trackable
+class Message: public boost::signals2::trackable
 {
     
 public:

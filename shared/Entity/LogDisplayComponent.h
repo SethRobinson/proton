@@ -94,7 +94,7 @@ private:
 	float * m_pFriction, *m_pMaxScrollSpeed, *m_pPowerMod;
 
 	deque<string> m_queuedLines; //if a user is scrolling around, we don't want to add the new lines added right away as it's visually jarring
-	boost::signals::connection m_conn;
+	boost::signals2::connection m_conn;
 };
 
 //misc helpers

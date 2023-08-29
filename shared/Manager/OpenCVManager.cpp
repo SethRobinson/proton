@@ -125,7 +125,7 @@ void decode(Mat &im, vector<QRCodeInfo>&decodedObjects)
 
 	// Convert image to grayscale
 	Mat imGray;
-	cvtColor(im, imGray, CV_BGR2GRAY);
+	cvtColor(im, imGray, COLOR_BGR2GRAY);
 
 	// Wrap image data in a zbar image
 	Image image(im.cols, im.rows, "Y800", (uchar *)imGray.data, im.cols * im.rows);
@@ -266,7 +266,7 @@ void OpenCVManager::SetCaptureFPS(int fps)
 #else
 
 
-	if (!m_capture.set(CV_CAP_PROP_FPS, fps))
+	if (!m_capture.set(CAP_PROP_FPS, fps))
 	{
 		if (GetBaseApp()->IsInitted())
 		LogMsg("Error setting cam FPS");
@@ -307,12 +307,12 @@ void OpenCVManager::SetCaptureSize(int width, int height)
 
 #else
 
-	if (!m_capture.set(CV_CAP_PROP_FRAME_WIDTH, width))
+	if (!m_capture.set(CAP_PROP_FRAME_WIDTH, width))
 	{
 		LogMsg("Unable to set capture size X to %d", width);
 	}
 
-	if (!m_capture.set(CV_CAP_PROP_FRAME_HEIGHT, height))
+	if (!m_capture.set(CAP_PROP_FRAME_HEIGHT, height))
 	{
 		LogMsg("Unable to set capture size Y to %d", height);
 	}
@@ -417,14 +417,14 @@ void OpenCVManager::CopyLastFrameToSoftSurface()
 	//m_frame = m_frame.t();
 	//memcpy(m_surface.GetPixelData(), m_frame.data, 3 * m_frame.cols*m_frame.rows);
 	
-	byte * framePixels = m_frame.data; //Pointer to the first pixel data ,it's return array in all values
+	uchar * framePixels = m_frame.data; //Pointer to the first pixel data ,it's return array in all values
 	
-	byte *softSurfacePixels = (byte*)m_surface.GetPixelData();
+	uchar* softSurfacePixels = (uchar*)m_surface.GetPixelData();
 
 	const int bytesPerPixel = 3;
 
-	byte *pSrc;
-	byte *pDst;
+	uchar *pSrc;
+	uchar *pDst;
 
 	bool bFlipImageY = true;
 

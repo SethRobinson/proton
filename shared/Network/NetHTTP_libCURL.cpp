@@ -158,9 +158,6 @@ void LogMsgNoCR(const char* traceStr, ...);
 void dump(const char *text,
 	FILE *stream, unsigned char *ptr, size_t size);
 
-
-
-
 void SimpleDump(const char* text,
 	FILE* stream, unsigned char* ptr, size_t size)
 {
@@ -237,8 +234,6 @@ static int CURLDebugTrace(CURL *handle, curl_infotype type,
 	//LogMsg("more info but can't display it... fix it, Seth");
 	return 0;
 }
-
-
 
 size_t NetHTTP::CURLWriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *pThisInstance)
 {

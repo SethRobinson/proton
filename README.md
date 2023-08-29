@@ -8,13 +8,41 @@ Seth's GL/GLES messy multi-platform C++ game SDK.  Can output to **Windows**, **
 
 A component based toolbox of useful things built up over the last ten years.  Instead of a giant .lib you link only the .cpp files used when possible to simplify multiplatform support as well as keep code size down.
 
-
-
 It's kind of an SDL-like on steroids (while also being able to target SDL2 for setup/input/audio itself when needed) but generally gets the best results with its own native implementations of things. For example, it can target the following audio subsystems: SDL2_mixer, Audiere, FMOD, FMODStudio, Native iOS, Native Android, Denshion, Native Flash
 
 It's designed with a "Write stuff in Windows with Visual Studio 2017, then compile/export to other platforms as needed" mentality.
 
 Deprecated platforms no longer actively supported:  Flash, BBX, WebOS
+
+### 8/29/2023 Note
+
+I had to make a breaking change - I updated the Boost library to the latest for proper C++20 support and it doesn't support signal anymore, just signals2.
+
+
+If you're updating an old project, When you get this error:
+
+1>c1xx : fatal  error C1083: Cannot open source file: '..\..\shared\util\boost\libs\signals\src\connection.cpp': No such file or directory
+1>named_slot_map.cpp
+1>c1xx : fatal  error C1083: Cannot open source file: '..\..\shared\util\boost\libs\signals\src\named_slot_map.cpp': No such file or directory
+1>signal_base.cpp
+1>c1xx : fatal  error C1083: Cannot open source file: '..\..\shared\util\boost\libs\signals\src\signal_base.cpp': No such file or directory
+1>slot.cpp
+1>c1xx : fatal  error C1083: Cannot open source file: '..\..\shared\util\boost\libs\signals\src\slot.cpp': No such file or directory
+1>trackable.cpp
+1>c1xx : fatal  error C1083: Cannot open source file: '..\..\shared\util\boost\libs\signals\src\trackable.cpp': No such file or directory
+
+Remove references to those files, they don't exist anymore, signals2 is header-only, no source needed.
+
+If you get errors like "1>D:\projects\proton\UGT\Source\App.h(132,9): error C2039: 'signal': is not a member of 'boost'" in your code, you'll need to change it.
+
+From this:
+
+	boost::signal<void(void)> m_sig_target_language_changed;
+
+To this:
+
+	boost::signals2::signal<void(void)> m_sig_target_language_changed;
+
 
 Some things written with Proton:
 

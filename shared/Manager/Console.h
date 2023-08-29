@@ -27,7 +27,7 @@ public:
 	size_t GetTotalLines(){return m_log.size();}
 	string GetLine(int index) {return m_log.at(index);}
 	
-	boost::signal<void()> m_sig_on_text_added; //if you want notification when text is added here, connect to this
+	boost::signals2::signal<void()> m_sig_on_text_added; //if you want notification when text is added here, connect to this
 
 private:
 

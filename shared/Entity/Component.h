@@ -21,7 +21,7 @@ typedef list<EntityComponent *>::iterator ComponentListItor;
 
 //Changed from Component to EntityComponent because of a naming conflict in OSX and I don't want to namespace it
 
-class EntityComponent: public boost::signals::trackable
+class EntityComponent: public boost::signals2::trackable
 {
 public:
 	EntityComponent();

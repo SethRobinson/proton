@@ -23,9 +23,6 @@
     <Filter Include="shared\util">
       <UniqueIdentifier>{c5a4e879-429e-49ae-a0e8-37e8c71d6d3b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="shared\util\Boost">
-      <UniqueIdentifier>{66d08251-7b62-4962-875a-39c4136f30a6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="shared\util\unzip">
       <UniqueIdentifier>{983e487d-cee0-4d71-ab6a-975c20223b2e}</UniqueIdentifier>
     </Filter>
@@ -189,21 +186,6 @@
     </ClCompile>
     <ClCompile Include="..\..\shared\util\Variant.cpp">
       <Filter>shared\util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\shared\util\boost\libs\signals\src\connection.cpp">
-      <Filter>shared\util\Boost</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\shared\util\boost\libs\signals\src\named_slot_map.cpp">
-      <Filter>shared\util\Boost</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\shared\util\boost\libs\signals\src\signal_base.cpp">
-      <Filter>shared\util\Boost</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\shared\util\boost\libs\signals\src\slot.cpp">
-      <Filter>shared\util\Boost</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\shared\util\boost\libs\signals\src\trackable.cpp">
-      <Filter>shared\util\Boost</Filter>
     </ClCompile>
     <ClCompile Include="..\..\shared\util\unzip\ioapi.c">
       <Filter>shared\util\unzip</Filter>

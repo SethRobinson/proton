@@ -26,7 +26,7 @@ public:
 
 };
 
-class Entity: public boost::signals::trackable
+class Entity: public boost::signals2::trackable
 {
 public:
 	Entity(string name);
@@ -129,7 +129,7 @@ public:
 	//reverse order that you draw things in
 	void CallFunctionRecursivelyWithUpdatedVarBackwards( const string funcName, VariantList *pVList, const string &varName, int varIndex, eRecursiveVarOp op );
 
-	boost::signal<void (Entity*)> sig_onRemoved;
+	boost::signals2::signal<void (Entity*)> sig_onRemoved;
 
 	EntityList * GetChildren() {return &m_children;}
 	ComponentList * GetComponents() {return &m_components;}

@@ -11,7 +11,7 @@
 #define Surface_h__
 
 #include "util/RenderUtils.h"
-#include "util/boost/boost/signal.hpp"
+#include "util/boost/boost/signals2.hpp"
 
 class VariantList;
 
@@ -36,7 +36,7 @@ class RenderBatcher;
 
 #define NO_TEXTURE_LOADED (2000000000) //I had this as 4294967294u but saw some weirdness with some compiles
 
-class Surface: public boost::signals::trackable
+class Surface: public boost::signals2::trackable
 {
 public:
 	/**

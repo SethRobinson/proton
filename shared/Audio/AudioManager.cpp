@@ -68,3 +68,9 @@ std::string AudioManager::GetAudioSystemName()
 {
 	return "unknown";
 }
+
+void PlaySound(VariantList *pVList)
+{
+	string fName = pVList->Get(0).GetString();
+	GetAudioManager()->Play(fName);
+}
