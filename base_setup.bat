@@ -26,7 +26,7 @@ SET JAVA_HOME=D:\pro\jdk-17.0.2
 SET RSYNC_OPTIONS=-az --chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r --exclude='*.ncb' --exclude='*.lib' --exclude='*.exe' --exclude='*.dll' --exclude='*.pdb' --exclude='*.obj' --exclude='*.o' --exclude='*.ilk' --exclude='*.so' --exclude='*.tlog' --exclude='.svn' --exclude='*.pch' --exclude='*.ipch' --exclude='.git' --exclude='.vs/*' --exclude='windows_vs/x64/*'
 
 :Need to know where your PI is, to ssh to (in my case, it's a local ip)
-SET RASPBERRYIP=192.168.68.191
+SET RASPBERRYIP=amigo
 :Name we should use when we ssh on
 SET LINUXUSER=pi
 

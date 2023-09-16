@@ -288,7 +288,7 @@ void AppInput(VariantList *pVList)
 		LogMsg("Touch start: X: %.2f Y: %.2f (Finger %d)", pt.x, pt.y, fingerID);
 		break;
 	case MESSAGE_TYPE_GUI_MOUSEWHEEL:
-		LogMsg("Mouse wheel: Offet: %.2f (Finger %d)", pt.x,  fingerID);
+		LogMsg("Mouse wheel: Offet: %.2f (Finger %d)", pVList->Get(4).GetVector2().x, fingerID);
 		break;
 
 	case MESSAGE_TYPE_GUI_CLICK_MOVE_RAW:
