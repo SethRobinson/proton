@@ -727,6 +727,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			#endif
 
+
 			//int vKey = ConvertWindowsKeycodeToProtonVirtualKey(wParam); 
 
 			GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_CHAR, (float)wParam, (float)lParam);  //lParam holds a lot of random data about the press, look it up if
@@ -1809,11 +1810,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLin
 	assert(r == S_OK);
 	*/
 
+	GetBaseApp(); //force it to init early so we can set the command line parms, thus allowing things like -windowed to be processed
+	//before we initialize video
+	
 	if (lpCmdLine[0])
 	{
 		vector<string> parms = StringTokenize(lpCmdLine, " ");
-	
-		for (unsigned int i=0; i < parms.size(); i++)
+
+		for (unsigned int i = 0; i < parms.size(); i++)
 		{
 			GetBaseApp()->AddCommandLineParm(parms[i]);
 		}

@@ -59,10 +59,10 @@ public:
 
 	void SetSurface(SurfaceAnim *pSurf, bool bDeleteSurface);
 	SurfaceAnim * GetSurfaceAnim() { return m_pTex; } //normally you wouldn't use this, but useful to check if something didn't properly load
+	void UpdateFrameSizeVar();
 
 private:
 
-	void UpdateFrameSizeVar();
 	void UpdateSizeVar();
 	
 	void OnRender(VariantList *pVList);
@@ -84,6 +84,8 @@ private:
 	bool m_bDeleteSurface;
 	uint32 *m_pVisible;
 	uint32 *m_pFlipX, *m_pFlipY;
+
+	CL_Rectf* m_pBorderPaddingPixels; //set to 0,0,10,0 to crop 10 pixels off the top for example
 
 };
 

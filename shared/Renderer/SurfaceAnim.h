@@ -23,7 +23,7 @@ public:
 
 	void BlitAnim(float x, float y, int frameX = 0, int frameY = 0, unsigned int rgba = MAKE_RGBA(255,255,255,255), float rotation=0, CL_Vec2f vRotationPtScreenCoords = CL_Vec2f(0,0));
 	void BlitScaledAnim( float x, float y,  int frameX, int frameY, CL_Vec2f vScale, eAlignment alignment = ALIGNMENT_CENTER, unsigned int rgba  = MAKE_RGBA(255,255,255,255), float rotation=0, CL_Vec2f vRotationPtScreenCoords = CL_Vec2f(0,0),
-		bool flipX = false, bool flipY = false, RenderBatcher *pBatcher = NULL, int padding = 0);
+		bool flipX = false, bool flipY = false, RenderBatcher *pBatcher = NULL, CL_Rectf borderPadding = CL_Rectf(0,0,0,0));
 
 	void BlitRotatedAnim( float x, float y,  int frameX, int frameY, CL_Vec2f vScale, eAlignment alignment = ALIGNMENT_CENTER, unsigned int rgba  = MAKE_RGBA(255,255,255,255), float rotation=0, CL_Vec2f vRotationPtLocalCoords =  CL_Vec2f(0,0),
 		bool flipX = false, bool flipY = false, RenderBatcher *pBatcher = NULL);

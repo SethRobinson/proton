@@ -94,6 +94,29 @@ string PrintColor(uint32 color)
 	return string(st);
 }
 
+//convert text to alignment, not case sensitive
+eAlignment GetAlignmentFromString(string s)
+{
+	//make it lowercase
+	for (unsigned int i = 0; i < s.length(); i++)
+	{
+		s[i] = tolower(s[i]);
+	}
+
+	if (s == "upper_left") return ALIGNMENT_UPPER_LEFT;
+	if (s == "upper_right") return ALIGNMENT_UPPER_RIGHT;
+	if (s == "center") return ALIGNMENT_CENTER;
+	if (s == "down_center") return ALIGNMENT_DOWN_CENTER;
+	if (s == "upper_center") return ALIGNMENT_UPPER_CENTER;
+	if (s == "down_left") return ALIGNMENT_DOWN_LEFT;
+	if (s == "down_right") return ALIGNMENT_DOWN_RIGHT;
+	if (s == "left_center") return ALIGNMENT_LEFT_CENTER;
+	if (s == "right_center") return ALIGNMENT_RIGHT_CENTER;
+
+	assert(!"Unknown alignment");
+	return ALIGNMENT_UPPER_LEFT;
+}
+
 
 CL_Vec2f GetAlignmentOffset(const CL_Vec2f &vSize, eAlignment alignment)
 {

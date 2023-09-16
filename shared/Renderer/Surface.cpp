@@ -1109,7 +1109,6 @@ bool Surface::InitBlankSurface( int x, int y)
 #endif
 	}
 
-
 	m_originalWidth = x;
 	m_originalHeight = y;
 

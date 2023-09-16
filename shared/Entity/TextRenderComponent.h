@@ -14,6 +14,16 @@
 #include "Entity.h"
 #include "Renderer/Surface.h"
 
+/*
+
+There are a lot of ways to fancy up the text, for example settings colors to
+shadowColor - this adds a little dropshadow
+backgroundColor - draws a rect behind the text of this color and alpha
+
+style - set to something from eVisualStyle
+*/
+
+
 class TextRenderComponent: public EntityComponent
 {
 public:
@@ -53,6 +63,8 @@ private:
 	uint32 *m_pVisible;
 	uint32 *m_pDisabled;
 	uint32 *m_pShadowColor; //if not 0,0,0,0, will render a shadow behind the text
+	uint32* m_pBackgroundColor; //if not 0,0,0,0, will render a shadow behind the text
+
 };
 
 #endif // TextRenderComponent_h__

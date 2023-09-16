@@ -70,11 +70,11 @@ bool SurfaceAnim::LoadFileFromMemory( uint8 *pMem, int inputSize )
 
 
 void SurfaceAnim::BlitScaledAnim( float x, float y, int frameX , int frameY, CL_Vec2f vScale, eAlignment alignment /*= ALIGNMENT_CENTER*/,
-								 unsigned int rgba /*= MAKE_RGBA(255,255,255,255)*/, float rotation, CL_Vec2f vRotationPt, bool flipX, bool flipY, RenderBatcher *pBatcher, int padding)
+								 unsigned int rgba /*= MAKE_RGBA(255,255,255,255)*/, float rotation, CL_Vec2f vRotationPt, bool flipX, bool flipY, RenderBatcher *pBatcher, CL_Rectf borderPadding)
 {
 	if (vScale.x == 0 && vScale.y == 0) return;
 
-	if (GetFrameWidth() == GetWidth() && GetFrameHeight() == GetHeight() && !flipX && !flipY) 
+	if (GetFrameWidth() == GetWidth() && GetFrameHeight() == GetHeight() && !flipX && !flipY && borderPadding == CL_Rectf(0,0,0,0)) 
 	{
 		BlitScaledWithRotatePoint(x,y, vScale, alignment, rgba, rotation, vRotationPt, pBatcher); //don't need the anim code
 		return;
@@ -82,11 +82,12 @@ void SurfaceAnim::BlitScaledAnim( float x, float y, int frameX , int frameY, CL_
 
 	CL_Vec2f vStart = CL_Vec2f(x,y);
 	rtRectf src;
-	src.left = m_frameWidth*frameX + (float)padding;
-	src.top = m_frameHeight*frameY + (float)padding;
-	src.right = src.left+m_frameWidth - (float)(padding * 2);
-	src.bottom = src.top + m_frameHeight - (float)(padding * 2);
+	src.left = m_frameWidth*frameX + borderPadding.left;
+	src.top = m_frameHeight*frameY + borderPadding.top;
+	src.right = m_frameWidth - borderPadding.right;
+	src.bottom = m_frameHeight - borderPadding.bottom;
 	
+	//TODO: Add a parm we can send so we'll modify the dst to avoid stretching when padding is used?
 	rtRectf dst(0,0, m_frameWidth, m_frameHeight);
 	
 	if (flipX)
@@ -114,6 +115,7 @@ void SurfaceAnim::BlitScaledAnim( float x, float y, int frameX , int frameY, CL_
 		BlitEx(dst, src, rgba, rotation, vRotationPt);
 	}
 }
+
 
 void SurfaceAnim::BlitArbitrarySection( float x, float y, CL_Rectf regionToDraw, CL_Vec2f vScale, eAlignment alignment /*= ALIGNMENT_CENTER*/,
 								 unsigned int rgba /*= MAKE_RGBA(255,255,255,255)*/, bool flipX, bool flipY, RenderBatcher *pBatcher)

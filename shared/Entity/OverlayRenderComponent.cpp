@@ -108,6 +108,7 @@ void OverlayRenderComponent::OnAdd(Entity *pEnt)
 	m_pFlipX = &GetVar("flipX")->GetUINT32(); 
 	m_pFlipY = &GetVar("flipY")->GetUINT32(); 
 
+	m_pBorderPaddingPixels = &GetVarWithDefault("borderPaddingPixels", CL_Rectf(0.0f, 0.0f, 0.0f, 0.0f))->GetRect();
 	m_pFileName = &GetVar("fileName")->GetString(); //local to us
 	
 	GetVarWithDefault("frameSize2d", Variant(0.0f, 0.0f));
@@ -167,18 +168,22 @@ void OverlayRenderComponent::OnRender(VariantList *pVList)
 		vRotationPt.x += (m_pTex->GetFrameSize().x* (m_pScale2d->x)) * m_pRotationCenter->x;
 		vRotationPt.y += (m_pTex->GetFrameSize().y* (m_pScale2d->y)) * m_pRotationCenter->y;
 		
-		if (m_pScale2d->x != 1 || m_pScale2d->y != 1 || *m_pFlipX != 0 || *m_pFlipY != 0)
+		if (m_pScale2d->x != 1 || m_pScale2d->y != 1 || *m_pFlipX != 0 || *m_pFlipY != 0 || *m_pBorderPaddingPixels != CL_Rectf(0, 0, 0, 0))
 		{
 			
 			if (m_pScale2d->x != 0 && m_pScale2d->y != 0)
 			{
-				m_pTex->BlitScaledAnim(vFinalPos.x, vFinalPos.y,  *m_pFrameX, *m_pFrameY,*m_pScale2d, ALIGNMENT_UPPER_LEFT, finalColor, *m_pRotation, vRotationPt,
-					*m_pFlipX != 0, *m_pFlipY != 0);
+				m_pTex->BlitScaledAnim(vFinalPos.x, vFinalPos.y, *m_pFrameX, *m_pFrameY, *m_pScale2d, ALIGNMENT_UPPER_LEFT, finalColor, *m_pRotation, vRotationPt,
+					*m_pFlipX != 0, *m_pFlipY != 0, NULL, *m_pBorderPaddingPixels);
 			}
-		} else
+			
+		}
+		else
 		{
 			m_pTex->BlitAnim(vFinalPos.x, vFinalPos.y, *m_pFrameX, *m_pFrameY, finalColor, *m_pRotation, vRotationPt);
 		}
+
+
 	}
 
 }

@@ -231,8 +231,8 @@ void MessageManager::Deliver(Message *m)
 					//actually, we're targeting an entity but adding this component...
 					m->GetTargetEntity()->AddComponent(m->GetTargetComponent());
 					m->ClearComponent();
-
 					break;
+
 				default:
 					LogError("Message delivery error");
 					assert(0);
@@ -245,7 +245,6 @@ void MessageManager::Deliver(Message *m)
 			
 				case MESSAGE_TYPE_CALL_COMPONENT_FUNCTION_BY_NAME:
 					{
-
 						EntityComponent *pComp = m->GetTargetEntity()->GetComponentByName(m->GetStringParm());
 						if (pComp)
 						{

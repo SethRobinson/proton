@@ -429,6 +429,8 @@ void BaseApp::OnMessage(Message &m)
 					v.Get(1).Set(float(m.GetParm1()), float(m.GetParm2()) );
 					v.Get(2).Set(uint32(m.GetParm3()));
 					v.Get(3).Set(m.GetParm4());
+					v.Get(4).Set(m.GetParm1()); //total hack, because using parm1 causes problems because it's treated as x/y and modified when used with GUI objects.
+					//So use Get(4) instead
 
 					m_sig_input(&v);
 					break;

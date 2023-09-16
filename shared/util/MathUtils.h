@@ -56,4 +56,6 @@ CL_Vec2f LerpVector(const CL_Vec2f &vOriginal, const CL_Vec2f &vTarget, float f_
 CL_Vec3f LerpVector(const CL_Vec3f &vOriginal, const CL_Vec3f &Target, float f_percent);
 CL_Vec2f RotateGUIPoint(CL_Vec2f vPos, CL_Rectf r, float rotation, CL_Vec2f destRectSize = CL_Vec2f(0,0)); //used for calculating screen positions for a splitscreen mode
 CL_Rectf RotateGUIRect(CL_Rectf vRect, CL_Rectf inputRect, float angle, CL_Vec2f destRectSize = CL_Vec2f(0,0)); //used for calculating screen positions for a splitscreen mode
+eAlignment GetAlignmentFromString(string s);
+
 #endif // MathUtils_h__
