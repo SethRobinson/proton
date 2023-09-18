@@ -176,6 +176,7 @@ void SetPrimaryScreenSize(int width, int height)
 	g_winVideoScreenX = width;
 	g_winVideoScreenY = height;
 }
+ 
 void AddVideoMode(string name, int x, int y, ePlatformID platformID, eOrientationMode forceOrientation)
 {
 	g_videoModes.push_back(VideoModeEntry(name, x, y, platformID, forceOrientation));
@@ -1352,10 +1353,11 @@ bool InitVideo(int width, int height, bool bFullscreen, float aspectRatio)
 
 	ResetOrthoFlag();
 
-	LogMsg("Setting native video mode to %d, %d - Fullscreen: %d  Aspect Ratio: %.2f", width, height, int(bFullscreen), aspectRatio);
+	LogMsg("Setting video mode to %d, %d - Fullscreen: %d  Aspect Ratio: %.2f", width, height, int(bFullscreen), aspectRatio);
 
-	g_winVideoScreenY = height;
 	g_winVideoScreenX = width;
+	g_winVideoScreenY = height;
+	
 
 	if (!g_bUseBorderlessFullscreenOnWindows)
 	{
@@ -1367,6 +1369,9 @@ bool InitVideo(int width, int height, bool bFullscreen, float aspectRatio)
 
 		if (bFullscreen)
 		{
+
+
+
 			DEVMODE dmScreenSettings;                   // Device Mode
 			memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));       // Makes Sure Memory's Cleared
 			dmScreenSettings.dmSize = sizeof(dmScreenSettings);       // Size Of The Devmode Structure
@@ -1447,6 +1452,9 @@ bool InitVideo(int width, int height, bool bFullscreen, float aspectRatio)
 	SetRect(&sRect, 0, 0, width, height);
 	//for taking screenshots with no borders with Alt-Print screen, try this:
 	
+
+
+
 	DWORD style = WS_POPUP | WS_SYSMENU | WS_CAPTION | CS_DBLCLKS;
 	
 #ifdef C_BORDERLESS_WINDOW_MODE_FOR_SCREENSHOT_EASE
