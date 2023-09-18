@@ -81,6 +81,7 @@ namespace boost
 
       template<typename F>
       BOOST_SIGNALS2_SLOT_CLASS_NAME(BOOST_SIGNALS2_NUM_ARGS)(const F& f)
+
       {
         init_slot_function(f);
       }

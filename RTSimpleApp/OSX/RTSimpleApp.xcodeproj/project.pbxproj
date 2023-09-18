@@ -3,12 +3,13 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 45;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5D270FA315C26245006DEBEA /* libfmodex.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D270FA215C26245006DEBEA /* libfmodex.dylib */; };
-		5D270FA415C2625E006DEBEA /* libfmodex.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5D270FA215C26245006DEBEA /* libfmodex.dylib */; };
+		5D361D4A2AB83C0E006C5169 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D361D492AB83C0E006C5169 /* libz.tbd */; };
+		5D361D512AB83E04006C5169 /* UTF16TestMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D361D502AB83E03006C5169 /* UTF16TestMenu.cpp */; };
+		5D423E502AB828D300A99994 /* AudioManagerFMODStudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D423E4E2AB828D300A99994 /* AudioManagerFMODStudio.cpp */; };
 		5D70B62512B5FED300A1AB17 /* OSXUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D70B61B12B5FED300A1AB17 /* OSXUtils.mm */; };
 		5D70B62612B5FED300A1AB17 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D70B61E12B5FED300A1AB17 /* main.m */; };
 		5D70B62712B5FED300A1AB17 /* MainController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D70B62012B5FED300A1AB17 /* MainController.mm */; };
@@ -87,11 +88,6 @@
 		5D70B80512B606DC00A1AB17 /* TextScanner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D70B78512B606DC00A1AB17 /* TextScanner.cpp */; };
 		5D70B80612B606DC00A1AB17 /* MathUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D70B78712B606DC00A1AB17 /* MathUtils.cpp */; };
 		5D70B80712B606DC00A1AB17 /* Variant.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D70B78912B606DC00A1AB17 /* Variant.cpp */; };
-		5D70B80812B606DC00A1AB17 /* connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D70B78D12B606DC00A1AB17 /* connection.cpp */; };
-		5D70B80912B606DC00A1AB17 /* named_slot_map.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D70B78E12B606DC00A1AB17 /* named_slot_map.cpp */; };
-		5D70B80A12B606DC00A1AB17 /* signal_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D70B78F12B606DC00A1AB17 /* signal_base.cpp */; };
-		5D70B80B12B606DC00A1AB17 /* slot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D70B79012B606DC00A1AB17 /* slot.cpp */; };
-		5D70B80C12B606DC00A1AB17 /* trackable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D70B79112B606DC00A1AB17 /* trackable.cpp */; };
 		5D70B80D12B606DC00A1AB17 /* GLESUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D70B79212B606DC00A1AB17 /* GLESUtils.cpp */; };
 		5D70B80E12B606DC00A1AB17 /* ResourceUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D70B79412B606DC00A1AB17 /* ResourceUtils.cpp */; };
 		5D70B80F12B606DC00A1AB17 /* MiscUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D70B79712B606DC00A1AB17 /* MiscUtils.cpp */; };
@@ -157,12 +153,12 @@
 		5D8E36DF14BEF45B003BA3DA /* jquant2.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D8E36B114BEF45B003BA3DA /* jquant2.c */; };
 		5D8E36E014BEF45B003BA3DA /* jutils.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D8E36B214BEF45B003BA3DA /* jutils.c */; };
 		5D8E37B114BF0C85003BA3DA /* RenderScissorComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D8E37B014BF0C85003BA3DA /* RenderScissorComponent.cpp */; };
-		5DDE02A012B4F50D000C5CC0 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DDE029F12B4F50D000C5CC0 /* libz.dylib */; };
+		5DD5C5952AB8471F00357191 /* libfmod.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DD5C5942AB8471F00357191 /* libfmod.dylib */; };
+		5DD5C5982AB84B7A00357191 /* libfmod.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5DD5C5942AB8471F00357191 /* libfmod.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		5DDE02A512B4F526000C5CC0 /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5DDE02A412B4F526000C5CC0 /* App.cpp */; };
 		5DDE05AA12B58EBD000C5CC0 /* interface in Resources */ = {isa = PBXBuildFile; fileRef = 5DDE05A912B58EBD000C5CC0 /* interface */; };
 		5DEB1B8B12D309CE00A3A6DB /* TouchTestComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5DEB1B8A12D309CE00A3A6DB /* TouchTestComponent.cpp */; };
 		5DEB1B8E12D309D700A3A6DB /* TouchTestMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5DEB1B8D12D309D700A3A6DB /* TouchTestMenu.cpp */; };
-		5DF9975A130B9CCB00985AF4 /* AudioManagerFMOD.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5DF99759130B9CCB00985AF4 /* AudioManagerFMOD.cpp */; };
 		5DF99764130B9D2D00985AF4 /* EmitVirtualKeyComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5DF99763130B9D2D00985AF4 /* EmitVirtualKeyComponent.cpp */; };
 		5DFB863312BB233D00337543 /* app.icns in Resources */ = {isa = PBXBuildFile; fileRef = 5DFB863212BB233D00337543 /* app.icns */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
@@ -179,7 +175,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				5D270FA415C2625E006DEBEA /* libfmodex.dylib in CopyFiles */,
+				5DD5C5982AB84B7A00357191 /* libfmod.dylib in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -191,7 +187,11 @@
 		256AC3F00F4B6AF500CF3369 /* RTSimpleApp_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTSimpleApp_Prefix.pch; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
-		5D270FA215C26245006DEBEA /* libfmodex.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfmodex.dylib; path = ../../shared/OSX/fmod/api/lib/libfmodex.dylib; sourceTree = "<group>"; };
+		5D361D492AB83C0E006C5169 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		5D361D4F2AB83E01006C5169 /* UTF16TestMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UTF16TestMenu.h; path = ../source/GUI/UTF16TestMenu.h; sourceTree = "<group>"; };
+		5D361D502AB83E03006C5169 /* UTF16TestMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UTF16TestMenu.cpp; path = ../source/GUI/UTF16TestMenu.cpp; sourceTree = "<group>"; };
+		5D423E4E2AB828D300A99994 /* AudioManagerFMODStudio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioManagerFMODStudio.cpp; path = ../../shared/Audio/AudioManagerFMODStudio.cpp; sourceTree = "<group>"; };
+		5D423E4F2AB828D300A99994 /* AudioManagerFMODStudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AudioManagerFMODStudio.h; path = ../../shared/Audio/AudioManagerFMODStudio.h; sourceTree = "<group>"; };
 		5D70B61A12B5FED300A1AB17 /* PlatformSetupOSX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PlatformSetupOSX.h; path = ../../shared/OSX/PlatformSetupOSX.h; sourceTree = SOURCE_ROOT; };
 		5D70B61B12B5FED300A1AB17 /* OSXUtils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = OSXUtils.mm; path = ../../shared/OSX/OSXUtils.mm; sourceTree = SOURCE_ROOT; };
 		5D70B61C12B5FED300A1AB17 /* OSXUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OSXUtils.h; path = ../../shared/OSX/OSXUtils.h; sourceTree = SOURCE_ROOT; };
@@ -345,11 +345,6 @@
 		5D70B78812B606DC00A1AB17 /* MathUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MathUtils.h; path = ../../shared/util/MathUtils.h; sourceTree = SOURCE_ROOT; };
 		5D70B78912B606DC00A1AB17 /* Variant.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Variant.cpp; path = ../../shared/util/Variant.cpp; sourceTree = SOURCE_ROOT; };
 		5D70B78A12B606DC00A1AB17 /* Variant.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Variant.h; path = ../../shared/util/Variant.h; sourceTree = SOURCE_ROOT; };
-		5D70B78D12B606DC00A1AB17 /* connection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = connection.cpp; path = ../../shared/util/boost/libs/signals/src/connection.cpp; sourceTree = SOURCE_ROOT; };
-		5D70B78E12B606DC00A1AB17 /* named_slot_map.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = named_slot_map.cpp; path = ../../shared/util/boost/libs/signals/src/named_slot_map.cpp; sourceTree = SOURCE_ROOT; };
-		5D70B78F12B606DC00A1AB17 /* signal_base.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = signal_base.cpp; path = ../../shared/util/boost/libs/signals/src/signal_base.cpp; sourceTree = SOURCE_ROOT; };
-		5D70B79012B606DC00A1AB17 /* slot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = slot.cpp; path = ../../shared/util/boost/libs/signals/src/slot.cpp; sourceTree = SOURCE_ROOT; };
-		5D70B79112B606DC00A1AB17 /* trackable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = trackable.cpp; path = ../../shared/util/boost/libs/signals/src/trackable.cpp; sourceTree = SOURCE_ROOT; };
 		5D70B79212B606DC00A1AB17 /* GLESUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GLESUtils.cpp; path = ../../shared/util/GLESUtils.cpp; sourceTree = SOURCE_ROOT; };
 		5D70B79312B606DC00A1AB17 /* GLESUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GLESUtils.h; path = ../../shared/util/GLESUtils.h; sourceTree = SOURCE_ROOT; };
 		5D70B79412B606DC00A1AB17 /* ResourceUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ResourceUtils.cpp; path = ../../shared/util/ResourceUtils.cpp; sourceTree = SOURCE_ROOT; };
@@ -432,7 +427,7 @@
 		5D8E36B214BEF45B003BA3DA /* jutils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jutils.c; path = ../../shared/Irrlicht/source/Irrlicht/jpeglib/jutils.c; sourceTree = SOURCE_ROOT; };
 		5D8E37AF14BF0C85003BA3DA /* RenderScissorComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RenderScissorComponent.h; path = ../../shared/Entity/RenderScissorComponent.h; sourceTree = SOURCE_ROOT; };
 		5D8E37B014BF0C85003BA3DA /* RenderScissorComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenderScissorComponent.cpp; path = ../../shared/Entity/RenderScissorComponent.cpp; sourceTree = SOURCE_ROOT; };
-		5DDE029F12B4F50D000C5CC0 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		5DD5C5942AB8471F00357191 /* libfmod.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libfmod.dylib; sourceTree = "<group>"; };
 		5DDE02A312B4F526000C5CC0 /* App.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = App.h; path = ../source/App.h; sourceTree = SOURCE_ROOT; };
 		5DDE02A412B4F526000C5CC0 /* App.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = App.cpp; path = ../source/App.cpp; sourceTree = SOURCE_ROOT; };
 		5DDE05A912B58EBD000C5CC0 /* interface */ = {isa = PBXFileReference; lastKnownFileType = folder; name = interface; path = ../bin/interface; sourceTree = SOURCE_ROOT; };
@@ -440,8 +435,6 @@
 		5DEB1B8A12D309CE00A3A6DB /* TouchTestComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TouchTestComponent.cpp; path = ../source/Component/TouchTestComponent.cpp; sourceTree = SOURCE_ROOT; };
 		5DEB1B8C12D309D700A3A6DB /* TouchTestMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TouchTestMenu.h; path = ../source/GUI/TouchTestMenu.h; sourceTree = SOURCE_ROOT; };
 		5DEB1B8D12D309D700A3A6DB /* TouchTestMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TouchTestMenu.cpp; path = ../source/GUI/TouchTestMenu.cpp; sourceTree = SOURCE_ROOT; };
-		5DF99758130B9CCB00985AF4 /* AudioManagerFMOD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AudioManagerFMOD.h; path = ../../shared/Audio/AudioManagerFMOD.h; sourceTree = SOURCE_ROOT; };
-		5DF99759130B9CCB00985AF4 /* AudioManagerFMOD.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioManagerFMOD.cpp; path = ../../shared/Audio/AudioManagerFMOD.cpp; sourceTree = SOURCE_ROOT; };
 		5DF99762130B9D2D00985AF4 /* EmitVirtualKeyComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EmitVirtualKeyComponent.h; path = ../../shared/Entity/EmitVirtualKeyComponent.h; sourceTree = SOURCE_ROOT; };
 		5DF99763130B9D2D00985AF4 /* EmitVirtualKeyComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EmitVirtualKeyComponent.cpp; path = ../../shared/Entity/EmitVirtualKeyComponent.cpp; sourceTree = SOURCE_ROOT; };
 		5DFB863212BB233D00337543 /* app.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = app.icns; sourceTree = "<group>"; };
@@ -457,11 +450,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5DD5C5952AB8471F00357191 /* libfmod.dylib in Frameworks */,
+				5D361D4A2AB83C0E006C5169 /* libz.tbd in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				AFD4D88A113C504F00C2DE76 /* OpenGL.framework in Frameworks */,
 				AF9DBBC6113C611C00D05754 /* QuartzCore.framework in Frameworks */,
-				5DDE02A012B4F50D000C5CC0 /* libz.dylib in Frameworks */,
-				5D270FA315C26245006DEBEA /* libfmodex.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -474,7 +467,6 @@
 				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
 				AFD4D889113C504F00C2DE76 /* OpenGL.framework */,
 				AF9DBBC5113C611C00D05754 /* QuartzCore.framework */,
-				5DDE029F12B4F50D000C5CC0 /* libz.dylib */,
 			);
 			name = "Linked Frameworks";
 			sourceTree = "<group>";
@@ -537,7 +529,8 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				5D270FA215C26245006DEBEA /* libfmodex.dylib */,
+				5DD5C5942AB8471F00357191 /* libfmod.dylib */,
+				5D361D492AB83C0E006C5169 /* libz.tbd */,
 				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
 			);
@@ -622,8 +615,8 @@
 		5D70B6D012B606DC00A1AB17 /* Audio */ = {
 			isa = PBXGroup;
 			children = (
-				5DF99758130B9CCB00985AF4 /* AudioManagerFMOD.h */,
-				5DF99759130B9CCB00985AF4 /* AudioManagerFMOD.cpp */,
+				5D423E4E2AB828D300A99994 /* AudioManagerFMODStudio.cpp */,
+				5D423E4F2AB828D300A99994 /* AudioManagerFMODStudio.h */,
 				5D70B6D312B606DC00A1AB17 /* AudioManager.cpp */,
 				5D70B6D412B606DC00A1AB17 /* AudioManager.h */,
 			);
@@ -810,7 +803,6 @@
 		5D70B77A12B606DC00A1AB17 /* util */ = {
 			isa = PBXGroup;
 			children = (
-				5D70B78B12B606DC00A1AB17 /* Boost */,
 				5D70B78112B606DC00A1AB17 /* CRandom.cpp */,
 				5D70B78212B606DC00A1AB17 /* CRandom.h */,
 				5D70B78312B606DC00A1AB17 /* PrimeSearch.cpp */,
@@ -847,26 +839,6 @@
 			name = unzip;
 			sourceTree = "<group>";
 		};
-		5D70B78B12B606DC00A1AB17 /* Boost */ = {
-			isa = PBXGroup;
-			children = (
-				5D70B78C12B606DC00A1AB17 /* Signals */,
-			);
-			name = Boost;
-			sourceTree = "<group>";
-		};
-		5D70B78C12B606DC00A1AB17 /* Signals */ = {
-			isa = PBXGroup;
-			children = (
-				5D70B78D12B606DC00A1AB17 /* connection.cpp */,
-				5D70B78E12B606DC00A1AB17 /* named_slot_map.cpp */,
-				5D70B78F12B606DC00A1AB17 /* signal_base.cpp */,
-				5D70B79012B606DC00A1AB17 /* slot.cpp */,
-				5D70B79112B606DC00A1AB17 /* trackable.cpp */,
-			);
-			name = Signals;
-			sourceTree = "<group>";
-		};
 		5D70B81F12B6072D00A1AB17 /* Component */ = {
 			isa = PBXGroup;
 			children = (
@@ -881,6 +853,8 @@
 		5D70B82212B6072D00A1AB17 /* GUI */ = {
 			isa = PBXGroup;
 			children = (
+				5D361D502AB83E03006C5169 /* UTF16TestMenu.cpp */,
+				5D361D4F2AB83E01006C5169 /* UTF16TestMenu.h */,
 				5D70B82312B6072D00A1AB17 /* AboutMenu.h */,
 				5DEB1B8C12D309D700A3A6DB /* TouchTestMenu.h */,
 				5DEB1B8D12D309D700A3A6DB /* TouchTestMenu.cpp */,
@@ -985,8 +959,6 @@
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
 				5D70BB2712B7208900A1AB17 /* CopyFiles */,
-				5D70BAE812B71B2200A1AB17 /* ShellScript */,
-				5DFB85AF12BB067D00337543 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1003,8 +975,10 @@
 /* Begin PBXProject section */
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "RTSimpleApp" */;
-			compatibilityVersion = "Xcode 3.1";
+			compatibilityVersion = "Xcode 12.0";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
@@ -1037,35 +1011,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		5D70BAE812B71B2200A1AB17 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = "/bin/sh -x";
-			shellScript = "install_name_tool -change ./libfmodex.dylib @loader_path/../Frameworks/libfmodex.dylib \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME\"";
-		};
-		5DFB85AF12BB067D00337543 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "set -ex\n\nif [ \"${CONFIGURATION}\" = 'Release' ]; then\n[ \"$ACTION\" = build ] || exit 0\n[ \"$BUILD_VARIANTS\" = \"normal\" ] || exit 0\n\ndir=\"$TEMP_FILES_DIR/disk\"\ndmg=\"$BUILT_PRODUCTS_DIR/$PROJECT_NAME.dmg\"\n\nrm -rf \"$dir\"\nmkdir \"$dir\"\ncp -R \"$BUILT_PRODUCTS_DIR/$PROJECT_NAME.app\" \"$dir\"\nrm -f \"$dmg\"\nhdiutil create -srcfolder \"$dir\" -volname \"$PROJECT_NAME\" \"$dmg\"\nhdiutil internet-enable -yes \"$dmg\"\nrm -rf \"$dir\"\nfi";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		8D11072C0486CEB800E47090 /* Sources */ = {
@@ -1136,6 +1081,7 @@
 				5D70B7F612B606DC00A1AB17 /* L_EffectEmitter.cpp in Sources */,
 				5D70B7F712B606DC00A1AB17 /* L_EffectManager.cpp in Sources */,
 				5D70B7F812B606DC00A1AB17 /* L_ExplosionEffect.cpp in Sources */,
+				5D423E502AB828D300A99994 /* AudioManagerFMODStudio.cpp in Sources */,
 				5D70B7F912B606DC00A1AB17 /* L_MotionController.cpp in Sources */,
 				5D70B7FA12B606DC00A1AB17 /* L_Particle.cpp in Sources */,
 				5D70B7FB12B606DC00A1AB17 /* L_ParticleEffect.cpp in Sources */,
@@ -1151,11 +1097,6 @@
 				5D70B80512B606DC00A1AB17 /* TextScanner.cpp in Sources */,
 				5D70B80612B606DC00A1AB17 /* MathUtils.cpp in Sources */,
 				5D70B80712B606DC00A1AB17 /* Variant.cpp in Sources */,
-				5D70B80812B606DC00A1AB17 /* connection.cpp in Sources */,
-				5D70B80912B606DC00A1AB17 /* named_slot_map.cpp in Sources */,
-				5D70B80A12B606DC00A1AB17 /* signal_base.cpp in Sources */,
-				5D70B80B12B606DC00A1AB17 /* slot.cpp in Sources */,
-				5D70B80C12B606DC00A1AB17 /* trackable.cpp in Sources */,
 				5D70B80D12B606DC00A1AB17 /* GLESUtils.cpp in Sources */,
 				5D70B80E12B606DC00A1AB17 /* ResourceUtils.cpp in Sources */,
 				5D70B80F12B606DC00A1AB17 /* MiscUtils.cpp in Sources */,
@@ -1172,7 +1113,6 @@
 				5D70C4BF12B7586D00A1AB17 /* MyApplication.mm in Sources */,
 				5DEB1B8B12D309CE00A3A6DB /* TouchTestComponent.cpp in Sources */,
 				5DEB1B8E12D309D700A3A6DB /* TouchTestMenu.cpp in Sources */,
-				5DF9975A130B9CCB00985AF4 /* AudioManagerFMOD.cpp in Sources */,
 				5DF99764130B9D2D00985AF4 /* EmitVirtualKeyComponent.cpp in Sources */,
 				5D8E368214BEF412003BA3DA /* JPGSurfaceLoader.cpp in Sources */,
 				5D8E368314BEF412003BA3DA /* RTGLESExt.cpp in Sources */,
@@ -1186,6 +1126,7 @@
 				5D8E36BA14BEF45B003BA3DA /* jcmainct.c in Sources */,
 				5D8E36BB14BEF45B003BA3DA /* jcmarker.c in Sources */,
 				5D8E36BC14BEF45B003BA3DA /* jcmaster.c in Sources */,
+				5D361D512AB83E04006C5169 /* UTF16TestMenu.cpp in Sources */,
 				5D8E36BD14BEF45B003BA3DA /* jcomapi.c in Sources */,
 				5D8E36BE14BEF45B003BA3DA /* jcparam.c in Sources */,
 				5D8E36BF14BEF45B003BA3DA /* jcphuff.c in Sources */,
@@ -1254,18 +1195,22 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_DEBUGGING_SYMBOLS = full;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INFOPLIST_FILE = "RTSimpleApp-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(LD_RUNPATH_SEARCH_PATHS_$(IS_MACCATALYST))",
+					"@executable_path/../Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(DEVELOPER_DIR)/FMOD Programmers API Mac/api/lib\"",
-					"\"$(SRCROOT)/../../shared/OSX/fmod/api/lib\"",
+					/Users/seth/thirdpartylibs/fmod/api/core/lib,
+					"$(PROJECT_DIR)",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(PRODUCT_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = RTSimpleApp;
 			};
 			name = Debug;
@@ -1275,14 +1220,19 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_MODEL_TUNING = G5;
 				INFOPLIST_FILE = "RTSimpleApp-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(LD_RUNPATH_SEARCH_PATHS_$(IS_MACCATALYST))",
+					"@executable_path/../Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(DEVELOPER_DIR)/FMOD Programmers API Mac/api/lib\"",
-					"\"$(SRCROOT)/../../shared/OSX/fmod/api/lib\"",
+					/Users/seth/thirdpartylibs/fmod/api/core/lib,
+					"$(PROJECT_DIR)",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(PRODUCT_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = RTSimpleApp;
 			};
 			name = Release;
@@ -1290,7 +1240,6 @@
 		C01FCF4F08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -1313,18 +1262,17 @@
 					"../../shared/ClanLib-2.0/Sources",
 					../../shared/FliteTTS/include,
 					../../shared/OSX,
+					"/Users/seth/thirdpartylibs/fmod/api/core/inc/**",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				ONLY_ACTIVE_ARCH = YES;
-				PREBINDING = NO;
-				SDKROOT = macosx;
+				SDKROOT = macosx13.3;
 			};
 			name = Debug;
 		};
 		C01FCF5008A954540054247B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = ../../shared/PlatformPrecomp.h;
@@ -1344,11 +1292,10 @@
 					"../../shared/ClanLib-2.0/Sources",
 					../../shared/FliteTTS/include,
 					../../shared/OSX,
+					"/Users/seth/thirdpartylibs/fmod/api/core/inc/**",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
-				PREBINDING = NO;
-				SDKROOT = macosx;
-				VALID_ARCHS = "i386 x86_64";
+				SDKROOT = macosx13.3;
 			};
 			name = Release;
 		};

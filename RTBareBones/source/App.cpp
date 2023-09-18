@@ -6,7 +6,6 @@
  */ 
 #include "PlatformPrecomp.h"
 #include "App.h"
-
 #include "Entity/CustomInputComponent.h" //used for the back button (android)
 #include "Entity/FocusInputComponent.h" //needed to let the input component see input messages
 #include "Entity/ArcadeInputComponent.h"
@@ -280,7 +279,7 @@ void AppInput(VariantList *pVList)
 	}
 
 	CL_Vec2f vLastTouchPt = GetBaseApp()->GetTouch(fingerID)->GetLastPos();
-
+	 
 	switch (msgType)
 	{
 	

@@ -78,11 +78,13 @@ typedef  __int64            int64;       /* Signed 64 bit value */
 #define _INT64_DEFINED
 #endif
 
+/*
 #ifndef _BYTE
 typedef uint8_t uint8;
 #define _BYTE
 #endif
 
+*/
 
 typedef intptr_t CSSM_INTPTR;
 

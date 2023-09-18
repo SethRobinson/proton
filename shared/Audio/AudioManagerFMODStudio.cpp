@@ -1,8 +1,6 @@
 #include "PlatformPrecomp.h"
 
 #ifndef RT_WEBOS
-
-
 #include "AudioManagerFMODStudio.h"
 #include "util/MiscUtils.h"
 

@@ -1,43 +1,38 @@
-
+#import "PlatformSetup.h"
+#import "BaseApp.h"
 #import <Cocoa/Cocoa.h>
-#import <QuartzCore/CVDisplayLink.h>
-#import <QuartzCore/CVOpenGLBuffer.h>
-#import <OpenGL/OpenGL.h>
-#import <OpenGL/CGLContext.h>
-#import <OpenGL/CGLTypes.h>
-#import <AppKit/NSOpenGL.h>
-#import <AppKit/NSOpenGLView.h>
-#import <AppKit/NSOpenGLLayer.h>
 
-
-@class MainController;
-
-@interface MyOpenGLView : NSView<NSApplicationDelegate> {
-	
-	NSOpenGLContext *openGLContext;
-	NSOpenGLPixelFormat *pixelFormat;
-	
-	MainController *controller;
-	
-	CVDisplayLinkRef displayLink;
-	BOOL isAnimating;
+@interface MyOpenGLView : NSOpenGLView
+{
+    CFAbsoluteTime msgTime; // message posting time for expiration
     
-@public
-    
-    BOOL m_bQuitASAP;
+    NSTimer* timer;
+ 
+    CFAbsoluteTime time;
+    bool m_bQuitASAP;
 }
 
-- (id) initWithFrame:(NSRect)frameRect;
-- (id) initWithFrame:(NSRect)frameRect shareContext:(NSOpenGLContext*)context;
++ (NSOpenGLPixelFormat*) basicPixelFormat;
 
 
-- (NSOpenGLContext*) openGLContext;
+- (void) updateObjectRotationForTimeDelta:(CFAbsoluteTime)deltaTime;
+- (void)animationTimer:(NSTimer *)timer;
 
-- (void) setMainController:(MainController*)theController;
 
-- (void) drawView;
+-(IBAction) info: (id) sender;
 
-- (void) startAnimation;
-- (void) stopAnimation;
-- (void) reshape;
+- (void)keyDown:(NSEvent *)theEvent;
+
+- (void) drawRect:(NSRect)rect;
+
+- (void) prepareOpenGL;
+- (void) update;        // moved or resized
+
+- (BOOL) acceptsFirstResponder;
+- (BOOL) becomeFirstResponder;
+- (BOOL) resignFirstResponder;
+
+- (id) initWithFrame: (NSRect) frameRect;
+- (void) awakeFromNib;
+
 @end

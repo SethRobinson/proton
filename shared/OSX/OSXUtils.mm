@@ -130,6 +130,9 @@ string GetDeviceID()
     return "";
 }
 
+
+
+
 bool LaterThanNow(const int year, const int month, const int day)
 {
 	return false;
@@ -296,6 +299,14 @@ int g_primaryGLY = 0;
 //this doesn't change even if you rotate, for speed
 int GetPrimaryGLX() {return g_primaryGLX;}
 int GetPrimaryGLY() {return g_primaryGLY;}
+
+
+void SetPrimaryScreenSize(int width, int height)
+{
+    g_primaryGLX = width;
+    g_primaryGLY = height;
+}
+
 
 int GetSystemData()
 {	

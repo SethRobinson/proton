@@ -15,7 +15,6 @@ public:
 	
 	App();
 	virtual ~App();
-	
 	virtual bool Init();
 	virtual void Kill();
 	virtual void Draw();

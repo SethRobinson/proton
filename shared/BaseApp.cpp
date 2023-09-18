@@ -88,7 +88,6 @@ void BaseApp::InitializeGLDefaults()
 	glClearColor(0,0,0,255);
 }
 
-
 void OnKillKeyboard(VariantList* pVList)
 {
 	if (!IsBaseAppInitted()) return;
