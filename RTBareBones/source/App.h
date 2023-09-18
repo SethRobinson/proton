@@ -33,7 +33,7 @@ public:
 private:
 
 	bool m_bDidPostInit;
-	Surface m_surf; //for testing
+	SurfaceAnim m_surf; //for testing
 };
 
 

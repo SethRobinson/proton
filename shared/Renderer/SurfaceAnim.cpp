@@ -13,8 +13,8 @@ SurfaceAnim::SurfaceAnim()
 SurfaceAnim::~SurfaceAnim()
 {
 }
- 
-void SurfaceAnim::SetupAnim( int framesX, int framesY )
+
+void SurfaceAnim::SetupAnim(int framesX, int framesY)
 {
 	assert(IsLoaded() && "Load your image before doing SetupAnim on it");
 
@@ -24,16 +24,16 @@ void SurfaceAnim::SetupAnim( int framesX, int framesY )
 	//assert(! (GetWidth() % m_framesX) && "image Doesn't evenly divide by frame count");
 	//assert(! (GetHeight() % m_framesY) && "image Doesn't evenly divide by frame count");
 
-	m_frameWidth = (float)(int(GetWidth()/framesX));
-	m_frameHeight = (float)(int(GetHeight()/framesY));
+	m_frameWidth = (float)(int(GetWidth() / framesX));
+	m_frameHeight = (float)(int(GetHeight() / framesY));
 }
 
-void SurfaceAnim::SetupAnimBySize( int frameWid,int frameHei )
+void SurfaceAnim::SetupAnimBySize(int frameWid, int frameHei)
 {
 	assert(IsLoaded() && "Load your image before doing SetupAnim on it");
 
-	m_framesX = int(GetWidth()/frameWid);
-	m_framesY = int(GetWidth()/frameHei);
+	m_framesX = int(GetWidth() / frameWid);
+	m_framesY = int(GetWidth() / frameHei);
 
 	m_frameWidth = (float)frameWid;
 	m_frameHeight = (float)frameHei;
@@ -43,23 +43,23 @@ void SurfaceAnim::BlitAnim(float x, float y, int frameX, int frameY, unsigned in
 {
 	if (GetFrameWidth() == GetWidth() && GetFrameHeight() == GetHeight())
 	{
-		Blit(x,y, rgba, rotationDegrees, vRotationPt); //don't need the anim code
+		Blit(x, y, rgba, rotationDegrees, vRotationPt); //don't need the anim code
 		return;
 	}
 
 	//first calculate the rect we need for the frame
 	rtRectf src;
-	src.left = m_frameWidth*frameX;
-	src.top = m_frameHeight*frameY;
-	src.right = src.left+m_frameWidth;
+	src.left = m_frameWidth * frameX;
+	src.top = m_frameHeight * frameY;
+	src.right = src.left + m_frameWidth;
 	src.bottom = src.top + m_frameHeight;
 
 	//calculate the target
-	rtRectf dst(x,y, x+m_frameWidth, y+m_frameHeight);
+	rtRectf dst(x, y, x + m_frameWidth, y + m_frameHeight);
 	BlitEx(dst, src, rgba, rotationDegrees, vRotationPt);
 }
 
-bool SurfaceAnim::LoadFileFromMemory( uint8 *pMem, int inputSize )
+bool SurfaceAnim::LoadFileFromMemory(uint8* pMem, int inputSize)
 {
 	if (!Surface::LoadFileFromMemory(pMem, inputSize)) return false;
 
@@ -68,28 +68,27 @@ bool SurfaceAnim::LoadFileFromMemory( uint8 *pMem, int inputSize )
 	return true;
 }
 
-
-void SurfaceAnim::BlitScaledAnim( float x, float y, int frameX , int frameY, CL_Vec2f vScale, eAlignment alignment /*= ALIGNMENT_CENTER*/,
-								 unsigned int rgba /*= MAKE_RGBA(255,255,255,255)*/, float rotation, CL_Vec2f vRotationPt, bool flipX, bool flipY, RenderBatcher *pBatcher, CL_Rectf borderPadding)
+/*
+void SurfaceAnim::BlitScaledAnim(float x, float y, int frameX, int frameY, CL_Vec2f vScale, eAlignment alignment,
+	unsigned int rgba , float rotation, CL_Vec2f vRotationPt, bool flipX, bool flipY, RenderBatcher* pBatcher, int padding)
 {
 	if (vScale.x == 0 && vScale.y == 0) return;
 
-	if (GetFrameWidth() == GetWidth() && GetFrameHeight() == GetHeight() && !flipX && !flipY && borderPadding == CL_Rectf(0,0,0,0)) 
+	if (GetFrameWidth() == GetWidth() && GetFrameHeight() == GetHeight() && !flipX && !flipY)
 	{
-		BlitScaledWithRotatePoint(x,y, vScale, alignment, rgba, rotation, vRotationPt, pBatcher); //don't need the anim code
+		BlitScaledWithRotatePoint(x, y, vScale, alignment, rgba, rotation, vRotationPt, pBatcher); //don't need the anim code
 		return;
 	}
 
-	CL_Vec2f vStart = CL_Vec2f(x,y);
+	CL_Vec2f vStart = CL_Vec2f(x, y);
 	rtRectf src;
-	src.left = m_frameWidth*frameX + borderPadding.left;
-	src.top = m_frameHeight*frameY + borderPadding.top;
-	src.right = m_frameWidth - borderPadding.right;
-	src.bottom = m_frameHeight - borderPadding.bottom;
-	
-	//TODO: Add a parm we can send so we'll modify the dst to avoid stretching when padding is used?
-	rtRectf dst(0,0, m_frameWidth, m_frameHeight);
-	
+	src.left = m_frameWidth * frameX + (float)padding;
+	src.top = m_frameHeight * frameY + (float)padding;
+	src.right = src.left + m_frameWidth - (float)(padding * 2);
+	src.bottom = src.top + m_frameHeight - (float)(padding * 2);
+
+	rtRectf dst(0, 0, m_frameWidth, m_frameHeight);
+
 	if (flipX)
 	{
 		swap(src.left, src.right);
@@ -106,37 +105,91 @@ void SurfaceAnim::BlitScaledAnim( float x, float y, int frameX , int frameY, CL_
 
 	dst.AdjustPosition(vStart.x, vStart.y);
 	dst.Scale(alignment, vScale);
-	
+
 	if (pBatcher && rotation == 0)
 	{
 		pBatcher->BlitEx(this, dst, src, rgba);
-	} else
+	}
+	else
+	{
+		BlitEx(dst, src, rgba, rotation, vRotationPt);
+	}
+}
+*/
+
+
+
+void SurfaceAnim::BlitScaledAnim(float x, float y, int frameX, int frameY, CL_Vec2f vScale, eAlignment alignment,
+	unsigned int rgba, float rotation, CL_Vec2f vRotationPt, bool flipX, bool flipY, RenderBatcher* pBatcher, CL_Rectf borderPadding)
+{
+	if (vScale.x == 0 && vScale.y == 0) return;
+
+	if (GetFrameWidth() == GetWidth() && GetFrameHeight() == GetHeight() && !flipX && !flipY && borderPadding == CL_Rectf(0, 0, 0, 0))
+	{
+		BlitScaledWithRotatePoint(x, y, vScale, alignment, rgba, rotation, vRotationPt, pBatcher); //don't need the anim code
+		return;
+	}
+
+	CL_Vec2f vStart = CL_Vec2f(x, y);
+	rtRectf src;
+	
+	src.left = m_frameWidth * frameX + borderPadding.left;
+	src.top = m_frameHeight * frameY + borderPadding.top;
+	src.right = (m_frameWidth * frameX + m_frameWidth) - borderPadding.right;
+	src.bottom = (m_frameHeight * frameY + m_frameHeight) - borderPadding.bottom;
+
+	//TODO: Add a parm we can send so we'll modify the dst to avoid stretching when padding is used?
+	rtRectf dst(0, 0, m_frameWidth, m_frameHeight);
+
+	if (flipX)
+	{
+		swap(src.left, src.right);
+	}
+
+	if (flipY)
+	{
+		swap(src.top, src.bottom);
+	}
+	if (alignment != ALIGNMENT_UPPER_LEFT)
+	{
+		vStart -= GetAlignmentOffset(CL_Vec2f(GetFrameWidth(), GetFrameHeight()), alignment);
+	}
+
+	dst.AdjustPosition(vStart.x, vStart.y);
+	dst.Scale(alignment, vScale);
+
+	if (pBatcher && rotation == 0)
+	{
+		pBatcher->BlitEx(this, dst, src, rgba);
+	}
+	else
 	{
 		BlitEx(dst, src, rgba, rotation, vRotationPt);
 	}
 }
 
 
-void SurfaceAnim::BlitArbitrarySection( float x, float y, CL_Rectf regionToDraw, CL_Vec2f vScale, eAlignment alignment /*= ALIGNMENT_CENTER*/,
-								 unsigned int rgba /*= MAKE_RGBA(255,255,255,255)*/, bool flipX, bool flipY, RenderBatcher *pBatcher)
+
+void SurfaceAnim::BlitArbitrarySection(float x, float y, CL_Rectf regionToDraw, CL_Vec2f vScale, eAlignment alignment /*= ALIGNMENT_CENTER*/,
+	unsigned int rgba /*= MAKE_RGBA(255,255,255,255)*/, bool flipX, bool flipY, RenderBatcher* pBatcher)
 {
 	if (vScale.x == 0 && vScale.y == 0) return;
 
-	CL_Vec2f vStart = CL_Vec2f(x,y);
+	CL_Vec2f vStart = CL_Vec2f(x, y);
 	rtRectf src;
 	src.left = regionToDraw.left;
 	src.top = regionToDraw.top;
 	src.right = regionToDraw.right;
 	src.bottom = regionToDraw.bottom;
-	
-	rtRectf dst(0,0, src.GetWidth(), src.GetHeight());
-	
+
+	rtRectf dst(0, 0, src.GetWidth(), src.GetHeight());
+
 	if (flipX)
 		swap(src.left, src.right);
-	
+
 	if (flipY)
 		swap(src.top, src.bottom);
-	
+
 	if (alignment != ALIGNMENT_UPPER_LEFT)
 	{
 		vStart -= GetAlignmentOffset(CL_Vec2f(src.GetWidth(), src.GetHeight()), alignment);
@@ -144,7 +197,7 @@ void SurfaceAnim::BlitArbitrarySection( float x, float y, CL_Rectf regionToDraw,
 
 	dst.AdjustPosition(vStart.x, vStart.y);
 	dst.Scale(alignment, vScale);
-	
+
 	if (pBatcher)
 		pBatcher->BlitEx(this, dst, src, rgba);
 	else
@@ -165,16 +218,16 @@ void SurfaceAnim::ReloadImage()
 	m_frameHeight = frameHeight;
 }
 
-bool SurfaceAnim::InitBlankSurface( int x, int y )
+bool SurfaceAnim::InitBlankSurface(int x, int y)
 {
-	if (!Surface::InitBlankSurface(x,y)) return false;
+	if (!Surface::InitBlankSurface(x, y)) return false;
 
 	m_frameWidth = (float)GetWidth();
 	m_frameHeight = (float)GetHeight();
 	return true;
 }
 
-bool SurfaceAnim::InitFromSoftSurface( SoftSurface *pSurf )
+bool SurfaceAnim::InitFromSoftSurface(SoftSurface* pSurf)
 {
 	if (!Surface::InitFromSoftSurface(pSurf)) return false;
 
@@ -183,12 +236,12 @@ bool SurfaceAnim::InitFromSoftSurface( SoftSurface *pSurf )
 	return true;
 }
 
-void SurfaceAnim::BlitRotatedAnim( float x, float y, int frameX, int frameY, CL_Vec2f vScale, eAlignment alignment
-								  /*= ALIGNMENT_CENTER*/, unsigned int rgba /*= MAKE_RGBA(255,255,255,255)*/, float rotation/*=0*/,
-								  CL_Vec2f vRotationPt /*= CL_Vec2f(x,y)*/, bool flipX /*= false*/, bool flipY /*= false*/,
-								  RenderBatcher *pBatcher)
+void SurfaceAnim::BlitRotatedAnim(float x, float y, int frameX, int frameY, CL_Vec2f vScale, eAlignment alignment
+	/*= ALIGNMENT_CENTER*/, unsigned int rgba /*= MAKE_RGBA(255,255,255,255)*/, float rotation/*=0*/,
+	CL_Vec2f vRotationPt /*= CL_Vec2f(x,y)*/, bool flipX /*= false*/, bool flipY /*= false*/,
+	RenderBatcher* pBatcher)
 {
-	BlitScaledAnim(x,y,frameX,frameY, vScale, alignment, rgba, rotation, CL_Vec2f(x,y)+vRotationPt, flipX, flipY, pBatcher);
+	BlitScaledAnim(x, y, frameX, frameY, vScale, alignment, rgba, rotation, CL_Vec2f(x, y) + vRotationPt, flipX, flipY, pBatcher);
 }
 
 float SurfaceAnim::GetAspectRatio()
@@ -199,5 +252,5 @@ float SurfaceAnim::GetAspectRatio()
 		return 1.0f;
 	}
 
-	return m_frameWidth/m_frameHeight;
+	return m_frameWidth / m_frameHeight;
 }
