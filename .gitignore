@@ -52,15 +52,11 @@ RTLooneyLadders/windows/log.txt
 .vscode/settings.json
 RTSimpleApp/html5
 RTSimpleApp/AndroidGradle/app/libs/fmod.jar
-RTSimpleApp/RTSimpleApp.xcodeproj/project.xcworkspace/xcuserdata/Seth.xcuserdatad
-RTSimpleApp/RTSimpleApp.xcodeproj/project.xcworkspace/xcshareddata
 RTBareBones/html5
 */windows_vs2017/x64
-*/windows_vc2017/x64
-RTBareBones/RTBareBones.xcodeproj/xcuserdata
-RTBareBones/RTBareBones.xcodeproj/project.xcworkspace/xcuserdata/Seth.xcuserdatad/
-RTSimpleApp/RTSimpleApp.xcodeproj/xcuserdata/Seth.xcuserdatad
 shared/win/libVLC
 RTPack/source/PVRTexLib
 RTPack/bin/RTPack.iobj
 RTPack/bin/RTPack.ipdb
+xcuserdata
+RTPack.vcxproj.FileListAbsolute.txt
