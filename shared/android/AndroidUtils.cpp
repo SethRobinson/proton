@@ -1275,6 +1275,11 @@ float AppGetLastOSMessageParm1(JNIEnv* env)
 	return g_lastOSMessage.m_parm1;
 }
 
+int AppGetLastOSMessageParm2(JNIEnv* env)
+{
+	return g_lastOSMessage.m_parm2;
+}
+
 // JAKE ADDED - MachineWorks needs this, so please leave.
 void AppOnJoypadButtons(JNIEnv* env, jobject jobj, jint key, jint value)
 {

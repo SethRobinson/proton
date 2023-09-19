@@ -39,7 +39,9 @@ public:
 	float GetLineHeight(float scale = 1.0f);
 	void DrawScaledFakeToUpdateState( const string &text, unsigned int color, FontStateStack *pState);
 	bool IsLoaded() {return m_surf.IsLoaded();}
-
+	
+	bool IsValidChar(uint16 c, bool bStrict); //is this character in font, bStrict will allow only actual letters
+	string FilterOutInvalidChars(const string &input, bool bStrict); //filters out characters that are not in font
 	unsigned int GetColorFromString(const char *pText);
 	Surface * GetSurface() {return &m_surf;}
 

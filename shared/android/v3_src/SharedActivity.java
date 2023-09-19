@@ -159,6 +159,7 @@ import android.net.ConnectivityManager;
 	
 	public static int m_text_max_length = 20;
 	public static String m_text_default = "";
+	public static int m_text_type = 0;
 	public static boolean update_display_ad;
 	public static boolean run_hooked;
 	public static int tapjoy_ad_show; //0 for don't shot, 1 for show
@@ -176,6 +177,13 @@ import android.net.ConnectivityManager;
 	final static int C_CONTROLLER_MAPPING_PS4 = 2;
 	final static int C_CONTROLLER_MAPPING_SWITCH_PRO = 3;
 	final static int C_CONTROLLER_MAPPING_8BITDO = 4;
+
+	final static int PARM_KEYBOARD_TYPE_ASCII = 0;
+	final static int PARM_KEYBOARD_TYPE_NUMBERS = 1;
+	final static int PARM_KEYBOARD_TYPE_URL = 2;
+	final static int PARM_KEYBOARD_TYPE_ASCII_FULL = 3;
+	final static int PARM_KEYBOARD_TYPE_EMAIL = 4;
+	final static int PARM_KEYBOARD_TYPE_ALL = 5;
 
 	@Override
 	protected void onDestroy()
@@ -834,6 +842,14 @@ public static String get_getNetworkType()
         if (show) 
 		{
             Log.d("Msg","Enabling keyboard");
+			
+			int imeOptions = EditorInfo.IME_FLAG_NO_FULLSCREEN | EditorInfo.IME_FLAG_NO_EXTRACT_UI;
+			if (m_text_type != PARM_KEYBOARD_TYPE_ALL) imeOptions |= EditorInfo.IME_FLAG_FORCE_ASCII;
+			m_editText.setImeOptions(imeOptions);
+			
+			if (m_text_type == PARM_KEYBOARD_TYPE_NUMBERS) m_editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+			else m_editText.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+			
 			mgr.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
             m_focusOnKeyboard = true;
              
@@ -1982,6 +1998,7 @@ class AppRenderer implements GLSurfaceView.Renderer
 					
 					app.m_text_max_length = nativeGetLastOSMessageParm1();
 					app.m_text_default = SharedActivity.app.m_spacer;
+					app.m_text_type = nativeGetLastOSMessageParm2();
 					
 					app.m_before =  app.m_text_default;
 					app.toggle_keyboard(true);
@@ -2064,6 +2081,7 @@ class AppRenderer implements GLSurfaceView.Renderer
 
 	private static native int nativeOSMessageGet();
 	private static native int nativeGetLastOSMessageParm1();
+	private static native int nativeGetLastOSMessageParm2();
 	private static native float nativeGetLastOSMessageX();
 	private static native float nativeGetLastOSMessageY();
 	private static native String nativeGetLastOSMessageString();

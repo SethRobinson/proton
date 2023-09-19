@@ -472,14 +472,15 @@ int VKeyToWMCharKey(int vKey)
 	if (vKey > 0 && vKey < 255)
 	{
 		static unsigned char  keystate[256];
-		static HKL _gkey_layout = GetKeyboardLayout(0);
+		HKL _gkey_layout = GetKeyboardLayout(0);
 
 		int      result;
-		unsigned short    val = 0;
+		wchar_t  wVal = 0;
+		unsigned short val = 0;
 
 		if (GetKeyboardState(keystate) == FALSE) return 0;
-		result = ToAsciiEx(vKey,vKey,keystate,&val,0,_gkey_layout);
-
+		result = ToUnicodeEx(vKey, vKey, keystate, &wVal, 1, 0, _gkey_layout);
+		WideCharToMultiByte(CP_UTF8, 0, &wVal, 1, (char*)&val, 2, 0, 0);
 		
 		if (result == 0)
 		{

@@ -18,6 +18,8 @@
 #include <iomanip>
 #include <sstream>
 #include <shellapi.h>
+#include <locale>
+#include <codecvt>
  
 using namespace std;
 
@@ -211,21 +213,22 @@ void SetClipboardTextW(uint16 *text, int charCount)
 
 string GetClipboardText()
 {
-	string text;
+	wstring text;
 
 	if (OpenClipboard(NULL))
 	{
-		HANDLE hData = GetClipboardData(CF_TEXT);  //note, if we every support unicode we would use CF_UNICODE
+		HANDLE hData = GetClipboardData(CF_UNICODETEXT);  //note, if we every support unicode we would use CF_UNICODE
 		if (hData)
 		{
-			text = (char*)GlobalLock(hData);
+			text = (wchar_t*)GlobalLock(hData);
 			GlobalUnlock(hData);
 		}
 
 		CloseClipboard();
 	}
-	return text;
-	
+
+	wstring_convert<codecvt_utf8<wchar_t>, wchar_t> converter;
+	return converter.to_bytes(text);
 }
 
 bool IsIPhone3GS()

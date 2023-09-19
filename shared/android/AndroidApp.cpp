@@ -72,6 +72,11 @@ extern "C"
 	{
 		return AppGetLastOSMessageParm1(env);
 	}
+	
+	JNIEXPORT int Java_com_rtsoft_RTAndroidApp_AppRenderer_nativeGetLastOSMessageParm2(JNIEnv* env)
+	{
+		return AppGetLastOSMessageParm2(env);
+	}
 
 	JNIEXPORT jstring Java_com_rtsoft_RTAndroidApp_AppRenderer_nativeGetLastOSMessageString(JNIEnv* env)
 	{
