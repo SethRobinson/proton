@@ -51,6 +51,7 @@ private:
 	void OnRender(VariantList *pVList);
 	void OnTargetOverStart(VariantList *pVList);
 	void OnTargetOverEnd(VariantList *pVList);
+	void OnMouseWheel(VariantList *pVList);
 	void OnBoundsChanged(Variant *pVariant);
 	void OnFileNameChanged(Variant *pDataObject);
 	CL_Vec2f *m_pPos2d;
@@ -64,6 +65,7 @@ private:
 	SurfaceAnim *m_pSurf;
 	string *m_pFileName;
 	bool m_bUsingScrollComponent;
+	bool m_bFadingIn;
 	
 };
 
