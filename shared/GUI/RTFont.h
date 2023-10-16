@@ -35,6 +35,8 @@ public:
 	CL_Vec2f DrawWrapped(rtRect &r, const string &txt, bool centerX=false, bool centerY=false, unsigned int color=MAKE_RGBA(255,255,255,255), float scale=1.0f, bool bMeasureOnly = false, uint32 bgColor = MAKE_RGBA(0,0,0,0));
 	void DrawAligned(float x, float y, const string &text, eAlignment alignment = ALIGNMENT_UPPER_LEFT, float scale = 1.0f, unsigned int color=MAKE_RGBA(255,255,255,255), FontStateStack *pState = NULL, RenderBatcher *pBatcher = NULL);
 	void DrawAlignedSolidColor(float x, float y, const string &text, eAlignment alignment = ALIGNMENT_UPPER_LEFT, float scale = 1.0f, unsigned int color=MAKE_RGBA(255,255,255,255), FontStateStack *pState = NULL, RenderBatcher *pBatcher = NULL);
+	void DrawAlignedBackground(float x, float y, const string& text, eAlignment alignment = ALIGNMENT_UPPER_LEFT, float scale = 1.0f, unsigned int color = MAKE_RGBA(255, 255, 255, 255), FontStateStack* pState = NULL, RenderBatcher* pBatcher = NULL);
+	
 	void SetSmoothing(bool bSmoothing); //false would disable linear texture filting
 	float GetLineHeight(float scale = 1.0f);
 	void DrawScaledFakeToUpdateState( const string &text, unsigned int color, FontStateStack *pState);

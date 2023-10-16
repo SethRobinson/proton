@@ -1936,24 +1936,28 @@ void EntitySetScaleBySize(Entity *pEnt, CL_Vec2f vDestSize, bool bPreserveAspect
 	pEnt->GetVar("scale2d")->Set(vFinalScale);
 }
 
-void EntitySetScaleBySizeAndAspectMode(Entity *pEnt, CL_Vec2f vDestSize, eAspect aspectMode)
+
+CL_Vec2f EntityGetScaleBySizeAndAspectMode(Entity* pEnt, CL_Vec2f vDestSize, eAspect aspectMode)
 {
 	CL_Vec2f vOriginalScale = GetScale2DEntity(pEnt);
 
 	CL_Vec2f vSize = pEnt->GetVar("size2d")->GetVector2();
+	
+	CL_Vec2f vReturnScale = CL_Vec2f(0, 0);
+
 	assert(vSize.x != 0 && vSize.y != 0);
 
 	if (vSize.x == 0 || vSize.y == 0)
 	{
 		assert(!"Huh?");
-		return; //avoid divide by 0
+		return vReturnScale; //avoid divide by 0
 	}
 	float aspectRatio = vSize.x / vSize.y;
 
 	switch (aspectMode)
 	{
 	case ASPECT_NONE:
-	break;
+		break;
 
 	case ASPECT_FIT:
 	{
@@ -1961,17 +1965,17 @@ void EntitySetScaleBySizeAndAspectMode(Entity *pEnt, CL_Vec2f vDestSize, eAspect
 		if (aspectRatio > 1.0f) //x is bigger, we go by that
 		{
 			float destYTemp = vDestSize.x * (1 / aspectRatio); //make Y match the aspect ratio
-				
-				if (destYTemp > vDestSize.y)
-				{
-					//well, it's too big.  Go reverse
-					vDestSize.x = vDestSize.y * aspectRatio;
-					//doesn't fit.  
-				}
-				else
-				{
-					vDestSize.y = destYTemp;
-				}
+
+			if (destYTemp > vDestSize.y)
+			{
+				//well, it's too big.  Go reverse
+				vDestSize.x = vDestSize.y * aspectRatio;
+				//doesn't fit.  
+			}
+			else
+			{
+				vDestSize.y = destYTemp;
+			}
 		}
 		else
 		{
@@ -1989,18 +1993,18 @@ void EntitySetScaleBySizeAndAspectMode(Entity *pEnt, CL_Vec2f vDestSize, eAspect
 			}
 		}
 
-	} 
+	}
 	break;
 
 	default:
-	
+
 		if (aspectMode == ASPECT_WIDTH_CONTROLS_HEIGHT)
 		{		//knock the Y setting out and replace with aspect correct size
-				vDestSize.y = vDestSize.x * (1 / aspectRatio);
+			vDestSize.y = vDestSize.x * (1 / aspectRatio);
 		}
 		else
 		{
-				vDestSize.x = vDestSize.y * aspectRatio;
+			vDestSize.x = vDestSize.y * aspectRatio;
 		}
 
 	}
@@ -2008,8 +2012,14 @@ void EntitySetScaleBySizeAndAspectMode(Entity *pEnt, CL_Vec2f vDestSize, eAspect
 	CL_Vec2f vFinalScale = CL_Vec2f(vDestSize.x / vSize.x, vDestSize.y / vSize.y);
 	vFinalScale.x *= vOriginalScale.x;
 	vFinalScale.y *= vOriginalScale.y;
+	return vFinalScale; //avoid divide by 0
 
-	pEnt->GetVar("scale2d")->Set(vFinalScale);
+}
+
+void EntitySetScaleBySizeAndAspectMode(Entity *pEnt, CL_Vec2f vDestSize, eAspect aspectMode)
+{
+
+	pEnt->GetVar("scale2d")->Set(EntityGetScaleBySizeAndAspectMode(pEnt, vDestSize, aspectMode));
 }
 
 //On an ipad sized device it does nothing, on anything else it resizes the entity to match the device size

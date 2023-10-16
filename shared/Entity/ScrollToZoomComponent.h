@@ -30,6 +30,8 @@ public:
 
 	bool m_bIsDraggingLook = false;
 
+	boost::signals2::signal<void(VariantList*)> m_sig_input_while_mousedown; //listen if you want to know if a key is tapped while dragging this entity around
+
 protected:
 
 	void UpdateStatusMessage(string msg);

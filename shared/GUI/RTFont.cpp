@@ -652,6 +652,20 @@ void RTFont::DrawAlignedSolidColor( float x, float y, const string &text, eAlign
 	DrawScaledSolidColor(x,y, text, scale, color, pState, pBatcher);
 }
 
+
+void RTFont::DrawAlignedBackground(float x, float y, const string& text, eAlignment alignment/*= ALIGNMENT_UPPER_LEFT*/, float scale /*= 1.0f*/, unsigned int color/*=MAKE_RGBA(255,255,255,255)*/, FontStateStack* pState /*= NULL*/, RenderBatcher* pBatcher /*= NULL*/)
+{
+	CL_Vec2f vSize = MeasureText(text, scale);
+	CL_Vec2f vOffset = GetAlignmentOffset(vSize, alignment);
+	x -= vOffset.x;
+	y -= vOffset.y;
+	
+	rtRectf rt = rtRectf(x, y, x + vSize.x, y + vSize.y);
+	g_globalBatcher.Flush();
+
+	DrawFilledRect(rt, color);
+}
+
 #define MAKE_KERNING_KEY(first,second) uint32( (uint32(first)*65536)  + uint32(second))
 
 void RTFont::SetKerningData( int first, int second, signed char data )

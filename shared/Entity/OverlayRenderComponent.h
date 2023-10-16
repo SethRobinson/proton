@@ -44,6 +44,8 @@
  * - <b>"fileName" (string):</b> specifies the name of the image to be loaded into the \c SurfaceAnim.
  * - <b>"frameSize2d" (Vector2):</b> a read only variant that contains the frame size of the
  *   rendered \c SurfaceAnim. If there is no current \c SurfaceAnim then this value is (0.0, 0.0).
+ 
+ * borderPaddingPixels - set to 0,0,10,0 to crop 10 pixels off the top for example
  */
 class OverlayRenderComponent: public EntityComponent
 {

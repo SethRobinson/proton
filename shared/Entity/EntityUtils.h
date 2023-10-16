@@ -355,6 +355,7 @@ bool EntityRetinaRemapIfNeeded(Entity *pEnt, bool bAdjustPosition = true, bool b
  */
 void EntitySetScaleBySize(Entity *pEnt, CL_Vec2f vDestSize, bool bPreserveAspectRatio = false, bool bPreserveOtherAxis = false);
 void EntitySetScaleBySizeAndAspectMode(Entity *pEnt, CL_Vec2f vDestSize, eAspect aspectMode);
+CL_Vec2f EntityGetScaleBySizeAndAspectMode(Entity* pEnt, CL_Vec2f vDestSize, eAspect aspectMode);
 void EntityScaleiPad(Entity *pEnt, bool bPerserveAspectRatio); //on ipad size does nothing, on anything else it scales to fit the same screen ratio.
 void EntityAdjustScaleSoPhysicalSizeMatches(Entity *pEnt, int ppiToMatch = C_IPAD_PPI, float powerMult = 1.0f); //so a 1 inch button on ipad1 is also 1 inch on a retina iphone or anything else.  powerMult 0.5 means weaken the changes by half
 EntityComponent * AddHotKeyToButton(Entity *pEnt, uint32 keycode);

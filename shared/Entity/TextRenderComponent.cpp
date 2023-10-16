@@ -111,7 +111,6 @@ void TextRenderComponent::OnRender(VariantList *pVList)
 	
 	if (vFinalPos.y < -m_pSize2d->y) return;
 	if (vFinalPos.y > GetOrthoRenderSizeYf()) return;
-
 	
 	if (*m_pRotation != 0)
 	{
@@ -151,6 +150,7 @@ void TextRenderComponent::OnRender(VariantList *pVList)
 		{
 			GetBaseApp()->GetFont(eFont(*m_pFontID))->DrawScaledSolidColor(vFinalPos.x+2, vFinalPos.y+2, *m_pText, m_pScale2d->x, ColorCombine(*m_pShadowColor, MAKE_RGBA(255,255,255,255), alpha));
 		}
+
 		GetBaseApp()->GetFont(eFont(*m_pFontID))->DrawScaled(vFinalPos.x, vFinalPos.y, *m_pText, m_pScale2d->x, color);
 		break;
 	
