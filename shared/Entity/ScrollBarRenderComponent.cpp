@@ -10,6 +10,7 @@ ScrollBarRenderComponent::ScrollBarRenderComponent()
 	m_pSurf = NULL;
 	SetName("ScrollBarRender");
 	m_bUsingScrollComponent = false;
+	m_bFadingIn = false;
 }
 
 ScrollBarRenderComponent::~ScrollBarRenderComponent()
@@ -33,6 +34,7 @@ void ScrollBarRenderComponent::OnAdd(Entity *pEnt)
 	GetParent()->GetFunction("OnRender")->sig_function.connect(1, boost::bind(&ScrollBarRenderComponent::OnRender, this, _1));
 	GetParent()->GetFunction("OnOverStart")->sig_function.connect(1, boost::bind(&ScrollBarRenderComponent::OnTargetOverStart, this, _1));
 	GetParent()->GetFunction("OnOverEnd")->sig_function.connect(1, boost::bind(&ScrollBarRenderComponent::OnTargetOverEnd, this, _1));
+	GetFunction("OnMouseWheel")->sig_function.connect(1, boost::bind(&ScrollBarRenderComponent::OnMouseWheel, this, _1));
 	//if "fileName" is set, we'll know about it here
 	GetVar("fileName")->GetSigOnChanged()->connect(boost::bind(&ScrollBarRenderComponent::OnFileNameChanged, this, _1));
 
@@ -79,6 +81,21 @@ void ScrollBarRenderComponent::OnTargetOverEnd(VariantList *pVList)
 	FadeEntity(GetParent(), false, 0.3f, 1000);
 }
 
+void ScrollBarRenderComponent::OnMouseWheel(VariantList* pVList)
+{
+	if ((*m_pAlpha < 0.6f && !m_bFadingIn) || *m_pAlpha <= 0.3f)
+	{
+		FadeEntity(GetParent(), false, 0.6f, 100);
+		FadeEntity(GetParent(), false, 0.3f, 1000, 200, true);
+		m_bFadingIn = true;
+	}
+	if (*m_pAlpha >= 0.6f)
+	{
+		m_bFadingIn = false;
+		FadeEntity(GetParent(), false, 0.3f, 1000, 200);
+	}
+}
+
 void ScrollBarRenderComponent::OnRemove()
 {
 	EntityComponent::OnRemove();
@@ -86,6 +103,10 @@ void ScrollBarRenderComponent::OnRemove()
 
 void ScrollBarRenderComponent::OnUpdate(VariantList *pVList)
 {	
+	if (*m_pAlpha >= 0.6f)
+	{
+		m_bFadingIn = false;
+	}
 }
 
 void ScrollBarRenderComponent::OnRender(VariantList *pVList)

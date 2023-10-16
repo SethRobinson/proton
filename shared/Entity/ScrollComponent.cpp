@@ -1,6 +1,7 @@
 #include "PlatformPrecomp.h"
 #include "ScrollComponent.h"
 #include "BaseApp.h"
+#include "Entity/EntityUtils.h"
 
 ScrollComponent::ScrollComponent()
 {
@@ -125,10 +126,36 @@ void ScrollComponent::OnInput(VariantList* pVList)
 	float f = pVList->Get(0).GetFloat();
 	if (f == MESSAGE_TYPE_GUI_MOUSEWHEEL) 
 	{
+#ifdef PLATFORM_WINDOWS
+		POINT pt;
+		extern HWND g_hWnd;
+		if (GetCursorPos(&pt))
+		{
+			RECT r;
+
+			GetClientRect(g_hWnd, (LPRECT)&r);
+			ClientToScreen(g_hWnd, (LPPOINT)&r.left);
+			ClientToScreen(g_hWnd, (LPPOINT)&r.right);
+
+			CL_Vec2f entPos = GetScreenPos2DEntity(GetParent());
+
+			if ((pt.x < r.left + entPos.x || pt.x > r.left + entPos.x + m_pSize2d->x)
+				|| (pt.y < r.top + entPos.y || pt.y > r.top + entPos.y + m_pSize2d->y))
+			{
+				return; //cursor is outside of our Entity
+			}
+		}
+#endif
 		SetIsScrolling(true);
 		m_vecDisplacement.y += pVList->Get(4).GetVector2().x * *m_pPowerMod * 0.75f;//Maybe change if on HTML5?
 		m_vTotalDisplacementOnCurrentSwipe.y += pVList->Get(4).GetVector2().x * *m_pPowerMod * 0.75f;
 		SetPosition(m_vecDisplacement, false);
+
+		EntityComponent* pScrollBar = GetParent()->GetComponentByName("ScrollBarRender");
+		if (pScrollBar)
+		{
+			pScrollBar->GetFunction("OnMouseWheel")->sig_function(NULL);
+		}
 	}
 }
 
