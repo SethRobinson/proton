@@ -702,7 +702,11 @@ bool BaseApp::OnPreInitVideo()
 	//extern these vars from main.cpp to change them...
 	
 	//SetEmulatedPlatformID(PLATFORM_ID_WINDOWS);
+	
+#ifndef PLATFORM_HTML5
 	SetPrimaryScreenSize(1024, 768);
+
+#endif
 
 	return true; //no error
 }

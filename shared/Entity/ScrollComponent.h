@@ -81,8 +81,12 @@ public:
 		STYLE_EXACT
 	};
 
+	void SetPositionByPercent(CL_Vec2f vPercent);
+	void SetDraggingByContentEnabled(bool bEnabled);
+	void SetProgress(VariantList* pVList);
 
 private:
+
 	bool isInterestingFinger(uint32 fingerID) const;
 
 	void OnUpdate(VariantList *pVList);
@@ -92,7 +96,6 @@ private:
 	void OnOverMove(VariantList *pVList);
 	void SetPosition(CL_Vec2f vDisplacement, bool bForceUpdate);
 	void OnBoundsChanged(Variant *pVariant);
-	void SetProgress(VariantList *pVList);
 	void SetIsScrolling(bool bScrolling);
 
 	CL_Vec2f *m_pPos2d;
@@ -116,6 +119,7 @@ private:
 	float *m_pSwipeDetectDistance; //how far we have to move to detect a swipe, 0 to disable
 	uint32 *m_pDontScrollUntilSwipeDetected; //1 if we don't scroll until they move enough to qualify for a swipe, 0 to always scroll
 	uint32 *m_pEatAllInput; //if 1, we claim all taps as ours.  This solves a very specific problem for a client, most people won't want this..
+	bool m_bDraggingByContentEnabled; //if true, we'll allow content to be dragged around.  We turn this off when dragging the scroll bar
 };
 
 #endif // ScrollComponent_h__

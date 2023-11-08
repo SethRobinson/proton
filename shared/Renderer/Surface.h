@@ -106,6 +106,7 @@ public:
 	void SetCreateMipMapsIfNeeded(bool bCreateMipMapsIfNeeded) {m_bCreateMipMapsIfNeeded = bCreateMipMapsIfNeeded;}
 	virtual bool InitBlankSurface(int x, int y); //initialize a blank surface to do whatever to
 	virtual bool InitFromSoftSurface(SoftSurface *pSurf, bool bCreateSurface = true, int mipLevel = 0);
+	bool CreateSoftSurfaceFromSurface(SoftSurface& outSurf);
 	bool IsRenderTarget() {return m_frameBuffer != 0;}
 	void CopyFromScreen(); //grabs whatever is currently in the gl buffer and creates a new texture with it
 	void FillRandomCrap();

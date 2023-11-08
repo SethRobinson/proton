@@ -1171,11 +1171,11 @@ rtRectf ConvertFakeScreenRectToReal(rtRectf r)
 {
 	if (GetFakePrimaryScreenSizeX() == 0) return r;
 
-	float primaryY = (float)GetPrimaryGLY();
-	float primaryX = (float)GetPrimaryGLX();
+	double primaryY = (double)GetPrimaryGLY();
+	double primaryX = (double)GetPrimaryGLX();
 
-	float fakeX = (float)GetFakePrimaryScreenSizeX();
-	float fakeY = (float)GetFakePrimaryScreenSizeY();
+	double fakeX = (double)GetFakePrimaryScreenSizeX();
+	double fakeY = (double)GetFakePrimaryScreenSizeY();
 
 #ifdef _DEBUG
 //	LogMsg("ConvertFakeScreenRectToReal:  Primary: %d, %d, Fake: %d, %d", GetPrimaryGLX(), GetPrimaryGLY(),
@@ -1187,17 +1187,25 @@ rtRectf ConvertFakeScreenRectToReal(rtRectf r)
 		swap(primaryX , primaryY);
 	}
 	
-    float ratiox = (primaryX/fakeX);
-	float ratioy = (primaryY/fakeY);
+    double ratiox = (primaryX/fakeX);
+	double ratioy = (primaryY/fakeY);
 
-	float widthHold = r.GetWidth();
-	float heightHold = r.GetHeight();
+	double widthHold = r.GetWidth();
+	double heightHold = r.GetHeight();
 
 	r.top *= ratioy;
 	r.left *= ratiox;
 
 	r.right = widthHold*ratiox+r.left;
 	r.bottom = heightHold*ratioy+r.top;
+
+	/*
+	//round off r to whole numbers only
+	r.top = (int)r.top;
+	r.left = (int)r.left;
+	r.right = (int)r.right;
+	r.bottom = (int)r.bottom;
+	*/
 
 	return r;
 }

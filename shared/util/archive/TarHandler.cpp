@@ -38,9 +38,10 @@ void TarHandler::Kill()
 	m_totalBytesWritten = 0;
 	m_bytesNeededToReachBlock = 0;
 	m_bForceLowerCaseFileNames = true;
+	m_bIsUSTARFormat = false; //we'll detect this
 }
 
-void TarHandler::panic(char *pMessage)
+void TarHandler::panic(const char *pMessage)
 {
 	LogMsg(pMessage);
 }
@@ -69,184 +70,237 @@ int oct_to_int(char *oct)
 	return i;
 }
 
-bool TarHandler::WriteBZipStream(byte *pData, int size)
+
+
+bool TarHandler::WriteBZipStream(uint8 *pData, int size)
 {
-	if (size == 0) return true;
-
-	int headerSize = sizeof(tar_header);
-
-	switch (m_tarState)
+	
+	while (size > 0)
 	{
-	case TAR_STATE_FILLING_HEADER:
-	{
-		int amountToRead = rt_min(size, headerSize - m_tarHeaderBytesRead);
-		memcpy(&m_tarHeader.name[0] + m_tarHeaderBytesRead, pData, amountToRead);
+	
+		int headerSize = sizeof(tar_header);
 
-		if (strncmp(m_tarHeader.magic, "ustar", 5) != 0)
+		switch (m_tarState)
 		{
-			//bad header.  We probably need to push it forward by 512 bytes for some reason
-			return WriteBZipStream(pData + 512, size - 512);
-		}
-		m_tarHeaderBytesRead += amountToRead;
-		m_totalBytesWritten += amountToRead;
-
-		assert(m_tarHeaderBytesRead <= sizeof(tar_header));
-		if (m_tarHeaderBytesRead == sizeof(tar_header))
+		case TAR_STATE_FILLING_HEADER:
 		{
-			m_tarFileOutBytesLeft = oct_to_int(m_tarHeader.size);
+			int amountToRead = rt_min(size, headerSize - m_tarHeaderBytesRead);
+			memcpy(&m_tarHeader.name[0] + m_tarHeaderBytesRead, pData, amountToRead);
 
-			//note:  files can be 0 size, so we can't check by that..
-			if ( /*m_tarFileOutBytesLeft == 0 ||*/ m_tarHeader.name[0] == 0)
+
+			//   wait, we don't want this because it breaks something else?   https://github.com/SethRobinson/RTDink/issues/6
+
+			if (strncmp(m_tarHeader.magic, "ustar", 5) != 0)
 			{
-				m_tarState = TAR_STATE_FINISHED;
-				if (m_fpOut)
+				if (m_bIsUSTARFormat)
 				{
-					fclose(m_fpOut);
-					m_fpOut = NULL;
+					//bad header.  We probably need to push it forward by 512 bytes for some reason
+					pData += 512;
+					size -= 512;
+					continue;
 				}
-				return true;
+				else
+				{
+					//Well, it's it's probably the older v7 format, just do nothing and hope for the best
+				}
+			}
+			else
+			{
+				//LogMsg("Yup, it's  ustar, the newer format");
+				m_bIsUSTARFormat = true;
 			}
 
-			//finished reading header, setup to switch to file writing
-			m_tarHeaderBytesRead = 0;
-			m_tarState = TAR_STATE_WRITING_FILE;
-			if (m_bForceLowerCaseFileNames)
+			m_tarHeaderBytesRead += amountToRead;
+			m_totalBytesWritten += amountToRead;
+
+			assert(m_tarHeaderBytesRead <= sizeof(tar_header));
+			if (m_tarHeaderBytesRead == sizeof(tar_header))
 			{
-				ToLowerCase(m_tarHeader.name);
-			}
+				m_tarFileOutBytesLeft = oct_to_int(m_tarHeader.size);
+
+				//note:  files can be 0 size, so we can't check by that..
+				if (  m_tarHeader.name[0] == 0)
+				{
+					m_tarState = TAR_STATE_FINISHED;
+					if (m_fpOut)
+					{
+						fclose(m_fpOut);
+						m_fpOut = NULL;
+					}
+					continue;
+				}
+
+				//finished reading header, setup to switch to file writing
+				m_tarHeaderBytesRead = 0;
+				m_tarState = TAR_STATE_WRITING_FILE;
+				if (m_bForceLowerCaseFileNames)
+				{
+					ToLowerCase(m_tarHeader.name);
+				}
 #ifdef _DEBUG
-			//LogMsg("Creating dir: %s : %s", m_destPath.c_str(), GetPathFromString(m_tarHeader.name).c_str());
+				//LogMsg("Creating dir: %s : %s", m_destPath.c_str(), GetPathFromString(m_tarHeader.name).c_str());
 #endif
-			CreateDirectoryRecursively(m_destPath, GetPathFromString(m_tarHeader.name));
+				CreateDirectoryRecursively(m_destPath, GetPathFromString(m_tarHeader.name));
 
-			//this is some extra info Dink might want
-			if (m_firstDirCreated.empty())
-			{
-				m_firstDirCreated = m_tarHeader.name;
-
-				//isolate just the first directory
-
-
-				for (unsigned int i = 0; i < m_firstDirCreated.length(); i++)
+				//this is some extra info Dink might want
+				if (m_firstDirCreated.empty())
 				{
-					if (m_firstDirCreated[i] == '/' || m_firstDirCreated[i] == '\\')
-					{
-						if (m_firstDirCreated[i + 1] != 0)
-						{
-							//well, this must be the cutoff point
-							m_firstDirCreated = m_firstDirCreated.substr(0, i);
-						}
-						break;
-					}
+					m_firstDirCreated = m_tarHeader.name;
 
-					if (i == m_firstDirCreated.length() - 1)
+					//isolate just the first directory
+
+
+					for (unsigned int i = 0; i < m_firstDirCreated.length(); i++)
 					{
-						//couldn't find it. ignore this file, they shouldn't be writing in the base.
-						m_firstDirCreated.clear();
+						if (m_firstDirCreated[i] == '/' || m_firstDirCreated[i] == '\\')
+						{
+							if (m_firstDirCreated[i + 1] != 0)
+							{
+								//well, this must be the cutoff point
+								m_firstDirCreated = m_firstDirCreated.substr(0, i);
+							}
+							break;
+						}
+
+						if (i == m_firstDirCreated.length() - 1)
+						{
+							//couldn't find it. ignore this file, they shouldn't be writing in the base.
+							m_firstDirCreated.clear();
+						}
 					}
 				}
-			}
 
 
-			string slashFixed = m_tarHeader.name;
-			StringReplace("\\", "/", slashFixed);
+				string slashFixed = m_tarHeader.name;
+				StringReplace("\\\\", "/", slashFixed);
+				StringReplace("\\", "/", slashFixed);
 
-			if (m_bLimitOutputToSingleSubDir && !m_firstDirCreated.empty())
-			{
-				//require that this file also goes into m_firstDirCreated
-				string expectedStart = m_firstDirCreated + "/";
-				if (expectedStart.length() > strlen(m_tarHeader.name)
-					|| string(m_tarHeader.name).substr(0, expectedStart.length()) != expectedStart)
+				if (m_bLimitOutputToSingleSubDir && !m_firstDirCreated.empty())
+				{
+					//require that this file also goes into m_firstDirCreated
+					string expectedStart = m_firstDirCreated + "/";
+					if (expectedStart.length() > strlen(m_tarHeader.name)
+						|| string(m_tarHeader.name).substr(0, expectedStart.length()) != expectedStart)
 					{
 						LogMsg("This archive tries to write to more than one subdir.  Weird");
 						return false;
 					}
-			}
-
-					if (IsInString(slashFixed, "/..") || IsInString(slashFixed, "../") || slashFixed[0] == '/')
-					{
-						LogMsg("This archive may be trying to write to a sketchy place, we don't trust it. If anyone actually needs this, we could add an option to allow it...");
-						return false;
-					}
-
-					//open the file for writing
-					m_fpOut = fopen( (m_destPath+m_tarHeader.name).c_str(), "wb");
-					if (!m_fpOut)
-					{
-						OnBZIPError(BZ_IO_ERROR);
-						return true;
-					}
-					return WriteBZipStream(pData+amountToRead, size-amountToRead);
-
 				}
-			}
-		break;
 
-		case TAR_STATE_WRITING_FILE:
-			{
-				assert(m_fpOut);
-
-				int amountToRead = rt_min(size, m_tarFileOutBytesLeft);
-				
-				//well, 0 byte files are legal so I guess we don't need to freak and assert here
-				//assert(amountToRead != 0);
-
-				int bytesRead = fwrite(pData, 1, amountToRead,  m_fpOut);
-				m_totalBytesWritten += amountToRead;
-
-				if (bytesRead != amountToRead)
+				if (IsInString(slashFixed, "/..") || IsInString(slashFixed, "../") || slashFixed[0] == '/')
 				{
-#ifdef _DEBUG
-					LogMsg("IO error, bytesRead: %d, amountToRead: %d", bytesRead, amountToRead);
-#endif
+					LogMsg("This archive may be trying to write to a sketchy place, we don't trust it. If anyone actually needs this, we could add an option to allow it...");
+					return false;
+				}
+
+				
+				if (m_tarHeader.typeflag == '5')
+				{
+					//this is a directory, so we don't need to write it
+					m_tarState = TAR_STATE_FILLING_HEADER;
+					pData += amountToRead;
+					size -= amountToRead;
+					continue;
+				}
+				
+
+				//open the file for writing
+				m_fpOut = fopen((m_destPath + m_tarHeader.name).c_str(), "wb");
+				if (!m_fpOut)
+				{
 					OnBZIPError(BZ_IO_ERROR);
 					return true;
 				}
 
-				m_tarFileOutBytesLeft -= amountToRead;
+				pData += amountToRead;
+				size -= amountToRead;
+				continue;
 
-				if (m_tarFileOutBytesLeft <= 0)
-				{
-					fclose(m_fpOut);
-					m_fpOut = NULL;
-					
-					m_bytesNeededToReachBlock = headerSize-(m_totalBytesWritten%headerSize);
-
-
-					tar_header * pHeader = (tar_header *)pData;
-
-					if (amountToRead == 0 && m_bytesNeededToReachBlock == 512 && pData[1] == 0)
-				//	if (amountToRead == 0)
-					{
-						//Next is a null, so that can't be a filename.  For some reason it's making us pad 512 bytes to get to the next header even though it could possibly start right now
-						pData += 512;
-					}
-
-
-					if (m_bytesNeededToReachBlock == 0 || m_bytesNeededToReachBlock == 512)
-					{
-						m_tarState = TAR_STATE_FILLING_HEADER;
-					} else
-					{
-						m_tarState = TAR_STATE_READING_BLANK_PART;
-					}
-					
-					return WriteBZipStream(pData+amountToRead, size-amountToRead);
-				}
 			}
-			
+		}
 		break;
 
-		case TAR_STATE_READING_BLANK_PART:
+		case TAR_STATE_WRITING_FILE:
+		{
+			assert(m_fpOut);
+
+			int amountToRead = rt_min(size, m_tarFileOutBytesLeft);
+
+			//well, 0 byte files are legal so I guess we don't need to freak and assert here
+			//assert(amountToRead != 0);
+
+			int bytesRead = fwrite(pData, 1, amountToRead, m_fpOut);
+			m_totalBytesWritten += amountToRead;
+
+			if (bytesRead != amountToRead)
 			{
-
-				int amountToRead = rt_min(size, m_bytesNeededToReachBlock);
-				m_totalBytesWritten += amountToRead;
-
-				m_bytesNeededToReachBlock -= amountToRead;
-				if (m_bytesNeededToReachBlock == 0) m_tarState = TAR_STATE_FILLING_HEADER;
-				return WriteBZipStream(pData+amountToRead, size-amountToRead);
+#ifdef _DEBUG
+			//	LogMsg("IO error, bytesRead: %d, amountToRead: %d", bytesRead, amountToRead);
+#endif
+				OnBZIPError(BZ_IO_ERROR);
+				return true;
 			}
+
+			m_tarFileOutBytesLeft -= amountToRead;
+
+			if (m_tarFileOutBytesLeft <= 0)
+			{
+				fclose(m_fpOut);
+				m_fpOut = NULL;
+
+				//DONE WITH THIS FILE
+#ifdef _DEBUG
+		//		auto checksum = GetHashOfFile(m_destPath + m_tarHeader.name, false);
+		//		LogMsg("Finished with file %s, checksum %u", m_tarHeader.name, checksum);
+#endif
+
+
+				m_bytesNeededToReachBlock = headerSize - (m_totalBytesWritten % headerSize);
+
+
+				tar_header* pHeader = (tar_header*)pData;
+
+				if (amountToRead == 0 && m_bytesNeededToReachBlock == 512 && pData[1] == 0)
+					//	if (amountToRead == 0)
+				{
+					//Next is a null, so that can't be a filename.  For some reason it's making us pad 512 bytes to get to the next header even though it could possibly start right now
+					pData += 512;
+				}
+
+
+				if (m_bytesNeededToReachBlock == 0 || m_bytesNeededToReachBlock == 512)
+				{
+					m_tarState = TAR_STATE_FILLING_HEADER;
+				}
+				else
+				{
+					m_tarState = TAR_STATE_READING_BLANK_PART;
+				}
+
+				pData += amountToRead;
+				size -= amountToRead;
+				continue;
+
+			}
+
+			return true;
+			break;
+
+		}
+
+	
+		case TAR_STATE_READING_BLANK_PART:
+		{
+
+			int amountToRead = rt_min(size, m_bytesNeededToReachBlock);
+			m_totalBytesWritten += amountToRead;
+
+			m_bytesNeededToReachBlock -= amountToRead;
+			if (m_bytesNeededToReachBlock == 0) m_tarState = TAR_STATE_FILLING_HEADER;
+			pData += amountToRead;
+			size -= amountToRead;
+			continue;
+		}
 
 		break;
 
@@ -256,14 +310,18 @@ bool TarHandler::WriteBZipStream(byte *pData, int size)
 			m_totalBytesWritten += size;
 
 			return true;
-			
+
 			break;
 
 		default:
 			assert(!"Error");
+			break;
+
+		}
 	}
 	return true; //success
 }
+
 
 bool TarHandler::uncompressStream ( FILE *zStream)
 {
@@ -271,7 +329,7 @@ bool TarHandler::uncompressStream ( FILE *zStream)
 		{
 			if (!m_pBzipBuffer)
 			{
-				m_pBzipBuffer = new byte[C_BZIP_BUFFER_SIZE];
+				m_pBzipBuffer = new uint8[C_BZIP_BUFFER_SIZE];
 				if (!m_pBzipBuffer)
 				{
 					OnBZIPError(BZ_MEM_ERROR);
@@ -299,7 +357,7 @@ bool TarHandler::uncompressStream ( FILE *zStream)
 		//LogMsg("Doing BZ2_bzRead..");
 			m_nread = BZ2_bzRead ( &m_bzerr, m_bzf, m_pBzipBuffer, C_BZIP_BUFFER_SIZE );
 #ifdef _DEBUG
-			LogMsg("Read %d bytes.  Error: %d", m_nread, m_bzerr);
+			//LogMsg("Read %d bytes.  Result: %d", m_nread, m_bzerr);
 #endif
 			
 			if (m_bzerr == BZ_DATA_ERROR_MAGIC) goto trycat;
@@ -316,7 +374,7 @@ bool TarHandler::uncompressStream ( FILE *zStream)
 		BZ2_bzReadGetUnused ( &m_bzerr, m_bzf, &m_bzipunusedTmpV, &m_bzipnUnused );
 		if (m_bzerr != BZ_OK) panic ( "decompress:bzReadGetUnused" );
 
-		m_bzipunusedTmp = (byte*)m_bzipunusedTmpV;
+		m_bzipunusedTmp = (uint8*)m_bzipunusedTmpV;
 		for (m_i = 0; m_i < m_bzipnUnused; m_i++) m_bzipReservedBuffer[m_i] = m_bzipunusedTmp[m_i];
 
 		BZ2_bzReadClose ( &m_bzerr, m_bzf );
@@ -372,12 +430,23 @@ bool TarHandler::OpenFile( const string &fName, const string &destPath )
 {
 	Kill();
 
-	m_destPath = destPath;
+	if (destPath.length() > 0 && destPath[destPath.length() - 1] != '/' && destPath[destPath.length() - 1] != '\\')
+	{
+#ifdef _DEBUG
+		LogMsg("TarHandler::OpenFile: destPath must end in a slash or backslash, adding one for you");
+#endif
+		m_destPath = destPath + "/";
+	}
+	else
+	{
+		m_destPath = destPath;
+	}
+
 	int headerSize = sizeof(tar_header);
 
 #ifdef _DEBUG
 	int fileSize = GetFileSize(fName.c_str());
-	LogMsg("File is %s, has a size of %d, writing to %s", fName.c_str(), fileSize, destPath.c_str());
+	//LogMsg("File is %s, has a size of %d, writing to %s", fName.c_str(), fileSize, destPath.c_str());
 #endif
 	m_fp = fopen(fName.c_str(), "rb");
 	

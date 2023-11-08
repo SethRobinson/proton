@@ -139,6 +139,7 @@ public:
 	void FlipY();
 	void Rotate90Degrees(bool bRotateLeft);
 	BMPImageHeader BuildBitmapHeader();
+	BMPImageHeader BuildBitmapHeader8bit();
 	void BlitFromScreen(int dstX, int dstY, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/); //deprecated
 	void BlitFromScreenFixed(int dstX, int dstY, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/);
 	void WriteRawDataOut(string fileName);
@@ -151,6 +152,8 @@ public:
 	void FlipRedAndBlue(); //I needed this to fix colors before sending camera capture to an OGL surface
 
 	void RemoveTrueBlack(uint8 minimumLuma);
+
+
 private:
 
 	SoftSurface(const SoftSurface&); //don't allow copy operation.  Use Blit or Surface::CreateFromSoftSurface instead

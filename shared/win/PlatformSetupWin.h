@@ -161,8 +161,8 @@ typedef  unsigned char      uint8;        /* byte type */
 
     //the old way that won't work with C++17+, but fixes older projects that need "byte" defined on windows
 #ifndef _BYTE_DEFINED
-	typedef  unsigned char      byte;        /* byte type */
-	#define  _BYTE_DEFINED
+		typedef  unsigned char      byte;        /* byte type */
+#define  _BYTE_DEFINED
 #endif
 
 #endif

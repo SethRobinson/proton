@@ -37,7 +37,9 @@ enum eAspect
 	
 };
 
-
+struct rtRect32;
+struct rtRect;
+struct rtRectf;
 
 //forces 32 bit version, useful for some 64 bit builds that broke things.  Should probably template these but whatever.
 
@@ -45,6 +47,8 @@ struct rtRect32
 {
 	rtRect32();
 	rtRect32(int32 l, int32 t, int32 r, int32 b) : left(l), top(t), right(r), bottom(b) {};
+	rtRect32(rtRectf r);
+	
 	int32 left, top, right, bottom;
 	void Clear() { left = top = right = bottom = 0; }
 	int32 GetHeight() const { return bottom - top; }

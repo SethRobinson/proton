@@ -92,7 +92,7 @@ bool NetHTTP::SetFileOutput(const string &fName)
 // 
 // }
 
-bool NetHTTP::AddPostData(const string &name, const byte *pData, int len/*=-1*/)
+bool NetHTTP::AddPostData(const string &name, const uint8 *pData, int len/*=-1*/)
 {
 	if (m_postData.length() != 0)
 	{
@@ -109,7 +109,7 @@ bool NetHTTP::AddPostData(const string &name, const byte *pData, int len/*=-1*/)
 	{
 		m_bHasEncodedPostData = true;
 
-		encoder.encodeData((const byte*)name.c_str(), name.length(), m_postData);
+		encoder.encodeData((const uint8*)name.c_str(), name.length(), m_postData);
 		m_postData += '=';
 		
 		if (len == -1) len = strlen((const char*)pData);
@@ -278,7 +278,7 @@ size_t NetHTTP::CURLReadMemoryCallback(void* ptr, size_t size, size_t nmemb, voi
 
 	int bytesToRead = rt_min(maxBytesToRead, pCURLInstance->m_postData.size() - pCURLInstance->m_CURL_bytesSent);
 	
-	memcpy(ptr, (byte*)pCURLInstance->m_postData.c_str()+ pCURLInstance->m_CURL_bytesSent, bytesToRead);
+	memcpy(ptr, (uint8*)pCURLInstance->m_postData.c_str()+ pCURLInstance->m_CURL_bytesSent, bytesToRead);
 	pCURLInstance->m_CURL_bytesSent += bytesToRead;
 
 	return  (curl_off_t)bytesToRead;
@@ -736,13 +736,13 @@ void NetHTTP::FinishDownload()
 
 }
 
-const byte * NetHTTP::GetDownloadedData()
+const uint8 * NetHTTP::GetDownloadedData()
 {
 	if (m_downloadData.empty())
 	{
 		return NULL;
 	}
-	return (const byte*)&m_downloadData[0];
+	return (const uint8*)&m_downloadData[0];
 }
 
 int NetHTTP::GetDownloadedBytes()

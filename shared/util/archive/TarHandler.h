@@ -75,9 +75,9 @@ public:
 private:
 
 	bool uncompressStream ( FILE *zStream);
-	void panic(char *pMessage);
+	void panic(const char* pMessage);
 	void OnBZIPError(int error);
-	bool WriteBZipStream(byte *pData, int size);
+	bool WriteBZipStream(uint8 *pData, int size);
 	
 	FILE *m_fp;
 	string m_destPath;
@@ -85,11 +85,11 @@ private:
 
 	BZFILE* m_bzf;;
 	int   m_bzerr, m_bzerr_dummy, m_ret, m_nread, m_streamNo, m_i;
-	byte   * m_pBzipBuffer;
-	byte   m_bzipReservedBuffer[BZ_MAX_UNUSED];
+	uint8   * m_pBzipBuffer;
+	uint8   m_bzipReservedBuffer[BZ_MAX_UNUSED];
 	int   m_bzipnUnused;
 	void*   m_bzipunusedTmpV;
-	byte *  m_bzipunusedTmp;
+	uint8 *  m_bzipunusedTmp;
 	eState m_state;
 	int m_error; //valid if state is STATE_ERROR
 
@@ -111,6 +111,7 @@ private:
 	int m_bytesNeededToReachBlock;
 	bool m_bForceLowerCaseFileNames;
 	string m_firstDirCreated; //Dink needs this info to figure out which DMOD dir to run fast
+	bool m_bIsUSTARFormat = false; //we'll detect this
 };
 
 #endif // TarHandler_h__

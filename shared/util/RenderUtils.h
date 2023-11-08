@@ -150,6 +150,7 @@ rtRectf ConvertFakeScreenRectToReal(rtRectf r, float aspectRatioModX, float aspe
 CL_Vec2f GetForceAspectContentSize();
 CL_Vec2f GetForceAspectPixelOffsets();
 CL_Vec2f GetForceAspectSquishModifer();
+CL_Vec2f GetForceAspectPrimaryScreenRatio();
 
 float GetForceAspectRatio();
 eOrientationMode GetForcedOrientation();

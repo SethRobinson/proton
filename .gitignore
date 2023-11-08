@@ -9,6 +9,8 @@ NotShared/
 *.obj
 *.DS_Store
 *.pdb
+*.iobj
+*.ipdb
 RTSimpleApp/media/interface/*.rttex
 RTSimpleApp/media/interface/*.rtfont
 RTSimpleApp/bin/
@@ -60,3 +62,7 @@ RTPack/bin/RTPack.iobj
 RTPack/bin/RTPack.ipdb
 xcuserdata
 RTPack.vcxproj.FileListAbsolute.txt
+DMODTester/
+RTConsole/windows_vc2017/RTConsole.vcxproj
+RTConsole/windows_vc2017/RTConsole.vcxproj.filters
+

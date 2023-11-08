@@ -10,6 +10,7 @@ ScrollComponent::ScrollComponent()
 	m_vTotalDisplacementOnCurrentSwipe = CL_Vec2f(0,0);
 	m_lastTouchPos = CL_Vec2f(-100,-100);
 	m_vecDisplacement = CL_Vec2f(0,0);
+	m_bDraggingByContentEnabled = true;
 }
 
 ScrollComponent::~ScrollComponent()
@@ -157,7 +158,7 @@ void ScrollComponent::OnOverMove(VariantList *pVList)
 
 	if (!isInterestingFinger(fingerID)) return;
 		
-	//LogMsg("moved %s", PrintVector2(vDisplacement).c_str());
+	//LogMsg("moved %s", PrintVector2(pVList->m_variant[0].GetVector2()).c_str());
 
 	if (*m_pScrollStyle == STYLE_EXACT)
 	{
@@ -190,9 +191,43 @@ void ScrollComponent::OnOverMove(VariantList *pVList)
 	}
 }
 
+void ScrollComponent::SetPositionByPercent(CL_Vec2f vPercent)
+{
+
+	SetIsScrolling(false);
+	//set the position by percent (0 to 1)
+	m_vecChildPos = CL_Vec2f(m_pBoundsRect->right - vPercent.x * m_pBoundsRect->get_width(), m_pBoundsRect->bottom - vPercent.y * m_pBoundsRect->get_height());
+
+	ForceRange(m_vecChildPos.x, m_pBoundsRect->left, m_pBoundsRect->right);
+	if (m_pBoundsRect->top > m_pBoundsRect->bottom) m_pBoundsRect->top = m_pBoundsRect->bottom;
+	ForceRange(m_vecChildPos.y, m_pBoundsRect->top, m_pBoundsRect->bottom);
+
+	CL_Vec2f percent2d(0, 0);
+	//avoid divide by 0 errors
+	if (m_pBoundsRect->get_width() != 0) percent2d.x = m_vecChildPos.x / (-m_pBoundsRect->get_width());
+	if (m_pBoundsRect->get_height() != 0) percent2d.y = m_vecChildPos.y / (-m_pBoundsRect->get_height());
+
+	m_progressVar->Set(percent2d);
+
+}
+
+void ScrollComponent::SetDraggingByContentEnabled(bool bEnabled)
+{
+	m_bDraggingByContentEnabled = bEnabled;
+
+	if (!m_bDraggingByContentEnabled)
+	{
+		m_vecDisplacement = CL_Vec2f(0,0); //don't want weird moving when we enabled it later
+	}
+}
+
 void ScrollComponent::SetPosition(CL_Vec2f vDisplacement, bool bForceUpdate)
 {
-	if (vDisplacement == CL_Vec2f(0,0) && !bForceUpdate) return;
+	if (m_bDraggingByContentEnabled)
+	{
+
+		if (vDisplacement == CL_Vec2f(0, 0) && !bForceUpdate) return;
+	}
 	
 	/*
 	//this works, but it still totally feels wrong, really I would need to turn "momentum" off as well, and perfectly tune the
@@ -218,6 +253,7 @@ void ScrollComponent::SetPosition(CL_Vec2f vDisplacement, bool bForceUpdate)
 
 	m_progressVar->Set(percent2d);
 	
+
 	//also run this on all children
 	EntityList *pChildren = GetParent()->GetChildren();
 
@@ -233,6 +269,13 @@ void ScrollComponent::SetPosition(CL_Vec2f vDisplacement, bool bForceUpdate)
 
 void ScrollComponent::OnUpdate(VariantList *pVList)
 {
+	if (!m_bDraggingByContentEnabled)
+	{
+		SetPosition(CL_Vec2f(0,0), false);
+		return;
+	}
+
+
 	if (*m_pScrollStyle == STYLE_MOMENTUM)
 	{
 		if (m_bIsScrolling || GetBaseApp()->GetTotalActiveTouches() == 0 || *m_pSwipeDetectDistance == 0 || *m_pDontScrollUntilSwipeDetected == 0)

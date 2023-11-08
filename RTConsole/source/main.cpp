@@ -37,6 +37,24 @@ void LogMsg ( const char* traceStr, ... )
 	AppendStringToFile( GetBaseAppPath()+"log.txt", GetDateAndTimeAsString()+": "+string(buffer)+"\r\n");
 }
 
+
+void LogMsgNoCR(const char* traceStr, ...)
+{
+	va_list argsVA;
+	const int logSize = 4096;
+	char buffer[logSize];
+	memset((void*)buffer, 0, logSize);
+
+	va_start(argsVA, traceStr);
+	vsnprintf_s(buffer, logSize, logSize, traceStr, argsVA);
+	va_end(argsVA);
+	OutputDebugString(buffer);
+	//OutputDebugString("\n");
+	printf(buffer);
+	//printf("\n");
+	//AppendStringToFile(GetBaseAppPath() + "log.txt", GetDateAndTimeAsString() + ": " + string(buffer) + "");
+}
+
 void LogError ( const char* traceStr, ... )
 {
 	va_list argsVA;

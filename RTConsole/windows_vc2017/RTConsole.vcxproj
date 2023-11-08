@@ -359,11 +359,6 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="..\..\shared\util\boost\libs\signals\src\connection.cpp" />
-    <ClCompile Include="..\..\shared\util\boost\libs\signals\src\named_slot_map.cpp" />
-    <ClCompile Include="..\..\shared\util\boost\libs\signals\src\signal_base.cpp" />
-    <ClCompile Include="..\..\shared\util\boost\libs\signals\src\slot.cpp" />
-    <ClCompile Include="..\..\shared\util\boost\libs\signals\src\trackable.cpp" />
     <ClCompile Include="..\..\shared\util\CRandom.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

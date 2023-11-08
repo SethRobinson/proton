@@ -10,10 +10,14 @@ ScrollBarRenderComponent::ScrollBarRenderComponent()
 	m_pSurf = NULL;
 	SetName("ScrollBarRender");
 	m_bUsingScrollComponent = false;
+	m_isCapsuleDragging = false;
+	m_pScrollComp = NULL;
 }
+
 
 ScrollBarRenderComponent::~ScrollBarRenderComponent()
 {
+
 }
 
 void ScrollBarRenderComponent::OnAdd(Entity *pEnt)
@@ -33,25 +37,28 @@ void ScrollBarRenderComponent::OnAdd(Entity *pEnt)
 	GetParent()->GetFunction("OnRender")->sig_function.connect(1, boost::bind(&ScrollBarRenderComponent::OnRender, this, _1));
 	GetParent()->GetFunction("OnOverStart")->sig_function.connect(1, boost::bind(&ScrollBarRenderComponent::OnTargetOverStart, this, _1));
 	GetParent()->GetFunction("OnOverEnd")->sig_function.connect(1, boost::bind(&ScrollBarRenderComponent::OnTargetOverEnd, this, _1));
+	GetParent()->GetFunction("OnOverMove")->sig_function.connect(1, boost::bind(&ScrollBarRenderComponent::OnTargetOverMove, this, _1));
+
 	//if "fileName" is set, we'll know about it here
 	GetVar("fileName")->GetSigOnChanged()->connect(boost::bind(&ScrollBarRenderComponent::OnFileNameChanged, this, _1));
 
 	GetVar("fileName")->Set("interface/scroll_bar_caps.rttex"); //default
 
-	EntityComponent *pScrollComp = GetParent()->GetComponentByName("Scroll");
-	if (!pScrollComp)
+	m_pScrollComp = (ScrollComponent*) GetParent()->GetComponentByName("Scroll");
+	if (!m_pScrollComp)
 	{
 		//assume our stuff will get set from the outside
 		m_pBoundsRect = &GetParent()->GetVar("boundsRect")->GetRect();
 		m_pProgress2d = &GetParent()->GetVar("progress2d")->GetVector2();
-
+		
 	} else
 	{
 		m_bUsingScrollComponent = true; //I keep track of this becuse it looks like the bounds is calculated a little
 		//differently with scroll components.. ??
-		m_pBoundsRect = &pScrollComp->GetVar("boundsRect")->GetRect();
-		m_pProgress2d = &pScrollComp->GetVar("progress2d")->GetVector2();
+		m_pBoundsRect = &m_pScrollComp->GetVar("boundsRect")->GetRect();
+		m_pProgress2d = &m_pScrollComp->GetVar("progress2d")->GetVector2();
 	}
+
 }
 
 
@@ -69,13 +76,149 @@ void ScrollBarRenderComponent::OnFileNameChanged(Variant *pDataObject)
 	}
 
 }
+
+bool ScrollBarRenderComponent::GetRectOfScrollCapsule(CL_Rectf *pRectout)
+{
+
+	float barHeight;
+	float barWidth;
+	CL_Vec2f vFinalPos;
+	float contentAreaRatio;
+	contentAreaRatio = (m_pBoundsRect->get_height() + m_pSize2d->y) / m_pSize2d->y;
+
+	if (!m_bUsingScrollComponent && m_pBoundsRect->get_height() < (m_pSize2d->y + 1)) //I don't really know why I need that +1..but it works..
+	{
+		contentAreaRatio = 0; //definitely don't need to scroll here
+	}
+
+	if (contentAreaRatio > 1)
+	{
+		//render vertical scroll bar
+	
+		const float touchPaddingWidth = 3;
+		barHeight = GetCapsuleHeight()+touchPaddingWidth;
+		barWidth = m_pSurf->GetFrameWidth()+touchPaddingWidth;
+
+//		LogMsg("percent scrolled is %.2f, contentAreaRation is %.2f", m_pProgress2d->y, contentAreaRatio);
+
+		vFinalPos = *m_pPos2d + CL_Vec2f(m_pSize2d->x, 0);
+
+		if (vFinalPos.x >= GetScreenSizeXf())
+		{
+			//position on the inside, not the outside
+			vFinalPos.x -= (barWidth + (iPadMapX(8))); //adjust the spacer with the screensize
+		}
+		//slide it down to the right position:
+		vFinalPos.y += (m_pSize2d->y - barHeight) * m_pProgress2d->y;
+
+		
+		CL_Rectf r = CL_Rectf(0, 0, barWidth, barHeight);
+		ApplyOffset(&r, vFinalPos);
+		//DrawFilledRect(r, *m_pColor);
+		*pRectout = r;
+		return true;
+	}
+
+	return false;
+}
+
+void ScrollBarRenderComponent::StartCapsuleDrag(CL_Vec2f vDragOffset)
+{
+	m_isCapsuleDragging = true;
+	m_capsuleDragOffset = vDragOffset;
+	if (m_pScrollComp)
+	{
+		m_pScrollComp->SetDraggingByContentEnabled(false);
+	}
+	//a drag is started
+	//LogMsg("Start drag...");
+}
+
+void ScrollBarRenderComponent::StopCapsuleDrag()
+{
+	m_isCapsuleDragging = false;
+	//LogMsg("Stop Drag...");
+	if (m_pScrollComp)
+	{
+		m_pScrollComp->SetDraggingByContentEnabled(true);
+	}
+}
+
 void ScrollBarRenderComponent::OnTargetOverStart(VariantList *pVList)
 {	
+	CL_Vec2f vMousePos = pVList->m_variant[0].GetVector2();
+	int touchID = pVList->m_variant[2].GetUINT32();
+
+	CL_Rectf r;
+	bool bIsUsed = GetRectOfScrollCapsule(&r);
+
+	if (bIsUsed && touchID == 0)
+	{
+		//LogMsg("Clicked %s, touch id %d.  Capsule rect is %s", PrintVector2(vMousePos).c_str(), touchID, PrintRect(r).c_str());
+		
+		if (r.contains(vMousePos))
+		{
+			StartCapsuleDrag(r.get_center() - vMousePos);
+		
+			GetBaseApp()->GetTouch(0)->SetWasHandled(true, GetParent());
+		}
+
+	}
 	FadeEntity(GetParent(), false, 0.6f, 100);
+}
+
+int ScrollBarRenderComponent::GetCapsuleHeight()
+{
+	float contentAreaRatio;
+	contentAreaRatio = (m_pBoundsRect->get_height() + m_pSize2d->y) / m_pSize2d->y;
+	float barHeight = m_pSize2d->y / contentAreaRatio;
+
+	if (barHeight < m_pSurf->GetFrameHeight() * 5) barHeight = m_pSurf->GetFrameHeight() * 5;
+
+	return barHeight;
+}
+void ScrollBarRenderComponent::OnTargetOverMove(VariantList* pVList)
+{
+	if (!m_isCapsuleDragging) return; //don't care
+
+	CL_Vec2f vMousePos = pVList->m_variant[0].GetVector2();
+	int touchID = pVList->m_variant[2].GetUINT32();
+	Entity* pPosParent = pVList->Get(1).GetEntity();
+
+	if (touchID != 0) return; //only care about the first touch (for now
+	GetBaseApp()->GetTouch(0)->SetWasHandled(true, GetParent());
+
+	float barHeight = GetCapsuleHeight();
+
+	CL_Vec2f percentProgressTemp = *m_pProgress2d;
+
+	//this math is suspect to say the least.  It doesn't quite work right
+	percentProgressTemp.y = ( ((vMousePos.y - (barHeight/2))) / (m_pSize2d->y - barHeight))-0.05f;
+	
+	if (m_pScrollComp)
+	{
+		//m_pScrollComp->SetPositionByPercent(percentProgressTemp);
+		VariantList vList;
+		vList.Get(0).Set(percentProgressTemp);
+		m_pScrollComp->SetProgress(&vList);
+	}
+
+	//LogMsg("updating drag... mouse: %s,Offset: %s Temp is %s,  final progress is %s", PrintVector2(vMousePos).c_str(), 
+	//	PrintVector2(m_capsuleDragOffset).c_str(), PrintVector2(percentProgressTemp).c_str(),  PrintVector2(*m_pProgress2d).c_str());
+
 }
 
 void ScrollBarRenderComponent::OnTargetOverEnd(VariantList *pVList)
 {	
+	CL_Vec2f vMousePos = pVList->m_variant[0].GetVector2();
+	int touchID = pVList->m_variant[2].GetUINT32();
+
+	if (m_isCapsuleDragging && touchID == 0)
+	{
+		StopCapsuleDrag();
+	}
+
+
 	FadeEntity(GetParent(), false, 0.3f, 1000);
 }
 
@@ -124,13 +267,8 @@ void ScrollBarRenderComponent::OnRender(VariantList *pVList)
 
 	if (contentAreaRatio > 1)
 	{
-		//render vertical scroll bar
-		m_pSurf->SetupAnim(1,2);
 
-		barHeight = m_pSize2d->y/contentAreaRatio;
-		
-		if (barHeight < m_pSurf->GetFrameHeight()*2) barHeight = m_pSurf->GetFrameHeight()*2;
-		
+		barHeight = GetCapsuleHeight();
 		barWidth = m_pSurf->GetFrameWidth();
 		//LogMsg("percent scrolled is %.2f, contentAreaRation is %.2f", m_pProgress2d->y, contentAreaRatio);
 

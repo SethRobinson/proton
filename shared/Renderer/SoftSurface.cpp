@@ -545,7 +545,7 @@ bool SoftSurface::LoadBMPTextureCheckerBoardFix(uint8 *pMem)
 		//convert 32 bit bmp to 32 bit rgba
 #ifdef _DEBUG
 
-		LogMsg("32 bit");
+		//LogMsg("32 bit");
 #endif
 		glColorBytes *pImg = (glColorBytes*)m_pPixels;
 
@@ -1249,7 +1249,7 @@ bool SoftSurface::LoadBMPTexture(uint8 *pMem)
 		//convert 32 bit bmp to 32 bit rgba
 #ifdef _DEBUG
 	
-		LogMsg("32 bit");
+		//LogMsg("32 bit");
 #endif
 		glColorBytes *pImg = (glColorBytes*)m_pPixels;
 
@@ -2359,6 +2359,32 @@ void SoftSurface::Rotate90Degrees( bool bRotateLeft )
 	m_usedPitch = targetPitch;
 }
 
+
+BMPImageHeader SoftSurface::BuildBitmapHeader8bit()
+{
+	BMPImageHeader bmpImageInfo;
+
+	memset(&bmpImageInfo, 0, sizeof(BMPImageHeader));
+
+	assert(sizeof(BMPImageHeader) == 40);
+
+	bmpImageInfo.Size = sizeof(BMPImageHeader);
+	bmpImageInfo.Width = m_width;
+	// For BMP files, the height is positive for bottom-up DIBs and negative for top-down DIBs.
+	bmpImageInfo.Height = -m_height;
+	bmpImageInfo.Planes = 1;
+	bmpImageInfo.BitCount = 8; // 8 bits for a palette-based image
+	bmpImageInfo.Compression = BMP_COMPRESSION_NONE;
+	bmpImageInfo.ImageSize = ((m_width + 3) & ~3) * m_height; // Row size is padded to a multiple of 4 bytes
+	bmpImageInfo.XPixels = 0; // Resolution can be set to 0 if not important
+	bmpImageInfo.YPixels = 0;
+	bmpImageInfo.ColorsUsed = 256; // Number of colors in the palette
+	bmpImageInfo.ColorsImportant = 0; // All colors are important
+
+	return bmpImageInfo;
+}
+
+
 BMPImageHeader SoftSurface::BuildBitmapHeader()
 {
 	BMPImageHeader bmpImageInfo;
@@ -2377,8 +2403,75 @@ BMPImageHeader SoftSurface::BuildBitmapHeader()
 	return bmpImageInfo;
 }
 
-void SoftSurface::WriteBMPOut( string fileName )
+void SoftSurface::WriteBMPOut(string fileName)
 {
+
+	if (GetSurfaceType() == SURFACE_PALETTE_8BIT)
+	{
+		FILE* fp = fopen(fileName.c_str(), "wb");
+		if (!fp)
+		{
+			LogError("Unable to open %s for writing", fileName.c_str());
+			return;
+		}
+
+		// BMP file header
+		const char* fileHeader = "BM";
+		fwrite(fileHeader, 2, 1, fp);
+
+		const int paletteSize = 256; // 8-bit BMP uses 256 colors
+		const int paletteSectionSize = paletteSize * 4; // Each entry is 4 bytes
+
+		BMPImageHeader bmpImageInfo = BuildBitmapHeader8bit();
+	
+
+		// Calculate file size and data offset
+		int rowSize = (m_width + 3) & ~3; // Rows are padded to the nearest 32 bits
+		int pixelDataSize = rowSize * m_height;
+		int fileSize = 14 + sizeof(BMPImageHeader) + paletteSectionSize + pixelDataSize;
+		int pixelDataOffset = 14 + sizeof(BMPImageHeader) + paletteSectionSize;
+
+		// Write BMP file size and pixel data offset
+		fwrite(&fileSize, 4, 1, fp);
+		unsigned int temp = 0;
+		fwrite(&temp, 4, 1, fp); // Reserved
+		fwrite(&pixelDataOffset, 4, 1, fp);
+
+		// Write image header
+		fwrite(&bmpImageInfo, sizeof(BMPImageHeader), 1, fp);
+
+		// Write palette in BGR format
+		for (int i = 0; i < paletteSize; i++)
+		{
+			// Assuming m_palette[i] is an array or struct where
+			// m_palette[i].r, m_palette[i].g, m_palette[i].b access the red, green, and blue color components respectively
+			uint8 bgr[4] = { m_palette[i].b, m_palette[i].g, m_palette[i].r, 0 }; // BGR with padding byte
+			fwrite(bgr, 4, 1, fp);
+		}
+
+		// Write pixel data
+		for (int y = m_height - 1; y >= 0; y--) // BMP format starts at the bottom row
+		{
+			for (int x = 0; x < m_width; x++)
+			{
+				//fwrite(&m_pPixels[y * m_width + x], 1, 1, fp); // Write one pixel (indexed color)
+				uint8 index = m_pPixels[y * m_width + x];
+				fwrite(&index, 1, 1, fp); // Write one pixel (indexed color)
+			}
+			// Row padding
+			for (int j = m_width; j < rowSize; j++)
+			{
+				char padding = 0;
+				fwrite(&padding, 1, 1, fp);
+			}
+		}
+
+		fclose(fp);
+		return;
+	}
+
+
+
 	if (GetSurfaceType() != SURFACE_RGB && GetSurfaceType() != SURFACE_RGBA)
 	{
 		LogError("Can only save bmps for RGB and RGBA formats, not 8 bit stuff.");

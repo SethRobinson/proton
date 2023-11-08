@@ -602,12 +602,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			)
 		{
 
-			float aspect_r=(float)GetPrimaryGLX()/(float)GetPrimaryGLY(); // aspect ratio
+			double aspect_r=(double)GetPrimaryGLX()/(double)GetPrimaryGLY(); // aspect ratio
 
 			if (GetFakePrimaryScreenSizeX() != 0)
 			{
 				//more reliable way to get the aspect ratio
-				aspect_r=(float)GetFakePrimaryScreenSizeX()/(float)GetFakePrimaryScreenSizeY(); // aspect ratio
+				aspect_r=(double)GetFakePrimaryScreenSizeX()/(double)GetFakePrimaryScreenSizeY(); // aspect ratio
 			}
 			
 			// difference between window and client size
@@ -628,15 +628,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				case WMSZ_BOTTOMLEFT:
 				case WMSZ_BOTTOMRIGHT:
 				case WMSZ_RIGHT:
-					r->bottom=r->top+(LONG)((float)(r->right-r->left-add_x)/aspect_r)+add_y;
+					r->bottom=r->top+(LONG)((double)(r->right-r->left-add_x)/aspect_r)+add_y;
 					break;
 				case WMSZ_TOPRIGHT:
 				case WMSZ_TOP:
 				case WMSZ_BOTTOM:
-					r->right=r->left+(LONG)((float)(r->bottom-r->top-add_y)*aspect_r)+add_x;
+					r->right=r->left+(LONG)((double)(r->bottom-r->top-add_y)*aspect_r)+add_x;
 					break;
 				case WMSZ_TOPLEFT:
-					r->left=r->right-(LONG)((float)(r->bottom-r->top)*aspect_r)+add_x;
+					r->left=r->right-(LONG)((double)(r->bottom-r->top)*aspect_r)+add_x;
 					break;
 				}
 			
@@ -664,6 +664,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					
 					//break;
 				}
+			
+				/*
+				//force Width to be even
+				if (Width % 2 != 0)
+				{
+					Width++;
+				}
+
+				//set Height so it will be a 4/3 ratio screen size
+				Height = (Width * 3) / 4;
+				*/
+
 				GetBaseApp()->KillOSMessagesByType(OSMessage::MESSAGE_SET_VIDEO_MODE);
 				GetBaseApp()->SetVideoMode(Width, Height, false, 0);
 			

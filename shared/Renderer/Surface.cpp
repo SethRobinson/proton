@@ -1217,6 +1217,67 @@ void Surface::OnUnloadSurfaces()
 	}
 }
 
+//This worked for me but isn't tested very well
+
+bool Surface::CreateSoftSurfaceFromSurface(SoftSurface& outSurf)
+{
+	if (!m_glTextureID)
+	{
+		LogMsg("No OpenGL texture found on this Surface.");
+		return false;
+	}
+
+	glBindTexture(GL_TEXTURE_2D, m_glTextureID);
+	CHECK_GL_ERROR();
+
+	GLenum format = GL_RGBA;
+	GLenum type = GL_UNSIGNED_BYTE;
+	int bytesPerPixel = 4;
+
+	// Assuming m_originalWidth and m_originalHeight store the actual texture size
+	int width = m_texWidth;
+	int height = m_texHeight;
+
+	if (m_bUsesAlpha)
+	{
+		format = GL_RGBA;
+		bytesPerPixel = 4;
+	}
+	else
+	{
+		format = GL_RGB;
+		bytesPerPixel = 3;
+	}
+
+	int dataSize = width * height * bytesPerPixel;
+	GLubyte* pixelData = new (std::nothrow) GLubyte[dataSize];
+
+	if (!pixelData)
+	{
+		LogMsg("Unable to allocate memory for pixel data.");
+		return false;
+	}
+
+	glGetTexImage(GL_TEXTURE_2D, 0, format, type, pixelData);
+	CHECK_GL_ERROR();
+
+	SoftSurface::eSurfaceType surfType = m_bUsesAlpha ? SoftSurface::SURFACE_RGBA : SoftSurface::SURFACE_RGB;
+
+	outSurf.Init(width, height, surfType, false);
+	
+	//Use outSurf.GetPixelData() to get the pixel data, and outSurf.GetPitch() and outsurf.GetWidth() to get the pitch and width of the surface, outSurf.GetPixelDataSize() to get the size of the surface in bytes
+	
+	memcpy(outSurf.GetPixelData(), pixelData, dataSize);
+	
+	//outSurf.SetPixelData(pixelData, true); // assuming SetPixelData takes ownership of the pixelData
+	
+	glBindTexture(GL_TEXTURE_2D, 0);
+	CHECK_GL_ERROR();
+
+	return true;
+}
+
+
 bool Surface::InitFromSoftSurface( SoftSurface *pSurf, bool bCreateSurface, int mipLevel )
 {
 	int dataSize = 0;

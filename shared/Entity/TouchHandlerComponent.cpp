@@ -78,6 +78,8 @@ void TouchHandlerComponent::HandleClickMove( CL_Vec2f &pt, uint32 fingerID )
 		//currently over, did we move off?
 		if (m_touchArea.contains(pt))
 		{
+
+			//LogMsg("TOUCHHANDLER: At %s", PrintVector2(pt).c_str());
 			//still over, do nothing?
 			FunctionObject *pFunc = GetParent()->GetShared()->GetFunctionIfExists("OnOverMove");
 

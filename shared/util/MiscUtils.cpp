@@ -2,6 +2,7 @@
 #include "MiscUtils.h"
 #include "ResourceUtils.h"
 #include "util/utf8.h"
+#include <algorithm>
 
 //taken from Gamedeveloper magazine's InnerProduct (Sean Barrett 2005-03-15)
 

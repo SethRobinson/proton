@@ -36,6 +36,8 @@ color - color tinting (defaults to MAKE_RGBA(224,188,130,255), a sort of brown)
 
 */
 
+class ScrollComponent;
+
 class ScrollBarRenderComponent: public EntityComponent
 {
 public:
@@ -50,9 +52,17 @@ private:
 	void OnUpdate(VariantList *pVList);
 	void OnRender(VariantList *pVList);
 	void OnTargetOverStart(VariantList *pVList);
+	int GetCapsuleHeight();
+	void OnTargetOverMove(VariantList* pVList);
 	void OnTargetOverEnd(VariantList *pVList);
 	void OnBoundsChanged(Variant *pVariant);
 	void OnFileNameChanged(Variant *pDataObject);
+	bool GetRectOfScrollCapsule(CL_Rectf* pRectout);
+
+	void StartCapsuleDrag(CL_Vec2f vDragOffset);
+
+	void StopCapsuleDrag();
+
 	CL_Vec2f *m_pPos2d;
 	CL_Vec2f *m_pSize2d;
 	CL_Vec2f *m_pScale2d;
@@ -64,6 +74,9 @@ private:
 	SurfaceAnim *m_pSurf;
 	string *m_pFileName;
 	bool m_bUsingScrollComponent;
+	bool m_isCapsuleDragging;
+	CL_Vec2f m_capsuleDragOffset;
+	ScrollComponent* m_pScrollComp; //Null if not used
 	
 };
 
