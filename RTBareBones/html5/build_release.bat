@@ -58,8 +58,7 @@ set SRC= %SHARED%\html5\HTML5Main.cpp %SHARED%\html5\HTML5Utils.cpp %SHARED%\Pla
 %SHARED%\Manager\GameTimer.cpp %SHARED%\Manager\MessageManager.cpp %SHARED%\Manager\ResourceManager.cpp %SHARED%\Manager\VariantDB.cpp %SHARED%\Math\rtPlane.cpp ^
 %SHARED%\Math\rtRect.cpp %SHARED%\Renderer\RenderBatcher.cpp %SHARED%\Renderer\SoftSurface.cpp %SHARED%\Renderer\Surface.cpp %SHARED%\Renderer\SurfaceAnim.cpp ^
 %SHARED%\util\CRandom.cpp %SHARED%\util\GLESUtils.cpp %SHARED%\util\MathUtils.cpp %SHARED%\util\MiscUtils.cpp %SHARED%\util\RenderUtils.cpp %SHARED%\util\ResourceUtils.cpp ^
-%SHARED%\util\Variant.cpp %SHARED%\util\boost\libs\signals\src\connection.cpp %SHARED%\util\boost\libs\signals\src\named_slot_map.cpp %SHARED%\util\boost\libs\signals\src\signal_base.cpp ^
-%SHARED%\util\boost\libs\signals\src\slot.cpp %SHARED%\util\boost\libs\signals\src\trackable.cpp %SHARED%\FileSystem\StreamingInstance.cpp %SHARED%\FileSystem\StreamingInstanceZip.cpp ^
+%SHARED%\util\Variant.cpp %SHARED%\FileSystem\StreamingInstance.cpp %SHARED%\FileSystem\StreamingInstanceZip.cpp ^
 %SHARED%\FileSystem\StreamingInstanceFile.cpp %SHARED%\BaseApp.cpp %SHARED%\util\unzip\unzip.c %SHARED%\util\unzip\ioapi.c
 
 REM **************************************** ENGINE COMPONENT SOURCE CODE FILES
@@ -75,12 +74,12 @@ REM **************************************** APP SOURCE CODE FILES
 set APP_SRC=%APP%\App.cpp
 REM **************************************** END SOURCE
 
-:unused so far: -s USE_GLFW=3 -s NO_EXIT_RUNTIME=1 -s FORCE_ALIGNED_MEMORY=1 -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -DRT_EMTERPRETER_ENABLED
+:unused so far: -s USE_GLFW=3 -s NO_EXIT_RUNTIME=1 -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -DRT_EMTERPRETER_ENABLED
 :To skip font loading so it needs no resource files or zlib, add  -DC_NO_ZLIB
 :-Wno-c++11-compat-deprecated-writable-strings -Wno-shift-negative-value
 
 SET CUSTOM_FLAGS=-DHAS_SOCKLEN_T -DBOOST_ALL_NO_LIB -DPLATFORM_HTML5 -DRT_USE_SDL_AUDIO -DC_GL_MODE -s LEGACY_GL_EMULATION=1 -s TOTAL_MEMORY=16MB -Wno-deprecated-builtins -Wno-c++11-compat-deprecated-writable-strings ^
--Wno-shift-negative-value -Wno-deprecated-non-prototype -s ALLOW_MEMORY_GROWTH=1 -s FORCE_ALIGNED_MEMORY=1
+-Wno-shift-negative-value -Wno-deprecated-non-prototype -s ALLOW_MEMORY_GROWTH=1
 
 SET SECOND_CUSTOM_FLAGS=-
 :unused:   -s FULL_ES2=1 --emrun

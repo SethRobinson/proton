@@ -47,14 +47,10 @@ Amigo
 AmigoMedia
 shared/addons/whisper.cpp
 shared/addons/WhisperModded
-
-RTConsole/html5
 RTLooneyLadders/windows/x64
 RTLooneyLadders/windows/log.txt
 .vscode/settings.json
-RTSimpleApp/html5
 RTSimpleApp/AndroidGradle/app/libs/fmod.jar
-RTBareBones/html5
 */windows_vs2017/x64
 shared/win/libVLC
 RTPack/source/PVRTexLib
@@ -65,4 +61,9 @@ RTPack.vcxproj.FileListAbsolute.txt
 DMODTester/
 RTConsole/windows_vc2017/RTConsole.vcxproj
 RTConsole/windows_vc2017/RTConsole.vcxproj.filters
-
+*/html5/WebLoaderData
+*/html5/temp*
+*/html5/*.wasm
+*/html5/*.data
+*/html5/*.js
+*/html5/*.html

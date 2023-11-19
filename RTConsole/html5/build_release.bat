@@ -62,11 +62,6 @@ set SRC= %SHARED%\PlatformSetup.cpp %SHARED%\util\MiscUtils.cpp %SHARED%\util\Re
 ..\..\shared\ClanLib-2.0\Sources\Core\Math\angle.cpp ^
 ..\..\shared\ClanLib-2.0\Sources\Core\Math\vec2.cpp ^
 ..\..\shared\ClanLib-2.0\Sources\Core\Math\vec3.cpp ^
-..\..\shared\util\boost\libs\signals\src\connection.cpp ^
-..\..\shared\util\boost\libs\signals\src\named_slot_map.cpp ^
-..\..\shared\util\boost\libs\signals\src\signal_base.cpp ^
-..\..\shared\util\boost\libs\signals\src\slot.cpp ^
-..\..\shared\util\boost\libs\signals\src\trackable.cpp ^
 ..\..\shared\util\TextScanner.cpp ^
 ..\..\shared\FileSystem\FileSystem.cpp ^
 ..\..\shared\FileSystem\FileManager.cpp ^
