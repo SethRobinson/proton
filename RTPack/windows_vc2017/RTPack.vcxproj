@@ -46,7 +46,7 @@
     <ProjectGuid>{67816C78-06BC-4665-BDE4-CBEAEB4B6760}</ProjectGuid>
     <RootNamespace>RTPack</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug WebOS|Win32'" Label="Configuration">
@@ -61,7 +61,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
@@ -85,7 +85,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug RT_NO_PVR|Win32'" Label="Configuration">
@@ -276,6 +276,7 @@
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ws2_32.lib;Winmm.lib;PVRTexLib.lib;zdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -677,11 +678,6 @@
     </ClCompile>
     <ClCompile Include="..\..\shared\Renderer\JPGSurfaceLoader.cpp" />
     <ClCompile Include="..\..\shared\Renderer\SoftSurface.cpp" />
-    <ClCompile Include="..\..\shared\util\boost\libs\signals\src\connection.cpp" />
-    <ClCompile Include="..\..\shared\util\boost\libs\signals\src\named_slot_map.cpp" />
-    <ClCompile Include="..\..\shared\util\boost\libs\signals\src\signal_base.cpp" />
-    <ClCompile Include="..\..\shared\util\boost\libs\signals\src\slot.cpp" />
-    <ClCompile Include="..\..\shared\util\boost\libs\signals\src\trackable.cpp" />
     <ClCompile Include="..\..\shared\util\CRandom.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug RT_NO_PVR|Win32'">true</ExcludedFromBuild>

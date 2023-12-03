@@ -62,7 +62,7 @@ bool UsesTransparency(SoftSurface &pixBuff)
 		{
 			for (int y = 0; y < pixBuff.GetHeight(); y++)
 			{
-				byte alpha = pixBuff.GetPixel(x,y).a;
+				uint8 alpha = pixBuff.GetPixel(x,y).a;
 
 				if (alpha != 255)
 				{
@@ -520,7 +520,7 @@ void FileWriteRAWPVR(string pathAndFileName, CPVRTexture* texture, int nNumMipLe
 			}
 
 			unsigned int size;
-			byte *pJpgData = LoadFileIntoMemory(tempFilePathAndName, &size);
+			uint8 *pJpgData = LoadFileIntoMemory(tempFilePathAndName, &size);
 			RemoveFile(tempFilePathAndName);
 
 			//note:  this would work to mix jpgs and raw rgb data (for tiny mipmaps) in  the same .rttex, but I'd need to vflip

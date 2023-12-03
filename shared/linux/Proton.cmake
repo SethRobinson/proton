@@ -60,6 +60,15 @@ IF (CMAKE_BUILD_TYPE MATCHES "Release")
 add_definitions(-O3 -DNDEBUG)
 ENDIF(CMAKE_BUILD_TYPE MATCHES "Release")
 
+# Check if compiling on a Raspberry Pi
+execute_process(COMMAND grep -q "Raspberry Pi" /proc/cpuinfo RESULT_VARIABLE is_raspberry_pi)
+if(${is_raspberry_pi} EQUAL 0)
+    message(STATUS "Compiling on Raspberry Pi")
+    add_definitions(-DRT_IS_ON_PI)
+else()
+    message(STATUS "Not compiling on Raspberry Pi")
+endif()
+
 
 include_directories("${PROTON_SHARED}")
 include_directories("${PROTON_UTIL}/boost")
@@ -77,7 +86,6 @@ set(PROTON_SOURCES_BASIC "${PROTON_SHARED}/BaseApp.cpp" "${PROTON_SHARED}/Platfo
 	"${PROTON_RENDERER}/Surface.cpp" "${PROTON_RENDERER}/SoftSurface.cpp" "${PROTON_RENDERER}/SurfaceAnim.cpp" "${PROTON_RENDERER}/RenderBatcher.cpp"
 	"${PROTON_UTIL}/MathUtils.cpp" "${PROTON_UTIL}/CRandom.cpp" "${PROTON_UTIL}/MiscUtils.cpp" "${PROTON_UTIL}/ResourceUtils.cpp" "${PROTON_UTIL}/RenderUtils.cpp" "${PROTON_UTIL}/GLESUtils.cpp"
 	"${PROTON_ENTITY}/Entity.cpp" "${PROTON_ENTITY}/Component.cpp"
-	"${PROTON_BOOSTSIGNALS}/connection.cpp" "${PROTON_BOOSTSIGNALS}/named_slot_map.cpp" "${PROTON_BOOSTSIGNALS}/signal_base.cpp" "${PROTON_BOOSTSIGNALS}/slot.cpp" "${PROTON_BOOSTSIGNALS}/trackable.cpp"
 	"${PROTON_CLANMATH}/angle.cpp" "${PROTON_CLANMATH}/mat3.cpp" "${PROTON_CLANMATH}/mat4.cpp" "${PROTON_CLANMATH}/rect.cpp" "${PROTON_CLANMATH}/vec2.cpp" "${PROTON_CLANMATH}/vec3.cpp" "${PROTON_CLANMATH}/vec4.cpp"
 )
 
@@ -89,7 +97,6 @@ set(PROTON_SOURCES_CONSOLE "${PROTON_SHARED}/PlatformSetup.cpp" "${PROTON_SHARED
 	"${PROTON_MATH}/rtRect.cpp" 
 	"${PROTON_RENDERER}/SoftSurface.cpp" 
 	"${PROTON_UTIL}/MathUtils.cpp" "${PROTON_UTIL}/TextScanner.cpp" "${PROTON_UTIL}/CRandom.cpp" "${PROTON_UTIL}/MiscUtils.cpp" "${PROTON_UTIL}/ResourceUtils.cpp"
-	"${PROTON_BOOSTSIGNALS}/connection.cpp" "${PROTON_BOOSTSIGNALS}/named_slot_map.cpp" "${PROTON_BOOSTSIGNALS}/signal_base.cpp" "${PROTON_BOOSTSIGNALS}/slot.cpp" "${PROTON_BOOSTSIGNALS}/trackable.cpp"
 	"${PROTON_CLANMATH}/angle.cpp" "${PROTON_CLANMATH}/mat3.cpp" "${PROTON_CLANMATH}/mat4.cpp" "${PROTON_CLANMATH}/rect.cpp" "${PROTON_CLANMATH}/vec2.cpp" "${PROTON_CLANMATH}/vec3.cpp" "${PROTON_CLANMATH}/vec4.cpp"
 )
 

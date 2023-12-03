@@ -1,15 +1,17 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.12)
+
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_HOME_DIRECTORY}/../bin)
 
-ENABLE_LANGUAGE(C)
 
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
+  set(CMAKE_BUILD_TYPE "Release")
 endif()
 
 set(ISRASPBERRYPIE FALSE)
 set(RASPBERRYPI_GLES11 OFF)
+
+ENABLE_LANGUAGE(C)
 
 include(CheckIncludeFile)
 set (CMAKE_REQUIRED_INCLUDES "/opt/vc/include")
@@ -22,6 +24,7 @@ add_definitions(-DRT_RASPBERRY)
 endif(ISRASPBERRYPIE)
 
 add_definitions(-DRT_LINUX)
+
 
 project(RTSimpleApp)
 
@@ -38,3 +41,5 @@ proton_set_sources("${APP}/App.cpp" "${APP}/Component/ParticleTestComponent.cpp"
     "${APP}/GUI/MainMenu.cpp" "${APP}/GUI/ParticleTestMenu.cpp" "${APP}/GUI/AboutMenu.cpp" 
     "${APP}/GUI/TouchTestMenu.cpp" "${APP}/Component/TouchTestComponent.cpp" 
     "${APP}/GUI/MainMenu.cpp" "${APP}/GUI/UTF16TestMenu.cpp")
+
+target_link_libraries(RTSimpleApp)

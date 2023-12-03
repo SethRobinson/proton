@@ -474,6 +474,7 @@
       <PrecompiledHeaderFile>PlatformPrecomp.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;zlibwapi.lib;wsock32.lib;SDL2_mixer.lib;SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -817,6 +818,7 @@
     <ClCompile Include="..\..\shared\Entity\ScrollComponent.cpp" />
     <ClCompile Include="..\..\shared\Entity\SelectButtonWithCustomInputComponent.cpp" />
     <ClCompile Include="..\..\shared\Entity\SliderComponent.cpp" />
+    <ClCompile Include="..\..\shared\Entity\SplashComponent.cpp" />
     <ClCompile Include="..\..\shared\Entity\TapSequenceDetectComponent.cpp" />
     <ClCompile Include="..\..\shared\Entity\TemplateComponent.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_GL|Win32'">true</ExcludedFromBuild>
@@ -2421,6 +2423,7 @@
     <ClInclude Include="..\..\shared\Entity\ScrollComponent.h" />
     <ClInclude Include="..\..\shared\Entity\SelectButtonWithCustomInputComponent.h" />
     <ClInclude Include="..\..\shared\Entity\SliderComponent.h" />
+    <ClInclude Include="..\..\shared\Entity\SplashComponent.h" />
     <ClInclude Include="..\..\shared\Entity\TapSequenceDetectComponent.h" />
     <ClInclude Include="..\source\GUI\UTF16TestMenu.h" />
     <CustomBuild Include="..\..\shared\Entity\TemplateComponent.h">

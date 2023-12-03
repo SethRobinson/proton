@@ -345,9 +345,9 @@ bool FontPacker::WriteFontStates(FILE *fp, TextScanner &t)
 		s.m_triggerChar = SeparateStringSTL(line, 1, '|')[0];
 		string color = SeparateStringSTL(line, 2, '|');
 
-		byte r = StringToInt(SeparateStringSTL(color, 0, ','));
-		byte g = StringToInt(SeparateStringSTL(color, 1, ','));
-		byte b = StringToInt(SeparateStringSTL(color, 2, ','));
+		uint8 r = StringToInt(SeparateStringSTL(color, 0, ','));
+		uint8 g = StringToInt(SeparateStringSTL(color, 1, ','));
+		uint8 b = StringToInt(SeparateStringSTL(color, 2, ','));
 		s.m_color = MAKE_RGB(r, g, b);
 		m_fontStates.push_back(s);
 	}
@@ -408,7 +408,7 @@ bool FontPacker::PackFont(string fileName)
 	WriteFontStates(fp, t);
 	//append the BMP to use next
 	unsigned int size;
-	byte *pData = LoadFileIntoMemory(path + ModifyFileExtension(fontImage, "rttex"), &size);
+	uint8 *pData = LoadFileIntoMemory(path + ModifyFileExtension(fontImage, "rttex"), &size);
 
 	if (!pData)
 	{

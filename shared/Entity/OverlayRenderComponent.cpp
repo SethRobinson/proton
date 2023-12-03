@@ -139,7 +139,7 @@ void OverlayRenderComponent::SetupAnim(VariantList *pVList)
 	GetVar("totalFramesY")->Set(pVList->m_variant[1].GetUINT32());
 	
 	m_pTex->SetupAnim(pVList->m_variant[0].GetUINT32(), pVList->m_variant[1].GetUINT32());
-
+	 
 	UpdateSizeVar();
 	UpdateFrameSizeVar();
 }

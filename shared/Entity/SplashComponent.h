@@ -71,7 +71,7 @@ public:
 
 	void AddSplash(string fileName, int timeOutMS=300, bool bScaleToFitScreen=true, bool bPerserveAspectRatio=false, unsigned int bgColor = MAKE_RGBA(0,0,0,255));
 
-	boost::signal<void (VariantList*)> m_sig_on_splash_change; //called when a splash screen is started, sends the entity that the splash is on
+	boost::signals2::signal<void (VariantList*)> m_sig_on_splash_change; //called when a splash screen is started, sends the entity that the splash is on
 
 private:
 

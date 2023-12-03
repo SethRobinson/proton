@@ -86,6 +86,10 @@ bool AudioManagerSDL::Init()
 #ifdef RT_LINUX
 	audioDriverToRequest = "alsa";
 #endif
+
+#ifdef RT_IS_ON_PI
+	audioDriverToRequest = "pulseaudio"; //new raspberry pi os using kms driver that doesn't work with alsa anymore or something
+#endif
 	
 	if (SDL_AudioInit(audioDriverToRequest.c_str()) != 0)
 	{

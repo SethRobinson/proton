@@ -26,9 +26,6 @@
     <Filter Include="shared\Util">
       <UniqueIdentifier>{bb798cf4-6cb5-4cd9-a499-1766356e6395}</UniqueIdentifier>
     </Filter>
-    <Filter Include="shared\Util\Boost">
-      <UniqueIdentifier>{f5aaf45b-2690-4666-8bb6-21b8a1c13d3f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="shared\Clanlib">
       <UniqueIdentifier>{7a4742e7-0885-4b53-960e-219cbd344682}</UniqueIdentifier>
     </Filter>
@@ -117,21 +114,6 @@
     </ClCompile>
     <ClCompile Include="..\..\shared\util\Variant.cpp">
       <Filter>shared\Util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\shared\util\boost\libs\signals\src\connection.cpp">
-      <Filter>shared\Util\Boost</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\shared\util\boost\libs\signals\src\named_slot_map.cpp">
-      <Filter>shared\Util\Boost</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\shared\util\boost\libs\signals\src\signal_base.cpp">
-      <Filter>shared\Util\Boost</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\shared\util\boost\libs\signals\src\slot.cpp">
-      <Filter>shared\Util\Boost</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\shared\util\boost\libs\signals\src\trackable.cpp">
-      <Filter>shared\Util\Boost</Filter>
     </ClCompile>
     <ClCompile Include="..\..\shared\ClanLib-2.0\Sources\Core\Math\angle.cpp">
       <Filter>shared\Clanlib</Filter>

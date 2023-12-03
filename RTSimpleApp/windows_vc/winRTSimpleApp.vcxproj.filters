@@ -631,6 +631,9 @@
     <ClCompile Include="..\source\GUI\UTF16TestMenu.cpp">
       <Filter>source\GUI</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\shared\Entity\SplashComponent.cpp">
+      <Filter>source\GUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\App.h">
@@ -1087,6 +1090,9 @@
       <Filter>shared\Audio</Filter>
     </ClInclude>
     <ClInclude Include="..\source\GUI\UTF16TestMenu.h">
+      <Filter>source\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shared\Entity\SplashComponent.h">
       <Filter>source\GUI</Filter>
     </ClInclude>
   </ItemGroup>

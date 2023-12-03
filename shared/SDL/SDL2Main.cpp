@@ -21,7 +21,7 @@ int g_winVideoScreenX = 0;
 int g_winVideoScreenY = 0;
 SDL_GLContext g_glcontext = NULL;
 SDL_Window *g_window = NULL;
-boost::signal<void(VariantList*)> g_sig_SDLEvent; //allow anyone to tap into SDL events
+boost::signals2::signal<void(VariantList*)> g_sig_SDLEvent; //allow anyone to tap into SDL events
 
 #ifndef C_GL_MODE
 #include "EGL/egl.h"
