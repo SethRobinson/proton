@@ -562,7 +562,7 @@ void InputTextRenderComponent::OnInput( VariantList *pVList )
 
 
 #ifdef PLATFORM_WINDOWS
-		uint16 c = pVList->Get(2).GetUINT32();
+		uint16 c = (uint16) pVList->Get(2).GetUINT32();
 #else
 		uint32 c = 0;
 		uint16 u16c = (uint16)pVList->Get(2).GetUINT32();
@@ -575,7 +575,7 @@ void InputTextRenderComponent::OnInput( VariantList *pVList )
 			break;
 		}
 #endif
-		uint8 seqLen = utf8::internal::sequence_length<char*>((char*)&c);
+		uint8 seqLen = (uint8)utf8::internal::sequence_length<char*>((char*)&c);
 		if (seqLen > 2) break; //we don't support these characters...
 		
 		string input = GetLastStringInput();
@@ -596,7 +596,7 @@ void InputTextRenderComponent::OnInput( VariantList *pVList )
 			{
 				if (input.length() < 2) input.erase(input.length() - 1, 1);
 				else {
-					uint8 countToRemove = utf8::internal::sequence_length<const char*>(&input.c_str()[input.length() - 2]);
+					uint8 countToRemove = (uint8)utf8::internal::sequence_length<const char*>(&input.c_str()[input.length() - 2]);
 					if (countToRemove < 1) countToRemove = 1;
 					input.erase(input.length() - countToRemove, countToRemove);
 				}

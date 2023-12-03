@@ -390,6 +390,7 @@ bool InitSDL()
 	glClear(GL_COLOR_BUFFER_BIT);
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
+	//SDL_StartTextInput();
 	return true;
 }
 
@@ -457,6 +458,46 @@ uint32 GetLinuxKeyModifiers()
 	return mods;
 }
 
+//sorry, only mapping for a US keybaord.  SDL doesn't have this stuff?
+
+char GetShiftedKey(SDL_Keycode keycode) 
+{
+	// Alphabetic characters
+	if (keycode >= SDLK_a && keycode <= SDLK_z) {
+		return std::toupper(keycode);
+	}
+
+	// Number row characters and symbols
+
+		switch (keycode)
+		{
+		case '`': return '~';
+		case SDLK_1: return '!';
+		case SDLK_2: return '@';
+		case SDLK_3: return '#';
+		case SDLK_4: return '$';
+		case SDLK_5: return '%';
+		case SDLK_6: return '^';
+		case SDLK_7: return '&';
+		case SDLK_8: return '*';
+		case SDLK_9: return '(';
+		case SDLK_0: return ')';
+		case SDLK_MINUS: return '_';
+		case SDLK_EQUALS: return '+';
+		case SDLK_LEFTBRACKET: return '{';
+		case SDLK_RIGHTBRACKET: return '}';
+		case SDLK_BACKSLASH: return '|';
+		case SDLK_SEMICOLON: return ':';
+		case SDLK_QUOTE: return '"';
+		case SDLK_COMMA: return '<';
+		case SDLK_PERIOD: return '>';
+		case SDLK_SLASH: return '?';
+			// Add other shifted keys if needed
+		}
+
+	// Return the original keycode for keys that don't change
+	return keycode;
+}
 
 void SDLEventLoop()
 {
@@ -650,8 +691,11 @@ LogMsg("Tapped %.2f, %.2f", xPos, yPos);
 			break;
 		}
 
+	
 		case SDL_KEYDOWN:
 		{
+
+			/*
 			if (ev.key.keysym.mod & KMOD_CTRL)
 			{
 				switch (ev.key.keysym.sym)
@@ -660,7 +704,10 @@ LogMsg("Tapped %.2f, %.2f", xPos, yPos);
 					LogMsg("Ctrl-Q detected, quitting app");
 					g_bAppFinished = true;
 					break;
-					case SDLK_l: // Left landscape mode
+					
+				    
+				
+				    case SDLK_l: // Left landscape mode
 						ChangeEmulationOrientationIfPossible(GetPrimaryGLY(), GetPrimaryGLX(), ORIENTATION_LANDSCAPE_LEFT);
 						break;
 
@@ -676,15 +723,47 @@ LogMsg("Tapped %.2f, %.2f", xPos, yPos);
 						ChangeEmulationOrientationIfPossible(GetPrimaryGLX(), GetPrimaryGLY(), ORIENTATION_PORTRAIT_UPSIDE_DOWN);
 						break;
 				}
-			}
+				*/
+			
 
 			int vKey = ConvertSDLKeycodeToProtonVirtualKey(ev.key.keysym.sym);
 			GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_CHAR_RAW, (float)vKey, (float)VIRTUAL_KEY_PRESS);
 
-			if (vKey == SDLK_BACKSPACE || vKey == SDLK_RETURN) //SDL Text Input only handles actual chars...
+
+			SDL_Keycode keycode = ev.key.keysym.sym;
+
+			if (keycode <= SDLK_KP_EQUALS || keycode == SDLK_RSHIFT || keycode == SDLK_LSHIFT ||
+				keycode == SDLK_RCTRL || keycode == SDLK_LCTRL)
 			{
-				GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_CHAR, (float)vKey, (float)VIRTUAL_KEY_PRESS);
+
+
+
+				//parity for how windows apps work
+				if (keycode == SDLK_LCTRL || keycode == SDLK_RCTRL)
+				{
+					GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_CHAR, 17, 0, 0);
+
+				}
+				else
+					if (keycode == SDLK_LSHIFT || keycode == SDLK_RSHIFT)
+					{
+						GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_CHAR, 16, 0, 0);
+
+					}
+					else
+					{
+						if (SDL_GetModState() & KMOD_SHIFT)
+						{
+							vKey = GetShiftedKey(vKey);
+						}
+
+						GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_CHAR, (float)vKey, 0, 0);
+					}
+
 			}
+		
+
+
 		}
 		break;
 			
@@ -692,12 +771,16 @@ LogMsg("Tapped %.2f, %.2f", xPos, yPos);
 		{
 			int vKey = ConvertSDLKeycodeToProtonVirtualKey(ev.key.keysym.sym);
 			GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_CHAR_RAW, (float)vKey, (float)VIRTUAL_KEY_RELEASE);
+	
 		}
 		break;
 
 		case SDL_TEXTINPUT:
 		{
+
+
 			string text = ev.text.text; //SDL Text Input doesn't give us a char, it gives us a null-terminated string...
+			//LogMsg("Got %s from SDL_TEXTINPUT", text.c_str());
 
 			GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_PASTE, Variant(text), 0); //pretending user pasted something, this way we will keep filtering in input
 		}

@@ -175,7 +175,7 @@ int ScrollBarRenderComponent::GetCapsuleHeight()
 
 	if (barHeight < m_pSurf->GetFrameHeight() * 5) barHeight = m_pSurf->GetFrameHeight() * 5;
 
-	return barHeight;
+	return (int)barHeight;
 }
 void ScrollBarRenderComponent::OnTargetOverMove(VariantList* pVList)
 {
@@ -188,7 +188,7 @@ void ScrollBarRenderComponent::OnTargetOverMove(VariantList* pVList)
 	if (touchID != 0) return; //only care about the first touch (for now
 	GetBaseApp()->GetTouch(0)->SetWasHandled(true, GetParent());
 
-	float barHeight = GetCapsuleHeight();
+	float barHeight = (float)GetCapsuleHeight();
 
 	CL_Vec2f percentProgressTemp = *m_pProgress2d;
 
@@ -268,7 +268,7 @@ void ScrollBarRenderComponent::OnRender(VariantList *pVList)
 	if (contentAreaRatio > 1)
 	{
 
-		barHeight = GetCapsuleHeight();
+		barHeight = (float)GetCapsuleHeight();
 		barWidth = m_pSurf->GetFrameWidth();
 		//LogMsg("percent scrolled is %.2f, contentAreaRation is %.2f", m_pProgress2d->y, contentAreaRatio);
 

@@ -1193,11 +1193,11 @@ rtRectf ConvertFakeScreenRectToReal(rtRectf r)
 	double widthHold = r.GetWidth();
 	double heightHold = r.GetHeight();
 
-	r.top *= ratioy;
-	r.left *= ratiox;
+	r.top *= (float)ratioy;
+	r.left *= (float)ratiox;
 
-	r.right = widthHold*ratiox+r.left;
-	r.bottom = heightHold*ratioy+r.top;
+	r.right = (float) (widthHold*ratiox+r.left);
+	r.bottom = (float) (heightHold*ratioy+r.top);
 
 	/*
 	//round off r to whole numbers only

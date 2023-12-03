@@ -719,7 +719,7 @@ string FilterToValidAscii(const string &input, bool bStrict)
 
 	for (unsigned int i=0; i < input.length(); i++)
 	{
-		uint8 seqLen = utf8::internal::sequence_length<const char*>(&input.c_str()[i]);
+		uint8 seqLen = (uint8) utf8::internal::sequence_length<const char*>(&input.c_str()[i]);
 		if (seqLen > 1)
 		{ //it's not ASCII for sure
 			i += seqLen - 1;
@@ -740,7 +740,7 @@ string FilterToNumbers(const string& input, bool bAllowNegative)
 
 	for (unsigned int i = 0; i < input.length(); i++)
 	{
-		uint8 seqLen = utf8::internal::sequence_length<const char*>(&input.c_str()[i]);
+		uint8 seqLen = (uint8) utf8::internal::sequence_length<const char*>(&input.c_str()[i]);
 		if (seqLen > 1) 
 		{ //it's not ASCII for sure
 			i += seqLen - 1;
