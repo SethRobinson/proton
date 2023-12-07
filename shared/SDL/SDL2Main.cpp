@@ -867,6 +867,9 @@ int SDL_main(int argc, char *argv[])
 		}
 	}
 
+	LogMsg("Initting Proton's SDL2 layer.  %d parms detected", GetBaseApp()->GetCommandLineParms().size());
+
+
 #ifndef C_GL_MODE
  bcm_host_init();
  graphics_get_display_size(0 /* LCD */, &width, &height);

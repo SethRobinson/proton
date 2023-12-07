@@ -76,26 +76,63 @@ bool AudioManagerSDL::Init()
 	}
 #endif
 
+
+
 	//valid is directsound or winmm
 	
 #ifndef RT_USE_SDL1_MIXER
 	//emscripten doesn't handle this
-	
-	string audioDriverToRequest = "directsound";
+	string audioDriverToRequest;
+
+#ifdef WINAPI
+	audioDriverToRequest = "directsound";
+
+#endif
 
 #ifdef RT_LINUX
-	audioDriverToRequest = "alsa";
+	audioDriverToRequest = "";
 #endif
 
 #ifdef RT_IS_ON_PI
-	audioDriverToRequest = "pulseaudio"; //new raspberry pi os using kms driver that doesn't work with alsa anymore or something
+	audioDriverToRequest = ""; 
 #endif
 	
-	if (SDL_AudioInit(audioDriverToRequest.c_str()) != 0)
+	std::vector<string> commandLineParms = GetBaseApp()->GetCommandLineParms();
+
+	// Code to set audioDriverToRequest based on command line parameters
+	for (size_t i = 0; i < commandLineParms.size(); ++i) 
 	{
-		LogMsg("Error setting audio driver: %s", SDL_GetError());
-		return false;
+		//LogMsg("Checking parm %d: %s", i, commandLineParms[i].c_str());
+
+		if (commandLineParms[i] == "-audio" && i + 1 < commandLineParms.size()) 
+		{
+			LogMsg("Forcing audio driver %s", commandLineParms[i + 1].c_str());
+
+			audioDriverToRequest = commandLineParms[i + 1];
+			break; // Found the parameter, no need to continue the loop
+		}
 	}
+
+	LogMsg("Initting SDL_Mixer with driver %s", audioDriverToRequest.c_str());
+
+	if (audioDriverToRequest.empty())
+	{
+		if (SDL_InitSubSystem(SDL_INIT_AUDIO) != 0)
+		{
+			LogMsg("Error setting audio driver: %s", SDL_GetError());
+			return false;
+		}
+	}
+	else
+	{
+		if (SDL_AudioInit(audioDriverToRequest.c_str()) != 0)
+		{
+			LogMsg("Error setting audio driver: %s", SDL_GetError());
+			return false;
+		}
+	}
+	
+
 #endif
 	
 
@@ -111,29 +148,9 @@ bool AudioManagerSDL::Init()
 	
 	Mix_ReserveChannels(2);
 
-	// we'll use SDL_Mixer to do all our sound playback. 
-	// It's a simple system that's easy to use. The most 
-	// complicated part about using SLD_Mixer is initting it. So 
-	// let's talk about that. 
-	// this is the function definition:
-	// Mix_OpenAudio(int frequency, Uint16 format, int channels, int chunksize);
-	// here's what it wants:
-	// 
-	// frequency: this is the sample rate you want the audio to
-	// play at. On the Palm, things are optimized for 44100 samples per
-	// second (CD quality). Though you can send in whatever sample rate you like.
-	// 
-	// format: For the Palm, you should use AUDIO_S16
-	// 
-	// channels: 1 for mono. 2 for stereo
-	// 
-	// chunksize: How big one audio buffer is, in bytes.
-	// 
-	// this example has the recommended settings for initting the mixer:
 
-
-//44100 or  22050
-	int rate = 44100; 
+	//44100 or  22050
+	int rate = 44100;
 	//They play right in other players, so sdlmixer bug I assume
 	Uint16 format = AUDIO_S16LSB;
 	int channels = 2;
@@ -148,36 +165,11 @@ bool AudioManagerSDL::Init()
 	{
 		// we had an error opening the audio
 		LogMsg("unable to open Audio! Reason: %s\n", Mix_GetError());
+	
 		return false;
 
 	}
 #endif
-
-	/*
-
-
-	SDL_AudioSpec want, have;
-	SDL_AudioDeviceID dev;
-
-	SDL_memset(&want, 0, sizeof(want));
-	want.freq = 22050;
-	want.format = AUDIO_S16LSB;
-	want.channels = 2;
-	want.samples = 4096;
-	//want.callback = MyAudioCallback;  // you wrote this function elsewhere.
-
-	dev = SDL_OpenAudioDevice(NULL, 0, &want, &have, SDL_AUDIO_ALLOW_ANY_CHANGE);
-	if (dev == 0)
-	{
-		LogMsg("Failed to open audio: %s\n", SDL_GetError());
-	} else 
-	{
-		if (have.format != want.format) 
-		{ // we let this one thing change.
-			LogMsg("We didn't get Float32 audio format.\n");
-		}
-	}
-*/
 
 	if (Mix_AllocateChannels(NUM_CHANNELS) == -1)
 	{
@@ -244,20 +236,26 @@ void AudioManagerSDL::KillCachedSounds(bool bKillMusic, bool bKillLooping, int i
 
 void AudioManagerSDL::Kill()
 {
+	// Halt all channels to stop any playing sounds
+	Mix_HaltChannel(-1);
+
+	// Halt any playing music
 	Mix_HaltMusic();
-	if ( m_pMusicChannel != NULL )
+
+	if (m_pMusicChannel != NULL)
 	{
-		// free up any memore in use by the music track
+		// Free up any memory in use by the music track
 		Mix_FreeMusic(m_pMusicChannel);
 
-		// set it to null for safety (ensuring that 
-		// if we acidentally refer to this variable after
-		// deletion, at least it will be null)
-		m_pMusicChannel = NULL; 
+		// Set it to null for safety
+		m_pMusicChannel = NULL;
 	}
 
-	// close out the audio
-	Mix_CloseAudio();
+	// Check if the Mixer is initialized before closing
+	if (Mix_Init(0))
+	{
+		Mix_CloseAudio();
+	}
 }
 
 bool AudioManagerSDL::DeleteSoundObjectByFileName(string fName)

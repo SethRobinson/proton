@@ -68,3 +68,4 @@ RTConsole/windows_vc2017/RTConsole.vcxproj.filters
 */html5/*.data
 */html5/*.js
 */html5/*.html
+_ignore
