@@ -1,11 +1,11 @@
 #include "PlatformPrecomp.h"
 #include "ScrollToZoomComponent.h"
 #include "EntityUtils.h"
+#include "TouchDragMoveComponent.h"
 
 ScrollToZoomComponent::ScrollToZoomComponent()
 {
-	
-	SetName("TouchDragMove");
+	SetName("ScrollToZoom");
 }
 
 ScrollToZoomComponent::~ScrollToZoomComponent()
@@ -26,12 +26,10 @@ void ScrollToZoomComponent::OnAdd(Entity* pEnt)
 		assert(0 && "ScrollToZoomComponent requires a TouchDragComponent to be added first");
 		return;
 	}
-	//pDragComponent->GetFunction("OnTouchDragUpdate")->sig_function.connect(1, boost::bind(&ScrollToZoomComponent::OnTouchDragUpdate, this, _1));
+
 	GetParent()->GetFunction("OnOverStart")->sig_function.connect(1, boost::bind(&ScrollToZoomComponent::OnOverStart, this, _1));
 	GetParent()->GetFunction("OnOverEnd")->sig_function.connect(1, boost::bind(&ScrollToZoomComponent::OnOverEnd, this, _1));
 	GetParent()->GetFunction("OnInput")->sig_function.connect(1, boost::bind(&ScrollToZoomComponent::OnInput, this, _1));
-
-
 }
 
 void  ScrollToZoomComponent::OnInput(VariantList* pVList)
@@ -60,21 +58,22 @@ void  ScrollToZoomComponent::OnInput(VariantList* pVList)
 			//	LogMsg("Mouse wheel: Offet: %.2f", wheelVal);
 			float fDelta = ((float)wheelVal) * (m_pScale2d->x * zoomPower);
 
-			//change scale by using GetParent()->GetVar() instead of m_pScale2d directly so that the OnChanged signal is fired
 			GetParent()->GetVar("scale2d")->Set(*m_pScale2d + CL_Vec2f(fDelta, fDelta));
-
-			UpdateStatusMessage("Scale: X: " + toString(m_pScale2d->x) + " Y: " + toString(m_pScale2d->y));
+			char buf[256];
+			sprintf(buf, "Scale: X: %.2f Y: %.2f", m_pScale2d->x, m_pScale2d->y);
+			UpdateStatusMessage(buf); 
 		}
 			break;
 
 		case MESSAGE_TYPE_GUI_CHAR:
 		{
-#ifdef _DEBUG
-			LogMsg("Got char: %c (%d)", (char)pVList->Get(2).GetUINT32(), pVList->Get(3).GetUINT32());
-#endif
+		#ifdef _DEBUG
+					LogMsg("Got char: %c (%d)", (char)pVList->Get(2).GetUINT32(), pVList->Get(3).GetUINT32());
+		#endif
 
 			//If you want to know when a key is pressed while a mouse is holding down and moving this 'window'...
-			m_sig_input_while_mousedown(pVList);
+					pVList->Get(5).Set(GetParent()); //share what entity we below to
+					m_sig_input_while_mousedown(pVList);
 			
 		}
 		break;
@@ -89,9 +88,11 @@ void ScrollToZoomComponent::OnRemove()
 	EntityComponent::OnRemove();
 }
 
-
 void ScrollToZoomComponent::UpdateStatusMessage(string msg)
 {
+
+	if (GetVarWithDefault("showCoords", (uint32)1)->GetUINT32() == 0) return;
+
 
 	int timeMS = 1000;
 

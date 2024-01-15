@@ -2,6 +2,10 @@
 #include "JPGSurfaceLoader.h"
 #include "SoftSurface.h"
 #include "util/ResourceUtils.h"
+#include "Addons/TinyEXIF-master/TinyEXIF.h"
+
+#define TINYEXIF_NO_XMP_SUPPORT
+#include "addons/TinyEXIF-master/TinyEXIF.cpp"
 
 extern "C"
 {
@@ -151,6 +155,14 @@ bool JPGSurfaceLoader::LoadFromMem( uint8 *pMem, int inputSize, SoftSurface *pSu
 	}
 	cinfo.do_fancy_upsampling=FALSE;
 
+
+	//let's figure out if the exif header has marked that it's rotated
+
+	TinyEXIF::EXIFInfo exifInfo;
+	exifInfo.parseFrom(pMem, inputSize);
+
+	int orientation = exifInfo.Orientation;
+
 	// Start decompressor
 	jpeg_start_decompress(&cinfo);
 	// Get image data
@@ -259,6 +271,47 @@ bool JPGSurfaceLoader::LoadFromMem( uint8 *pMem, int inputSize, SoftSurface *pSu
 
 	//jpg will be upside down if we don't do this.. uhh.. investigate why later.
 	pSurf->FlipY();
+
+
+	switch (orientation)
+	{
+	case 1:
+		// Normal orientation, do nothing
+		break;
+	case 2:
+		// Flip horizontally
+		// You'll need to implement this if it's not already in SoftSurface
+		pSurf->FlipX();
+		break;
+	case 3:
+		// Rotate 180 degrees (rotate left twice)
+		pSurf->Rotate90Degrees(true);
+		pSurf->Rotate90Degrees(true);
+		break;
+	case 4:
+		// Flip vertically
+		pSurf->FlipY();
+		break;
+	case 5: 
+		// Transpose (Flip horizontally then rotate left)
+		pSurf->FlipX();
+		pSurf->Rotate90Degrees(true);
+		break;
+	case 6:
+		// Rotate 90 degrees CW (rotate left)
+		pSurf->Rotate90Degrees(true);
+		break;
+	case 7:
+		// Transverse (Flip horizontally then rotate right)
+		pSurf->FlipX();
+		pSurf->Rotate90Degrees(false);
+		break;
+	case 8:
+		// Rotate 90 degrees CCW (rotate right)
+		pSurf->Rotate90Degrees(false);
+		break;
+	}
+
 	SAFE_DELETE_ARRAY(output);
 	
 	//if we wanted to test our decompression..

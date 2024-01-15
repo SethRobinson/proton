@@ -46,6 +46,7 @@ void TouchDragComponent::OnAdd(Entity *pEnt)
 	m_pReverseX = &GetVar("reverseX")->GetUINT32();
 	m_pReverseY = &GetVar("reverseY")->GetUINT32();
 	m_pDisabled = &GetVarWithDefault("disabled", uint32(0))->GetUINT32();
+	m_pLimitedToThisFingerID = &GetVarWithDefault("limitedToThisFingerID", uint32(-1))->GetUINT32();
 
 	m_pTouchPadding = &GetParent()->GetVarWithDefault(string("touchPadding"), Variant(CL_Rectf()))->GetRect();
 
@@ -62,12 +63,14 @@ void TouchDragComponent::OnRemove()
 }
 
 
-void TouchDragComponent::SetPosition(CL_Vec2f vInputPos)
+void TouchDragComponent::SetPosition(uint32 fingerID, CL_Vec2f vInputPos)
 {
 	//if (vPos == m_lastPos) return;
 	
 	//LogMsg("Setting position of %s", PrintVector2(vInputPos).c_str());
 	CL_Vec2f vPos = vInputPos-m_lastPos;
+
+
 
 	m_lastPos = vInputPos;
 
@@ -85,7 +88,7 @@ void TouchDragComponent::SetPosition(CL_Vec2f vInputPos)
 		vPos.y *= -1;
 	}
 
-    VariantList vList(this, vPos);
+    VariantList vList(this, vPos, fingerID);
 
 	m_pOnTouchDragUpdate->sig_function(&vList);
 }
@@ -100,6 +103,8 @@ void TouchDragComponent::OnInput( VariantList *pVList )
 	{
 		fingerID = pVList->Get(2).GetUINT32();
 	}
+
+	if (*m_pLimitedToThisFingerID != -1 && *m_pLimitedToThisFingerID != fingerID) return;
 
 	//LogMsg("Detected finger %d at %s", fingerID, PrintVector2(pt).c_str());
 	switch (eMessageType( int(pVList->Get(0).GetFloat())))
@@ -153,7 +158,7 @@ void TouchDragComponent::OnInput( VariantList *pVList )
 
 		if (m_activeFingerID == fingerID)
 		{
-			SetPosition(pt);
+			SetPosition(fingerID, pt);
 		}
 	
 		break;

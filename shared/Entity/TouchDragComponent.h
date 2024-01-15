@@ -17,6 +17,12 @@ Why use this?  It's a way I enabled "drag around the screen" to look/rotate in 3
 
 - It ignores touches marked as "handled".  (so if a user clicks a button and drags off it, it will ignore that)
 - It marks touches it responds to as handled, so buttons and other components will ignore that touch.
+
+Set limitedToThisFingerID to not -1 to limit processing to a specific finger/mouse button like this:
+
+	pDragComp->GetVar("limitedToThisFingerID")->Set(uint32(0)); //only allow left mouse button
+
+
 */
 
 #ifndef TouchDragComponent_h__
@@ -48,7 +54,8 @@ public:
 
 private:
 
-	void SetPosition(CL_Vec2f vInputPos);
+	uint32 *m_pLimitedToThisFingerID = NULL; //-1 means not limited
+	void SetPosition(uint32 fingerID, CL_Vec2f vInputPos);
 	void EndDrag(int fingerID, CL_Vec2f pt);
 	uint32 *m_pDisabled;
 	uint32 * m_pVisualStyle;

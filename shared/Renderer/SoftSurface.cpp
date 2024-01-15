@@ -77,6 +77,7 @@ bool SoftSurface::Init( int sizex, int sizey, eSurfaceType type, bool bRememberO
 		break;
 	case SURFACE_RGBA:
 		m_bytesPerPixel = 4;
+		SetUsesAlpha(true);
 		break;
 	case SURFACE_RGB:
 		m_bytesPerPixel = 3;
@@ -2047,8 +2048,33 @@ void SoftSurface::RemoveTrueBlack(uint8 minimumLuma)
 		}
 
 	}
+}
 
+void SoftSurface::FlipX() 
+{
+	if (m_surfaceType == SURFACE_NONE) return;
 
+	const int width = GetWidth();
+	const int height = GetHeight();
+	const int bpp = GetBytesPerPixel(); // Bytes per pixel
+	uint8* pTmp = new uint8[bpp];
+
+	for (int y = 0; y < height; y++)
+	{
+		for (int x = 0; x < width / 2; x++)
+		{
+			// Pointers to the pixels that will be swapped
+			uint8* pixel1 = GetPointerToPixel(x, y);
+			uint8* pixel2 = GetPointerToPixel(width - 1 - x, y);
+
+			// Swap the pixels
+			memcpy(pTmp, pixel1, bpp);
+			memcpy(pixel1, pixel2, bpp);
+			memcpy(pixel2, pTmp, bpp);
+		}
+	}
+
+	delete[] pTmp;
 }
 
 void SoftSurface::FlipY()
@@ -2071,6 +2097,8 @@ void SoftSurface::FlipY()
 	}
 	delete [] pTmp;
 }
+
+
 
 #ifndef _CONSOLE
 void SoftSurface::BlitFromScreen(int dstX, int dstY, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/)
@@ -2260,37 +2288,52 @@ Surface * SoftSurface::CreateGLTexture()
 	pSurf->SetTextureType(Surface::TYPE_GUI);
 	pSurf->InitBlankSurface(GetWidth(),GetHeight());
 	//pSurf->FillColor(glColorBytes(0,0,0,0));
+	//pSurf->SetBlendingMode(Surface::BLENDING_PREMULTIPLIED_ALPHA);
 
+	UpdateGLTexture(pSurf);
+	return pSurf;
+}
+
+void SoftSurface::UpdateGLTexture(Surface *pSurf)
+{
+	
 	if (GetSurfaceType() == SURFACE_PALETTE_8BIT)
 	{
 		SoftSurface s;
 		//do slow conversion first
-		s.Init(GetWidth(),GetHeight(), SoftSurface::SURFACE_RGBA);
-		s.Blit(0,0, this);
+		s.Init(GetWidth(), GetHeight(), SoftSurface::SURFACE_RGBA);
+		s.Blit(0, 0, this);
 		s.FlipY();
 		//put it on the GL surface
-		pSurf->UpdateSurfaceRect(rtRect(0,0, s.GetWidth(), s.GetHeight()), s.GetPixelData());
-	
-		if (s.GetHasPremultipliedAlpha()) 
+		pSurf->UpdateSurfaceRect(rtRect(0, 0, s.GetWidth(), s.GetHeight()), s.GetPixelData());
+
+		if (s.GetHasPremultipliedAlpha())
 		{
 			pSurf->SetBlendingMode(Surface::BLENDING_PREMULTIPLIED_ALPHA);
 		}
 
-	} else
+	}
+	else
 	{
 		//put it on the GL surface
 		//FlipY();
-		pSurf->UpdateSurfaceRect(rtRect(0,0, GetWidth(), GetHeight()), GetPixelData());
+		pSurf->UpdateSurfaceRect(rtRect(0, 0, GetWidth(), GetHeight()), GetPixelData());
 		//FlipY();
-		if (GetHasPremultipliedAlpha()) 
+		if (GetHasPremultipliedAlpha())
 		{
 			pSurf->SetBlendingMode(Surface::BLENDING_PREMULTIPLIED_ALPHA);
 		}
+		else
+		{
+			//pSurf->SetBlendingMode(Surface::BLENDING_NORMAL);
+
+		}
 	}
-	
+
 	pSurf->SetUsesAlpha(GetUsesAlpha());
-	return pSurf;
+	
 }
+
 #endif
 
 bool SoftSurface::IsPaletteTheSame( glColorBytes *palette, int colorCount)

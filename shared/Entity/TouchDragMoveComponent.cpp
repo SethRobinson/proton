@@ -11,6 +11,15 @@ TouchDragMoveComponent::~TouchDragMoveComponent()
 {
 }
 
+
+void TouchDragMoveComponent::ResetTouch()
+{
+	if (m_bIsDraggingLook)
+	{
+		m_bIgnoreNextMove = true;
+	}
+}
+
 void TouchDragMoveComponent::OnAdd(Entity* pEnt)
 {
 	EntityComponent::OnAdd(pEnt);
@@ -27,9 +36,19 @@ void TouchDragMoveComponent::OnAdd(Entity* pEnt)
 	GetParent()->GetFunction("OnOverStart")->sig_function.connect(1, boost::bind(&TouchDragMoveComponent::OnOverStart, this, _1));
 	GetParent()->GetFunction("OnOverEnd")->sig_function.connect(1, boost::bind(&TouchDragMoveComponent::OnOverEnd, this, _1));
 
+
+	//register to get notified if scalexy changes
+	GetParent()->GetVar("scale2d")->GetSigOnChanged()->connect(1, boost::bind(&TouchDragMoveComponent::OnScaleChanged, this, _1));
+	
+	
 	//register to get updated every frame
 	//GetParent()->GetFunction("OnInput")->sig_function.connect(1, boost::bind(&TouchDragComponent::OnInput, this, _1));
 
+}
+
+void TouchDragMoveComponent::OnScaleChanged(Variant* pDataObject)
+{
+	ResetTouch();
 }
 
 
@@ -38,10 +57,11 @@ void TouchDragMoveComponent::OnRemove()
 	EntityComponent::OnRemove();
 }
 
-
 void TouchDragMoveComponent::UpdateStatusMessage(string msg)
 {
 	
+	if (GetVarWithDefault("showCoords", (uint32)1)->GetUINT32() == 0) return;
+
 	int timeMS = 1000;
 
 	Entity *pOldEnt = GetParent()->GetEntityByName("DebugText");
@@ -58,6 +78,10 @@ void TouchDragMoveComponent::UpdateStatusMessage(string msg)
 
 void TouchDragMoveComponent::OnTouchDragUpdate(VariantList* pVList)
 {
+	int fingerID = pVList->Get(2).GetUINT32(); //0 is left mouse button
+	if (fingerID != 0) return; //only allow left mouse button to drag
+
+
 	CL_Vec2f vMovement = pVList->Get(1).GetVector2();
 
 #ifdef _DEBUG
@@ -65,13 +89,25 @@ void TouchDragMoveComponent::OnTouchDragUpdate(VariantList* pVList)
 #endif
  	if (m_bIsDraggingLook)
 	{
-		*m_pPos2d += vMovement;
-		UpdateStatusMessage("Pos: X: " + toString(m_pPos2d->x)+" Y: "+ toString(m_pPos2d->y));
+		//*m_pPos2d += vMovement;
+
+		if (!m_bIgnoreNextMove)
+		{
+			GetParent()->GetVar("pos2d")->Set(*m_pPos2d + vMovement);
+			//GetParent()->GetVar("size2d")->Set(*m_pSize2d);
+
+			UpdateStatusMessage("Pos: X: " + toString(m_pPos2d->x) + " Y: " + toString(m_pPos2d->y));
+		}
+		m_bIgnoreNextMove = false;
 	}
 }
 
 void TouchDragMoveComponent::OnOverStart(VariantList* pVList)
 {
+
+	int fingerID =  pVList->Get(2).GetUINT32(); //0 is left mouse button
+	if (fingerID != 0) return; //only allow left mouse button to drag
+
 	m_bIsDraggingLook = true;
 
 	//move it to the top layer
@@ -81,5 +117,8 @@ void TouchDragMoveComponent::OnOverStart(VariantList* pVList)
 
 void TouchDragMoveComponent::OnOverEnd(VariantList* pVList)
 {
+	int fingerID = pVList->Get(2).GetUINT32(); //0 is left mouse button
+	if (fingerID != 0) return; //only allow left mouse button to drag
+
 	m_bIsDraggingLook = false;
 }

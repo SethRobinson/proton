@@ -19,11 +19,22 @@ public:
     void InitVideoSurfaces();
 
     bool Init(const std::string& rtsp_url, int cachingMS, SurfaceAnim* pSurfaceToWriteTo, LibVlcStreamComponent* pStreamComp, int width, int height);
+    std::tuple<int, int, int> GetRotationAndSizeOfVideoFile(const std::string& fileName);
+    void GetMetaData();
     void Update();
+
+    void SetPause(bool bPause);
+    bool GetPause();
+    void TogglePause();
+
+    void SetLooping(bool bLoop);
 
     static void* lock(void* data, void** p_pixels);
     static void unlock(void* data, void* id, void* const* p_pixels);
     static void display(void* data, void* id);
+    float GetVolume();
+    void SetPlaybackPosition(float pos);
+    float GetPlaybackPosition();
     void SetVolume(float vol);  // Set the volume level. Values range between 0 and 1
 
     libvlc_media_player_t* GetMP() { return m_pVlcMediaPlayer; }
@@ -45,6 +56,12 @@ protected:
     LibVlcStreamComponent* m_pStreamComp = NULL;
     string m_source;
     int m_cachingMS;
+
+    int m_rotationAngle =0;
+    bool m_isStreaming = false;
+    int m_timesChangedVideoResolution = 0;
+
+    bool m_bLoopVideo = false;
 };
 
 void OneTimeReleaseOnAppClose(); //you should probably call this when you exit the app, to release the main VLC instance

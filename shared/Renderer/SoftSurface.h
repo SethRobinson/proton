@@ -73,6 +73,7 @@ public:
 	void SetCustomColorKey(glColorBytes color) { m_customColorKey = color; }
 
 	Surface * CreateGLTexture();
+	void UpdateGLTexture(Surface* pSurf);
 	unsigned int GetSizeInBytes() {return m_memUsed;}
 	void SetAutoPremultiplyAlpha(bool bYes) {m_bAutoPremultiplyAlpha = bYes;} //will convert to pre multiplied alpha ASAP, during the next copy to 32 bit surface in the case of 8 bit images
 	bool GetAutoPremultiplyAlpha() {return m_bAutoPremultiplyAlpha;}
@@ -86,6 +87,33 @@ public:
 			memcpy(m_pPixels+(y*m_usedPitch+x*4), &color.r, 4);
 		} else assert(!"uh");
 	}
+
+	void SetPixelSafe(int x, int y, glColorBytes color)
+	{
+		if (x < 0 || y < 0 || x >= m_width || y >= m_height) return;
+		SetPixel(x, y, color);
+	}
+
+	void DrawCircleSafe(int centerX, int centerY, glColorBytes color, int radius)
+	{
+		int xStart = centerX - radius;
+		int yStart = centerY - radius;
+		int diameter = 2 * radius;
+
+		for (int x = 0; x <= diameter; x++)
+		{
+			for (int y = 0; y <= diameter; y++)
+			{
+				int dx = radius - x;
+				int dy = radius - y;
+				if (dx * dx + dy * dy <= radius * radius)
+				{
+					SetPixelSafe(centerX + dx, centerY + dy, color);
+				}
+			}
+		}
+	}
+
 	
 	void SetPixel( int x, int y, uint8 color )
 	{
@@ -137,6 +165,7 @@ public:
 	bool GetModified() {return m_bModified;}
 	void SetModified(bool bNew) {m_bModified = bNew;}
 	void FlipY();
+	void FlipX(); 
 	void Rotate90Degrees(bool bRotateLeft);
 	BMPImageHeader BuildBitmapHeader();
 	BMPImageHeader BuildBitmapHeader8bit();
@@ -152,6 +181,8 @@ public:
 	void FlipRedAndBlue(); //I needed this to fix colors before sending camera capture to an OGL surface
 
 	void RemoveTrueBlack(uint8 minimumLuma);
+
+
 
 
 private:

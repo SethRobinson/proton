@@ -523,6 +523,32 @@ void Entity::MoveEntityToTopByAddress(Entity *pEnt)
 	m_children.push_back(pEnt);
 }
 
+void Entity::MoveEntityToTopOfOtherEntityByAddress(Entity* pEnt, Entity* pOtherEnt)
+{
+	if (!RemoveEntityByAddress(pEnt, false))
+	{
+		LogError("Unable to find entity to remove");
+		return;
+	}
+
+	EntityListItor itor = m_children.begin();
+
+	while (itor != m_children.end())
+	{
+		if ((*itor) == pOtherEnt)
+		{
+			itor++;
+			m_children.insert(itor, pEnt);
+			return;
+		}
+		itor++;
+	}
+
+	LogError("Unable to find entity to move on top of");
+	m_children.push_back(pEnt); //uh, we better put it back somewhere
+}
+
+
 bool Entity::RemoveComponentByAddress( EntityComponent *pCompToDelete, bool bDeleteAlso )
 {
 	ComponentListItor itor = m_components.begin();

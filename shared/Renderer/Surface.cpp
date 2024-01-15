@@ -1032,6 +1032,7 @@ void Surface::FillColor(glColorBytes color)
 
 void Surface::UpdateSurfaceRect(rtRect dstRect, uint8 *pPixelData, bool bUpsideDownMode)
 {
+	
 	Bind();
 	int yStart = dstRect.top;
 	
@@ -1384,17 +1385,21 @@ bool Surface::InitFromSoftSurface( SoftSurface *pSurf, bool bCreateSurface, int 
 				yStart += (m_texHeight-m_originalHeight);
 			} 
 
-#ifdef _DEBUG
-			//if (pSurf->GetWidth() % 4 != 0)
+			if (pSurf->GetWidth() % 4 != 0)
 			{
-				//LogMsg("Warning: Texture is not divisible by 4, might crash old hardware?");
-				//note: We could get around the error above with glPixelStorei(GL_PACK_ALIGNMENT, 1), but I don't think
-				//it's available on all platforms so not going to bother
+				//LogMsg("Warning: Texture is not divisible by 4, might crash unless we allow it");
+				glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 			}
-#endif
 			
 			glTexSubImage2D(GL_TEXTURE_2D, mipLevel, 0, yStart, pSurf->GetWidth(), pSurf->GetHeight(), internalColorFormat, pixelFormat, pSurf->GetPixelData());
 			CHECK_GL_ERROR();
+
+			if (pSurf->GetWidth() % 4 != 0)
+			{
+				glPixelStorei(GL_UNPACK_ALIGNMENT, 4); //put it back
+			}
+		
+
 #endif
 	}
 

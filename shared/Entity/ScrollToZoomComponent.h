@@ -7,6 +7,13 @@
 //  Programmer(s):  Seth A. Robinson (seth@rtsoft.com)
 //  ***************************************************************
 
+/*
+
+To not show scale text do:
+
+//pComponent->GetVar("showCoords")->Set(uint32(0));
+
+*/
 #pragma once
 #include "Component.h"
 
