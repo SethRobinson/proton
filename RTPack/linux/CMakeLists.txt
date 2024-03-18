@@ -11,8 +11,10 @@ set(RASPBERRYPI_GLES11 OFF)
 
 ENABLE_LANGUAGE(C)
 
-include(CheckIncludeFile)
-CHECK_INCLUDE_FILE(/opt/vc/include/bcm_host.h ISRASPBERRYPIE)
+if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  include(CheckIncludeFile)
+  CHECK_INCLUDE_FILE(/opt/vc/include/bcm_host.h ISRASPBERRYPIE)
+endif()
 
 #if(ISRASPBERRYPIE)
 OPTION(RASPBERRYPI_GLES11 "Compile for Raspberry PI GLES" ON)
@@ -22,6 +24,7 @@ OPTION(RASPBERRYPI_GLES11 "Compile for Raspberry PI GLES" ON)
 
 project (RTPack)
 include(../../shared/linux/Proton.cmake)
+
 # additional compiler flags -DSIMPLE_PROFILING_ACTIVE
 add_definitions(-D_CONSOLE -DRTLINUX -DRT_NO_PVR)
 
@@ -35,13 +38,13 @@ proton_set_sources_console("${APP}/App.cpp")
 
 #add more sources
 target_sources(RTPack PUBLIC 
-${APP}/main.cpp
-${APP}/FontPacker.cpp
-${APP}/main.cpp
-${APP}/TexturePacker.cpp
+  ${APP}/main.cpp
+  ${APP}/FontPacker.cpp
+  ${APP}/main.cpp
+  ${APP}/TexturePacker.cpp
+  ${PROTON_SHARED}/Renderer/JPGSurfaceLoader.cpp
+)
 
-${PROTON_SHARED}/Renderer/JPGSurfaceLoader.cpp
- 
- )
-
-target_link_libraries(RTPack rt)
+if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  target_link_libraries(RTPack rt)
+endif()

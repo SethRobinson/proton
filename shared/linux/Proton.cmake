@@ -339,7 +339,9 @@ function(proton_set_sources)
 		
 	endif(RASPBERRYPI_GLES11)
 
-	target_link_libraries(${PROJECT_NAME} rt)
+	if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+		target_link_libraries(${PROJECT_NAME} rt)
+	endif()
 endfunction(proton_set_sources)
 
 
@@ -361,10 +363,12 @@ function(proton_set_sources_console)
 	endif(NOT PROTON_USE_INTERNAL_ZLIB)
 
 
-if(RASPBERRYPI_GLES11)
-target_link_libraries(${PROJECT_NAME} pthread bcm_host)
-endif(RASPBERRYPI_GLES11)
+	if(RASPBERRYPI_GLES11)
+		target_link_libraries(${PROJECT_NAME} pthread bcm_host)
+	endif(RASPBERRYPI_GLES11)
 
-target_link_libraries(${PROJECT_NAME} rt)
+	if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+		target_link_libraries(${PROJECT_NAME} rt)
+	endif()
 endfunction(proton_set_sources_console)
 
