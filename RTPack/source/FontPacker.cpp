@@ -69,7 +69,8 @@ bool FontPacker::WriteHeaderBitMapFontGenerator(FILE *fp, string fntFile, rtfont
 			}
 			++insIt;
 		}
-		charList.insert(insIt, c);
+		if (insIt != charList.end())
+			charList.insert(insIt, c);
 	}
 
 	header.firstChar = charList.front().id;
