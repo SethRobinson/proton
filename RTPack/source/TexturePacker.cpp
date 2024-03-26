@@ -185,7 +185,7 @@ void EmbedImageFileAsRTTEX(string outputFile, string fileToImbed, SoftSurface &p
 		fwrite(&mipHeader, 1, sizeof(rttex_mip_header), pFileOut);
 
 		//load temp file
-		byte *pBuff = new byte[embedFileSize];
+		uint8 *pBuff = new uint8[embedFileSize];
 
 		FILE *fEmbed = fopen(fileToImbed.c_str(), "rb");
 		if (!fEmbed)
@@ -342,7 +342,7 @@ void WriteTextureWithoutPVR(string pathAndFileName, SoftSurface * texture, int n
 			}
 
 			unsigned int size;
-			byte *pJpgData = LoadFileIntoMemory(tempFilePathAndName, &size);
+			uint8 *pJpgData = LoadFileIntoMemory(tempFilePathAndName, &size);
 			RemoveFile(tempFilePathAndName);
 
 			//write the jpg out
