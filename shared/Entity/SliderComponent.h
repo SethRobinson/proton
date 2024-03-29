@@ -21,6 +21,8 @@ public:
 
 	virtual void OnAdd(Entity *pEnt);
 	virtual void OnRemove();
+	void SetSliderPosition();
+	void SetSliderPosition(float value);
 
 private:
 
@@ -28,12 +30,10 @@ private:
 	void OnUpdate(VariantList *pVList);
 	void OnProgressChanged(Variant *pDataObject);
 	void OnSliderButtonChanged(Variant *pDataObject);
-	void SetSliderPosition();
-	void OnTouchStart(VariantList *pVList);
-	void OnTouchEnd(VariantList *pVList);
+
+	void SetPositionWithMouseClick(CL_Vec2f pt);
 	void OnInput( VariantList *pVList );
 	void UpdatePositionByTouch(CL_Vec2f pt);
-	void OnOverEnd(VariantList *pVList);
 
 	CL_Vec2f *m_pPos2d;
 	CL_Vec2f *m_pSize2d;

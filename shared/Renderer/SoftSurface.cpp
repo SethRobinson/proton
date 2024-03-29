@@ -265,6 +265,8 @@ bool SoftSurface::LoadBMPTextureCheckerBoardFix(uint8 *pMem)
 
 	m_width = bmpImageInfoCopy.Width;
 	m_height = bmpImageInfoCopy.Height;
+	m_originalWidth = m_width = bmpImageInfoCopy.Width;
+	m_originalHeight = m_height = bmpImageInfoCopy.Height;
 
 	uint16 bitCount;
 	bitCount = bmpImageInfoCopy.BitCount;
@@ -1002,8 +1004,8 @@ bool SoftSurface::LoadBMPTexture(uint8 *pMem)
 	memcpy(&offsetToImageData, &pMem[10], 2);
 	uint8 *pPixelData = &pMem[offsetToImageData];
 
-	m_width = bmpImageInfoCopy.Width;
-	m_height =  bmpImageInfoCopy.Height;
+	m_originalWidth = m_width = bmpImageInfoCopy.Width;
+	m_originalHeight = m_height =  bmpImageInfoCopy.Height;
 
 	uint16 bitCount;
 	bitCount = bmpImageInfoCopy.BitCount;
@@ -1222,6 +1224,8 @@ bool SoftSurface::LoadBMPTexture(uint8 *pMem)
 #ifdef _DEBUG
 //LogMsg("24 bit");
 #endif
+
+		//Write a poem
 
 		glColorBytes *pImg = (glColorBytes*)m_pPixels;
 

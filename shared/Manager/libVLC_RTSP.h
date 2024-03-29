@@ -17,7 +17,6 @@ public:
     virtual ~libVLC_RTSP();
 
     void InitVideoSurfaces();
-
     bool Init(const std::string& rtsp_url, int cachingMS, SurfaceAnim* pSurfaceToWriteTo, LibVlcStreamComponent* pStreamComp, int width, int height);
     std::tuple<int, int, int> GetRotationAndSizeOfVideoFile(const std::string& fileName);
     void GetMetaData();
@@ -40,7 +39,19 @@ public:
     libvlc_media_player_t* GetMP() { return m_pVlcMediaPlayer; }
     void Release();
 
+    enum eStatus
+    {
+        C_STATUS_INITTED,
+        C_STATUS_PAUSED,
+        C_STATUS_UNPAUSED,
+        C_STATUS_SET_VOLUME
+    };
+
+    boost::signals2::signal<void(VariantList*)> m_sig_update_status; //a way to get a callback when something important changes
+
 protected:
+
+    void SendStatusUpdate(eStatus status, float secondFloat = 0.0f);
 
     void UpdateFrame();
 

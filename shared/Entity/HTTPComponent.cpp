@@ -110,7 +110,7 @@ void HTTPComponent::PrepareConnection(VariantList *pVList)
 
 void HTTPComponent::AddPostData(VariantList *pVList)
 {
-	m_netHTTP.AddPostData(pVList->m_variant[0].GetString(), (uint8*)pVList->m_variant[1].GetString().c_str(), pVList->m_variant[1].GetString().size());
+	m_netHTTP.AddPostData(pVList->m_variant[0].GetString(), (uint8*)pVList->m_variant[1].GetString().c_str(), (int)pVList->m_variant[1].GetString().size());
 }
 
 void HTTPComponent::SetFileOutput(VariantList *pVList)

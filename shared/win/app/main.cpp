@@ -10,6 +10,8 @@
 #include "shellscalingapi.h" //for DPI awareness, this means Win7+ from now on
 #undef byte
 
+#include <shellapi.h> //needed to handle file dropping
+
 //avoid needing to define _WIN32_WINDOWS > 0x0400.. although I guess we could in PlatformPrecomp's win stuff...
 #ifndef WM_MOUSEWHEEL
 	#define WM_MOUSEWHEEL                   0x020A
@@ -576,6 +578,61 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		LogMsg("App lost focus");
 		break;
+
+	case WM_DROPFILES:
+	{
+		HDROP hDropInfo = (HDROP)wParam;
+		UINT fileCount = DragQueryFile(hDropInfo, 0xFFFFFFFF, NULL, 0); // Get file count
+
+		POINT pt;
+		GetCursorPos(&pt);
+		ScreenToClient(g_hWnd, &pt);
+		double X = pt.x;
+		double Y = pt.y;
+
+
+		for (UINT i = 0; i < fileCount; i++)
+		{
+			TCHAR filePath[MAX_PATH];
+			if (DragQueryFile(hDropInfo, i, filePath, MAX_PATH))
+			{
+				// Here, you would typically post a custom event to your application's
+				// event system, or directly call a function to handle the dropped file.
+				#ifdef _DEBUG
+								LogMsg("DEBUG: Dropped file: %s, sending MESSAGE_TYPE_FILE_DROPPED", filePath);
+				#endif
+				//create a custom Proton SDK message to send the text. Also let's get the mouse location of the drop
+							
+								ConvertCoordinatesIfRequired(X, Y);
+
+								VariantList vList;
+								vList.Get(0).Set(filePath);
+								vList.Get(1).Set(CL_Vec2f(X, Y));
+
+				GetMessageManager()->SendGUI(MESSAGE_TYPE_FILE_DROPPED, vList, (int)0);
+
+				//offset the XY a bit in case there are more, don't want them all at the exact same place
+				X += 20;
+				Y += 20;
+
+				//if we're within 100 of the right or bottom, reset over to the top left
+				if (X > GetPrimaryGLX()-100)
+				{
+					X = 20;
+				}
+
+				//now for Y
+				if (Y > GetPrimaryGLY()-100)
+				{
+					Y = 20;
+				}
+
+			}
+		}
+
+		DragFinish(hDropInfo); // Clean up
+	}
+	break;
 
 	case WM_SETFOCUS:
 	if (!g_bAppCanRunInBackground || !g_bHasFocus)
@@ -1381,8 +1438,6 @@ bool InitVideo(int width, int height, bool bFullscreen, float aspectRatio)
 		if (bFullscreen)
 		{
 
-
-
 			DEVMODE dmScreenSettings;                   // Device Mode
 			memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));       // Makes Sure Memory's Cleared
 			dmScreenSettings.dmSize = sizeof(dmScreenSettings);       // Size Of The Devmode Structure
@@ -1659,6 +1714,8 @@ assert(!g_hDC);
 	InitMultiTouch();
 #endif
 	SetupScreenInfo(GetPrimaryGLX(), GetPrimaryGLY(), GetOrientation());
+	DragAcceptFiles(g_hWnd, TRUE); // TRUE to enable drag-and-drop.  Any reason we don't want this enabled all the time?
+	
 	return true;
 }
 

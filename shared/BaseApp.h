@@ -240,7 +240,7 @@ public:
     void SetGameTickPause(bool bNew) {m_gameTimer.SetGameTickPause(bNew);}
     bool GetGameTickPause() {return m_gameTimer.GetGameTickPause();}
     GameTimer * GetGameTimer() {return &m_gameTimer;}
-    virtual void OnMessage(Message &m);
+    virtual void OnMessage(Message &m); //good to override if you want to catch messages, then call this for things not handled
     RTFont * GetFont(eFont font) {return &m_fontArray[font];}
     void SetInputMode(eInputMode mode){m_inputMode = mode;}
     eInputMode GetInputMode() {return m_inputMode;}

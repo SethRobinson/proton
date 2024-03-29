@@ -2105,7 +2105,8 @@ EntityComponent * CreateSlider(Entity *pBG, float x, float y, float sizeX, strin
 	EntityComponent * pSliderComp = pSliderEnt->AddComponent(new SliderComponent);
 
 	//the button we move around to slide
-	Entity *pSliderButton = CreateOverlayButtonEntity(pSliderEnt, "sliderButton",  buttonFileName, 0, 0);
+	//Entity *pSliderButton = CreateOverlayButtonEntity(pSliderEnt, "sliderButton",  buttonFileName, 0, 0);
+	Entity* pSliderButton = CreateOverlayEntity(pSliderEnt, "sliderButton", buttonFileName, 0, 0);
 
 	CL_Vec2f vButtonScale = CL_Vec2f(0.7f, 0.7f);
 
@@ -2114,12 +2115,12 @@ EntityComponent * CreateSlider(Entity *pBG, float x, float y, float sizeX, strin
 		vButtonScale = CL_Vec2f(1, 1);
 	}
 	
-	SetButtonStyleEntity(pSliderButton, Button2DComponent::BUTTON_STYLE_CLICK_ON_TOUCH);
-	SetButtonVisualStyleEntity(pSliderButton, Button2DComponent::STYLE_NONE); //sliders are not really buttons, and the
+	//SetButtonStyleEntity(pSliderButton, Button2DComponent::BUTTON_STYLE_CLICK_ON_TOUCH);
+	//SetButtonVisualStyleEntity(pSliderButton, Button2DComponent::STYLE_NONE); //sliders are not really buttons, and the
 	//default "alpha when hovering until clicked" effect doesn't look right, so we shut it off
 
 	pSliderButton->GetVar("scale2d")->Set(vButtonScale);
-	pSliderButton->GetComponentByName("Button2D")->GetVar("onClickAudioFile")->Set("");
+	//pSliderButton->GetComponentByName("Button2D")->GetVar("onClickAudioFile")->Set("");
 
 	CL_Vec2f vImageSize = pSliderButton->GetVar("size2d")->GetVector2();
 	pSliderEnt->GetVar("pos2d")->Set(CL_Vec2f(x+(vImageSize.x/2)*0.5f, y));
@@ -2372,7 +2373,7 @@ void SetSmoothingEntity(Entity* pEnt, bool bSmoothing)
 
 }
 
-void SetProgressBarPercent(Entity *pEnt, float progressPercent)
+void SetProgressBarPercent(Entity *pEnt, float progressPercent, bool bIgnoreLerpingAndSetVisualToo)
 {
 	EntityComponent *pComp = pEnt->GetComponentByName("ProgressBar");
 	if (!pComp)
@@ -2382,6 +2383,11 @@ void SetProgressBarPercent(Entity *pEnt, float progressPercent)
 	}
 
 	pComp->GetVar("progress")->Set(progressPercent);
+	if (bIgnoreLerpingAndSetVisualToo)
+	{
+		pComp->GetVar("visualProgress")->Set(progressPercent);
+
+	}
 }
 
 void SetVisibleEntity(Entity *pEnt, bool bVisible)

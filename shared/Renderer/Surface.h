@@ -104,6 +104,7 @@ public:
 	eBlendingMode GetBlendingMode() {return m_blendingMode;}
 	int GetMIPMapCount() {return m_mipMapCount;}
 	void SetCreateMipMapsIfNeeded(bool bCreateMipMapsIfNeeded) {m_bCreateMipMapsIfNeeded = bCreateMipMapsIfNeeded;}
+	void SetupSignalsForUnloadingAndLoadingTextures();
 	virtual bool InitBlankSurface(int x, int y); //initialize a blank surface to do whatever to
 	virtual bool InitFromSoftSurface(SoftSurface *pSurf, bool bCreateSurface = true, int mipLevel = 0);
 	bool CreateSoftSurfaceFromSurface(SoftSurface& outSurf);
@@ -126,6 +127,7 @@ public:
 
 	void HardKill(); //like kill, but also forces the texture to forget things about itself so it won't auto reinit if surfaces are lost
 	void SetDefaults();
+	string GetTextureLoaded() { return m_textureLoaded; }
 
 protected:
 

@@ -232,6 +232,9 @@ enum eMessageType
 	MESSAGE_TYPE_IAP_ITEM_INFO_RESULT, // IAP info result
     MESSAGE_TYPE_HTML5_GOT_UPLOAD,
     MESSAGE_TYPE_CALL_STATIC_FUNCTION_VOID,
+
+    MESSAGE_TYPE_FILE_DROPPED, //notify the app that a file was dropped on it, Windows only for now
+
     MESSAGE_USER = 1000, //users can add their own messages starting here
     
 };

@@ -8,7 +8,6 @@
 //  ***************************************************************
 
 //makes a strip or rectangle and returns an xy vector from 0 to 1 on each axis if you connect a signal to its parent's "OnTouchStripUpdate"
-//NOTE: Requires a TouchHandlerComponent to work
 
 #ifndef TouchStripComponent_h__
 #define TouchStripComponent_h__

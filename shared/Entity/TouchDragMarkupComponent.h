@@ -24,6 +24,8 @@ public:
 	virtual ~TouchDragMarkupComponent();
 
 	virtual void OnAdd(Entity* pEnt);
+	void OnEnterForeground(VariantList* pVList);
+	void OnLoadSurfaces();
 	void OnRender(VariantList* pVList);
 	virtual void OnRemove();
 

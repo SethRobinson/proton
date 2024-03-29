@@ -9,7 +9,9 @@
 
 #pragma once
 #include "Entity/Component.h"
+#include "Entity/SliderComponent.h"
 #include "Manager/libVLC_RTSP.h"
+
 
 //plays a stream from a URL or file using libVLC
 
@@ -38,7 +40,8 @@ public:
 	void OnSetPause(VariantList* pList);
 	void OnSetPlaybackPosition(VariantList* pList);
 	virtual void OnRemove();
-
+	void SetMutedVolume(float vol);
+	float GetMutedVolume() { return m_savedVolume; }
 	void Init(std::string url, int cacheMS);
 	void OnUpdate(VariantList* pVList);
 	void SetSurfaceSize(int width, int height);
@@ -49,13 +52,22 @@ public:
 
 	float GetVolume() { return m_libVlcRTSP.GetVolume(); }
 	void SetVolume(float vol) { m_libVlcRTSP.SetVolume(vol); }  // Set the volume level. Values range between 0 and 1
+	void OnScaleChanged(Variant* pDataObject);
+	string GetTitle() { return m_title; }
+	void SetTitle(string title) { m_title = title; }
 
 protected:
 
+	void OnSliderVolumeChanged(Variant* pDataObject);
+	void UpdateControlButtons(bool bIsPaused);
+	void OnPlayButtonClicked(VariantList* pVList);
+	void OnStripUpdate(VariantList* pVList);
+	void UpdateProgressBar();
 	void ShowVolume();
 	void OnInputWhileMouseDown(VariantList* pVList);
 	void OnLoopingChanged(Variant* pVariant);
 	void UpdateStatusMessage(string msg);
+	void OnStatusUpdated(VariantList* pVList);
 
 	string m_url;
 	int m_cacheMS = 0;
@@ -67,9 +79,14 @@ protected:
 	uint32 * m_pLooping = NULL;
 	bool m_bMuted = false;
 	float m_savedVolume = 1.0f;
+	Entity* m_pProgressEnt = NULL;
+	Entity* m_pControlsEnt = NULL;
+	Entity* m_pButtonPlay = NULL;
+	SliderComponent* m_pVolSliderComp = NULL;
+	string m_title;
 };
 
 //helper
-LibVlcStreamComponent* AddNewStream(std::string name, std::string url, int cacheMS, Entity* pGUIEnt, bool bIgnoreIfExists = true);
+LibVlcStreamComponent* AddNewStream(std::string name, std::string url, int cacheMS, Entity* pGUIEnt, bool bIgnoreIfExists = true, string title = "");
 LibVlcStreamComponent* GetStreamEntityByName(std::string name);
 void SetStreamVolumeByName(std::string name, float volume);

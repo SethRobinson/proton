@@ -28,6 +28,7 @@ public:
 		TYPE_HORIZONTAL,
 		TYPE_VERTICAL
 	};
+
 private:
 
 	void OnUpdate(VariantList *pVList);
@@ -59,5 +60,7 @@ private:
 	string *m_pFileName;
 	uint32 *m_pFlipX, *m_pFlipY;
 	uint32 *m_pInterpolateType; //really a eInterpolateType
+	float* m_visualPixelModY; //will remove/add this to the top and button of the rect in pixels, was useful to draw a thin line by still have
+	//a fat touch area for making a youtube-like slider display
 };
 #endif // ProgressBarComponent_h__

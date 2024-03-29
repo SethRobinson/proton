@@ -24,7 +24,8 @@ float libVLC_RTSP::GetVolume()
     if (m_pVlcMediaPlayer != nullptr)
     {
 		// Get the volume level. Values range between 0 and 100
-		return (float)libvlc_audio_get_volume(m_pVlcMediaPlayer) / 100.0f;
+		float vol = (float)libvlc_audio_get_volume(m_pVlcMediaPlayer) / 100.0f;
+        return vol;
 	}
 	return 0;
 }
@@ -34,7 +35,7 @@ void libVLC_RTSP::SetPlaybackPosition(float pos)
     if (m_pVlcMediaPlayer != nullptr)
     {
 		// Set the playback position as a percentage between 0.0 and 1.0
-		libvlc_media_player_set_position(m_pVlcMediaPlayer, pos);
+        libvlc_media_player_set_position(m_pVlcMediaPlayer, pos);
 	}
 }
 
@@ -77,6 +78,9 @@ void libVLC_RTSP::SetVolume(float vol)
         // Set the volume level. Values range between 0 and 100
         libvlc_audio_set_volume(m_pVlcMediaPlayer, intVol);
     }
+
+    SendStatusUpdate(C_STATUS_SET_VOLUME, vol);
+
 }
 
 static void handle_playing_event(const libvlc_event_t* p_event, void* p_data)
@@ -153,8 +157,30 @@ void  libVLC_RTSP::InitVideoSurfaces()
 }
 
 
+
+std::wstring StringToWString(const std::string& str)
+{
+    if (str.empty()) return std::wstring();
+    int size_needed = MultiByteToWideChar(CP_ACP, 0, &str[0], (int)str.size(), NULL, 0);
+    std::wstring wstrTo(size_needed, 0);
+    MultiByteToWideChar(CP_ACP, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
+    return wstrTo;
+}
+
+std::string WStringToString(const std::wstring& wstr)
+{
+    if (wstr.empty()) return std::string();
+    int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
+    std::string strTo(size_needed, 0);
+    WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
+    return strTo;
+}
+
+
 bool libVLC_RTSP::Init(const std::string& rtsp_url, int cachingMS, SurfaceAnim* pSurfaceToWriteTo, LibVlcStreamComponent * pStreamComp, int width, int height)
 {
+    Release();
+
     m_pSurface = pSurfaceToWriteTo;
     m_pStreamComp = pStreamComp;
     m_source = rtsp_url;
@@ -162,7 +188,6 @@ bool libVLC_RTSP::Init(const std::string& rtsp_url, int cachingMS, SurfaceAnim* 
     m_timesChangedVideoResolution++;
 
    // putenv("VLC_VERBOSE=-1"); //also doesn't work
-
 
     //adding these parms are for forcing no hardware accelleration which fixes things for me
    //--avcodec-hw=none --avcodec-fast --no-avcodec-hurry-up
@@ -172,10 +197,10 @@ bool libVLC_RTSP::Init(const std::string& rtsp_url, int cachingMS, SurfaceAnim* 
       "--no-video-title-show",
       "--quiet",
       "--no-xlib",
-      "--avcodec-hw=none",
-      "--avcodec-fast",
-      "--no-avcodec-hurry-up",
-      "--aout=directsound", //otherwise I can't set audio per stream, it would affect all streams.  
+   //   "--avcodec-hw=none",
+  //    "--avcodec-fast",
+  //    "--no-avcodec-hurry-up",
+      "--aout=directsound", //otherwise I can't set audio per stream, and even this seems to not really work right
      //, "--verbose=-1" // explicitly set verbosity level, 'cept it doesn't work
     };
 
@@ -196,58 +221,59 @@ bool libVLC_RTSP::Init(const std::string& rtsp_url, int cachingMS, SurfaceAnim* 
         m_isStreaming = true;
         m_pVlcMedia = libvlc_media_new_location(m_pVlcInstance, rtsp_url.c_str());
 
+        string caching = ":network-caching=" + toString(cachingMS);
+
+        libvlc_media_add_option(m_pVlcMedia, caching.c_str());
+
     }
     else
     {
-        
-        /*
-        std::tuple<int, int, int> rotationAndSize = GetRotationAndSizeOfVideoFile(rtsp_url);
-        //fill in values from the tuple
-        m_rotationAngle = std::get<0>(rotationAndSize);
-        
-        if (std::get<1>(rotationAndSize) != 0)
-        {
-            m_video_width = std::get<1>(rotationAndSize);
-            m_video_height = std::get<2>(rotationAndSize);
-        }
-        else
-        {
-            LogMsg("Error reading the size of the video");
-        }
-
-        LogMsg("Video is rotated %d degrees", m_rotationAngle);
-
-        */
+       
 
         //it's a file on our HD, let's play the file instead of trying to stream it
-        m_pVlcMedia = libvlc_media_new_path(m_pVlcInstance, rtsp_url.c_str());
+
+        //fix filename to work with umlauts and junk by converting from raw ascii to utf-8.  Sorry for the windows specific code here
+
+        string filename = rtsp_url;
+        std::wstring wideFilename = StringToWString(filename); // Step 1: Only if necessary
+        std::string utf8Filename = WStringToString(wideFilename); // Step 2
+
         
+        //note, the original filename (with an umlaut) works with fopen, but not with VLC
+
+        /*
+        if (FileExists(filename) == false)
+        {
+			LogMsg("File doesn't exist: %s", filename.c_str()); //this never gets called
+			return false;
+		}
+        */      
+
+        //but our converted utf-8 version will work with VLC
+
+        m_pVlcMedia = libvlc_media_new_location(m_pVlcInstance, (string("file:///")+ utf8Filename).c_str());
     }
  
     if (m_pVlcMedia == nullptr) return false;
 
-    // Reduce network caching 
-
-    string caching = ":network-caching=" + toString(cachingMS);
-
-    libvlc_media_add_option(m_pVlcMedia, caching.c_str());
 
     libvlc_media_player_set_media(m_pVlcMediaPlayer, m_pVlcMedia);
 
     // Attach event handlers
     libvlc_event_manager_t* em = libvlc_media_player_event_manager(m_pVlcMediaPlayer);
     libvlc_event_attach(em, libvlc_MediaPlayerPlaying, handle_playing_event, this);
-
-  
+ 
     // Set the video callbacks and format
     libvlc_video_set_callbacks(m_pVlcMediaPlayer, lock, unlock, display, this);
    
     // Initialize buffer for OpenGL texture data, assuming 1920x1080 resolution
-    
+   	m_video_width = width;
+	m_video_height = height;
     InitVideoSurfaces();
-    libvlc_media_player_play(m_pVlcMediaPlayer);
 
-    return true;
+    libvlc_media_player_play(m_pVlcMediaPlayer);
+   
+   return true;
 }
 
 //Unused as I figured out how to do it with libVLC
@@ -343,6 +369,15 @@ std::tuple<int, int, int> libVLC_RTSP::GetRotationAndSizeOfVideoFile(const std::
 
 */
 
+void libVLC_RTSP::SendStatusUpdate(eStatus status, float secondFloat)
+{
+    VariantList v;
+
+    v.Get(0).Set(uint32(status));
+    v.Get(1).Set(secondFloat);
+    m_sig_update_status(&v);
+}
+
 void libVLC_RTSP::UpdateFrame()
 {
     if (m_pVlcMediaPlayer != nullptr)
@@ -383,23 +418,26 @@ void libVLC_RTSP::UpdateFrame()
 
                         libvlc_media_tracks_release(tracks, num_tracks);
 
-
                         //I had problems trying to live-change things, so doing a complete reinit for this size change:
-                        Release();
-
+                      
                         m_video_width = width;
                         m_video_height = height;
                         Init(m_source, m_cachingMS, m_pSurface, m_pStreamComp, m_video_width, m_video_height);
+                       
+                        SendStatusUpdate(C_STATUS_INITTED);
+                        SendStatusUpdate(C_STATUS_UNPAUSED);
                         return;
                     }
                 }
                
                 m_pSurface->UpdateSurfaceRect(rtRect(0, 0, m_video_width, m_video_height), m_pImageBuffer);
+                
             }
         }
         else
         {
             // Handle the error: Could not get video size
+            //  LogMsg("Can't get video buffer");  //yeah well, that's normal if it's an audio file
         }
     }
 }
@@ -418,8 +456,13 @@ void libVLC_RTSP::Update()
             {
                 // The media has ended, restart it
                 LogMsg("Restarting...");
+                float volTemp = GetVolume();
                 libvlc_media_player_stop(m_pVlcMediaPlayer); // Stop the player
                 libvlc_media_player_play(m_pVlcMediaPlayer); // Start playback again
+                SendStatusUpdate(C_STATUS_INITTED);
+                SendStatusUpdate(C_STATUS_UNPAUSED);
+                SetVolume(volTemp); 
+
             }
         }
         else if (libvlc_media_player_is_playing(m_pVlcMediaPlayer))
@@ -466,6 +509,9 @@ void libVLC_RTSP::SetPause(bool bPause)
                 LogMsg("Restarting...");
                 libvlc_media_player_stop(m_pVlcMediaPlayer); // Stop the player
                 libvlc_media_player_play(m_pVlcMediaPlayer); // Start playback again
+                SendStatusUpdate(C_STATUS_INITTED);
+                SendStatusUpdate(C_STATUS_UNPAUSED);
+
             }
         }
         else if (libvlc_media_player_is_playing(m_pVlcMediaPlayer))
@@ -475,6 +521,8 @@ void libVLC_RTSP::SetPause(bool bPause)
                 // The media is playing, pause it
                 LogMsg("Pausing...");
                 libvlc_media_player_pause(m_pVlcMediaPlayer);
+                SendStatusUpdate(C_STATUS_PAUSED);
+
             }
         }
         else
@@ -485,6 +533,8 @@ void libVLC_RTSP::SetPause(bool bPause)
                 LogMsg("Unpausing...");
                 libvlc_media_player_set_pause(m_pVlcMediaPlayer, 0);
                 libvlc_media_player_play(m_pVlcMediaPlayer);
+                SendStatusUpdate(C_STATUS_UNPAUSED);
+
             }
         }
 	}
@@ -541,6 +591,12 @@ void libVLC_RTSP::Release()
 {
     if (m_pVlcMediaPlayer != nullptr)
     {
+
+        libvlc_event_manager_t* em = libvlc_media_player_event_manager(m_pVlcMediaPlayer);
+        if (em)
+            libvlc_event_detach(em, libvlc_MediaPlayerPlaying, handle_playing_event, this);
+
+
         libvlc_media_player_stop(m_pVlcMediaPlayer);
         libvlc_media_player_release(m_pVlcMediaPlayer);
 

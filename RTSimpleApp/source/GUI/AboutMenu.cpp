@@ -47,6 +47,13 @@ void AboutMenuOnSelect(VariantList *pVList) //0=vec2 point of click, 1=entity se
 	GetEntityRoot()->PrintTreeAsText(); //useful for debugging
 }
 
+void OnSliderChanged(Variant* pDataObject)
+{
+	float sliderVal = pDataObject->GetFloat();
+	GetApp()->GetVar("slider_cool")->Set(sliderVal);
+	LogMsg("Slider cool changed to %.2f", sliderVal);
+}
+
 void AboutMenuAddScrollContent(Entity *pParent)
 {
 	//here we add our actual content we want scrolled.  At the end, we'll calculate the size used using ResizeScrollBounds and the scroll bars
@@ -104,7 +111,18 @@ void AboutMenuAddScrollContent(Entity *pParent)
 	SetButtonStyleEntity(pButton, Button2DComponent::BUTTON_STYLE_CLICK_ON_TOUCH);
 	y += pButton->GetVar("size2d")->GetVector2().y;
 	
+	y += spacerY; //don't forget our spacer
 
+
+	//oh, let's add a slider control too
+	EntityComponent* pSliderComp;
+
+	y += spacerY;
+	pSliderComp = CreateSlider(pParent, iPhoneMapX(x), y, iPhoneMapX(360), "interface/slider_button.rttex", "Min", "Coolness", "Max");
+	pSliderComp->GetVar("progress")->Set(GetApp()->GetVar("slider_cool")->GetFloat()); //set to a default value
+	pSliderComp->GetVar("progress")->GetSigOnChanged()->connect(&OnSliderChanged);
+	y += pSliderComp->GetParent()->GetVar("size2d")->GetVector2().y;
+	y += spacerY;
 
 	//automatically calculate the total size of this entity with all its children for the scroll bars, do this at the end
 	VariantList vList(pParent->GetParent());

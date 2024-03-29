@@ -384,7 +384,7 @@ void SetScale2DEntity(Entity *pEnt, const CL_Vec2f &vScale);
 void SetVisibleEntity(Entity *pEnt, bool bVisible);
 CL_Vec2f GetScreenPos2DEntity(Entity *pEnt, CL_Vec2f vRecursivePosToAdd = CL_Vec2f(0,0)); //the post transformed position, it recursively adds all parent positions to figure it out, slow
 
-void SetProgressBarPercent(Entity *pEnt, float progressPercent);
+void SetProgressBarPercent(Entity *pEnt, float progressPercent, bool bIgnoreLerpingAndSetVisualToo =false);
 float EnforceMinimumFontLineToScreenRatio(eFont fontID, float fontScale, float minLineToScreenRatio);
 
 float EnforceMinimumFontLineToScreenRatioAllowBig(eFont fontID, float fontScale, float minLineToScreenRatio);

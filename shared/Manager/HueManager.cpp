@@ -144,7 +144,6 @@ void HueManager::SetLightRGB(string lightName, string rgb, bool bAllowPartialMat
 			hueplusplus::Light light = m_pBridge->lights().get(id);
 			hueplusplus::RGB hueRGB(StringToInt(rgbParts[0]), StringToInt(rgbParts[1]), StringToInt(rgbParts[2]));
 			light.setColorRGB(hueRGB, 4);
-		
 		}
 
 	}

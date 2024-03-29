@@ -72,10 +72,31 @@ void TouchDragMarkupComponent::OnAdd(Entity* pEnt)
 	m_surface.SetUsesAlpha(true);
 	OverlayRenderComponent *m_pOverlayComp = (OverlayRenderComponent *) GetParent()->AddComponent(new OverlayRenderComponent());
 	m_pOverlayComp->SetSurface(&m_surface, false);
-	
+	m_surface.SetupSignalsForUnloadingAndLoadingTextures();
+	//we want to get notified as well
+	GetBaseApp()->m_sig_enterforeground.connect(1, boost::bind(&TouchDragMarkupComponent::OnEnterForeground, this, _1));
+	GetBaseApp()->m_sig_loadSurfaces.connect(1, boost::bind(&TouchDragMarkupComponent::OnLoadSurfaces, this));
 	//register to get updated every frame
 	GetParent()->GetFunction("OnUpdate")->sig_function.connect(1, boost::bind(&TouchDragMarkupComponent::OnUpdate, this, _1));
 }
+
+void TouchDragMarkupComponent::OnEnterForeground(VariantList* pVList)
+{
+	/*
+	m_softSurf.FlipY();
+	m_softSurf.UpdateGLTexture(&m_surface);
+	m_softSurf.FlipY();
+	*/
+}
+void TouchDragMarkupComponent::OnLoadSurfaces()
+{
+	
+	m_softSurf.FlipY();
+	m_softSurf.UpdateGLTexture(&m_surface);
+	m_softSurf.FlipY();
+	
+}
+
 
 void TouchDragMarkupComponent::OnEntityToFollowChanged(Variant* pDataObject)
 {

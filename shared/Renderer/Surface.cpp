@@ -73,11 +73,7 @@ bool Surface::LoadBMPTexture(uint8 *pMem)
 {
 	
 	BMPImageHeader *pBmpImageInfo = new BMPImageHeader;
-
-		
 	memcpy(pBmpImageInfo, &pMem[14], sizeof(BMPImageHeader)-14);
-
-
 	unsigned short offsetToImageData;
 	
 	memcpy(&offsetToImageData, &pMem[10], 2);
@@ -492,12 +488,16 @@ bool Surface::LoadFileFromMemory(uint8 *pMem, int inputSize)
 			//load on demand, helps with speed
 		}
 
+
+		SetupSignalsForUnloadingAndLoadingTextures();
 		//unload happens right away though
+/*
 		GetBaseApp()->m_sig_unloadSurfaces.connect(1, boost::bind(&Surface::OnUnloadSurfaces, this));
 
 #ifdef WINAPI
 		GetBaseApp()->m_sig_enterforeground.connect(1, boost::bind(&Surface::OnEnterForeground, this, _1));
 #endif
+*/
 
 		CHECK_GL_ERROR();
 	}
@@ -528,8 +528,25 @@ bool Surface::LoadFileFromMemory(uint8 *pMem, int inputSize)
 	if (strncmp((char*)pMem, "BM", 2) == 0)
 	{
 		//we've got a bitmap on our hands it looks like
-		bReturn = LoadBMPTexture(pMem);
-		CHECK_GL_ERROR();
+		//while this loader is faster, it requires 32 or 24 bit and that the image be a power of 2.  Let's use SoftSurface instead which will
+		//convert stuff and pad non-power of 2 images as needed.  Actually, why are we even assuming images need to be power of 2 anymore?  Is
+		//that still a thing with GPUs?
+
+	//	bReturn = LoadBMPTexture(pMem);
+	//	CHECK_GL_ERROR();
+
+
+		SoftSurface s;
+		if (!s.LoadFileFromMemory(pMem, SoftSurface::COLOR_KEY_NONE, inputSize, false))
+		{
+			LogMsg("(Failed to load bmp)");
+			return false;
+		}
+		s.FlipY();
+		
+		//Load the bitmap into our surface here
+		return InitFromSoftSurface(&s);
+		
 
 	} else if (strncmp((char*)pMem, C_RTFILE_TEXTURE_HEADER, 6) == 0)
 	{
@@ -576,6 +593,8 @@ void Surface::Bind()
 
 bool Surface::LoadFile( string fName, bool bAddBasePath )
 {
+
+
 	if (fName.empty())
 	{
 		Kill();
@@ -583,7 +602,7 @@ bool Surface::LoadFile( string fName, bool bAddBasePath )
 	}
 	
 #ifdef _DEBUG
-	//LogMsg("Loading texture %s", fName.c_str());
+	LogMsg("Loading texture %s", fName.c_str());
 #endif
 
 	m_bAddBasePath = bAddBasePath;
@@ -1086,6 +1105,22 @@ CHECK_GL_ERROR();
 }
 
 
+void Surface::SetupSignalsForUnloadingAndLoadingTextures()
+{
+#ifdef _DEBUG
+	//LogMsg("Binding to load/unload signals for surface %s", m_textureLoaded.c_str());
+#endif
+
+	//load manually, these kinds of surfaces are probably needed right away
+	GetBaseApp()->m_sig_loadSurfaces.connect(1, boost::bind(&Surface::OnLoadSurfaces, this));
+
+	//unload happens right away though
+	GetBaseApp()->m_sig_unloadSurfaces.connect(1, boost::bind(&Surface::OnUnloadSurfaces, this));
+
+#ifdef WINAPI
+	GetBaseApp()->m_sig_enterforeground.connect(1, boost::bind(&Surface::OnEnterForeground, this, _1));
+#endif
+}
 
 bool Surface::InitBlankSurface( int x, int y)
 {
@@ -1099,15 +1134,7 @@ bool Surface::InitBlankSurface( int x, int y)
 		
 	if (m_texWidth == 0)
 	{
-		//load manually, these kinds of surfaces are probably needed right away
-		GetBaseApp()->m_sig_loadSurfaces.connect(1, boost::bind(&Surface::OnLoadSurfaces, this));
-
-		//unload happens right away though
-		GetBaseApp()->m_sig_unloadSurfaces.connect(1, boost::bind(&Surface::OnUnloadSurfaces, this));
-
-#ifdef WINAPI
-		GetBaseApp()->m_sig_enterforeground.connect(1, boost::bind(&Surface::OnEnterForeground, this, _1));
-#endif
+		SetupSignalsForUnloadingAndLoadingTextures();
 	}
 
 	m_originalWidth = x;
@@ -1156,9 +1183,6 @@ if (bClearFirst)
 	IncreaseMemCounter(dataSize);
 	SetTextureStates();
 	CHECK_GL_ERROR();
-
-
-	CHECK_GL_ERROR();
 	return true;
 }
 
@@ -1169,6 +1193,10 @@ void Surface::ReloadImage()
 
 void Surface::OnLoadSurfaces()
 {
+
+#ifdef _DEBUG
+	LogMsg("Runing OnLoadSurfaces on %s", m_textureLoaded.c_str());
+#endif
 	if (m_glTextureID != NO_TEXTURE_LOADED) return; //already loaded I guess
 
 
@@ -1281,16 +1309,30 @@ bool Surface::CreateSoftSurfaceFromSurface(SoftSurface& outSurf)
 
 bool Surface::InitFromSoftSurface( SoftSurface *pSurf, bool bCreateSurface, int mipLevel )
 {
+
 	int dataSize = 0;
 	assert(pSurf->GetWidth() && pSurf->GetHeight());
 	GLenum colorFormat = GL_RGBA;
 	GLenum pixelFormat = GL_UNSIGNED_BYTE;
 	int bytesPerPixel = 4;
+	SoftSurface converter;
 
 	if (pSurf->GetSurfaceType() == SoftSurface::SURFACE_RGB) 
 	{
 		colorFormat = GL_RGB;
 		bytesPerPixel = 3;
+	}
+
+	if (pSurf->GetSurfaceType() != SoftSurface::SURFACE_RGBA && pSurf->GetSurfaceType() != SoftSurface::SURFACE_RGB)
+	{
+		//error if we don't convert it...
+		converter.Init(pSurf->GetWidth(), pSurf->GetHeight(), SoftSurface::SURFACE_RGBA);
+		converter.Blit(0,0, pSurf);
+		
+		pSurf = &converter; //don't look at me like that
+		
+		pSurf->FlipY(); //flip it back because for some reason the conversion undoes the flip we did earlier?  I don't know, but this way
+		//both 8/24/32 bit bmps are all the same orientation
 	}
 
 	if (mipLevel == 0)
@@ -1303,6 +1345,7 @@ bool Surface::InitFromSoftSurface( SoftSurface *pSurf, bool bCreateSurface, int 
 		if (m_originalWidth == 0) m_originalWidth = pSurf->GetOriginalWidth();
 		dataSize = m_texWidth*m_texHeight*bytesPerPixel;
 
+
 	} else
 	{
 		//it's a mipmap.  We assume these are power of 2 already
@@ -1312,12 +1355,16 @@ bool Surface::InitFromSoftSurface( SoftSurface *pSurf, bool bCreateSurface, int 
 
 	if (bCreateSurface)
 	{
+
 		Kill();
+		
 		PrepareGLForNewTexture();
+	
 		if (m_textureLoaded.empty())
 		{
 			m_textureCreationMethod = TEXTURE_CREATION_BLANK;
 		}
+
 	}
 
 	m_bUsesAlpha = (colorFormat == GL_RGBA);

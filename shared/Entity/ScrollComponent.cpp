@@ -124,7 +124,7 @@ void ScrollComponent::OnOverStart(VariantList *pVList)
 void ScrollComponent::OnInput(VariantList* pVList)
 {
 	float f = pVList->Get(0).GetFloat();
-	if (f == MESSAGE_TYPE_GUI_MOUSEWHEEL) 
+	if ((int)f == MESSAGE_TYPE_GUI_MOUSEWHEEL) 
 	{
 		SetIsScrolling(true);
 		m_vecDisplacement.y += pVList->Get(4).GetVector2().x * *m_pPowerMod * 0.75f;//Maybe change if on HTML5?

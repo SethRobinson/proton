@@ -126,6 +126,9 @@ void SurfaceAnim::BlitScaledAnim(float x, float y, int frameX, int frameY, CL_Ve
 
 	if (GetFrameWidth() == GetWidth() && GetFrameHeight() == GetHeight() && !flipX && !flipY && borderPadding == CL_Rectf(0, 0, 0, 0))
 	{
+		//Print the filename if the image
+		//LogMsg("Filename is %s", GetTextureLoaded().c_str());
+
 		BlitScaledWithRotatePoint(x, y, vScale, alignment, rgba, rotation, vRotationPt, pBatcher); //don't need the anim code
 		return;
 	}

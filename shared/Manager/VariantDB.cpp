@@ -73,8 +73,6 @@ Variant * VariantDB::GetVarIfExists(const string &keyName)
 	return NULL;
 }
 
-
-
 Variant * VariantDB::GetVarWithDefault(const string &keyName, const Variant &vDefault)
 {
 

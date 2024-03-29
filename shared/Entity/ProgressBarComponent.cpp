@@ -79,6 +79,9 @@ void ProgressBarComponent::OnAdd(Entity *pEnt)
 	m_pBorderColor = &GetVarWithDefault("borderColor", Variant(MAKE_RGBA(255,255,255,0)))->GetUINT32();
 	m_pBackgroundColor = &GetVarWithDefault("backgroundColor", Variant(MAKE_RGBA(255,255,255,0)))->GetUINT32();
 	m_pProgress = &GetVarWithDefault("progress", Variant(0.0f))->GetFloat();
+
+	m_visualPixelModY = &GetVarWithDefault("visualPixelModY", Variant(0.0f))->GetFloat();
+
 	m_pVisualProgress = &GetVarWithDefault("visualProgress", Variant(0.0f))->GetFloat();
 	m_pProgressOfLastSet = &GetVarWithDefault("progressOfLastSet", Variant(0.0f))->GetFloat(); //don't really want this shared, but too lazy to convert it back
 	m_pFileName = &GetVar("fileName")->GetString(); //local to us
@@ -122,8 +125,11 @@ void ProgressBarComponent::OnRender(VariantList *pVList)
 	{
 		CL_Vec2f vFinalPos = pVList->m_variant[0].GetVector2()+*m_pPos2d;
 		float progress = m_baseProgress +  ( (*m_pProgress-m_baseProgress) * ApplyInterpolationToFloat(eInterpolateType(*m_pInterpolateType), GetVisualProgress()) );
-		if (progress == 0) return;
+		
+		//if (progress == 0) return;
 		*m_pVisualProgress = progress; //save it so outsiders can check and see what we're displaying
+		
+		
 		uint32 color = ColorCombine(*m_pColor, *m_pColorMod, *m_pAlpha);
 		uint32 borderColor = ColorCombine(*m_pBorderColor, *m_pColorMod, *m_pAlpha);
 		uint32 backgroundColor = ColorCombine(*m_pBackgroundColor, *m_pColorMod, *m_pAlpha);
@@ -157,6 +163,11 @@ void ProgressBarComponent::OnRender(VariantList *pVList)
 				//manual rectangle version of a progress bar
 				CL_Rectf r = CL_Rectf(vFinalPos.x, vFinalPos.y, vFinalPos.x+ (m_pSize2d->x), vFinalPos.y+m_pSize2d->y); 
 
+				if (*m_visualPixelModY != 0)
+				{
+					r.set_height(r.get_height() + *m_visualPixelModY);
+					r.translate(0, - ((*m_visualPixelModY)/2));
+				}
 				//flip y?  //default is yes, which is bottom up
 
 				if (GET_ALPHA(backgroundColor) > 0)
@@ -168,6 +179,13 @@ void ProgressBarComponent::OnRender(VariantList *pVList)
 					}
 				}
 				r = CL_Rectf(vFinalPos.x, vFinalPos.y, vFinalPos.x+ (m_pSize2d->x*progressX), vFinalPos.y+m_pSize2d->y*progressY); 
+
+				if (*m_visualPixelModY != 0)
+				{
+					r.set_height(r.get_height() + *m_visualPixelModY);
+					r.translate(0, -((*m_visualPixelModY) / 2));
+				}
+
 
 				if (*m_pType == TYPE_VERTICAL && *m_pFlipY == 0)
 				{
@@ -189,7 +207,6 @@ void ProgressBarComponent::OnRender(VariantList *pVList)
 					r.left = r.right - m_pSize2d->x*progressX;
 				}
 
-
 				if (GET_ALPHA(color) > 0)
 				{
 					DrawFilledRect(r, color);
@@ -201,7 +218,6 @@ void ProgressBarComponent::OnRender(VariantList *pVList)
 				}
 			}
 		
-	
 		
 	}
 
