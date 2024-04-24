@@ -161,8 +161,6 @@ void dump(const char *text,
 void SimpleDump(const char* text,
 	FILE* stream, unsigned char* ptr, size_t size)
 {
-	size_t i;
-	size_t c;
 	unsigned int width = 0x10;
 
 	//this will crash when downloading a file, so maybe bad right now.  (it's a debug mode only thing so no biggie)
@@ -173,6 +171,9 @@ void SimpleDump(const char* text,
 	return;
 	
 	/*
+	size_t i;
+	size_t c;
+
 	for (i = 0; i < size; i += width) {
 		LogMsgNoCR("%4.4lx: ", (long)i);
 

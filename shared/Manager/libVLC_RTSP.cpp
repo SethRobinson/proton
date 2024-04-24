@@ -74,7 +74,7 @@ void libVLC_RTSP::SetVolume(float vol)
 
     if (m_pVlcMediaPlayer != nullptr)
     {
-        LogMsg("Setting vol to %d, based on %.2f", intVol, vol);
+        //LogMsg("Setting vol to %d, based on %.2f", intVol, vol);
         // Set the volume level. Values range between 0 and 100
         libvlc_audio_set_volume(m_pVlcMediaPlayer, intVol);
     }

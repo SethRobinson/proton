@@ -53,7 +53,8 @@ void SliderComponent::OnUpdate(VariantList *pVList)
 
 void SliderComponent::OnProgressChanged(Variant *pDataObject)
 {
-	SetSliderPosition();
+	//LogMsg("Progress set to %.2f, ", pDataObject->GetFloat());
+	SetSliderPosition(pDataObject->GetFloat());
 }
 
 void SliderComponent::SetSliderPosition(float value)
@@ -63,12 +64,13 @@ void SliderComponent::SetSliderPosition(float value)
 	SetSliderPosition();
 }
 
+
 void SliderComponent::SetSliderPosition()
 {
 	if (!m_pSliderButton)
 	{
 		m_pSliderButton = GetParent()->GetEntityByName("sliderButton");
-	    return;
+
 	}
 //	assert(m_pSliderButton && "Must set var 'sliderButton' to a valid entity");
 	

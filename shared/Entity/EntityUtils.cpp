@@ -2105,7 +2105,6 @@ EntityComponent * CreateSlider(Entity *pBG, float x, float y, float sizeX, strin
 	EntityComponent * pSliderComp = pSliderEnt->AddComponent(new SliderComponent);
 
 	//the button we move around to slide
-	//Entity *pSliderButton = CreateOverlayButtonEntity(pSliderEnt, "sliderButton",  buttonFileName, 0, 0);
 	Entity* pSliderButton = CreateOverlayEntity(pSliderEnt, "sliderButton", buttonFileName, 0, 0);
 
 	CL_Vec2f vButtonScale = CL_Vec2f(0.7f, 0.7f);

@@ -55,6 +55,8 @@ public:
 	void OnScaleChanged(Variant* pDataObject);
 	string GetTitle() { return m_title; }
 	void SetTitle(string title) { m_title = title; }
+	void SetControlsTransparency(float alpha);
+	void ResetTimeOfLastTouch();
 
 protected:
 
@@ -68,6 +70,7 @@ protected:
 	void OnLoopingChanged(Variant* pVariant);
 	void UpdateStatusMessage(string msg);
 	void OnStatusUpdated(VariantList* pVList);
+	void OnTouchDragUpdate(VariantList* pVList);
 
 	string m_url;
 	int m_cacheMS = 0;
@@ -84,6 +87,8 @@ protected:
 	Entity* m_pButtonPlay = NULL;
 	SliderComponent* m_pVolSliderComp = NULL;
 	string m_title;
+	unsigned int m_timeOfLastTouchMS = 0;
+	float m_lastTargetAlpha = -1;
 };
 
 //helper

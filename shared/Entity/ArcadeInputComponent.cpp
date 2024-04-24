@@ -443,6 +443,7 @@ void ArcadeInputComponent::RemoveKeyBindingsStartingWith( VariantList *pVList )
 	}
 }
 
+//Note:  For 'modifer bits', use: VIRTUAL_KEY_MODIFIER_CONTROL, VIRTUAL_KEY_MODIFIER_SHIFT and VIRTUAL_KEY_MODIFIER_ALT bits
 void AddKeyBinding(EntityComponent *pComp, string name, uint32 inputcode, uint32 outputcode, bool bAlsoSendAsNormalRawKey, uint32 modifiersRequired)
 {
     VariantList vList(name, inputcode, outputcode, uint32(bAlsoSendAsNormalRawKey!=0), modifiersRequired);

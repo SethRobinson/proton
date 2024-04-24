@@ -143,6 +143,7 @@ enum eVirtualKeys
 	VIRTUAL_JOYSTICK_BUTTON_RIGHT,
     VIRTUAL_DPAD_MENU, //like that weird symbol on a Pro 2, or the big Xbox button on a 360 controller
     VIRTUAL_DPAD_MEDIA, //the share/screen button?
+    VIRTUAL_KEY_BACKTICK, //aka unshifted tilde or VK_OEM_3 on Windows
 
     VIRTUAL_KEY_CUSTOM_START = 510000, //if you add your own at the app specific level, do it after this
 };

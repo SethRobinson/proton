@@ -410,6 +410,8 @@ int ConvertWindowsKeycodeToProtonVirtualKey(int keycode)
 	case VK_CONTROL: keycode = VIRTUAL_KEY_CONTROL; break;
 	case VK_ESCAPE:  keycode = VIRTUAL_KEY_BACK; break;
 
+	case VK_OEM_3: keycode = VIRTUAL_KEY_BACKTICK; break;
+
 	default:
 		if (keycode >= VK_F1 && keycode <= VK_F12)
 		{
@@ -607,7 +609,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 								VariantList vList;
 								vList.Get(0).Set(filePath);
-								vList.Get(1).Set(CL_Vec2f(X, Y));
+								vList.Get(1).Set(CL_Vec2f((float)X, (float)Y));
 
 				GetMessageManager()->SendGUI(MESSAGE_TYPE_FILE_DROPPED, vList, (int)0);
 
@@ -1775,7 +1777,7 @@ string GetExePath()
 	TCHAR szExt[256];
 	GetModuleFileName(0, szDllName, _MAX_PATH);
 	_splitpath(szDllName, szDrive, szDir, szFilename, szExt);
-
+	 
 	return string(szDrive) + string(szDir); 
 }
 

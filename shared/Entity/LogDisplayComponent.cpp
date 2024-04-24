@@ -40,6 +40,7 @@ void LogDisplayComponent::OnAdd(Entity *pEnt)
 	m_pColorMod = &GetParent()->GetVarWithDefault("colorMod", Variant(MAKE_RGBA(255,255,255,255)))->GetUINT32();
 	m_pAlpha = &GetParent()->GetVarWithDefault("alpha", Variant(1.0f))->GetFloat();
 	m_pAlignment = &GetParent()->GetVar("alignment")->GetUINT32();
+	GetParent()->GetFunction("OnInput")->sig_function.connect(1, boost::bind(&LogDisplayComponent::OnInput, this, _1));
 
 	//our own stuff
 	m_pFontScale = &GetVarWithDefault("fontScale", Variant(1.0f))->GetFloat();
@@ -87,6 +88,7 @@ void LogDisplayComponent::InitInternalConsoleIfNeeded()
 	{
 		m_pInternalConsole = new Console;
 		m_pActiveConsole = m_pInternalConsole;
+		//m_pInternalConsole->SetMaxLines()
 	}
 }
 
@@ -150,6 +152,30 @@ void LogDisplayComponent::OnEnableScrollingChanged(Variant *pVariant)
 	GetParent()->GetVar("size2d")->GetSigOnChanged()->connect(boost::bind(&Variant::SetVariant, pScrollEnt->GetVar("size2d"), _1));
 	m_curLine = (float)m_pActiveConsole->GetTotalLines(); //move to last line.  Cur means the last line that we can see.
 	UpdateScrollBar();
+}
+
+// handles MESSAGE_TYPE_GUI_MOUSEWHEEL only. Platforms other than Windows and HTML 5 don't seem to send this
+void LogDisplayComponent::OnInput(VariantList* pVList)
+{
+	float f = pVList->Get(0).GetFloat();
+	if ((int)f == MESSAGE_TYPE_GUI_MOUSEWHEEL)
+	{
+		float x = pVList->Get(4).GetVector2().x;
+		x *= -(1.0f/60.0f);
+		
+		/*
+		if (x > 0)
+		{
+			x = -1;
+		}
+		else
+		{
+			x = 1;
+		}
+		*/
+		ModCurLine(x);
+
+	}
 }
 
 void LogDisplayComponent::OnTouchDragUpdate(VariantList *pVList)
@@ -348,6 +374,7 @@ void SetConsole(bool bOn, bool bEnableScrollbars)
 	{
 		pConsole = GetEntityRoot()->AddEntity(new Entity("ConsoleEnt"));
 		SetAlignmentEntity(pConsole, ALIGNMENT_UPPER_LEFT);
+	
 		pConsole->GetVar("pos2d")->Set(CL_Vec2f(10, 40));
 		pConsole->GetVar("size2d")->Set(CL_Vec2f(GetScreenSizeXf()-20, GetScreenSizeYf()-70));
 		EntityComponent *pComp = new LogDisplayComponent;
@@ -356,8 +383,44 @@ void SetConsole(bool bOn, bool bEnableScrollbars)
 		{
 			pComp->GetVar("enableScrolling")->Set(uint32(1));
 		}
-		
+	
 		pConsole->AddComponent(pComp);
+
+		AddFocusIfNeeded(pConsole);
+	}
+}
+
+void SetDinkStyleConsole(bool bOn, bool bEnableScrollbars, Entity* pParent)
+{
+	Entity* pConsole = GetEntityRoot()->GetEntityByName("ConsoleEnt");
+
+	if (bOn && pConsole) return; //already on
+	if (!bOn && !pConsole) return; //already off
+
+	if (pConsole)
+	{
+		//kill it
+		KillEntity(pConsole);
+	}
+	else
+	{
+		Entity* pBG = CreateOverlayRectEntity(pParent, CL_Vec2f(0, 0), GetScreenSize(), MAKE_RGBA(0, 0, 0, 140));
+		pBG->SetName("ConsoleEnt");
+		pConsole = pBG->AddEntity(new Entity("LogRenderingPart"));
+		SetAlignmentEntity(pConsole, ALIGNMENT_UPPER_LEFT);
+		pConsole->GetVar("pos2d")->Set(CL_Vec2f(10, 40));
+		pConsole->GetVar("size2d")->Set(CL_Vec2f(GetScreenSizeXf() - 20, GetScreenSizeYf() - 70));
+		EntityComponent* pComp = new LogDisplayComponent;
+
+		if (bEnableScrollbars)
+		{
+			pComp->GetVar("enableScrolling")->Set(uint32(1));
+		}
+
+		pConsole->AddComponent(pComp);
+
+		float scale = 0.6f;
+		SetupTextEntity(pConsole, FONT_SMALL, scale);
 		AddFocusIfNeeded(pConsole);
 	}
 }
@@ -373,6 +436,35 @@ void ToggleConsole()
 	} else
 	{
 		SetConsole(true);
+	}
+}
+
+bool QuickLogIsActive()
+{
+	return GetEntityRoot()->GetEntityByName("ConsoleEnt") != NULL;
+}
+
+void KillConsoleIfActive()
+{
+	Entity* pConsole = GetEntityRoot()->GetEntityByName("ConsoleEnt");
+	if (pConsole)
+	{
+		KillEntity(pConsole);
+	}
+}
+
+void ToggleDinkStyleConsole(Entity *pParent)
+{
+	Entity* pConsole = GetEntityRoot()->GetEntityByName("ConsoleEnt");
+
+	if (pConsole)
+	{
+		//kill it
+		SetDinkStyleConsole(false, true,  pParent);
+	}
+	else
+	{
+		SetDinkStyleConsole(true,true,  pParent);
 	}
 }
 

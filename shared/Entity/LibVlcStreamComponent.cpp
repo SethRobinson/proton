@@ -61,8 +61,15 @@ void LibVlcStreamComponent::OnLoopingChanged(Variant* pVariant)
 	//UpdateControlButtons();
 }
 
+void LibVlcStreamComponent::ResetTimeOfLastTouch()
+{
+	m_timeOfLastTouchMS = GetTick();
+}
+
 void LibVlcStreamComponent::Init(std::string url, int cacheMS)
 {
+
+	ResetTimeOfLastTouch();
 
 	m_url = url;
 	m_cacheMS = cacheMS;
@@ -86,6 +93,14 @@ void LibVlcStreamComponent::Init(std::string url, int cacheMS)
 
 	EntityComponent* pDragComp = GetParent()->AddComponent(new TouchDragComponent);
 	EntityComponent* pDragMoveComp = GetParent()->AddComponent(new TouchDragMoveComponent);
+
+
+	//you know, it would be useful if we knew when someone started dragging this window around, so let's connect to those signals
+	pDragComp->GetFunction("OnTouchDragUpdate")->sig_function.connect(1, boost::bind(&LibVlcStreamComponent::OnTouchDragUpdate, this, _1));
+	pDragMoveComp->GetParent()->GetFunction("OnOverStart")->sig_function.connect(1, boost::bind(&LibVlcStreamComponent::OnTouchDragUpdate, this, _1));
+	pDragMoveComp->GetParent()->GetFunction("OnOverEnd")->sig_function.connect(1, boost::bind(&LibVlcStreamComponent::OnTouchDragUpdate, this, _1));
+		
+	
 	ScrollToZoomComponent* pScrollZoomComp = (ScrollToZoomComponent*)GetParent()->AddComponent(new ScrollToZoomComponent);
 	pDragComp->GetVar("limitedToThisFingerID")->Set(uint32(0)); //only allow left mouse button
 
@@ -142,6 +157,11 @@ void LibVlcStreamComponent::UpdateStatusMessage(string msg)
 	Entity* pEnt = CreateTextLabelEntity(GetParent(), "DebugText", 0, 0, msg);
 	SetupTextEntity(pEnt, FONT_LARGE, 0.66f);
 	FadeOutAndKillEntity(pEnt, true, 100, timeMS);
+}
+
+void LibVlcStreamComponent::OnTouchDragUpdate(VariantList* pVList)
+{
+	ResetTimeOfLastTouch();
 }
 
 void LibVlcStreamComponent::OnStatusUpdated(VariantList* pVList)
@@ -230,6 +250,7 @@ void LibVlcStreamComponent::OnInputWhileMouseDown(VariantList* pVList)
 	#endif
 			if (letterPressed == 'r')
 			{
+				ResetTimeOfLastTouch();
 				LogMsg("Reconnecting with stream...");
 
 				m_libVlcRTSP.Release();
@@ -242,6 +263,7 @@ void LibVlcStreamComponent::OnInputWhileMouseDown(VariantList* pVList)
 
 			if (letterPressed == ' ')
 			{
+				ResetTimeOfLastTouch();
 				m_libVlcRTSP.TogglePause();
 			}
 
@@ -264,12 +286,14 @@ void LibVlcStreamComponent::OnInputWhileMouseDown(VariantList* pVList)
 			//volume up and down 10% by hitting - and =
 			if (letterPressed == '-')
 			{
+				ResetTimeOfLastTouch();
 				m_libVlcRTSP.SetVolume(m_libVlcRTSP.GetVolume() - 0.1f);
 				//ShowVolume();
 			}
 
 			if (letterPressed == '=')
 			{
+				ResetTimeOfLastTouch();
 				//toggle looping
 				m_libVlcRTSP.SetVolume(m_libVlcRTSP.GetVolume() + 0.1f);
 				//ShowVolume();
@@ -319,6 +343,7 @@ void LibVlcStreamComponent::SetSurfaceSize(int width, int height)
 
 void LibVlcStreamComponent::OnScaleChanged(Variant* pDataObject)
 {
+	ResetTimeOfLastTouch();
 	//update the progress bar
 	UpdateProgressBar();
 }
@@ -338,6 +363,32 @@ void LibVlcStreamComponent::UpdateControlButtons(bool bIsPaused)
 
 }
 
+void LibVlcStreamComponent::SetControlsTransparency(float alpha)
+{
+
+	if (m_pControlsEnt)
+	{
+		if (m_lastTargetAlpha != alpha)
+		{
+			//LogMsg("Updating transparency: %.2f", alpha);
+			
+			int fadeTimeMS = 1000;
+			if (alpha >= 50)
+			{
+				//do it faster
+				fadeTimeMS = 0;
+			}
+			FadeEntity(m_pControlsEnt, true, alpha, fadeTimeMS, 0, false);
+			m_lastTargetAlpha = alpha;
+		}
+	}
+	else
+	{
+		LogMsg("Transparency controls can't be set because they aren't initted yet");
+	}
+	
+}
+
 void LibVlcStreamComponent::OnPlayButtonClicked(VariantList* pVList)
 {
 	//LogMsg("They clicked the play toggle button");
@@ -351,8 +402,9 @@ void LibVlcStreamComponent::OnSliderVolumeChanged(Variant* pDataObject)
 {
 	m_bMuted = false;
 	float sliderVal = pDataObject->GetFloat();
-	LogMsg("Slider cool changed to %.2f", sliderVal);
+	//LogMsg("Slider cool changed to %.2f", sliderVal);
 	//Set volume
+	this->ResetTimeOfLastTouch();
 
 	m_libVlcRTSP.SetVolume(sliderVal);
 
@@ -425,14 +477,26 @@ void LibVlcStreamComponent::UpdateProgressBar()
 	SetPos2DEntity(m_pProgressEnt, CL_Vec2f(playSliderRect.left, 0));
 	m_pProgressEnt->GetVar("size2d")->Set(playSliderRect.get_width(), playSliderRect.get_height());
 	SetProgressBarPercent(m_pProgressEnt, m_libVlcRTSP.GetPlaybackPosition(), true);
+
+	//compare m_timeOfLastTouchMS to GetTick(), if more than 2 seconds have passed, we'll fade it out
+	if (GetTick() - m_timeOfLastTouchMS > 2000)
+	{
+		SetControlsTransparency(0.0f);
+	}
+	else
+	{
+		SetControlsTransparency(1.0f);
+	}
 }
 
 
 void LibVlcStreamComponent::OnStripUpdate(VariantList* pVList)
 {
 
+#ifdef _DEBUG
 	LogMsg("X touched at %.2f", pVList->Get(1).GetVector2().x);
-	
+#endif
+	this->ResetTimeOfLastTouch();
 	m_libVlcRTSP.SetPlaybackPosition(pVList->Get(1).GetVector2().x);
 
 }

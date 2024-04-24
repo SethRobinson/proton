@@ -132,9 +132,9 @@ bool IsLargeScreen();
 void SetPrimaryScreenSize(int width, int height); //implemented by each platform, must be called VERY early, mostly for win testing
 
 //Useful for certain things when you need to know if someone is actually using a gamepad or the touch controls
-int GetTimeOfLastTouchMS();
+unsigned int GetTimeOfLastTouchMS();
 void SetTimeOfLastTouchMS(unsigned int time);
-int GetTimeOfLastGamepadInputMS();
+unsigned int GetTimeOfLastGamepadInputMS();
 void SetTimeOfLastGamepadInputMS(unsigned int time);
 
 /**

@@ -229,7 +229,7 @@ bool TarHandler::WriteBZipStream(uint8 *pData, int size)
 			//well, 0 byte files are legal so I guess we don't need to freak and assert here
 			//assert(amountToRead != 0);
 
-			int bytesRead = fwrite(pData, 1, amountToRead, m_fpOut);
+			int bytesRead = (int)fwrite(pData, 1, amountToRead, m_fpOut);
 			m_totalBytesWritten += amountToRead;
 
 			if (bytesRead != amountToRead)

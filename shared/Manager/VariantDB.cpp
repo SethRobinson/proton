@@ -242,7 +242,8 @@ bool VariantDB::Load( const string &fileName, bool *pFileExistedOut, bool bAddBa
 		LoadFromFile(s, fp);
 		
 #ifdef _DEBUG
-		if (GetVarIfExists(s) != NULL) {
+		if (GetVarIfExists(s) != NULL)
+		{
 			LogMsg("VariantDB: variable %s already exists in database while loading from file %s. The previous value gets overwritten!", s.c_str(), fileName.c_str());
 		}
 #endif

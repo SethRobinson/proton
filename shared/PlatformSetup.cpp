@@ -124,12 +124,12 @@ void SetEmulatedPlatformID(ePlatformID platformID)
 }
 
 
-int GetTimeOfLastTouchMS() { return g_timeOfLastTouchMS; }
+unsigned int GetTimeOfLastTouchMS() { return g_timeOfLastTouchMS; }
 void SetTimeOfLastTouchMS(unsigned int time)
 {
 	g_timeOfLastTouchMS = time; 
 }
-int GetTimeOfLastGamepadInputMS() { return g_timeOfLastGamepadInputMS; }
+unsigned int GetTimeOfLastGamepadInputMS() { return g_timeOfLastGamepadInputMS; }
 void SetTimeOfLastGamepadInputMS(unsigned int time) 
 { 
 	g_timeOfLastGamepadInputMS = time; 

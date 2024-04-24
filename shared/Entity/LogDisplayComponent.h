@@ -66,7 +66,8 @@ private:
 	void ModByDistance(float mod);
 	void OnTextChanged(Variant *pDataObject);
 	void InitInternalConsoleIfNeeded();
-	
+	void OnInput(VariantList* pVList); //needed for scrollwheel
+
 	CL_Vec2f *m_pPos2d;
 	CL_Vec2f *m_pSize2d;
 	uint32 *m_pFontID;
@@ -100,7 +101,12 @@ private:
 //misc helpers
 
 void ToggleConsole();
+void ToggleDinkStyleConsole(Entity* pParent);
 void SetConsole(bool bOn, bool bEnableScrollbars = false);
+void SetDinkStyleConsole(bool bOn, bool bEnableScrollbars, Entity* pParent);
 Entity * CreateLogDisplayEntity(Entity *pParent, string entName, CL_Vec2f vPos, CL_Vec2f vTextAreaSize, string msg, float scale=1.0f);
+bool QuickLogIsActive();
+void KillConsoleIfActive();
+
 
 #endif // LogDisplayComponent_h__
