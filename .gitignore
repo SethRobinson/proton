@@ -70,3 +70,4 @@ RTConsole/windows_vc2017/RTConsole.vcxproj.filters
 */html5/*.html
 _ignore
 Arduino
+RTLooneyLadders/windows/save.dat
