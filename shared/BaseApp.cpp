@@ -703,7 +703,7 @@ bool BaseApp::OnPreInitVideo()
 	
 	//SetEmulatedPlatformID(PLATFORM_ID_WINDOWS);
 	
-#ifndef PLATFORM_HTML5
+#if defined(PLATFORM_WINDOWS) || defined (PLATFORM_OSX) || defined (PLATFORM_LINUX) 
 	SetPrimaryScreenSize(1024, 768);
 
 #endif

@@ -173,7 +173,7 @@ public:
 	void BlitFromScreenFixed(int dstX, int dstY, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/);
 	void WriteRawDataOut(string fileName);
 	void WriteBMPOut(string fileName);
-	byte* WritePNGToMemory(int compressionLevel, int &outSize); //NOTE: You need to delete[] the data when done with it!
+	uint8* WritePNGToMemory(int compressionLevel, int &outSize); //NOTE: You need to delete[] the data when done with it!
 	void WritePNGOut(string fileName, int compressionLevel);
 	void FillAlphaBit(unsigned char alpha);
 	void Scale(int newX, int newY); //does simple linear scaling

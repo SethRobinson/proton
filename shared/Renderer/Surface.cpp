@@ -1253,9 +1253,12 @@ void Surface::OnUnloadSurfaces()
 		Kill();
 	}
 }
- 
+
+
 bool Surface::CreateSoftSurfaceFromSurface(SoftSurface& outSurf, bool bUseOriginalSizes )
 {
+
+#ifndef PLATFORM_ANDROID
 	if (!m_glTextureID)
 	{
 		LogMsg("No OpenGL texture found on this Surface.");
@@ -1335,7 +1338,11 @@ bool Surface::CreateSoftSurfaceFromSurface(SoftSurface& outSurf, bool bUseOrigin
 	delete[] tempData;
 	glBindTexture(GL_TEXTURE_2D, 0);
 	CHECK_GL_ERROR();
+#else
+//assert an error
 
+
+#endif
 	return true;
 }
 

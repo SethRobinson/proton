@@ -2450,7 +2450,7 @@ BMPImageHeader SoftSurface::BuildBitmapHeader()
 	return bmpImageInfo;
 }
 
-byte* SoftSurface::WritePNGToMemory(int compressionLevel, int &outSize)
+uint8 * SoftSurface::WritePNGToMemory(int compressionLevel, int &outSize)
 {
 #ifdef RT_PNG_SUPPORT
 	// Structure to hold the PNG data in memory
