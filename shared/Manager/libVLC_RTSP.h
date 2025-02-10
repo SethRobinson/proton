@@ -6,9 +6,22 @@
 typedef SSIZE_T ssize_t;
 #endif
 #include <vlc/vlc.h>
-
+#include <mutex>
 
 class LibVlcStreamComponent;
+
+struct WebcamConfig
+{
+    std::string deviceName;
+    int width = 0;
+    int height = 0;
+    float fps = 0;
+};
+
+struct VLC_ExtraSettings
+{
+	rtRect cropRect = rtRect(0,0,0,0); //all 0's if unused
+};
 
 class libVLC_RTSP
 {
@@ -17,7 +30,12 @@ public:
     virtual ~libVLC_RTSP();
 
     void InitVideoSurfaces();
-    bool Init(const std::string& rtsp_url, int cachingMS, SurfaceAnim* pSurfaceToWriteTo, LibVlcStreamComponent* pStreamComp, int width, int height);
+    bool Init(const std::string& rtsp_url, int cachingMS, SurfaceAnim* pSurfaceToWriteTo, LibVlcStreamComponent* pStreamComp, 
+        int width, int height, VLC_ExtraSettings = VLC_ExtraSettings());
+   
+    bool InitWebcam(const std::string& deviceNameOrId, SurfaceAnim* pSurfaceToWriteTo,
+        LibVlcStreamComponent* pStreamComp, int width, int height, VLC_ExtraSettings = VLC_ExtraSettings());
+
     std::tuple<int, int, int> GetRotationAndSizeOfVideoFile(const std::string& fileName);
     void GetMetaData();
     void Update();
@@ -28,16 +46,17 @@ public:
 
     void SetLooping(bool bLoop);
 
-    static void* lock(void* data, void** p_pixels);
-    static void unlock(void* data, void* id, void* const* p_pixels);
-    static void display(void* data, void* id);
-    float GetVolume();
+     float GetVolume();
     void SetPlaybackPosition(float pos);
     float GetPlaybackPosition();
     void SetVolume(float vol);  // Set the volume level. Values range between 0 and 1
 
     libvlc_media_player_t* GetMP() { return m_pVlcMediaPlayer; }
     void Release();
+
+    std::string FindFullDeviceName(const std::string& partialName);
+    bool StringIsNumber(const std::string& s);
+    std::string FindMatchingAudioDevice(const std::string& videoDeviceName);
 
     enum eStatus
     {
@@ -49,8 +68,23 @@ public:
 
     boost::signals2::signal<void(VariantList*)> m_sig_update_status; //a way to get a callback when something important changes
 
-protected:
+    bool IsCropped();
 
+protected:
+    
+    static void* lock(void* data, void** p_pixels);
+    static void unlock(void* data, void* id, void* const* p_pixels);
+    static void display(void* data, void* id);
+
+
+    unsigned char* m_pCroppedBuffer = nullptr; // Add this member
+
+    VLC_ExtraSettings m_extraSettings;
+
+    std::string m_audioDeviceName;  // Store the found audio device name
+    bool m_isWebcam = false;
+    std::string GetWebcamDevicePath(const std::string& deviceNameOrId);
+  
     void SendStatusUpdate(eStatus status, float secondFloat = 0.0f);
 
     void UpdateFrame();
@@ -71,8 +105,10 @@ protected:
     int m_rotationAngle =0;
     bool m_isStreaming = false;
     int m_timesChangedVideoResolution = 0;
-
+    std::mutex m_bufferMutex;
     bool m_bLoopVideo = false;
 };
 
 void OneTimeReleaseOnAppClose(); //you should probably call this when you exit the app, to release the main VLC instance
+
+void ListWebcamDevices(); //Easy way to list all webcam devices, not connected to VLC, but needs dshow stuff and coinit to have been done

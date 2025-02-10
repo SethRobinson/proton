@@ -56,6 +56,36 @@ struct rtRect32
 	void ScaleCentered(float f);
 	void AdjustPosition(int32 x, int32 y); //move the rect by repositioning the upper left hand corner
 	void Inflate(int32 x, int32 y);
+	bool Intersects(rtRect32 r) const
+	{
+		if (left > r.right || r.left > right)
+		{
+			return false;
+		}
+
+		if (top > r.bottom || r.top > bottom)
+		{
+			return false;
+		}
+
+		return true;
+	}
+	bool Contains(rtRect32 r) const
+	{
+		// Check if all points of rectangle r are inside this rectangle
+		if (r.left >= left && r.right <= right &&
+			r.top >= top && r.bottom <= bottom)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	bool operator==(const rtRect32& other) const
+	{
+		return left == other.left && top == other.top &&
+			right == other.right && bottom == other.bottom;
+	}
 };
 
 
@@ -71,6 +101,26 @@ struct rtRect
 	void ScaleCentered(float f);
 	void AdjustPosition(int x, int y); //move the rect by repositioning the upper left hand corner
 	void Inflate(int x, int y);
+	bool Intersects(rtRect r);
+	CL_Vec2i GetCenter() const { return CL_Vec2i((left + right) / 2, (top + bottom) / 2); }
+
+	bool Contains(rtRect r) const
+	{
+		// Check if all points of rectangle r are inside this rectangle
+		if (r.left >= left && r.right <= right &&
+			r.top >= top && r.bottom <= bottom)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	bool operator==(const rtRect& other) const
+	{
+		return left == other.left && top == other.top &&
+			right == other.right && bottom == other.bottom;
+	}
+
 };
 
 struct rtRectf
@@ -89,6 +139,36 @@ struct rtRectf
 
 	rtRectf operator+ (const rtRectf &r) const;
 	bool IsInside( float x, float y );
+	bool Intersects(rtRectf r) const
+	{
+		if (left > r.right || r.left > right)
+		{
+			return false;
+		}
+
+		if (top > r.bottom || r.top > bottom)
+		{
+			return false;
+		}
+
+		return true;
+	}
+	bool Contains(rtRectf r) const
+	{
+		// Check if all points of rectangle r are inside this rectangle
+		if (r.left >= left && r.right <= right &&
+			r.top >= top && r.bottom <= bottom)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	bool operator==(const rtRectf& other) const
+	{
+		return left == other.left && top == other.top &&
+			right == other.right && bottom == other.bottom;
+	}
 };
 
 #endif // rtRect_h__

@@ -67,7 +67,7 @@ public:
 	void Kill();
 	void FillColor(glColorBytes color);
 	uint8 * GetPixelData() {return m_pPixels;}
-	bool LoadFile(string fName, eColorKeyType colorKey, bool addBasePath = true, bool bApplyCheckerboardFix = false);
+	bool LoadFile(string fName, eColorKeyType colorKey = SoftSurface::COLOR_KEY_NONE, bool addBasePath = true, bool bApplyCheckerboardFix = false);
 	bool LoadFileFromMemory( uint8 *pMem, eColorKeyType colorKey, int inputSize = 0, bool bAddAlphaChannelIfNotPowerOfTwo =false, bool bApplyCheckerboardFix =false );
 	void Blit(int dstX, int dstY, SoftSurface *pSrc, int srcX = 0, int srcY = 0, int srcWidth = 0, int srcHeight = 0); //paste an image over ours
 	void SetCustomColorKey(glColorBytes color) { m_customColorKey = color; }
@@ -173,6 +173,8 @@ public:
 	void BlitFromScreenFixed(int dstX, int dstY, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/);
 	void WriteRawDataOut(string fileName);
 	void WriteBMPOut(string fileName);
+	byte* WritePNGToMemory(int compressionLevel, int &outSize); //NOTE: You need to delete[] the data when done with it!
+	void WritePNGOut(string fileName, int compressionLevel);
 	void FillAlphaBit(unsigned char alpha);
 	void Scale(int newX, int newY); //does simple linear scaling
 	void SetForceBlackAndWhiteOnBmpPalettes(bool bNew) { m_bForceBlackAndWhiteOnBmpPalettes = bNew; }
@@ -181,9 +183,6 @@ public:
 	void FlipRedAndBlue(); //I needed this to fix colors before sending camera capture to an OGL surface
 
 	void RemoveTrueBlack(uint8 minimumLuma);
-
-
-
 
 private:
 

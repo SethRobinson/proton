@@ -2450,6 +2450,175 @@ BMPImageHeader SoftSurface::BuildBitmapHeader()
 	return bmpImageInfo;
 }
 
+byte* SoftSurface::WritePNGToMemory(int compressionLevel, int &outSize)
+{
+#ifdef RT_PNG_SUPPORT
+	// Structure to hold the PNG data in memory
+	struct MemoryBuffer {
+		uint8* data;
+		size_t size;
+		size_t capacity;
+	};
+
+	MemoryBuffer memBuf = { nullptr, 0, 0 };
+
+	// Custom write function to write PNG data to memory buffer
+	auto WriteDataToMemory = [](png_structp png_ptr, png_bytep data, png_size_t length) {
+		MemoryBuffer* p = (MemoryBuffer*)png_get_io_ptr(png_ptr);
+		size_t new_size = p->size + length;
+		if (new_size > p->capacity) {
+			size_t new_capacity = new_size + 1024; // Allocate additional memory to reduce reallocations
+			uint8* new_data = new uint8[new_capacity];
+			if (p->data) {
+				memcpy(new_data, p->data, p->size);
+				delete[] p->data;
+			}
+			p->data = new_data;
+			p->capacity = new_capacity;
+		}
+		memcpy(p->data + p->size, data, length);
+		p->size += length;
+		};
+
+	// Initialize write structure
+	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	if (!png_ptr) {
+		LogError("Could not create PNG write structure");
+		return nullptr;
+	}
+
+	// Initialize info structure
+	png_infop info_ptr = png_create_info_struct(png_ptr);
+	if (!info_ptr) {
+		LogError("Could not create PNG info structure");
+		png_destroy_write_struct(&png_ptr, NULL);
+		return nullptr;
+	}
+
+	// Setup exception handling
+	if (setjmp(png_jmpbuf(png_ptr))) {
+		LogError("Error during PNG creation");
+		png_destroy_write_struct(&png_ptr, &info_ptr);
+		if (memBuf.data)
+			delete[] memBuf.data;
+		return nullptr;
+	}
+
+	// Set custom write function
+	png_set_write_fn(png_ptr, &memBuf, WriteDataToMemory, NULL);
+	png_set_compression_level(png_ptr, compressionLevel);
+
+	// Write header
+	int bit_depth = 8;
+	int color_type;
+
+	switch (m_surfaceType) {
+	case SURFACE_RGBA:
+		color_type = PNG_COLOR_TYPE_RGB_ALPHA;
+		break;
+	case SURFACE_RGB:
+		color_type = PNG_COLOR_TYPE_RGB;
+		break;
+	case SURFACE_PALETTE_8BIT:
+		color_type = PNG_COLOR_TYPE_PALETTE;
+		break;
+	default:
+		LogError("Unsupported surface type for PNG writing");
+		png_destroy_write_struct(&png_ptr, &info_ptr);
+		if (memBuf.data)
+			delete[] memBuf.data;
+		return nullptr;
+	}
+
+	png_set_IHDR(png_ptr, info_ptr, m_width, m_height,
+		bit_depth, color_type, PNG_INTERLACE_NONE,
+		PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+
+	// Write palette if needed
+	if (m_surfaceType == SURFACE_PALETTE_8BIT) {
+		png_color palette[256];
+		for (int i = 0; i < m_paletteColors; i++) {
+			palette[i].red = m_palette[i].r;
+			palette[i].green = m_palette[i].g;
+			palette[i].blue = m_palette[i].b;
+		}
+		png_set_PLTE(png_ptr, info_ptr, palette, m_paletteColors);
+
+		// If we have transparency in our palette
+		if (GetUsesAlpha()) {
+			png_byte trans[256];
+			for (int i = 0; i < m_paletteColors; i++) {
+				trans[i] = m_palette[i].a;
+			}
+			png_set_tRNS(png_ptr, info_ptr, trans, m_paletteColors, NULL);
+		}
+	}
+
+	png_write_info(png_ptr, info_ptr);
+
+	// Allocate memory for row pointers
+	png_bytep* row_pointers = new png_bytep[m_height];
+
+	// Set up row pointers based on surface type
+	for (int y = 0; y < m_height; y++) {
+		row_pointers[y] = m_pPixels + y * GetPitch();
+	}
+
+	// If RGB/RGBA, we might need to swap BGR to RGB
+	if (m_surfaceType == SURFACE_RGB || m_surfaceType == SURFACE_RGBA) {
+		//not needed
+		//png_set_bgr(png_ptr);
+	}
+
+	// Write image data
+	png_write_image(png_ptr, row_pointers);
+
+	// Cleanup
+	png_write_end(png_ptr, info_ptr);
+	delete[] row_pointers;
+	png_destroy_write_struct(&png_ptr, &info_ptr);
+
+	// Prepare the output buffer
+	byte* result = new byte[memBuf.size];
+	memcpy(result, memBuf.data, memBuf.size);
+	outSize = memBuf.size;
+
+	// Clean up memory buffer
+	delete[] memBuf.data;
+
+	return result;
+#else
+	LogError("PNG support not compiled in! Define RT_PNG_SUPPORT to enable PNG writing.");
+	return nullptr;
+#endif
+}
+void SoftSurface::WritePNGOut(string fileName, int compressionLevel)
+{
+#ifdef RT_PNG_SUPPORT
+	int pngSize = 0;
+	byte* pngData = WritePNGToMemory(compressionLevel, pngSize);
+	if (!pngData) {
+		LogError("Failed to write PNG data to memory");
+		return;
+	}
+
+	FILE* fp = fopen(fileName.c_str(), "wb");
+	if (!fp) {
+		LogError("Unable to open %s for writing", fileName.c_str());
+		delete[] pngData;
+		return;
+	}
+
+	fwrite(pngData, 1, pngSize, fp);
+	fclose(fp);
+
+	// Clean up
+	delete[] pngData;
+#else
+	LogError("PNG support not compiled in! Define RT_PNG_SUPPORT to enable PNG writing.");
+#endif
+}
+
 void SoftSurface::WriteBMPOut(string fileName)
 {
 

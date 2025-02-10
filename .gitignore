@@ -71,3 +71,6 @@ RTConsole/windows_vc2017/RTConsole.vcxproj.filters
 _ignore
 Arduino
 RTLooneyLadders/windows/save.dat
+RTMahjong
+RTLibretroTest_dynamic_link_version
+TempBackup

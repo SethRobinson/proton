@@ -107,7 +107,7 @@ public:
 	void SetupSignalsForUnloadingAndLoadingTextures();
 	virtual bool InitBlankSurface(int x, int y); //initialize a blank surface to do whatever to
 	virtual bool InitFromSoftSurface(SoftSurface *pSurf, bool bCreateSurface = true, int mipLevel = 0);
-	bool CreateSoftSurfaceFromSurface(SoftSurface& outSurf);
+	bool CreateSoftSurfaceFromSurface(SoftSurface& outSurf, bool bUseOriginalSizes = false);
 	bool IsRenderTarget() {return m_frameBuffer != 0;}
 	void CopyFromScreen(); //grabs whatever is currently in the gl buffer and creates a new texture with it
 	void FillRandomCrap();
@@ -150,7 +150,7 @@ private:
 	void IncreaseMemCounter(int mem);
 	void SetTextureStates();
 	void PrepareGLForNewTexture();
-		void PreMultiplyAlpha(uint8 *pBytes, int width, int height, int format);
+	void PreMultiplyAlpha(uint8 *pBytes, int width, int height, int format);
 	void OnEnterForeground(VariantList *pVList); //only wired up in Windows currently, don't need it anywhere
 	//else, windows is a special case
 	GLuint m_glTextureID;

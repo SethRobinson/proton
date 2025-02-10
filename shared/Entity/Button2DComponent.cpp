@@ -9,7 +9,6 @@
 
 string *g_defaultButtonClickSound = NULL;
 
-
 class Button2DFlashHackInit
 {
 public:
@@ -211,7 +210,6 @@ void Button2DComponent::OnTouchStart(VariantList *pVList)
 
 void Button2DComponent::PerformClick(VariantList *pVList)
 {
-
 	assert(pVList && "Need to send in coords so it knows where they clicked on the image");
 
 	//why are we setting the parent here?  Well, I must have had a good reason.. someone must want this as output.
@@ -251,7 +249,6 @@ void Button2DComponent::PerformClick(VariantList *pVList)
 			SendFakeInputMessageToEntity(GetParent(), MESSAGE_TYPE_GUI_CLICK_END, pVList->m_variant[0].GetVector2()); //otherwise the menu may never get the touch release message
 			return;
 		}
-		
 	} else
 	{
 #ifdef _DEBUG

@@ -251,11 +251,14 @@ int NetHTTP::ScanDownloadedHeader()
 		
 		case 301: //moved permanently
 		case 302: //moved temporarily
-		
+		case 303: //other
+		case 307: //temporary redirect
+
 		string url = t.GetParmString("Location:",1, " ");
 
 		if (!url.empty())
 		{
+
 			string domain;
 			string request;
 			int port = 80;
@@ -266,6 +269,9 @@ int NetHTTP::ScanDownloadedHeader()
 			{
 				SetFileOutput(fNameTemp);
 			}
+#ifdef _DEBUG
+			LogMsg("Redirecting to %s", url.c_str());
+#endif
 			Setup(domain, port, request, m_endOfDataSignal);
 			Start();
 		}

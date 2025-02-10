@@ -579,12 +579,18 @@ void Surface::Bind()
 		ReloadImage();
 	}
 
+	/*
+	//Update 12/27/2024 - Well, I'm doing something weird with libVLC in one of my apps and this isn't updated so it can
+	//cause texture problems, so I'm going to disable it.  Doubt it saves 2fps anymore, when I wrote that when I had an iphone 3gs
+	//or something, times be changin'
+	
 	if (g_lastBound == m_glTextureID)
 	{
 		//believe it or not, I saved 2 FPS on the iphone by doing my own checks
 		return;
 	}
 
+	*/
 	glBindTexture( GL_TEXTURE_2D, m_glTextureID);
 	g_lastBound = m_glTextureID;
 	CHECK_GL_ERROR();
@@ -819,7 +825,7 @@ void Surface::BlitScaled( float x, float y, CL_Vec2f vScale, eAlignment alignmen
 void Surface::BlitScaledWithRotatePoint( float x, float y, CL_Vec2f vScale, eAlignment alignment, unsigned int rgba, float rotation, CL_Vec2f vScreenRotationPt, RenderBatcher *pRenderBatcher)
 {
 	assert(vScale.x != 0 && vScale.y != 0 && "Dahell?");
-
+	 
 	CL_Vec2f vStart = CL_Vec2f(x,y);
 	rtRectf src(0,0,(float)m_originalWidth,(float)m_originalHeight);
 	rtRectf dst = src;
@@ -1062,6 +1068,8 @@ void Surface::UpdateSurfaceRect(rtRect dstRect, uint8 *pPixelData, bool bUpsideD
 
 	glTexSubImage2D(GL_TEXTURE_2D, 0, dstRect.left, yStart, dstRect.GetWidth(), dstRect.GetHeight(), GL_RGBA, GL_UNSIGNED_BYTE, pPixelData);
 	CHECK_GL_ERROR();
+
+
 }
 
 void Surface::SetTextureStates()
@@ -1245,10 +1253,8 @@ void Surface::OnUnloadSurfaces()
 		Kill();
 	}
 }
-
-//This worked for me but isn't tested very well
-
-bool Surface::CreateSoftSurfaceFromSurface(SoftSurface& outSurf)
+ 
+bool Surface::CreateSoftSurfaceFromSurface(SoftSurface& outSurf, bool bUseOriginalSizes )
 {
 	if (!m_glTextureID)
 	{
@@ -1263,9 +1269,19 @@ bool Surface::CreateSoftSurfaceFromSurface(SoftSurface& outSurf)
 	GLenum type = GL_UNSIGNED_BYTE;
 	int bytesPerPixel = 4;
 
-	// Assuming m_originalWidth and m_originalHeight store the actual texture size
-	int width = m_texWidth;
-	int height = m_texHeight;
+	// Determine dimensions based on bUseOriginalSizes parameter
+	int width = bUseOriginalSizes && m_originalWidth ? m_originalWidth : m_texWidth;
+	int height = bUseOriginalSizes && m_originalHeight ? m_originalHeight : m_texHeight;
+
+	// For reading from GL texture, we always need to read the full texture size
+	int fullDataSize = m_texWidth * m_texHeight * bytesPerPixel;
+	GLubyte* tempData = new (std::nothrow) GLubyte[fullDataSize];
+
+	if (!tempData)
+	{
+		LogMsg("Unable to allocate memory for pixel data.");
+		return false;
+	}
 
 	if (m_bUsesAlpha)
 	{
@@ -1278,34 +1294,50 @@ bool Surface::CreateSoftSurfaceFromSurface(SoftSurface& outSurf)
 		bytesPerPixel = 3;
 	}
 
-	int dataSize = width * height * bytesPerPixel;
-	GLubyte* pixelData = new (std::nothrow) GLubyte[dataSize];
-
-	if (!pixelData)
-	{
-		LogMsg("Unable to allocate memory for pixel data.");
-		return false;
-	}
-
-	glGetTexImage(GL_TEXTURE_2D, 0, format, type, pixelData);
+	glGetTexImage(GL_TEXTURE_2D, 0, format, type, tempData);
 	CHECK_GL_ERROR();
 
 	SoftSurface::eSurfaceType surfType = m_bUsesAlpha ? SoftSurface::SURFACE_RGBA : SoftSurface::SURFACE_RGB;
 
-	outSurf.Init(width, height, surfType, false);
-	
-	//Use outSurf.GetPixelData() to get the pixel data, and outSurf.GetPitch() and outsurf.GetWidth() to get the pitch and width of the surface, outSurf.GetPixelDataSize() to get the size of the surface in bytes
-	
-	memcpy(outSurf.GetPixelData(), pixelData, dataSize);
-	
-	//outSurf.SetPixelData(pixelData, true); // assuming SetPixelData takes ownership of the pixelData
-	
+	// Initialize the output surface with the desired dimensions
+	if (!outSurf.Init(width, height, surfType, false))
+	{
+		delete[] tempData;
+		return false;
+	}
+
+	uint8* destData = outSurf.GetPixelData();
+
+	// If we're using original sizes and they're different from texture sizes,
+	// we need to copy only the relevant portion
+	if (bUseOriginalSizes && (width != m_texWidth || height != m_texHeight))
+	{
+		// Calculate the offset to the start of the actual texture content
+		// In OpenGL, the original texture is at the bottom of the padded texture
+		int yOffset = m_texHeight - m_originalHeight;
+
+		// Copy row by row, only the width we want
+		for (int y = 0; y < height; y++)
+		{
+			// Calculate source Y position - start from the bottom of the padded area
+			int srcY = yOffset + y;
+			int srcOffset = srcY * m_texWidth * bytesPerPixel;
+			int destOffset = y * width * bytesPerPixel;
+			memcpy(destData + destOffset, tempData + srcOffset, width * bytesPerPixel);
+		}
+	}
+	else
+	{
+		// If dimensions match or we want the full texture, just copy everything
+		memcpy(destData, tempData, width * height * bytesPerPixel);
+	}
+
+	delete[] tempData;
 	glBindTexture(GL_TEXTURE_2D, 0);
 	CHECK_GL_ERROR();
 
 	return true;
 }
-
 
 bool Surface::InitFromSoftSurface( SoftSurface *pSurf, bool bCreateSurface, int mipLevel )
 {

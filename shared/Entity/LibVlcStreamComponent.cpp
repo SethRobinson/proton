@@ -8,6 +8,7 @@
 #include "LibVlcStreamComponent.h"
 #include "Entity/ScrollToZoomComponent.h"
 #include "ProgressBarComponent.h"
+#include "Renderer/SoftSurface.h"
 
 LibVlcStreamComponent::LibVlcStreamComponent()
 {
@@ -16,6 +17,7 @@ LibVlcStreamComponent::LibVlcStreamComponent()
 
 LibVlcStreamComponent::~LibVlcStreamComponent()
 {
+	m_libVlcRTSP.Release();
 }
 
 void LibVlcStreamComponent::OnAdd(Entity* pEnt)
@@ -66,14 +68,46 @@ void LibVlcStreamComponent::ResetTimeOfLastTouch()
 	m_timeOfLastTouchMS = GetTick();
 }
 
-void LibVlcStreamComponent::Init(std::string url, int cacheMS)
+void LibVlcStreamComponent::LoadStaticImage(string url)
 {
+	OverlayRenderComponent* pOverlay = (OverlayRenderComponent*)GetParent()->GetComponentByName("OverlayRender");
 
+	pOverlay->SetSurface(NULL, false); //unload the surface and delete it
+
+	//it's an image, let's load it
+	//SAFE_DELETE(m_pSurface);
+
+	m_pSurface = new SurfaceAnim();
+	m_pSurface->LoadFile(url);
+	if (!m_pSurface->IsLoaded())
+	{
+		LogMsg("Error loading %s", url.c_str());
+		assert(!"Image is missing");
+		return;
+	}
+	m_bUseStillPicMode = true;
+	SetSurfaceSize(m_pSurface->GetWidth(), m_pSurface->GetHeight());
+
+	SoftSurface ss;
+	ss.LoadFile(url);
+	m_pSurface->InitFromSoftSurface(&ss);
+	
+	if (pOverlay)
+	{
+		pOverlay->SetSurface(m_pSurface, true);
+	}
+	else
+	{
+		assert(!"Couldn't find overlay..");
+	}
+}
+void LibVlcStreamComponent::Init(std::string url, int cacheMS, VLC_ExtraSettings settings)
+{
 	ResetTimeOfLastTouch();
 
 	m_url = url;
 	m_cacheMS = cacheMS;
-
+	
 	//default to a size good for audio.  If it's video we load, it will auto-resize to the correct video size
 	int width = 400;
 	int height = 70;
@@ -86,6 +120,7 @@ void LibVlcStreamComponent::Init(std::string url, int cacheMS)
 
 	OverlayRenderComponent* pOverlay = (OverlayRenderComponent*)GetParent()->AddComponent(new OverlayRenderComponent());
 	pOverlay->SetSurface(m_pSurface, true);
+	
 	GetParent()->GetParent()->MoveEntityToTopByAddress(GetParent());
 	SetScale2DEntity(GetParent(), CL_Vec2f(1, 1));
 	AnimateEntitySetMirrorMode(GetParent(), false, true);
@@ -94,12 +129,10 @@ void LibVlcStreamComponent::Init(std::string url, int cacheMS)
 	EntityComponent* pDragComp = GetParent()->AddComponent(new TouchDragComponent);
 	EntityComponent* pDragMoveComp = GetParent()->AddComponent(new TouchDragMoveComponent);
 
-
 	//you know, it would be useful if we knew when someone started dragging this window around, so let's connect to those signals
 	pDragComp->GetFunction("OnTouchDragUpdate")->sig_function.connect(1, boost::bind(&LibVlcStreamComponent::OnTouchDragUpdate, this, _1));
-	pDragMoveComp->GetParent()->GetFunction("OnOverStart")->sig_function.connect(1, boost::bind(&LibVlcStreamComponent::OnTouchDragUpdate, this, _1));
-	pDragMoveComp->GetParent()->GetFunction("OnOverEnd")->sig_function.connect(1, boost::bind(&LibVlcStreamComponent::OnTouchDragUpdate, this, _1));
-		
+	GetParent()->GetFunction("OnOverStart")->sig_function.connect(1, boost::bind(&LibVlcStreamComponent::OnTouchDragUpdate, this, _1));
+	GetParent()->GetFunction("OnOverEnd")->sig_function.connect(1, boost::bind(&LibVlcStreamComponent::OnTouchDragUpdate, this, _1));
 	
 	ScrollToZoomComponent* pScrollZoomComp = (ScrollToZoomComponent*)GetParent()->AddComponent(new ScrollToZoomComponent);
 	pDragComp->GetVar("limitedToThisFingerID")->Set(uint32(0)); //only allow left mouse button
@@ -111,36 +144,59 @@ void LibVlcStreamComponent::Init(std::string url, int cacheMS)
 
 	if (m_pSurface)
 	{
-		//register ourselves to get messages from the libVlcRTSP object
 
-		m_libVlcRTSP.m_sig_update_status.connect(1, boost::bind(&LibVlcStreamComponent::OnStatusUpdated, this, _1));
+		//if m_url ends with .png or .jpg (case insensitive) we'll do something
+		string ext = ToLowerCaseString(GetFileExtension(url));
+		if (ext == "png" || ext == "jpg")
+		{
 
-		//init the libVLC_RTSP object
-		if (!m_libVlcRTSP.Init(url, cacheMS, m_pSurface, this, width, height))
-		{
-			//show a windows text box with an error
-			MessageBox(NULL, "Can't init libVLC stream.", "Error", MB_OK);
-		}
-		else
-		{
-			m_libVlcRTSP.SetLooping(*m_pLooping != 0);
-			//default color, if the stream isn't video, it will stay like this forever
-			m_pSurface->FillColor(glColorBytes(50, 50, 50, 255));
+			LoadStaticImage(url);
+			
 		}
 
+		if (!m_bUseStillPicMode)
+		{
+			//register ourselves to get messages from the libVlcRTSP object
+
+			m_libVlcRTSP.m_sig_update_status.connect(1, boost::bind(&LibVlcStreamComponent::OnStatusUpdated, this, _1));
+
+			//init the libVLC_RTSP object
+			//if url starts with "webcam:" we'll cut off that part and call InitWebcam instead
+			if (url.find("webcam:") == 0)
+			{
+				//cut off the "webcam:" part
+				url = url.substr(7);
+				url = StripWhiteSpace(url);
+
+				m_libVlcRTSP.InitWebcam(url, m_pSurface, this, width, height, settings);
+			}
+			else
+			{
+
+				if (!m_libVlcRTSP.Init(url, cacheMS, m_pSurface, this, width, height, settings))
+				{
+					//show a windows text box with an error
+					MessageBox(NULL, "Can't init libVLC stream.", "Error", MB_OK);
+				}
+				else
+				{
+					m_libVlcRTSP.SetLooping(*m_pLooping != 0);
+					//default color, if the stream isn't video, it will stay like this forever
+					m_pSurface->FillColor(glColorBytes(50, 50, 50, 255));
+				}
+			}
+		}
 	}
 
 	if (!m_title.empty())
 	{
 		//oh, we want to show the 'title' in a text dialog box that won't go off the screen
 		Entity* pEnt = CreateTextBoxEntity(GetParent(), "TitleText", CL_Vec2f(3, 3), CL_Vec2f(400, 50), m_title, 0.7f, ALIGNMENT_UPPER_LEFT);
-
 		TypeTextLabelEntity(pEnt, 0, 20);
-		
 		//Entity* pEnt = CreateTextLabelEntity(GetParent(), "TitleText", 0, 0, m_title);
 	}
 
-}
+} 
 
 void LibVlcStreamComponent::UpdateStatusMessage(string msg)
 {
@@ -206,7 +262,6 @@ void LibVlcStreamComponent::SetMute(bool bMute)
 	//toggle looping
 	if (bMute)
 	{
-		
 		//mute
 		m_savedVolume = m_libVlcRTSP.GetVolume();
 		if (m_libVlcRTSP.GetVolume() != 0)
@@ -214,7 +269,6 @@ void LibVlcStreamComponent::SetMute(bool bMute)
 			UpdateStatusMessage("Muted");
 		}
 		m_libVlcRTSP.SetVolume(0);
-		
 	}
 	else
 	{
@@ -280,7 +334,6 @@ void LibVlcStreamComponent::OnInputWhileMouseDown(VariantList* pVList)
 			if (letterPressed == 'm')
 			{
 				SetMute(!m_bMuted);
-
 			}
 
 			//volume up and down 10% by hitting - and =
@@ -542,7 +595,7 @@ void SetStreamVolumeByName(std::string name, float volume)
 
 }	
 
-LibVlcStreamComponent* AddNewStream(std::string name, std::string url, int cacheMS, Entity* pGUIEnt, bool bIgnoreIfExists, string title)
+LibVlcStreamComponent* AddNewStream(std::string name, std::string url, int cacheMS, Entity* pGUIEnt, bool bIgnoreIfExists, string title, VLC_ExtraSettings settings)
 {
 	LibVlcStreamComponent* pVlcComp = NULL;
 
@@ -562,6 +615,7 @@ LibVlcStreamComponent* AddNewStream(std::string name, std::string url, int cache
 	GetApp()->Draw();
 	ForceVideoUpdate();
 	pVlcComp->SetTitle(title);
-	pVlcComp->Init(url, cacheMS);
+	pVlcComp->Init(url, cacheMS, settings);
+
 	return pVlcComp;
 }

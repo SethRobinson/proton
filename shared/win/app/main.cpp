@@ -152,13 +152,14 @@ void InitVideoSize()
 	AddVideoMode("Playbook Landscape", 1024,600, PLATFORM_ID_BBX);
 
 	AddVideoMode("Flash", 640, 480, PLATFORM_ID_FLASH);
+	AddVideoMode("HTML5", 1280, 720, PLATFORM_ID_HTML5);
 
 	//WORK: Change device emulation here
 	string desiredVideoMode = "Windows";
 	
 #ifdef _DEBUG
 
-	//desiredVideoMode = "iPhone 6.5 Retina Landscape";
+	//desiredVideoMode = "HTML5";
 #endif // DEBUG
 
 	SetVideoModeByName(desiredVideoMode);
@@ -1838,7 +1839,7 @@ void CheckIfMouseLeftWindowArea()
 		}
 }
 
-void SetVSync(bool sync)
+void SetVSync(int sync)
 {
 	typedef BOOL(APIENTRY* PFNWGLSWAPINTERVALPROC)(int);
 	PFNWGLSWAPINTERVALPROC wglSwapIntervalEXT = 0;
@@ -1962,7 +1963,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLin
 		
 		//wglSwapIntervalEXT(0);
 		SetVSync(true);
-
+	
 		/*
 		if (GetAsyncKeyState('Q') && GetAsyncKeyState(VK_MENU))
 		{
@@ -1978,7 +1979,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLin
 				GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_TOGGLE_FULLSCREEN, 0, 0);  //lParam holds a lot of random data about the press, look it up if
 				//return true;
 			}
-
 		}
 
 		if (g_bAppFinished) break;

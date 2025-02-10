@@ -42,7 +42,12 @@ public:
 	virtual void OnRemove();
 	void SetMutedVolume(float vol);
 	float GetMutedVolume() { return m_savedVolume; }
-	void Init(std::string url, int cacheMS);
+
+	void LoadStaticImage(string url);
+
+	//Note:  If you just send in a png or jpn instead of a stream, it will use that instead.  This helps debug things without needing a real stream
+	//running.
+	void Init(std::string url, int cacheMS, VLC_ExtraSettings settings = VLC_ExtraSettings());
 	void OnUpdate(VariantList* pVList);
 	void SetSurfaceSize(int width, int height);
 
@@ -89,9 +94,10 @@ protected:
 	string m_title;
 	unsigned int m_timeOfLastTouchMS = 0;
 	float m_lastTargetAlpha = -1;
+	bool m_bUseStillPicMode = false;
 };
 
 //helper
-LibVlcStreamComponent* AddNewStream(std::string name, std::string url, int cacheMS, Entity* pGUIEnt, bool bIgnoreIfExists = true, string title = "");
+LibVlcStreamComponent* AddNewStream(std::string name, std::string url, int cacheMS, Entity* pGUIEnt, bool bIgnoreIfExists = true, string title = "", VLC_ExtraSettings settings = VLC_ExtraSettings());
 LibVlcStreamComponent* GetStreamEntityByName(std::string name);
 void SetStreamVolumeByName(std::string name, float volume);

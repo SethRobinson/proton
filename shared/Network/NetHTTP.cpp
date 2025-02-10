@@ -57,8 +57,10 @@ void NetHTTP::Reset(bool bClearPostdata)
 		m_contentType = "";
 		m_postData.clear();
 		m_bForcePost = false;
+		m_postHeaderOverride = "";
 		
 	}
+
 	m_bytesWrittenToFile = 0;
 }
 
@@ -108,7 +110,9 @@ bool NetHTTP::AddPostData( const string &name, const uint8 *pData, int len/*=-1*
 	} else
 	{
 		//it's put data.  No name for it
-		m_contentType = "put";
+		//m_contentType = "put";
+		
+		//why would we use put?  I'm displaying this for now.  Just do a SetPostHeaderOverride("Content-Type: application/json\r\n"
 		m_postData = string((char*)pData);
 	}
 
@@ -136,6 +140,11 @@ bool NetHTTP::AddPostData( const string &name, const uint8 *pData, int len/*=-1*
 bool NetHTTP::AddPutData( const string data )
 {
 	return AddPostData("",  (uint8*)data.c_str(),data.size());
+}
+
+void NetHTTP::SetPostHeaderOverride(string header)
+{
+	m_postHeaderOverride = header;
 }
 
 string NetHTTP::BuildHTTPHeader()
@@ -166,7 +175,14 @@ string NetHTTP::BuildHTTPHeader()
 
 	if (m_postData.length() > 0 || m_bForcePost)
 	{
-		header += "Content-Type: application/x-www-form-urlencoded\r\n";
+		if (!m_postHeaderOverride.empty())
+		{
+			header += m_postHeaderOverride;
+		}
+		else
+		{
+			header += "Content-Type: application/x-www-form-urlencoded\r\n";
+		}
 		header += "Content-Length: "+toString(m_postData.length())+"\r\n";
 	}
 

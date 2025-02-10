@@ -842,7 +842,7 @@ CL_Vec2f RTFont::DrawWrapped(rtRect &r, const string &txt, bool centerX, bool ce
 
 	if (GET_ALPHA(bgColor) != 0)
 	{
-		float borderSizeX = GetLineHeight(scale)/10;
+		float borderSizeX = GetLineHeight(scale)/6;
 		float offsetX = ((r.GetWidth()-(int)enclosingRect.x)/2)-borderSizeX;
 
 		if (deq.size() == 1 && centerX)

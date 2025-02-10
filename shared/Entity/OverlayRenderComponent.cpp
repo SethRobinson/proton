@@ -5,6 +5,7 @@
 
 OverlayRenderComponent::OverlayRenderComponent()
 {
+	m_pTex = NULL;
 	m_bDeleteSurface = false;
 	SetName("OverlayRender");
 }

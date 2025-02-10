@@ -102,7 +102,7 @@ public:
 	bool AddPostData(const string &name, const uint8 *pData, int len=-1);
 	bool AddPutData(const string data); //can only be set once.  Can't be used with AddPostData
 	bool SetFileOutput(const string &fName); //call this before Start, allows you to save to a file instead of memory
-
+	void SetPostHeaderOverride(string header); //example: "Content-Type: application/json\r\n"
 	bool Start();
 	
 	eState GetState() {return m_state;}
@@ -186,7 +186,7 @@ private:
 	string m_contentType;
 	bool m_bHasEncodedPostData = false; //used by the libcurl implementation
 	bool m_bForcePost = false; //always post, even if not sending data
-	
+	string m_postHeaderOverride;
 };
 
 bool CheckCharVectorForString(vector<char> &v, string marker, int *pIndexOfMarkerEndPosOut=NULL);

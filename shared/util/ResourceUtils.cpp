@@ -239,6 +239,10 @@ uint8 * LoadFileIntoMemoryBasic(string fileName, unsigned int *length, bool bUse
 	return pData;
 }
 
+bool SaveStringToFile(const string& str, string fileName, bool bUseSavePath, bool bAddBasePath)
+{
+	return SaveMemoryIntoFileBasic((uint8*)str.c_str(), str.size(), fileName, bUseSavePath, bAddBasePath);
+}
 
 bool SaveMemoryIntoFileBasic(uint8* pData, unsigned int length, std::string fileName, bool bUseSavePath, bool bAddBasePath)
 {

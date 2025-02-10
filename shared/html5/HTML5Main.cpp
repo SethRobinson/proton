@@ -341,8 +341,13 @@ int ConvertSDLKeycodeToProtonVirtualKey(SDLKey sdlkey)
 	case SDLK_LSHIFT: keycode = VIRTUAL_KEY_SHIFT; break;
 	case SDLK_RCTRL:
 	case SDLK_LCTRL: keycode = VIRTUAL_KEY_CONTROL; break;
-	
-	case SDLK_ESCAPE: keycode = VIRTUAL_KEY_BACK; break;
+		
+	case 96: keycode = VIRTUAL_KEY_BACKTICK; break;
+
+	case SDLK_ESCAPE:
+	{
+		keycode = VIRTUAL_KEY_BACK; break;
+	}
 
 	default:
 		if (sdlkey >= SDLK_F1 && sdlkey <= SDLK_F15)
@@ -528,6 +533,7 @@ void SDLEventLoop()
 
 			}
 
+			/*
 			switch (ev.key.keysym.sym)
 			{
 			case SDLK_ESCAPE:
@@ -536,20 +542,32 @@ void SDLEventLoop()
 				g_bAppFinished = true;
 				break;
 			}
-
-			int vKey = ConvertSDLKeycodeToProtonVirtualKey(ev.key.keysym.sym);
-			GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_CHAR_RAW, (float)vKey, (float)VIRTUAL_KEY_PRESS);
-
-			if ( (vKey >= SDLK_SPACE && vKey <= SDLK_DELETE) || vKey == SDLK_BACKSPACE || vKey == SDLK_RETURN)
+			*/
+		
+			int protonvKey = ConvertSDLKeycodeToProtonVirtualKey(ev.key.keysym.sym);
+#ifdef _DEBUG
+			//LogMsg("Sending key %d as RAW", protonvKey);
+#endif
+			GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_CHAR_RAW, (float)protonvKey, (float)VIRTUAL_KEY_PRESS);
+			if (protonvKey != ev.key.keysym.sym)
 			{
-				signed char key = vKey;
+				GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_CHAR, (float)protonvKey, (float)VIRTUAL_KEY_PRESS);
 
-				if (ev.key.keysym.mod & KMOD_SHIFT || ev.key.keysym.mod & KMOD_CAPS)
+			}
+			else
+			{
+				//if ( (vKey >= SDLK_SPACE && vKey <= SDLK_DELETE) || vKey == SDLK_BACKSPACE || vKey == SDLK_RETURN)
 				{
-					key = toupper(key);
+					char key = ev.key.keysym.sym;
+					if (ev.key.keysym.mod & KMOD_SHIFT || ev.key.keysym.mod & KMOD_CAPS)
+					{
+						key = toupper(key);
+					}
+					
+					//LogMsg("Sending key %d as non-RAW", protonvKey);
+					
+					GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_CHAR, (float)key, (float)VIRTUAL_KEY_PRESS);
 				}
-
-				GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_CHAR, (float)key, (float)VIRTUAL_KEY_PRESS);
 			}
 		}
 		break;

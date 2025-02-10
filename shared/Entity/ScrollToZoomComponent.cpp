@@ -32,11 +32,10 @@ void ScrollToZoomComponent::OnAdd(Entity* pEnt)
 	GetParent()->GetFunction("OnInput")->sig_function.connect(1, boost::bind(&ScrollToZoomComponent::OnInput, this, _1));
 }
 
-void  ScrollToZoomComponent::OnInput(VariantList* pVList)
+void ScrollToZoomComponent::OnInput(VariantList* pVList)
 {
 	//0 = message type, 1 = parent coordinate offset
 	CL_Vec2f pt = pVList->Get(1).GetVector2();
-	
 	
 	if (m_bIsDraggingLook)
 	{

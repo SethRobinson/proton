@@ -2451,14 +2451,24 @@ void ShowTextMessage(string msg, int timeMS, int delayBeforeStartingMS)
 	GetMessageManager()->CallStaticFunction(OnShowTextMessage, delayBeforeStartingMS, &vList, TIMER_SYSTEM);
 }
 
-void ShowTextMessageSimple(string msg, int timeMS)
+Entity * ShowTextMessageSimple(string msg, int timeMS, float x, float y)
 {
 	
 	Entity* pEnt = CreateTextLabelEntity(NULL, "", 0, 0, msg);
 	SetupTextEntity(pEnt, FONT_LARGE, 0.66f);
 
 	//now that we know the size of the text, let's create a black bg, then attach the text to it.
-	Entity* pRect = CreateOverlayRectEntity(NULL, GetScreenSize() / 2, GetSize2DEntity(pEnt), MAKE_RGBA(0, 0, 0, 170));
+	if (x == -1)
+	{
+		x = GetScreenSize().x / 2;
+	}
+
+	if (y == -1)
+	{
+		y = GetScreenSize().y / 2;
+	}
+	
+	Entity* pRect = CreateOverlayRectEntity(NULL, CL_Vec2f(x,y), GetSize2DEntity(pEnt), MAKE_RGBA(0, 0, 0, 170));
 	SetAlignmentEntity(pRect, ALIGNMENT_UPPER_CENTER);
 	pRect->AddEntity(pEnt);
 
@@ -2469,7 +2479,7 @@ void ShowTextMessageSimple(string msg, int timeMS)
 	VariantList v(pRect);
 	GetMessageManager()->CallEntityFunction(pRect, timeMS + 1, "MoveToTop", &v, TIMER_SYSTEM);
 	pRect->GetFunction("MoveToTop")->sig_function.connect(MoveEntityToTop);
-
+	return pEnt;
 }
 
 

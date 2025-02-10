@@ -20,6 +20,23 @@ rtRect::rtRect()
 
 }
 
+
+
+bool rtRect::Intersects(rtRect r)
+{
+	if (left > r.right || r.left > right)
+	{
+		return false;
+	}
+
+	if (top > r.bottom || r.top > bottom)
+	{
+		return false;
+	}
+
+	return true;
+}
+
 void rtRect::AdjustPosition( int x, int y )
 {
 	left += x;
@@ -176,3 +193,4 @@ void rtRect32::Inflate(int32 x, int32 y)
 	top -= y;
 	bottom += y;
 }
+
