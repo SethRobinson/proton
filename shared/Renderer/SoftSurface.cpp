@@ -2586,7 +2586,7 @@ uint8 * SoftSurface::WritePNGToMemory(int compressionLevel, int &outSize)
 	// Clean up memory buffer
 	delete[] memBuf.data;
 
-	return result;
+	return (uint8*)result;
 #else
 	LogError("PNG support not compiled in! Define RT_PNG_SUPPORT to enable PNG writing.");
 	return nullptr;
@@ -2596,7 +2596,7 @@ void SoftSurface::WritePNGOut(string fileName, int compressionLevel)
 {
 #ifdef RT_PNG_SUPPORT
 	int pngSize = 0;
-	byte* pngData = WritePNGToMemory(compressionLevel, pngSize);
+	uint8* pngData = WritePNGToMemory(compressionLevel, pngSize);
 	if (!pngData) {
 		LogError("Failed to write PNG data to memory");
 		return;
