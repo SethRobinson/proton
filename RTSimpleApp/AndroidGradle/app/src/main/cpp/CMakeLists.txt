@@ -57,8 +57,7 @@ ${SHARED}/Entity/Entity.cpp ${SHARED}/Entity/Component.cpp ${SHARED}/GUI/RTFont.
 ${SHARED}/Manager/GameTimer.cpp ${SHARED}/Manager/MessageManager.cpp ${SHARED}/Manager/ResourceManager.cpp ${SHARED}/Manager/VariantDB.cpp ${SHARED}/Math/rtPlane.cpp 
 ${SHARED}/Math/rtRect.cpp ${SHARED}/Renderer/RenderBatcher.cpp ${SHARED}/Renderer/SoftSurface.cpp ${SHARED}/Renderer/Surface.cpp ${SHARED}/Renderer/SurfaceAnim.cpp 
 ${SHARED}/util/CRandom.cpp ${SHARED}/util/GLESUtils.cpp ${SHARED}/util/MathUtils.cpp ${SHARED}/util/MiscUtils.cpp ${SHARED}/util/RenderUtils.cpp ${SHARED}/util/ResourceUtils.cpp 
-${SHARED}/util/Variant.cpp ${SHARED}/util/boost/libs/signals/src/connection.cpp ${SHARED}/util/boost/libs/signals/src/named_slot_map.cpp ${SHARED}/util/boost/libs/signals/src/signal_base.cpp 
-${SHARED}/util/boost/libs/signals/src/slot.cpp ${SHARED}/util/boost/libs/signals/src/trackable.cpp ${SHARED}/BaseApp.cpp 
+${SHARED}/util/Variant.cpp ${SHARED}/BaseApp.cpp 
 ${SHARED}/util/unzip/unzip.c ${SHARED}/util/unzip/ioapi.c ${SHARED}/util/TextScanner.cpp ${SHARED}/Entity/EntityUtils.cpp 
 ${SHARED}/Network/NetHTTP.cpp ${SHARED}/Network/NetSocket.cpp ${SHARED}/Network/NetUtils.cpp ${SHARED}/FileSystem/StreamingInstance.cpp 
 ${SHARED}/FileSystem/StreamingInstanceZip.cpp ${SHARED}/FileSystem/StreamingInstanceFile.cpp ${SHARED}/FileSystem/FileSystem.cpp ${SHARED}/FileSystem/FileSystemZip.cpp 

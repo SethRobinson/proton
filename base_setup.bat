@@ -18,7 +18,7 @@ SET ANDROID_SDK=D:\pro\androidsdk
 :Ant 1.9x+ is used for packaging Android builds, add to path if needed
 SET ANT_HOME=D:\pro\apache-ant-1.9.16
 SET PATH=%ANT_HOME%\bin;%PATH%
-SET JAVA_HOME=D:\pro\jdk-17.0.2
+SET JAVA_HOME=C:\Apps\androidstudio\jbr
 
 : Below is used to find the Raspberry pi and command line utils like ssh, don't really need to set this stuff up but it makes various scripts work that Seth uses
 
