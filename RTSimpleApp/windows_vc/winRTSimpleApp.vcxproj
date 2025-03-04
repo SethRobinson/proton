@@ -2586,6 +2586,7 @@
     <None Include="..\..\shared\OSX\app\MyOpenGLView.mm" />
     <None Include="..\..\shared\OSX\OSXUtils.mm" />
     <None Include="..\AndroidGradle\app\build.gradle" />
+    <None Include="..\AndroidGradle\build.gradle" />
     <None Include="..\AndroidGradle\local.properties" />
     <None Include="..\AndroidGradle\PrepareResources.bat" />
     <None Include="..\html5\build_release.bat" />

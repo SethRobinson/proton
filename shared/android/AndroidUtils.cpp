@@ -853,7 +853,7 @@ void AppResize( JNIEnv*  env, jobject  thiz, jint w, jint h )
 #ifdef _DEBUG
 	LogMsg("Resizing screen to %d %d", w, h);
 #endif
-	
+
 	if (!GetBaseApp()->IsInitted())
 	{
 		SetupScreenInfo(GetPrimaryGLX(), GetPrimaryGLY(), ORIENTATION_PORTRAIT);
@@ -896,16 +896,17 @@ void AppResize( JNIEnv*  env, jobject  thiz, jint w, jint h )
 			LogMsg("Unable to initalize BaseApp");
 		}
 
-
 		//let's also create our save directory on the sd card if needed, so we don't get errors when just assuming we can save
 		//settings later in the app.
 
 		CreateDirectoryRecursively("", GetAppCachePath());
-
-
+	}
+	else
+	{
+		SetupScreenInfo(GetPrimaryGLX(), GetPrimaryGLY(), ORIENTATION_PORTRAIT);
 	}
 
-	GetBaseApp()->OnScreenSizeChange();
+	//GetBaseApp()->OnScreenSizeChange();
 };
 
 void AppRender(JNIEnv*  env)

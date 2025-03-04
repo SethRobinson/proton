@@ -258,7 +258,7 @@ void BaseApp::OnScreenSizeChange()
 {
 	
 #ifdef _DEBUG
-	//LogMsg("Changing screen-size to %d, %d, %d", GetScreenSizeX(), GetScreenSizeY(), GetOrientation());
+	LogMsg("Changing screen-size to %d, %d, %d", GetScreenSizeX(), GetScreenSizeY(), GetOrientation());
 #endif
 	
 	GenerateSetPerspectiveFOV(C_APP_FOV, GetScreenSizeXf()/ GetScreenSizeYf(),0.1f,500.0f);
@@ -673,7 +673,7 @@ void BaseApp::SetFPSLimit(float fps)
 		GetBaseApp()->AddOSMessage(o);
 	}
 }
-
+ 
 void BaseApp::SetVideoMode(int width, int height, bool bFullScreen, float aspectRatio) //aspectRatio should be 0 to ignore
 {
 	//this message is only going to be processed by platforms that can change size during runtime and have such a thing as fullscreen

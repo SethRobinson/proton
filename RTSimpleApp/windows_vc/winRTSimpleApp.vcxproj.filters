@@ -1190,6 +1190,9 @@
     <None Include="..\AndroidGradle\app\build.gradle">
       <Filter>source\Platform Stuff\AndroidGradle\App</Filter>
     </None>
+    <None Include="..\AndroidGradle\build.gradle">
+      <Filter>source\Platform Stuff\AndroidGradle</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\linux\CMakeLists.txt">

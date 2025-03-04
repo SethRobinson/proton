@@ -154,26 +154,6 @@ bool App::Init()
 	{
 		//special handling for certain platforms to tweak the video settings
 
-	case PLATFORM_ID_WEBOS:
-		//if we do this, everything will be stretched/zoomed to fit the screen
-		if (IsIPADSize)
-		{
-			//doesn't need rotation
-			SetLockedLandscape(false);  //because it's set in the app manifest, we don't have to rotate ourselves
-			SetupScreenInfo(GetPrimaryGLX(), GetPrimaryGLY(), ORIENTATION_PORTRAIT);
-            if (bScaleScreenActive)
-                SetupFakePrimaryScreenSize(scaleToX,scaleToY); //game will think it's this size, and will be scaled up
-		} 
-else 
-		{
-			//but the phones do
-			SetLockedLandscape(true); //we don't allow portrait mode for this game
-            if (bScaleScreenActive)
-                SetupFakePrimaryScreenSize(scaleToX,scaleToY); //game will think it's this size, and will be scaled up
-		}
-		
-		break;
-
 		case PLATFORM_ID_IOS:
 			SetLockedLandscape(true); //we stay in portrait but manually rotate, gives better fps on older devices
             if (bScaleScreenActive)
@@ -294,7 +274,7 @@ int App::GetBuild()
 	return 1;
 }
 
-const char * GetAppName() {return "SimpleApp";}
+const char * GetAppName() {return "RTSimpleApp";}
 
 //for palm webos and android
 const char * GetBundlePrefix()

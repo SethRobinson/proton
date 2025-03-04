@@ -3,8 +3,8 @@ plugins {
 }
 
 void execute(String... args) {
-    println "Executing $args...";
-    def proc = args.execute();
+    println "Executing $args..."
+    def proc = args.execute()
 
     proc.in.eachLine {line -> println line}
     proc.err.eachLine {line -> println 'ERROR: ' + line}
@@ -82,7 +82,6 @@ android {
         viewBinding true
     }
     namespace 'com.rtsoft.RTAndroidApp'
-    buildToolsVersion '35.0.1'
     ndkVersion '25.1.8937393'
 }
 

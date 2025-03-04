@@ -1203,7 +1203,7 @@ void Surface::OnLoadSurfaces()
 {
 
 #ifdef _DEBUG
-	LogMsg("Runing OnLoadSurfaces on %s", m_textureLoaded.c_str());
+	LogMsg("Running OnLoadSurfaces on %s", m_textureLoaded.c_str());
 #endif
 	if (m_glTextureID != NO_TEXTURE_LOADED) return; //already loaded I guess
 
