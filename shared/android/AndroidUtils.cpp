@@ -355,6 +355,7 @@ string GetDeviceID()
 	return string(s);
 }
 
+
 string GetMacAddress()
 {
 	JNIEnv *env = GetJavaEnv();
@@ -555,7 +556,48 @@ double GetSystemTimeAccurate()
 
 unsigned int GetFreeMemory()
 {
-	return 0; //don't care on the PC
+	JNIEnv* env = GetJavaEnv();
+	if (!env) return 0;
+
+	jclass cls = env->FindClass(GetAndroidMainClassName());
+	if (!cls)
+	{
+		LogMsg("Failed to find main class");
+		return 0;
+	}
+
+	jmethodID mid = env->GetStaticMethodID(cls, "getFreeMemory", "()J");
+	if (!mid)
+	{
+		LogMsg("Failed to find getFreeMemory method");
+		return 0;
+	}
+
+	// Call the getFreeMemory method
+	jlong freeMemory = env->CallStaticLongMethod(cls, mid);
+
+	// Clean up the local references
+	env->DeleteLocalRef(cls);
+
+	return (unsigned int)freeMemory;
+}
+
+unsigned int GetNativeMemoryUsed()
+{
+	JNIEnv* env = GetJavaEnv();
+	if (env)
+	{
+		jclass clazz = env->FindClass("android/os/Debug");
+		if (clazz)
+		{
+			jmethodID mid = env->GetStaticMethodID(clazz, "getNativeHeapSize", "()J");
+			if (mid)
+			{
+				return env->CallStaticLongMethod(clazz, mid);
+			}
+		}
+	}
+	return -1L;
 }
 
 string g_string;

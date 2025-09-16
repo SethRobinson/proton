@@ -189,10 +189,10 @@ AudioHandle AudioManagerAudiere::Play( string fName, bool bLooping /*= false*/, 
 
 	if (bIsMusic && m_bLastMusicLooping == bLooping && m_lastMusicFileName == fName && m_bLastMusicLooping)
 	{
-		return (AudioHandle) 0;
+		return (AudioHandle) m_lastMusicID;
 	}
 	
-	if(bIsMusic)
+	if (bIsMusic)
 	{
 		StopMusic();
 		m_bLastMusicLooping = bLooping;
@@ -226,6 +226,7 @@ AudioHandle AudioManagerAudiere::Play( string fName, bool bLooping /*= false*/, 
 	if (bIsMusic)
 	{
 		SetMusicVol(m_musicVol);
+		m_lastMusicID = (AudioHandle)pObject;
 	} else
 	{
 		if (m_globalVol != 1.0f || m_defaultVol != 1.0f)
@@ -281,7 +282,11 @@ AudioHandle AudioManagerAudiere::GetMusicChannel()
 
 bool AudioManagerAudiere::IsPlaying( AudioHandle soundID )
 {
-	//skipped
+	AudiereSoundObject* pObject = GetSoundObjectByPointer((void*)soundID);
+	if (pObject && pObject->m_pSound)
+	{
+		return pObject->m_pSound->isPlaying();
+	}
 	return false;
 }
 

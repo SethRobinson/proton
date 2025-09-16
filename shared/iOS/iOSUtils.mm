@@ -56,8 +56,19 @@ void LogMsg(const char *lpFormat, ...)
 
 void LaunchURL(string url)
 {
-	NSURL *appStoreUrl = [NSURL URLWithString:[NSString stringWithCString: url.c_str() encoding: [NSString defaultCStringEncoding]]];
-	[[UIApplication sharedApplication] openURL:appStoreUrl];
+    NSURL *appStoreUrl = [NSURL URLWithString:[NSString stringWithCString:url.c_str() encoding:[NSString defaultCStringEncoding]]];
+    
+    if ([[UIApplication sharedApplication] respondsToSelector:@selector(openURL:options:completionHandler:)])
+    {
+        [[UIApplication sharedApplication] openURL:appStoreUrl options:@{} completionHandler:^(BOOL success)
+        {
+            // Optionally, handle the success or failure of the URL opening here.
+        }];
+    }
+    else
+    {
+        [[UIApplication sharedApplication] openURL:appStoreUrl];
+    }
 }
 
 eNetworkType IsNetReachable(string url)

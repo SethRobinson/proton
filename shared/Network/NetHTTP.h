@@ -135,7 +135,7 @@ protected:
 	static size_t CURLWriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *pThisInstance);
 
 	static size_t CURLReadMemoryCallback(void* ptr, size_t size, size_t nmemb, void* userdata);
-
+	int m_receiveBuffCapacity = 0;
 	char *m_pReceiveBuff = NULL;
 	size_t m_receivedSize = 0;
 	CURLM *m_CURL_multi_handle = NULL;

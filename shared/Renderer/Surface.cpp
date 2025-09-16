@@ -1258,7 +1258,7 @@ void Surface::OnUnloadSurfaces()
 bool Surface::CreateSoftSurfaceFromSurface(SoftSurface& outSurf, bool bUseOriginalSizes )
 {
 
-#ifndef PLATFORM_ANDROID
+#if !defined(PLATFORM_ANDROID) && !defined(PLATFORM_IOS)
 	if (!m_glTextureID)
 	{
 		LogMsg("No OpenGL texture found on this Surface.");

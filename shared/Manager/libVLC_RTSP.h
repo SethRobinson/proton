@@ -86,6 +86,7 @@ protected:
     std::string GetWebcamDevicePath(const std::string& deviceNameOrId);
   
     void SendStatusUpdate(eStatus status, float secondFloat = 0.0f);
+    int GetVideoRotation(); // Get rotation metadata from video
 
     void UpdateFrame();
 

@@ -103,6 +103,10 @@ import android.widget.RelativeLayout;
 import android.view.View.OnClickListener;
 import android.net.ConnectivityManager;
 
+import android.app.ActivityManager;
+
+import android.graphics.Rect;
+import android.view.ViewTreeObserver;
 
 	public class SharedActivity extends Activity implements SensorEventListener
 
@@ -279,6 +283,41 @@ import android.net.ConnectivityManager;
         }
     });
        
+	   
+	   
+	 final View rootView = getWindow().getDecorView().getRootView();
+    rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        private boolean wasKeyboardOpen = false;
+        
+        @Override
+        public void onGlobalLayout() {
+            Rect r = new Rect();
+            rootView.getWindowVisibleDisplayFrame(r);
+            
+            int screenHeight = rootView.getHeight();
+            int keyboardHeight = screenHeight - r.bottom;
+            
+            // If keyboard height is more than 15% of screen height, consider keyboard visible
+            boolean isKeyboardOpen = keyboardHeight > screenHeight * 0.15;
+            
+            // Detect keyboard closing
+            if (wasKeyboardOpen && !isKeyboardOpen) {
+                // Keyboard was just closed
+                if (m_editText != null && m_editText.hasFocus()) {
+                    // Notify Proton that text input is complete
+                    nativeOnKey(1, 13, 13); // fake enter key event
+                    mGLView.requestFocus();
+                    m_editText.setText("");
+                    m_before = "";
+                }
+            }
+            
+            wasKeyboardOpen = isKeyboardOpen;
+        }
+    });
+
+	
+	   
    
 	m_editText.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
  	
@@ -606,6 +645,16 @@ m_editText.addTextChangedListener(new TextWatcher()
 		
 	}
 
+	public static long getFreeMemory()
+	{
+		if (app == null) return 0;
+    
+		Context context = app.getApplicationContext();
+		ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+		ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
+		activityManager.getMemoryInfo(memoryInfo);
+		return memoryInfo.availMem;
+	}
 
 	public static void SetPackageName(String packageID)
 	{

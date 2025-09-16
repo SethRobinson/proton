@@ -120,6 +120,7 @@ public:
 	virtual void SetFrequency(AudioHandle soundID, int freq) {}
 	virtual void SetPan(AudioHandle soundID, float pan) {} //0 is normal stereo, -1 is all left, +1 is all right
 	virtual bool IsPlaying(AudioHandle soundID) {return false;}
+	virtual bool IsPlayingMusic();
 	virtual void SetVol(AudioHandle soundID, float vol) {} //using audio handle -1 adjusts global vol on some systems
 	virtual void SetPriority(AudioHandle soundID, int priority) {}
 	virtual uint32 GetPos( AudioHandle soundID ){return 0;}
@@ -172,14 +173,15 @@ bool CheckIfOtherAudioIsPlaying(); //are they playing ipod stuff before the app 
 
 //can be scheduled easier.
 
-/*
+//some functions to help with scheduling, not needed but I use them in RTSlideShow
 
+/*
 VariantList vList;
 vList.Get(0).Set(sfx);
 GetMessageManager()->CallStaticFunction(PlaySound, timeMS, &vList);
-
 */
 
 void PlaySound(VariantList* pVList);
-
+void PlayMusic(VariantList* pVList);
+void StopMusic(VariantList* pVList);
 #endif // AudioManager_h__

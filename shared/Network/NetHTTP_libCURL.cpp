@@ -15,6 +15,7 @@ If RT_USE_LIBCURL is defined, NetHTTP uses CURL internally instead, can support 
 
 NetHTTP::NetHTTP()
 {
+	m_receiveBuffCapacity = 0;
 	m_pFile = NULL;
 	Reset(true);
 }
@@ -31,10 +32,13 @@ NetHTTP::~NetHTTP()
 	}
 
 	SAFE_FREE(m_pReceiveBuff);
+	m_receiveBuffCapacity = 0;
 }
 
 void NetHTTP::Reset(bool bClearPostdata)
 {
+	SAFE_FREE(m_pReceiveBuff);
+	m_receiveBuffCapacity = 0;
 
 	if (m_pFile)
 	{
@@ -236,24 +240,70 @@ static int CURLDebugTrace(CURL *handle, curl_infotype type,
 	return 0;
 }
 
-size_t NetHTTP::CURLWriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *pThisInstance)
+size_t NetHTTP::CURLWriteMemoryCallback(void* contents, size_t size, size_t nmemb, void* pThisInstance)
 {
 	size_t realsize = size * nmemb;
-	NetHTTP *pCURLInstance = (NetHTTP *)pThisInstance;
+	NetHTTP* pCURLInstance = (NetHTTP*)pThisInstance;
 
-	char *ptr = (char *)realloc(pCURLInstance->m_pReceiveBuff, pCURLInstance->m_receivedSize + realsize + 1);
-	if (ptr == NULL) {
-		/* out of memory! */
-		printf("not enough memory (realloc returned NULL)\n");
-		return 0;
+
+	//if we're downloading a file, we'll directly write to m_pFile and leave early
+	if (pCURLInstance->m_pFile)
+	{
+		fwrite(contents, realsize, 1, pCURLInstance->m_pFile);
+		pCURLInstance->m_bytesWrittenToFile += realsize;
+		pCURLInstance->m_receivedSize += realsize;
+
+		return realsize;
 	}
 
-	pCURLInstance->m_pReceiveBuff = ptr;
+	// Calculate how much space we need
+	size_t newSize = pCURLInstance->m_receivedSize + realsize + 1;
+
+	// Check if we need to resize the buffer
+	if (newSize > pCURLInstance->m_receiveBuffCapacity) {
+		// Double the capacity, or more if needed
+		size_t newCapacity = pCURLInstance->m_receiveBuffCapacity;
+		if (newCapacity == 0) {
+			// First allocation - start with a reasonable size
+			newCapacity = 262144; // 256KB initial allocation
+		}
+
+		// Keep doubling until we have enough space, but cap at 10MB
+		while (newCapacity < newSize && newCapacity < 10 * 1024 * 1024) {
+			newCapacity *= 2;
+		}
+
+		// Ensure we don't exceed 10MB
+		if (newCapacity > 10 * 1024 * 1024) {
+			newCapacity = 10 * 1024 * 1024;
+		}
+
+		// Make sure we have at least enough space for this chunk
+		if (newCapacity < newSize) {
+			// If the current chunk would exceed our max buffer, just allocate exactly what we need
+			newCapacity = newSize;
+		}
+
+		// Reallocate with the new capacity
+		char* ptr = (char*)realloc(pCURLInstance->m_pReceiveBuff, newCapacity);
+		if (ptr == NULL) {
+			/* out of memory! */
+			printf("not enough memory (realloc returned NULL)\n");
+			return 0;
+		}
+
+		pCURLInstance->m_pReceiveBuff = ptr;
+		pCURLInstance->m_receiveBuffCapacity = newCapacity;
+	}
+
+	// Copy the new data into the buffer
 	memcpy(&(pCURLInstance->m_pReceiveBuff[pCURLInstance->m_receivedSize]), contents, realsize);
 	pCURLInstance->m_receivedSize += realsize;
 	pCURLInstance->m_pReceiveBuff[pCURLInstance->m_receivedSize] = 0;
+
+	// Update progress less frequently for large downloads
+		pCURLInstance->SetProgress(pCURLInstance->m_receivedSize, -1);
 	
-	pCURLInstance->SetProgress(pCURLInstance->m_receivedSize, -1);
 	return realsize;
 }
 
@@ -453,6 +503,7 @@ bool NetHTTP::Start()
 	//curl_easy_setopt(m_CURL_handle, CURLOPT_VERBOSE, 1L);
 	//curl_easy_setopt(m_CURL_handle, CURLOPT_DEBUGFUNCTION, CURLDebugTrace);
 #endif
+	curl_easy_setopt(m_CURL_handle, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2TLS);
 
 	curl_easy_setopt(m_CURL_handle, CURLOPT_URL, finalURL.c_str());
 	//curl_easy_setopt(curl_handle, CURLOPT_SSL_VERIFYPEER, 0);
@@ -470,10 +521,13 @@ bool NetHTTP::Start()
 
 	curl_easy_setopt(m_CURL_handle, CURLOPT_WRITEDATA, this);
 	curl_easy_setopt(m_CURL_handle, CURLOPT_WRITEFUNCTION, NetHTTP::CURLWriteMemoryCallback);
+	curl_easy_setopt(m_CURL_handle, CURLOPT_BUFFERSIZE, 1024 * 1024L); // 1MB chunks
+	curl_easy_setopt(m_CURL_handle, CURLOPT_MAX_RECV_SPEED_LARGE, (curl_off_t)0);
+	curl_easy_setopt(m_CURL_handle, CURLOPT_MAX_SEND_SPEED_LARGE, (curl_off_t)0);
 
 
-	/* ask libcurl to allocate a larger receive buffer */
-	curl_easy_setopt(m_CURL_handle, CURLOPT_BUFFERSIZE, 120000L);
+	// Enable TCP keepalive
+	curl_easy_setopt(m_CURL_handle, CURLOPT_TCP_KEEPALIVE, 1L);
 
 
 	if (GetPlatformID() == PLATFORM_ID_ANDROID)
@@ -760,9 +814,17 @@ int NetHTTP::GetDownloadedBytes()
 void NetHTTP::SetBuffer(const char *pData, int byteSize)
 {
 	m_expectedFileBytes = byteSize;
-	m_downloadData.resize(byteSize + 1); //1 extra so we can add a null
-	memcpy((char*)&m_downloadData[0], pData, byteSize); //never do this at home, kids
-	m_downloadData[byteSize] = 0; //set the NULL too
+	
+	if (m_pFile)
+	{
+		
+	}
+	else
+	{
+		m_downloadData.resize(byteSize + 1); //1 extra so we can add a null
+		memcpy((char*)&m_downloadData[0], pData, byteSize); //never do this at home, kids
+		m_downloadData[byteSize] = 0; //set the NULL too
+	}
 
 	if (m_endOfDataSignal == END_OF_DATA_SIGNAL_RTSOFT_MARKER && m_pFile == NULL)
 	{
@@ -783,16 +845,6 @@ void NetHTTP::SetBuffer(const char *pData, int byteSize)
 		}
 	}
 
-
-	//if we were downloading a file, this closes it up
-
-
-	
-	if (m_pFile)
-	{
-		fwrite(GetDownloadedData(), GetDownloadedBytes(), 1, m_pFile);
-	}
-	
 }
 
 void NetHTTP::SetProgress(int bytesDownloaded, int totalBytes)

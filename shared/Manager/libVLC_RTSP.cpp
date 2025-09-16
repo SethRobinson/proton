@@ -1,6 +1,8 @@
 #include "PlatformPrecomp.h"
 #include "libVLC_RTSP.h"
 #include <GL/gl.h> // or appropriate OpenGL header for your platform
+#include <algorithm> // for std::swap
+#include <string> // for std::stoi
 #include "App.h"
 #include "Entity/LibVlcStreamComponent.h"
 #include "Renderer/SoftSurface.h"
@@ -574,6 +576,49 @@ bool libVLC_RTSP::IsCropped()
 	return m_extraSettings.cropRect.left != 0 || m_extraSettings.cropRect.top != 0 || m_extraSettings.cropRect.right != 0 || m_extraSettings.cropRect.bottom != 0;
 }
 
+int libVLC_RTSP::GetVideoRotation()
+{
+    if (m_pVlcMediaPlayer == nullptr) return 0;
+    
+    // Try to get rotation from libVLC metadata
+    libvlc_media_t* media = libvlc_media_player_get_media(m_pVlcMediaPlayer);
+    if (media)
+    {
+        // Try different metadata keys that might contain rotation info
+        char* rotationMeta = libvlc_media_get_meta(media, libvlc_meta_Setting);
+        if (rotationMeta)
+        {
+            // Parse rotation metadata - common values are "90", "180", "270"
+            std::string rotStr(rotationMeta);
+            libvlc_free(rotationMeta);
+            
+            try {
+                int rotation = std::stoi(rotStr);
+                if (rotation == 90 || rotation == 180 || rotation == 270) {
+                    return rotation;
+                }
+            } catch (...) {
+                // Not a valid rotation value, continue trying other methods
+            }
+        }
+        
+        // Try alternative metadata approach - some videos store rotation in Description
+        char* descMeta = libvlc_media_get_meta(media, libvlc_meta_Description);
+        if (descMeta)
+        {
+            std::string desc(descMeta);
+            libvlc_free(descMeta);
+            
+            // Look for rotation patterns in description
+            if (desc.find("rotate=90") != std::string::npos || desc.find("rotation=90") != std::string::npos) return 90;
+            if (desc.find("rotate=180") != std::string::npos || desc.find("rotation=180") != std::string::npos) return 180;
+            if (desc.find("rotate=270") != std::string::npos || desc.find("rotation=270") != std::string::npos) return 270;
+        }
+    }
+    
+    return 0; // No rotation detected
+}
+
 void libVLC_RTSP::UpdateFrame()
 {
     if (m_pVlcMediaPlayer != nullptr)
@@ -587,10 +632,24 @@ void libVLC_RTSP::UpdateFrame()
                 {
                     if (width != m_video_width || height != m_video_height)
                     {
-                        // Handle rotation check as before...
+                        // Check for rotation metadata and swap dimensions if needed
+                        int rotation = GetVideoRotation();
+                        
+                        // If video is rotated 90° or 270°, swap dimensions for correct aspect ratio
+                        if (rotation == 90 || rotation == 270) 
+                        {
+                            std::swap(width, height);
+                            LogMsg("Detected %d° rotation, swapping dimensions to %dx%d", rotation, width, height);
+                        }
+                        else if (rotation != 0)
+                        {
+                            LogMsg("Detected %d° rotation (no dimension swap needed)", rotation);
+                        }
 
                         m_video_width = width;
                         m_video_height = height;
+                        m_rotationAngle = rotation; // Store rotation for potential future use
+                        
                         Init(m_source, m_cachingMS, m_pSurface, m_pStreamComp,
                             m_video_width, m_video_height, m_extraSettings); // Pass settings to maintain crop
 

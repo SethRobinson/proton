@@ -576,6 +576,8 @@ string GetFileNameWithoutExtension(const string fileName)
 string GetPathFromString(const string &path)
 {
 
+    if (path.empty()) return path;
+    
 	for (size_t i=path.size()-1; i > 0; i--)
 	{
 		if (path[i] == '/' || path[i] == '\\')

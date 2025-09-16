@@ -69,8 +69,26 @@ std::string AudioManager::GetAudioSystemName()
 	return "unknown";
 }
 
+bool AudioManager::IsPlayingMusic()
+{
+		if (m_lastMusicID == AUDIO_HANDLE_BLANK) return false;
+		return IsPlaying(m_lastMusicID);
+}
+
 void PlaySound(VariantList *pVList)
 {
 	string fName = pVList->Get(0).GetString();
 	GetAudioManager()->Play(fName);
 }
+
+void PlayMusic(VariantList* pVList)
+{
+	string fName = pVList->Get(0).GetString();
+	GetAudioManager()->Play(fName, true, true);
+}
+
+void StopMusic(VariantList* pVList)
+{
+	GetAudioManager()->StopMusic();
+}
+

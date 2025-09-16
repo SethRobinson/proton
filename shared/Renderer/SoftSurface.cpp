@@ -165,12 +165,7 @@ bool SoftSurface::SetPaletteFromBMP(const string fName, eColorKeyType colorKey)
 
 		}
 	}
-	/*
-	LogMsg("Setting bitmapimage type");
-	BMPImageHeader *pBmpImageInfo = (BMPImageHeader*)(f.GetAsBytes()+14);
-	byte *pPaletteData = (byte*)pBmpImageInfo+sizeof(BMPImageHeader);
-	*/
-
+	
 	//new way
 
 	uint8 *pPaletteData = f.GetAsBytes()+14+sizeof(BMPImageHeader);
@@ -662,7 +657,7 @@ bool SoftSurface::LoadPNGTexture(uint8 *pMem, int inputSize, bool bApplyCheckerB
 
 	// Convert from weird gray bits to bytes
 	if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8)
-		png_set_gray_1_2_4_to_8(png_ptr);
+		png_set_expand_gray_1_2_4_to_8(png_ptr);
 
 	// Not sure; this was recommended at http://www.libpng.org/pub/png/libpng-1.2.5-manual.html
 	if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS)) 
@@ -2450,35 +2445,37 @@ BMPImageHeader SoftSurface::BuildBitmapHeader()
 	return bmpImageInfo;
 }
 
-uint8 * SoftSurface::WritePNGToMemory(int compressionLevel, int &outSize)
+// Define the memory buffer structure outside the function
+struct PNGMemoryBuffer {
+	uint8* data;
+	size_t size;
+	size_t capacity;
+};
+
+// Define the write function outside the WritePNGToMemory function
+static void WriteDataToMemory(png_structp png_ptr, png_bytep data, png_size_t length)
+{
+	PNGMemoryBuffer* p = (PNGMemoryBuffer*)png_get_io_ptr(png_ptr);
+	size_t new_size = p->size + length;
+	if (new_size > p->capacity) {
+		size_t new_capacity = new_size + 1024; // Allocate additional memory to reduce reallocations
+		uint8* new_data = new uint8[new_capacity];
+		if (p->data) {
+			memcpy(new_data, p->data, p->size);
+			delete[] p->data;
+		}
+		p->data = new_data;
+		p->capacity = new_capacity;
+	}
+	memcpy(p->data + p->size, data, length);
+	p->size += length;
+}
+
+uint8* SoftSurface::WritePNGToMemory(int compressionLevel, int& outSize)
 {
 #ifdef RT_PNG_SUPPORT
-	// Structure to hold the PNG data in memory
-	struct MemoryBuffer {
-		uint8* data;
-		size_t size;
-		size_t capacity;
-	};
-
-	MemoryBuffer memBuf = { nullptr, 0, 0 };
-
-	// Custom write function to write PNG data to memory buffer
-	auto WriteDataToMemory = [](png_structp png_ptr, png_bytep data, png_size_t length) {
-		MemoryBuffer* p = (MemoryBuffer*)png_get_io_ptr(png_ptr);
-		size_t new_size = p->size + length;
-		if (new_size > p->capacity) {
-			size_t new_capacity = new_size + 1024; // Allocate additional memory to reduce reallocations
-			uint8* new_data = new uint8[new_capacity];
-			if (p->data) {
-				memcpy(new_data, p->data, p->size);
-				delete[] p->data;
-			}
-			p->data = new_data;
-			p->capacity = new_capacity;
-		}
-		memcpy(p->data + p->size, data, length);
-		p->size += length;
-		};
+	// Initialize memory buffer
+	PNGMemoryBuffer memBuf = { nullptr, 0, 0 };
 
 	// Initialize write structure
 	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
@@ -2486,7 +2483,6 @@ uint8 * SoftSurface::WritePNGToMemory(int compressionLevel, int &outSize)
 		LogError("Could not create PNG write structure");
 		return nullptr;
 	}
-
 	// Initialize info structure
 	png_infop info_ptr = png_create_info_struct(png_ptr);
 	if (!info_ptr) {
@@ -2494,7 +2490,6 @@ uint8 * SoftSurface::WritePNGToMemory(int compressionLevel, int &outSize)
 		png_destroy_write_struct(&png_ptr, NULL);
 		return nullptr;
 	}
-
 	// Setup exception handling
 	if (setjmp(png_jmpbuf(png_ptr))) {
 		LogError("Error during PNG creation");
@@ -2503,15 +2498,12 @@ uint8 * SoftSurface::WritePNGToMemory(int compressionLevel, int &outSize)
 			delete[] memBuf.data;
 		return nullptr;
 	}
-
 	// Set custom write function
 	png_set_write_fn(png_ptr, &memBuf, WriteDataToMemory, NULL);
 	png_set_compression_level(png_ptr, compressionLevel);
-
 	// Write header
 	int bit_depth = 8;
 	int color_type;
-
 	switch (m_surfaceType) {
 	case SURFACE_RGBA:
 		color_type = PNG_COLOR_TYPE_RGB_ALPHA;
@@ -2529,11 +2521,9 @@ uint8 * SoftSurface::WritePNGToMemory(int compressionLevel, int &outSize)
 			delete[] memBuf.data;
 		return nullptr;
 	}
-
 	png_set_IHDR(png_ptr, info_ptr, m_width, m_height,
 		bit_depth, color_type, PNG_INTERLACE_NONE,
 		PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
-
 	// Write palette if needed
 	if (m_surfaceType == SURFACE_PALETTE_8BIT) {
 		png_color palette[256];
@@ -2543,7 +2533,6 @@ uint8 * SoftSurface::WritePNGToMemory(int compressionLevel, int &outSize)
 			palette[i].blue = m_palette[i].b;
 		}
 		png_set_PLTE(png_ptr, info_ptr, palette, m_paletteColors);
-
 		// If we have transparency in our palette
 		if (GetUsesAlpha()) {
 			png_byte trans[256];
@@ -2553,45 +2542,38 @@ uint8 * SoftSurface::WritePNGToMemory(int compressionLevel, int &outSize)
 			png_set_tRNS(png_ptr, info_ptr, trans, m_paletteColors, NULL);
 		}
 	}
-
 	png_write_info(png_ptr, info_ptr);
-
 	// Allocate memory for row pointers
 	png_bytep* row_pointers = new png_bytep[m_height];
-
 	// Set up row pointers based on surface type
 	for (int y = 0; y < m_height; y++) {
 		row_pointers[y] = m_pPixels + y * GetPitch();
 	}
-
 	// If RGB/RGBA, we might need to swap BGR to RGB
 	if (m_surfaceType == SURFACE_RGB || m_surfaceType == SURFACE_RGBA) {
 		//not needed
 		//png_set_bgr(png_ptr);
 	}
-
 	// Write image data
 	png_write_image(png_ptr, row_pointers);
-
 	// Cleanup
 	png_write_end(png_ptr, info_ptr);
 	delete[] row_pointers;
 	png_destroy_write_struct(&png_ptr, &info_ptr);
-
 	// Prepare the output buffer
-	byte* result = new byte[memBuf.size];
+	uint8* result = new uint8[memBuf.size];
 	memcpy(result, memBuf.data, memBuf.size);
 	outSize = memBuf.size;
-
 	// Clean up memory buffer
 	delete[] memBuf.data;
-
 	return (uint8*)result;
 #else
 	LogError("PNG support not compiled in! Define RT_PNG_SUPPORT to enable PNG writing.");
 	return nullptr;
 #endif
 }
+
+
 void SoftSurface::WritePNGOut(string fileName, int compressionLevel)
 {
 #ifdef RT_PNG_SUPPORT

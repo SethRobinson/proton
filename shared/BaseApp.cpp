@@ -170,7 +170,7 @@ void BaseApp::Draw()
 	if (GetFPSVisible())
 	{
 		char stTemp[256];
-		sprintf(stTemp, "fps: %d - M: %.2f, T: %.2f A: %.2f F: %.2f", m_gameTimer.GetFPS(), (float(m_memUsed)/1024)/1024, (float(m_texMemUsed)/1024)/1024,  float(GetAudioManager()->GetMemoryUsed()/1024)/ 1024, float(GetFreeMemory()/1024)/ 1024);
+		sprintf(stTemp, "fps: %d - M: %.2f, T: %.2f A: %.2f F: %.2f", m_gameTimer.GetFPS(),  (float(m_memUsed)/1024)/1024, (float(m_texMemUsed)/1024)/1024,  float(GetAudioManager()->GetMemoryUsed()/1024)/ 1024, float(GetFreeMemory()/1024)/ 1024);
 	
 #ifdef _IRR_STATIC_LIB_
 		int prims = 0;
@@ -186,6 +186,13 @@ void BaseApp::Draw()
 #ifdef PLATFORM_FLASH
 		char stExtra[256];
 		sprintf(stExtra, " Flash: %.2f", float(GetNativeMemoryUsed())/1024/1024);
+		strcat(stTemp, stExtra);
+
+#endif
+
+#ifdef PLATFORM_ANDROID
+		char stExtra[256];
+		sprintf(stExtra, " MemUsed: %.2f", float(GetNativeMemoryUsed()) / 1024 / 1024);
 		strcat(stTemp, stExtra);
 
 #endif
