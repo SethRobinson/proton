@@ -1,6 +1,6 @@
 /* pngwutil.c - utilities to write a PNG file
  *
- * Copyright (c) 2018-2024 Cosmin Truta
+ * Copyright (c) 2018-2025 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -485,10 +485,10 @@ png_free_buffer_list(png_structrp png_ptr, png_compression_bufferp *listp)
  */
 typedef struct
 {
-   png_const_bytep      input;        /* The uncompressed input data */
-   png_alloc_size_t     input_len;    /* Its length */
-   png_uint_32          output_len;   /* Final compressed length */
-   png_byte             output[1024]; /* First block of output */
+   png_const_bytep input;      /* The uncompressed input data */
+   png_alloc_size_t input_len; /* Its length */
+   png_uint_32 output_len;     /* Final compressed length */
+   png_byte output[1024];      /* First block of output */
 } compression_state;
 
 static void

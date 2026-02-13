@@ -113,7 +113,7 @@
 {
     GCController *controller = (GCController *)note.object;
     GCExtendedGamepad *x = [controller extendedGamepad];
-    [controller setPlayerIndex:0];
+    [controller setPlayerIndex:(GCControllerPlayerIndex)0];
     if (x != nil)
     {
        
