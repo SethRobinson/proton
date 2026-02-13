@@ -493,3 +493,12 @@ string GetNetworkType()
 {
 	return "none"; // not supported for this OS
 }
+
+void SyncPersistentData()
+{
+}
+
+bool IsStillLoadingPersistentData()
+{
+	return false;
+}
