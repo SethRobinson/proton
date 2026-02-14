@@ -542,7 +542,11 @@ bool NetHTTP::Start()
         curl_easy_setopt(m_CURL_handle, CURLOPT_CAINFO, (GetBaseAppPath()+"curl-ca-bundle.crt").c_str());
         
         
-      } else
+      } else if (GetPlatformID() == PLATFORM_ID_LINUX)
+	{
+		//On Linux, let libCURL use the system's default CA certificate store
+		//No need to set CURLOPT_CAINFO - curl will find /etc/ssl/certs/ca-certificates.crt on its own
+	} else
 	{
 		//manually set the cert on windows otherwise it can't find it.  I've only used this curl stuff on android and windows so no idea on other platforms.
 		curl_easy_setopt(m_CURL_handle, CURLOPT_CAINFO, "curl-ca-bundle.crt");

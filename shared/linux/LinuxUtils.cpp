@@ -67,7 +67,7 @@ string GetBaseAppPath()
 
 string GetSavePath()
 {
-	return "";
+	return GetBaseAppPath();
 }
 
 
@@ -87,6 +87,12 @@ void LaunchEmail(string subject, string content)
 void LaunchURL(string url)
 {
 	LogMsg("LaunchURL: %s", url.c_str());
+	string cmd = "xdg-open \"" + url + "\"";
+	int result = system(cmd.c_str());
+	if (result != 0)
+	{
+		LogMsg("LaunchURL: xdg-open failed with code %d", result);
+	}
 }
 
 string GetClipboardText()
