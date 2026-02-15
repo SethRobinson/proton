@@ -120,7 +120,7 @@ bool initSDL_GLES()
 
 	SDL_JoystickEventState(SDL_ENABLE);
 
-	uint32 videoFlags = SDL_WINDOW_OPENGL;
+	uint32 videoFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 
 
 	//for fulscreen:
@@ -557,6 +557,9 @@ void SDLEventLoop()
 			SDL_Log("Window %d resized to %dx%d",
 				ev.window.windowID, ev.window.data1,
 				ev.window.data2);
+			SetPrimaryScreenSize(ev.window.data1, ev.window.data2);
+			SetupScreenInfo(ev.window.data1, ev.window.data2, ORIENTATION_DONT_CARE);
+			GetBaseApp()->OnScreenSizeChange();
 			break;
 		case SDL_WINDOWEVENT_SIZE_CHANGED:
 			SDL_Log("Window %d size changed to %dx%d",
@@ -946,8 +949,27 @@ int SDL_main(int argc, char *argv[])
 				break;
 
 				case OSMessage::MESSAGE_SET_VIDEO_MODE:
-					LogMsg("Video mode set, ignoring");
+				{
+					int newWidth = (int)m.m_x;
+					int newHeight = (int)m.m_y;
+					LogMsg("Setting video mode to %dx%d (fullscreen: %d)", newWidth, newHeight, (int)m.m_fullscreen);
+					if (g_window)
+					{
+						if (m.m_fullscreen)
+						{
+							SDL_SetWindowFullscreen(g_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+						}
+						else
+						{
+							SDL_SetWindowFullscreen(g_window, 0);
+							SDL_SetWindowSize(g_window, newWidth, newHeight);
+						}
+						SetPrimaryScreenSize(newWidth, newHeight);
+						SetupScreenInfo(newWidth, newHeight, ORIENTATION_DONT_CARE);
+						GetBaseApp()->OnScreenSizeChange();
+					}
 					break;
+				}
 				case OSMessage::MESSAGE_CHECK_CONNECTION:
 					//pretend we did it
 					GetMessageManager()->SendGUI(MESSAGE_TYPE_OS_CONNECTION_CHECKED, (float)RT_kCFStreamEventOpenCompleted, 0.0f);	
