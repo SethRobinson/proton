@@ -2,7 +2,7 @@
 #include "JPGSurfaceLoader.h"
 #include "SoftSurface.h"
 #include "util/ResourceUtils.h"
-#include "Addons/TinyEXIF-master/TinyEXIF.h"
+#include "addons/TinyEXIF-master/TinyEXIF.h"
 
 #define TINYEXIF_NO_XMP_SUPPORT
 #include "addons/TinyEXIF-master/TinyEXIF.cpp"
