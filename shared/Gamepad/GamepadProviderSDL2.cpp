@@ -108,9 +108,14 @@ void GamepadProviderSDL2::OnSDLEvent(VariantList* pVList)
 
 bool GamepadProviderSDL2::Init()
 {
-	LogMsg("Initting SDL2 windows gamepad provider");
+	LogMsg("Initting SDL2 gamepad provider");
 
-	
+	if (SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER) != 0)
+	{
+		LogMsg("SDL joystick init failed: %s", SDL_GetError());
+		return false;
+	}
+
 	int numJoysticks = SDL_NumJoysticks();
 	LogMsg("We can see %d joysticks are detected", numJoysticks);
 
