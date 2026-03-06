@@ -330,13 +330,17 @@
             break;
         case OSMessage::MESSAGE_SET_VIDEO_MODE:
         {
-            NSWindow *window = [NSApp mainWindow];
-            NSSize frameSize;
-            frameSize.width = pMsg->m_x;
-            frameSize.height = pMsg->m_y;
-            [window setContentSize:frameSize];
-            [window center];
-             }
+            NSWindow *window = [self window];
+            if (!window) window = [NSApp mainWindow];
+            if (window)
+            {
+                NSSize frameSize;
+                frameSize.width = pMsg->m_x;
+                frameSize.height = pMsg->m_y;
+                [window setContentSize:frameSize];
+                [window center];
+            }
+        }
             break;
             
         default:
