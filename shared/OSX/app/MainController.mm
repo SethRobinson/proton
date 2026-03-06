@@ -7,6 +7,12 @@
 
 - (void) awakeFromNib
 {
+    NSLog(@"MainController awakeFromNib: openGLView=%@", openGLView);
+    if (openGLView == nil)
+    {
+        NSLog(@"ERROR: openGLView outlet is nil - XIB outlet not connected!");
+        return;
+    }
     [openGLView awakeFromNib];
 }
 

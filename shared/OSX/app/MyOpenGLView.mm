@@ -142,6 +142,7 @@
 
 - (void) awakeFromNib
 {
+    NSLog(@"MyOpenGLView awakeFromNib: frame=%.0fx%.0f", [self frame].size.width, [self frame].size.height);
     time = CFAbsoluteTimeGetCurrent();
 
     // Set working directory to bundle Resources so relative paths work
