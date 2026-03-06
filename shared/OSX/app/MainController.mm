@@ -12,20 +12,20 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
 {
+    // Find the window - may not be set as mainWindow yet
     NSWindow *window = [NSApp mainWindow];
-    if (window)
+    if (!window)
     {
-        [window makeKeyAndOrderFront:nil];
-        [window orderFrontRegardless];
-    }
-    else
-    {
-        // No main window found - try to find any window
         NSArray *windows = [NSApp windows];
         if ([windows count] > 0)
-        {
-            [[windows objectAtIndex:0] makeKeyAndOrderFront:nil];
-        }
+            window = [windows objectAtIndex:0];
+    }
+
+    if (window)
+    {
+        // Prevent window from being released when closed
+        [window setReleasedWhenClosed:NO];
+        [window makeKeyAndOrderFront:nil];
     }
 }
 
@@ -149,8 +149,9 @@
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender
 {
-	NSLog(@"Last window closed MainController");
-	return YES;
+    // Return NO - we handle termination via applicationWillTerminate
+    // Returning YES was causing immediate exit when window wasn't visible yet
+    return NO;
 }
 
 - (void)windowDidEnterFullScreen:(NSNotification *)notification
@@ -168,6 +169,11 @@
     if (GetBaseApp()->IsInitted())
         GetApp()->GetVar("fullscreen")->Set(uint32(0));
     [openGLView reshape];
+}
+
+- (void)windowWillClose:(NSNotification *)notification
+{
+    [NSApp terminate:nil];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification
