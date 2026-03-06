@@ -61,30 +61,14 @@
 - (NSSize)windowWillResize:(NSWindow*)sender
                     toSize:(NSSize)frameSize
 {
-	
-	
 	frameSize = [self computeFrameSize: frameSize];
-	
-    [self OnResizeFinished];
-    
-	return frameSize;	
-}
-
-- (void) OnResizeFinished
-{
-		NSRect bounds = [openGLView bounds];
-		LogMsg("Finished resizing");
-	//	CGLLockContext( (_CGLContextObject*)[[openGLView openGLContext] CGLContextObj]);
-		InitDeviceScreenInfoEx(bounds.size.width, bounds.size.height, ORIENTATION_LANDSCAPE_LEFT);
-	//	CGLUnlockContext( (_CGLContextObject*) [[openGLView openGLContext] CGLContextObj]);
-	
+	return frameSize;
 }
 
 - (void) windowDidResize: (NSNotification *) aNotification
 {
-   NSLog (@"windowDidResize: called");
-	
-	[openGLView reshape];
+    // reshape updates OpenGL viewport and calls InitDeviceScreenInfoEx with correct new bounds
+    [openGLView reshape];
 }
 
 - (void)windowDidMiniaturize:(NSNotification *)notification

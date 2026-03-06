@@ -54,14 +54,26 @@
 
     [[self openGLContext] setValues:&swapInt forParameter:NSOpenGLCPSwapInterval]; // set to vbl sync
 
-    GetBaseApp()->Init();
-    
     NSRect bounds = [self bounds];
-    
+
+    // InitDeviceScreenInfoEx handles Init() internally (guards with IsInitted())
     InitDeviceScreenInfoEx(bounds.size.width, bounds.size.height, ORIENTATION_LANDSCAPE_LEFT);
     
 }
 // ---------------------------------
+
+- (void) reshape
+{
+    [super reshape];
+    NSRect bounds = [self bounds];
+    int w = (int)bounds.size.width;
+    int h = (int)bounds.size.height;
+    if (w > 0 && h > 0)
+    {
+        InitDeviceScreenInfoEx(w, h, ORIENTATION_LANDSCAPE_LEFT);
+        [[self openGLContext] update];
+    }
+}
 
 - (void) update // window resizes, moves and display changes (resize, depth and display config change)
 {
