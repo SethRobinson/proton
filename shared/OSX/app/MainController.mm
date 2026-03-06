@@ -5,28 +5,32 @@
 
 @implementation MainController
 
-- (void) awakeFromNib
-{
-    [openGLView awakeFromNib];
-}
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
 {
-    // Find the window - may not be set as mainWindow yet
-    NSWindow *window = [NSApp mainWindow];
-    if (!window)
-    {
-        NSArray *windows = [NSApp windows];
-        if ([windows count] > 0)
-            window = [windows objectAtIndex:0];
-    }
+    // No window XIB exists for macOS — create window and OpenGL view programmatically
+    NSRect frame = NSMakeRect(0, 0, 1024, 768);
+    NSWindow *window = [[NSWindow alloc]
+        initWithContentRect:frame
+                  styleMask:NSWindowStyleMaskTitled |
+                            NSWindowStyleMaskClosable |
+                            NSWindowStyleMaskMiniaturizable |
+                            NSWindowStyleMaskResizable
+                    backing:NSBackingStoreBuffered
+                      defer:NO];
+    [window setTitle:@"Dink Smallwood HD"];
+    [window setReleasedWhenClosed:NO];
+    [window setDelegate:(id<NSWindowDelegate>)self];
 
-    if (window)
-    {
-        // Prevent window from being released when closed
-        [window setReleasedWhenClosed:NO];
-        [window makeKeyAndOrderFront:nil];
-    }
+    // Create the OpenGL view filling the whole content area
+    openGLView = [[MyOpenGLView alloc] initWithFrame:frame];
+    [window setContentView:openGLView];
+
+    // Trigger the same setup that awakeFromNib would have done via XIB
+    [openGLView awakeFromNib];
+
+    [window center];
+    [window makeKeyAndOrderFront:nil];
 }
 
 - (void) dealloc
