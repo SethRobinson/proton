@@ -119,36 +119,35 @@
 
 - (void) awakeFromNib
 {
-    // set start values...
-    
-    time = CFAbsoluteTimeGetCurrent ();  // set animation time start time
-    
-    // start animation timer
+    time = CFAbsoluteTimeGetCurrent();
+
+    // Set working directory to bundle Resources so relative paths work
+    CFBundleRef mainBundle = CFBundleGetMainBundle();
+    CFURLRef resourcesURL = CFBundleCopyResourcesDirectoryURL(mainBundle);
+    char path[PATH_MAX];
+    if (!CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8 *)path, PATH_MAX))
+    {
+        LogMsg("Error getting bundle path");
+    }
+    CFRelease(resourcesURL);
+    chdir(path);
+
+    // Force OpenGL context creation and game init before the timer starts.
+    // prepareOpenGL is normally called lazily on first draw, but we need
+    // InitDeviceScreenInfoEx (and thus GetBaseApp()->Init()) to run now
+    // so the timer's drawRect finds IsInitted() == true.
+    [[self openGLContext] makeCurrentContext];
+    [self prepareOpenGL];
+
+    // Start animation timer after init
     timer = [NSTimer timerWithTimeInterval:(1.0f/60.0f) target:self selector:@selector(animationTimer:) userInfo:nil repeats:YES];
     [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
-    [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSEventTrackingRunLoopMode]; // ensure timer fires during resize
-    
-    
-    // Look for changes in view size
-           // Note, -reshape will not be called automatically on size changes because NSView does not export it to override
-           [[NSNotificationCenter defaultCenter] addObserver:self
-                                                    selector:@selector(reshape)
-                                                        name:NSViewGlobalFrameDidChangeNotification
-                                                      object:self];
-           
-           //make the working directory our resources dir, to match other platforms.  Shouldn't really matter as GetAppPath() will return it, and we usually use full
-           //path names to load stuff anyway.
-           
-           CFBundleRef mainBundle = CFBundleGetMainBundle();
-           CFURLRef resourcesURL = CFBundleCopyResourcesDirectoryURL(mainBundle);
-           char path[PATH_MAX];
-           if (!CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8 *)path, PATH_MAX))
-           {
-               LogMsg("Error getting bundle path");
-           }
-           CFRelease(resourcesURL);
-           chdir(path);
-    
+    [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSEventTrackingRunLoopMode];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(reshape)
+                                                 name:NSViewGlobalFrameDidChangeNotification
+                                               object:self];
 }
 
 
