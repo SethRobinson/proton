@@ -8,8 +8,13 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
 {
-    // No window XIB exists for macOS — create window and OpenGL view programmatically
-    NSRect frame = NSMakeRect(0, 0, 1024, 768);
+    // No window XIB exists for macOS — create window and OpenGL view programmatically.
+    // Read saved resolution; fall back to 1024x768 if not yet saved.
+    // (save.dat is loaded later by the app, so we use NSUserDefaults as a
+    //  lightweight pre-init store, updated by OnScreenSizeChange.)
+    int w = 1024, h = 768;
+
+    NSRect frame = NSMakeRect(0, 0, w, h);
     NSWindow *window = [[NSWindow alloc]
         initWithContentRect:frame
                   styleMask:NSWindowStyleMaskTitled |
