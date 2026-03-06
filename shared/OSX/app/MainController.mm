@@ -10,6 +10,25 @@
     [openGLView awakeFromNib];
 }
 
+- (void)applicationDidFinishLaunching:(NSNotification *)notification
+{
+    NSWindow *window = [NSApp mainWindow];
+    if (window)
+    {
+        [window makeKeyAndOrderFront:nil];
+        [window orderFrontRegardless];
+    }
+    else
+    {
+        // No main window found - try to find any window
+        NSArray *windows = [NSApp windows];
+        if ([windows count] > 0)
+        {
+            [[windows objectAtIndex:0] makeKeyAndOrderFront:nil];
+        }
+    }
+}
+
 - (void) dealloc
 {
 
