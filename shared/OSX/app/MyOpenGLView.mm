@@ -39,8 +39,6 @@
     if (!GetBaseApp()->IsInitted())
     {
         NSRect bounds = [self bounds];
-        NSLog(@"drawRect: not initted yet, bounds=%.0fx%.0f context=%@",
-              bounds.size.width, bounds.size.height, [self openGLContext]);
         if (bounds.size.width > 0 && bounds.size.height > 0)
         {
             [self prepareOpenGL];
@@ -71,17 +69,11 @@
 {
     [super prepareOpenGL];
 
-    NSRect bounds = [self bounds];
-    NSLog(@"prepareOpenGL: bounds=%.0fx%.0f context=%@",
-          bounds.size.width, bounds.size.height, [self openGLContext]);
-
     GLint swapInt = 1;
     [[self openGLContext] setValues:&swapInt forParameter:NSOpenGLCPSwapInterval];
 
-    // InitDeviceScreenInfoEx handles Init() internally (guards with IsInitted())
+    NSRect bounds = [self bounds];
     InitDeviceScreenInfoEx(bounds.size.width, bounds.size.height, ORIENTATION_LANDSCAPE_LEFT);
-
-    NSLog(@"prepareOpenGL: IsInitted=%d", GetBaseApp()->IsInitted());
 }
 // ---------------------------------
 
@@ -142,7 +134,6 @@
 
 - (void) awakeFromNib
 {
-    NSLog(@"MyOpenGLView awakeFromNib: frame=%.0fx%.0f", [self frame].size.width, [self frame].size.height);
     time = CFAbsoluteTimeGetCurrent();
 
     // Set working directory to bundle Resources so relative paths work
