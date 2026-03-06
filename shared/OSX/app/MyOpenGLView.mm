@@ -27,15 +27,19 @@
 // per-window timer function, basic time based animation preformed here
 - (void)animationTimer:(NSTimer *)timer
 {
-    [self drawRect:[self bounds]]; // redraw now instead dirty to enable updates during live resize
+    // Use display instead of calling drawRect directly -
+    // this properly triggers the display cycle and ensures
+    // the OpenGL context is current before drawing
+    [self display];
 }
 
 - (void) drawRect:(NSRect)rect
 {
+    // Ensure our OpenGL context is current
     [[self openGLContext] makeCurrentContext];
 
-    // prepareOpenGL is called lazily by the system - if it hasn't fired yet
-    // (bounds were zero at awakeFromNib time), call it now when we have valid size
+    // prepareOpenGL is called lazily by the system on first display.
+    // If it hasn't fired yet and we have valid bounds, call it now.
     if (!GetBaseApp()->IsInitted())
     {
         NSRect bounds = [self bounds];
@@ -43,18 +47,26 @@
         {
             [self prepareOpenGL];
         }
+        else
+        {
+            // No valid bounds yet - clear to black and wait
+            glClearColor(0, 0, 0, 1);
+            glClear(GL_COLOR_BUFFER_BIT);
+            [[self openGLContext] flushBuffer];
+            return;
+        }
     }
 
     if (GetBaseApp()->IsInitted())
     {
         GetBaseApp()->Update();
-        
-        if(!m_bQuitASAP)
+
+        if (!m_bQuitASAP)
         {
             GetBaseApp()->Draw();
         }
     }
-      
+
     if ([self inLiveResize])
         glFlush();
     else
