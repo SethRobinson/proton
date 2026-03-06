@@ -6,12 +6,22 @@
 + (NSOpenGLPixelFormat*) basicPixelFormat
 {
     NSOpenGLPixelFormatAttribute attributes [] = {
-        NSOpenGLPFAWindow,
-        NSOpenGLPFADoubleBuffer,    // double buffered
-        NSOpenGLPFADepthSize, (NSOpenGLPixelFormatAttribute)16, // 16 bit depth buffer
+        NSOpenGLPFADoubleBuffer,
+        NSOpenGLPFADepthSize, (NSOpenGLPixelFormatAttribute)16,
+        NSOpenGLPFAOpenGLProfile, (NSOpenGLPixelFormatAttribute)NSOpenGLProfileVersionLegacy,
         (NSOpenGLPixelFormatAttribute)nil
     };
-    return [[[NSOpenGLPixelFormat alloc] initWithAttributes:attributes] autorelease];
+    NSOpenGLPixelFormat *pf = [[[NSOpenGLPixelFormat alloc] initWithAttributes:attributes] autorelease];
+    if (!pf)
+    {
+        // Fallback: minimal pixel format
+        NSOpenGLPixelFormatAttribute fallback [] = {
+            NSOpenGLPFADoubleBuffer,
+            (NSOpenGLPixelFormatAttribute)nil
+        };
+        pf = [[[NSOpenGLPixelFormat alloc] initWithAttributes:fallback] autorelease];
+    }
+    return pf;
 }
 
 // per-window timer function, basic time based animation preformed here
@@ -29,6 +39,8 @@
     if (!GetBaseApp()->IsInitted())
     {
         NSRect bounds = [self bounds];
+        NSLog(@"drawRect: not initted yet, bounds=%.0fx%.0f context=%@",
+              bounds.size.width, bounds.size.height, [self openGLContext]);
         if (bounds.size.width > 0 && bounds.size.height > 0)
         {
             [self prepareOpenGL];
@@ -57,18 +69,19 @@
 // called after context is created
 - (void) prepareOpenGL
 {
-    
     [super prepareOpenGL];
-    
-    GLint swapInt = 1;
-
-    [[self openGLContext] setValues:&swapInt forParameter:NSOpenGLCPSwapInterval]; // set to vbl sync
 
     NSRect bounds = [self bounds];
+    NSLog(@"prepareOpenGL: bounds=%.0fx%.0f context=%@",
+          bounds.size.width, bounds.size.height, [self openGLContext]);
+
+    GLint swapInt = 1;
+    [[self openGLContext] setValues:&swapInt forParameter:NSOpenGLCPSwapInterval];
 
     // InitDeviceScreenInfoEx handles Init() internally (guards with IsInitted())
     InitDeviceScreenInfoEx(bounds.size.width, bounds.size.height, ORIENTATION_LANDSCAPE_LEFT);
-    
+
+    NSLog(@"prepareOpenGL: IsInitted=%d", GetBaseApp()->IsInitted());
 }
 // ---------------------------------
 
