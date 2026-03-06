@@ -23,7 +23,18 @@
 - (void) drawRect:(NSRect)rect
 {
     [[self openGLContext] makeCurrentContext];
-  
+
+    // prepareOpenGL is called lazily by the system - if it hasn't fired yet
+    // (bounds were zero at awakeFromNib time), call it now when we have valid size
+    if (!GetBaseApp()->IsInitted())
+    {
+        NSRect bounds = [self bounds];
+        if (bounds.size.width > 0 && bounds.size.height > 0)
+        {
+            [self prepareOpenGL];
+        }
+    }
+
     if (GetBaseApp()->IsInitted())
     {
         GetBaseApp()->Update();
@@ -34,11 +45,10 @@
         }
     }
       
-    if ([self inLiveResize] )
-        glFlush ();
+    if ([self inLiveResize])
+        glFlush();
     else
         [[self openGLContext] flushBuffer];
-   
 }
 
 // ---------------------------------
@@ -132,14 +142,8 @@
     CFRelease(resourcesURL);
     chdir(path);
 
-    // Force OpenGL context creation and game init before the timer starts.
-    // prepareOpenGL is normally called lazily on first draw, but we need
-    // InitDeviceScreenInfoEx (and thus GetBaseApp()->Init()) to run now
-    // so the timer's drawRect finds IsInitted() == true.
-    [[self openGLContext] makeCurrentContext];
-    [self prepareOpenGL];
-
-    // Start animation timer after init
+    // Start animation timer - prepareOpenGL will be called by the system
+    // on the first real draw when the window has valid bounds
     timer = [NSTimer timerWithTimeInterval:(1.0f/60.0f) target:self selector:@selector(animationTimer:) userInfo:nil repeats:YES];
     [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
     [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSEventTrackingRunLoopMode];
