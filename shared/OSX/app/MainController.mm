@@ -134,6 +134,23 @@
 	return YES;
 }
 
+- (void)windowDidEnterFullScreen:(NSNotification *)notification
+{
+    extern bool g_bIsFullScreen;
+    g_bIsFullScreen = true;
+    if (GetBaseApp()->IsInitted())
+        GetApp()->GetVar("fullscreen")->Set(uint32(1));
+}
+
+- (void)windowDidExitFullScreen:(NSNotification *)notification
+{
+    extern bool g_bIsFullScreen;
+    g_bIsFullScreen = false;
+    if (GetBaseApp()->IsInitted())
+        GetApp()->GetVar("fullscreen")->Set(uint32(0));
+    [openGLView reshape];
+}
+
 - (void)applicationWillTerminate:(NSNotification *)notification
 {
 	LogMsg("App terminating");	

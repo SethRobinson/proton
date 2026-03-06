@@ -13,5 +13,6 @@
 
 void InitDeviceScreenInfoEx(int width, int height, int orientation);
 int ConvertOSXKeycodeToProtonVirtualKey(int c);
+void OSXToggleFullscreen();
 #endif
 
