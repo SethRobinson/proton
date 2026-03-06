@@ -59,6 +59,15 @@
 
     if (GetBaseApp()->IsInitted())
     {
+        // Drain the OS message queue - this is how SetVideoMode, quit, etc. reach us.
+        // On other platforms SDL2Main.cpp or LinuxMain.cpp does this; on macOS we do it here.
+        while (!GetBaseApp()->GetOSMessages()->empty())
+        {
+            OSMessage m = GetBaseApp()->GetOSMessages()->front();
+            GetBaseApp()->GetOSMessages()->pop_front();
+            [self onOSMessage:&m];
+        }
+
         GetBaseApp()->Update();
 
         if (!m_bQuitASAP)
