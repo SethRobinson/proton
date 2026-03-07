@@ -74,7 +74,7 @@ void GamepadProviderSDL2::OnSDLEvent(VariantList* pVList)
 	case SDL_JOYDEVICEADDED:
 	{
 		// Both mapped controllers (SDL_CONTROLLERDEVICEADDED) and generic/unmapped
-		// HID gamepads like Luxton (SDL_JOYDEVICEADDED) are handled here.
+		// HID gamepads like Lukton (SDL_JOYDEVICEADDED) are handled here.
 		// AddGamepadBySDLID falls back to SDL_JoystickOpen for unmapped devices.
 		AddGamepadBySDLID(pEvent->jdevice.which);
 		break;
