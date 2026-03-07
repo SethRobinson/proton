@@ -572,6 +572,14 @@ int GetTouchesReceived()
 {
 	return 0; //uh, not accurate
 }
+
+void OSXToggleFullscreen()
+{
+	dispatch_async(dispatch_get_main_queue(), ^{
+		NSWindow *window = [NSApp mainWindow];
+		[window toggleFullScreen:nil];
+	});
+}
 bool IsStillLoadingPersistentData()
 {
 	return false;

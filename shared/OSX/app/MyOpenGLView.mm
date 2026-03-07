@@ -6,39 +6,80 @@
 + (NSOpenGLPixelFormat*) basicPixelFormat
 {
     NSOpenGLPixelFormatAttribute attributes [] = {
-        NSOpenGLPFAWindow,
-        NSOpenGLPFADoubleBuffer,    // double buffered
-        NSOpenGLPFADepthSize, (NSOpenGLPixelFormatAttribute)16, // 16 bit depth buffer
+        NSOpenGLPFADoubleBuffer,
+        NSOpenGLPFADepthSize, (NSOpenGLPixelFormatAttribute)16,
+        NSOpenGLPFAOpenGLProfile, (NSOpenGLPixelFormatAttribute)NSOpenGLProfileVersionLegacy,
         (NSOpenGLPixelFormatAttribute)nil
     };
-    return [[[NSOpenGLPixelFormat alloc] initWithAttributes:attributes] autorelease];
+    NSOpenGLPixelFormat *pf = [[[NSOpenGLPixelFormat alloc] initWithAttributes:attributes] autorelease];
+    if (!pf)
+    {
+        // Fallback: minimal pixel format
+        NSOpenGLPixelFormatAttribute fallback [] = {
+            NSOpenGLPFADoubleBuffer,
+            (NSOpenGLPixelFormatAttribute)nil
+        };
+        pf = [[[NSOpenGLPixelFormat alloc] initWithAttributes:fallback] autorelease];
+    }
+    return pf;
 }
 
 // per-window timer function, basic time based animation preformed here
 - (void)animationTimer:(NSTimer *)timer
 {
-    [self drawRect:[self bounds]]; // redraw now instead dirty to enable updates during live resize
+    // Use display instead of calling drawRect directly -
+    // this properly triggers the display cycle and ensures
+    // the OpenGL context is current before drawing
+    [self display];
 }
 
 - (void) drawRect:(NSRect)rect
 {
+    // Ensure our OpenGL context is current
     [[self openGLContext] makeCurrentContext];
-  
+
+    // prepareOpenGL is called lazily by the system on first display.
+    // If it hasn't fired yet and we have valid bounds, call it now.
+    if (!GetBaseApp()->IsInitted())
+    {
+        NSRect bounds = [self bounds];
+        if (bounds.size.width > 0 && bounds.size.height > 0)
+        {
+            [self prepareOpenGL];
+        }
+        else
+        {
+            // No valid bounds yet - clear to black and wait
+            glClearColor(0, 0, 0, 1);
+            glClear(GL_COLOR_BUFFER_BIT);
+            [[self openGLContext] flushBuffer];
+            return;
+        }
+    }
+
     if (GetBaseApp()->IsInitted())
     {
+        // Drain the OS message queue - this is how SetVideoMode, quit, etc. reach us.
+        // On other platforms SDL2Main.cpp or LinuxMain.cpp does this; on macOS we do it here.
+        while (!GetBaseApp()->GetOSMessages()->empty())
+        {
+            OSMessage m = GetBaseApp()->GetOSMessages()->front();
+            GetBaseApp()->GetOSMessages()->pop_front();
+            [self onOSMessage:&m];
+        }
+
         GetBaseApp()->Update();
-        
-        if(!m_bQuitASAP)
+
+        if (!m_bQuitASAP)
         {
             GetBaseApp()->Draw();
         }
     }
-      
-    if ([self inLiveResize] )
-        glFlush ();
+
+    if ([self inLiveResize])
+        glFlush();
     else
         [[self openGLContext] flushBuffer];
-   
 }
 
 // ---------------------------------
@@ -47,21 +88,28 @@
 // called after context is created
 - (void) prepareOpenGL
 {
-    
     [super prepareOpenGL];
-    
+
     GLint swapInt = 1;
+    [[self openGLContext] setValues:&swapInt forParameter:NSOpenGLCPSwapInterval];
 
-    [[self openGLContext] setValues:&swapInt forParameter:NSOpenGLCPSwapInterval]; // set to vbl sync
-
-    GetBaseApp()->Init();
-    
     NSRect bounds = [self bounds];
-    
     InitDeviceScreenInfoEx(bounds.size.width, bounds.size.height, ORIENTATION_LANDSCAPE_LEFT);
-    
 }
 // ---------------------------------
+
+- (void) reshape
+{
+    [super reshape];
+    NSRect bounds = [self bounds];
+    int w = (int)bounds.size.width;
+    int h = (int)bounds.size.height;
+    if (w > 0 && h > 0)
+    {
+        InitDeviceScreenInfoEx(w, h, ORIENTATION_LANDSCAPE_LEFT);
+        [[self openGLContext] update];
+    }
+}
 
 - (void) update // window resizes, moves and display changes (resize, depth and display config change)
 {
@@ -107,36 +155,29 @@
 
 - (void) awakeFromNib
 {
-    // set start values...
-    
-    time = CFAbsoluteTimeGetCurrent ();  // set animation time start time
-    
-    // start animation timer
+    time = CFAbsoluteTimeGetCurrent();
+
+    // Set working directory to bundle Resources so relative paths work
+    CFBundleRef mainBundle = CFBundleGetMainBundle();
+    CFURLRef resourcesURL = CFBundleCopyResourcesDirectoryURL(mainBundle);
+    char path[PATH_MAX];
+    if (!CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8 *)path, PATH_MAX))
+    {
+        LogMsg("Error getting bundle path");
+    }
+    CFRelease(resourcesURL);
+    chdir(path);
+
+    // Start animation timer - prepareOpenGL will be called by the system
+    // on the first real draw when the window has valid bounds
     timer = [NSTimer timerWithTimeInterval:(1.0f/60.0f) target:self selector:@selector(animationTimer:) userInfo:nil repeats:YES];
     [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
-    [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSEventTrackingRunLoopMode]; // ensure timer fires during resize
-    
-    
-    // Look for changes in view size
-           // Note, -reshape will not be called automatically on size changes because NSView does not export it to override
-           [[NSNotificationCenter defaultCenter] addObserver:self
-                                                    selector:@selector(reshape)
-                                                        name:NSViewGlobalFrameDidChangeNotification
-                                                      object:self];
-           
-           //make the working directory our resources dir, to match other platforms.  Shouldn't really matter as GetAppPath() will return it, and we usually use full
-           //path names to load stuff anyway.
-           
-           CFBundleRef mainBundle = CFBundleGetMainBundle();
-           CFURLRef resourcesURL = CFBundleCopyResourcesDirectoryURL(mainBundle);
-           char path[PATH_MAX];
-           if (!CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8 *)path, PATH_MAX))
-           {
-               LogMsg("Error getting bundle path");
-           }
-           CFRelease(resourcesURL);
-           chdir(path);
-    
+    [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSEventTrackingRunLoopMode];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(reshape)
+                                                 name:NSViewGlobalFrameDidChangeNotification
+                                               object:self];
 }
 
 
@@ -298,13 +339,17 @@
             break;
         case OSMessage::MESSAGE_SET_VIDEO_MODE:
         {
-            NSWindow *window = [NSApp mainWindow];
-            NSSize frameSize;
-            frameSize.width = pMsg->m_x;
-            frameSize.height = pMsg->m_y;
-            [window setContentSize:frameSize];
-            [window center];
-             }
+            NSWindow *window = [self window];
+            if (!window) window = [NSApp mainWindow];
+            if (window)
+            {
+                NSSize frameSize;
+                frameSize.width = pMsg->m_x;
+                frameSize.height = pMsg->m_y;
+                [window setContentSize:frameSize];
+                [window center];
+            }
+        }
             break;
             
         default:
