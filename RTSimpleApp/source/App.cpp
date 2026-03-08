@@ -31,15 +31,15 @@ FileManager * GetFileManager() {return &g_fileManager;}
 	
 	AudioManagerDenshion g_audioManager;
 #else
-	//it's being compiled as a native OSX app
-   #include "Audio/AudioManagerFMODStudio.h"
-  AudioManagerFMOD g_audioManager; //dummy with no sound
+	//it's being compiled as a native OSX app - use SDL audio, no FMOD required
+#include "Audio/AudioManagerSDL.h"
+#include "Gamepad/GamepadProviderSDL2.h"
+#include <SDL2/SDL.h>
+AudioManagerSDL g_audioManager;
 
-//in theory, CocosDenshion should work for the Mac builds, but right now it seems to want a big chunk of
-//Cocos2d included so I'm not fiddling with it for now
-
-//#include "Audio/AudioManagerDenshion.h"
-//AudioManagerDenshion g_audioManager;
+// g_sig_SDLEvent is defined in SDL2Main.cpp for SDL-main builds.
+// For the OSX Cocoa build which doesn't use SDL2Main.cpp, define it here.
+boost::signals2::signal<void(VariantList*)> g_sig_SDLEvent;
 #endif
 	
 #else
@@ -179,6 +179,11 @@ bool App::Init()
 	
 	if (!BaseApp::Init()) return false;
 
+#ifdef PLATFORM_OSX
+    SDL_Init(SDL_INIT_EVENTS | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
+    GetGamepadManager()->AddProvider(new GamepadProviderSDL2());
+#endif
+
 
 	LogMsg("Save path is %s", GetSavePath().c_str());
 
@@ -223,6 +228,21 @@ void App::Update()
 {
 	BaseApp::Update();
 
+#ifdef PLATFORM_OSX
+	{
+		SDL_PumpEvents();
+		SDL_Event ev;
+		while (SDL_PeepEvents(&ev, 1, SDL_GETEVENT,
+		                      SDL_JOYAXISMOTION, SDL_CONTROLLERDEVICEREMAPPED) > 0)
+		{
+			VariantList v;
+			v.Get(0).Set((Entity*)&ev);
+			g_sig_SDLEvent(&v);
+		}
+	}
+#endif
+
+	if (!m_bDidPostInit)
 	if (!m_bDidPostInit)
 	{
 		m_bDidPostInit = true;

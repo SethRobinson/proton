@@ -30,10 +30,15 @@ GamepadManager * GetGamepadManager() {return &g_gamepadManager;}
 
 AudioManagerOS g_audioManager;
 #else
-	//it's being compiled as a native OSX app
-   #include "Audio/AudioManagerFMOD.h"
+	//it's being compiled as a native OSX app - use SDL audio, no FMOD required
+#include "Audio/AudioManagerSDL.h"
+#include "Gamepad/GamepadProviderSDL2.h"
+#include <SDL2/SDL.h>
+AudioManagerSDL g_audioManager;
 
-   AudioManagerFMOD g_audioManager; //dummy with no sound
+// g_sig_SDLEvent is defined in SDL2Main.cpp for SDL-main builds.
+// For the OSX Cocoa build which doesn't use SDL2Main.cpp, define it here.
+boost::signals2::signal<void(VariantList*)> g_sig_SDLEvent;
 #endif
 	
 #else
@@ -120,6 +125,11 @@ bool App::Init()
 	}
 	
 	if (!BaseApp::Init()) return false;
+
+#ifdef PLATFORM_OSX
+	SDL_Init(SDL_INIT_EVENTS | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
+	GetGamepadManager()->AddProvider(new GamepadProviderSDL2());
+#endif
 
 	LogMsg("Save path is %s", GetSavePath().c_str());
 
@@ -244,6 +254,10 @@ void App::Update()
 {
 	BaseApp::Update();
 	g_gamepadManager.Update();
+
+#ifdef PLATFORM_OSX
+	SDL_PumpEvents();
+#endif
 
 	if (!m_bDidPostInit)
 	{
