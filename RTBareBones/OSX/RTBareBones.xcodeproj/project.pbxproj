@@ -612,12 +612,16 @@
 				COPY_PHASE_STRIP = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					_DEBUG,
-					BOOST_ALL_NO_LIB,
-					C_GL_MODE,
-					GL_SILENCE_DEPRECATION,
-				);
+GCC_PREPROCESSOR_DEFINITIONS = (
+				_DEBUG,
+				BOOST_ALL_NO_LIB,
+				C_GL_MODE,
+				GL_SILENCE_DEPRECATION,
+				RT_PNG_SUPPORT,
+				RT_JPG_SUPPORT,
+				RT_CUSTOM_LOGMSG,
+				RT_IPV6,
+			);
 				INFOPLIST_FILE = "RTBareBones-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = RTBareBones;
@@ -629,12 +633,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					BOOST_ALL_NO_LIB,
-					NDEBUG,
-					C_GL_MODE,
-					GL_SILENCE_DEPRECATION,
-				);
+GCC_PREPROCESSOR_DEFINITIONS = (
+				BOOST_ALL_NO_LIB,
+				NDEBUG,
+				C_GL_MODE,
+				GL_SILENCE_DEPRECATION,
+				RT_PNG_SUPPORT,
+				RT_JPG_SUPPORT,
+				RT_CUSTOM_LOGMSG,
+				RT_IPV6,
+			);
 				INFOPLIST_FILE = "RTBareBones-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = RTBareBones;
@@ -653,23 +661,28 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = ../../shared/PlatformPrecomp.h;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					_DEBUG,
-					BOOST_ALL_NO_LIB,
-					C_GL_MODE,
-				);
+GCC_PREPROCESSOR_DEFINITIONS = (
+				_DEBUG,
+				BOOST_ALL_NO_LIB,
+				C_GL_MODE,
+				GL_SILENCE_DEPRECATION,
+				RT_PNG_SUPPORT,
+				RT_JPG_SUPPORT,
+				RT_CUSTOM_LOGMSG,
+				RT_IPV6,
+			);
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					source,
-					../../shared,
-					../../shared/util/boost/,
-					"../../shared/ClanLib-2.0/Sources",
-					../../shared/FliteTTS/include,
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				"MACOSX_DEPLOYMENT_TARGET[arch=*]" = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
-				ONLY_ACTIVE_ARCH = YES;
+HEADER_SEARCH_PATHS = (
+				source,
+				../../shared,
+				../../shared/util/boost/,
+				"../../shared/ClanLib-2.0/Sources",
+				../../shared/FliteTTS/include,
+				"$(HOME)/Library/Frameworks/SDL2.framework/Headers",
+			);
+			MACOSX_DEPLOYMENT_TARGET = 11.0;
+			OTHER_CFLAGS = "-w -Wno-error";
 			};
 			name = Debug;
 		};
@@ -681,23 +694,28 @@
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = ../../shared/PlatformPrecomp.h;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					BOOST_ALL_NO_LIB,
-					NDEBUG,
-					C_GL_MODE,
-				);
+GCC_PREPROCESSOR_DEFINITIONS = (
+				BOOST_ALL_NO_LIB,
+				NDEBUG,
+				C_GL_MODE,
+				GL_SILENCE_DEPRECATION,
+				RT_PNG_SUPPORT,
+				RT_JPG_SUPPORT,
+				RT_CUSTOM_LOGMSG,
+				RT_IPV6,
+			);
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					source,
-					../../shared,
-					../../shared/util/boost/,
-					"../../shared/ClanLib-2.0/Sources",
-					../../shared/FliteTTS/include,
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				"MACOSX_DEPLOYMENT_TARGET[arch=*]" = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
-			};
+HEADER_SEARCH_PATHS = (
+				source,
+				../../shared,
+				../../shared/util/boost/,
+				"../../shared/ClanLib-2.0/Sources",
+				../../shared/FliteTTS/include,
+				"$(HOME)/Library/Frameworks/SDL2.framework/Headers",
+			);
+			MACOSX_DEPLOYMENT_TARGET = 11.0;
+			OTHER_CFLAGS = "-w -Wno-error";
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
