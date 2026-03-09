@@ -186,6 +186,7 @@ AA000004000000000000AA01 /* AudioManagerSDL.cpp in Sources */ = {isa = PBXBuildF
 		BDARM000000000000000000002 /* arm_init.c in Sources */ = {isa = PBXBuildFile; fileRef = BDARM000000000000000000001 /* arm_init.c */; };
 		BDARM000000000000000000102 /* filter_neon_intrinsics.c in Sources */ = {isa = PBXBuildFile; fileRef = BDARM000000000000000000101 /* filter_neon_intrinsics.c */; };
 		BDARM000000000000000000202 /* palette_neon_intrinsics.c in Sources */ = {isa = PBXBuildFile; fileRef = BDARM000000000000000000201 /* palette_neon_intrinsics.c */; };
+		LLEC0000000000000000000006 /* LogDisplayComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = LLEC0000000000000000000016 /* LogDisplayComponent.cpp */; };
 		/* Missing Entity component build files */
 		LLEC0000000000000000000001 /* ArcadeInputComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = LLEC0000000000000000000011 /* ArcadeInputComponent.cpp */; };
 		LLEC0000000000000000000002 /* DPadComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = LLEC0000000000000000000012 /* DPadComponent.cpp */; };
@@ -445,6 +446,8 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 		AF9DBBC5113C611C00D05754 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		AFBD7715113895850015E685 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		AFD4D889113C504F00C2DE76 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		LLEC0000000000000000000016 /* LogDisplayComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LogDisplayComponent.cpp; path = ../../shared/Entity/LogDisplayComponent.cpp; sourceTree = SOURCE_ROOT; };
+		LLEC0000000000000000000026 /* LogDisplayComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LogDisplayComponent.h; path = ../../shared/Entity/LogDisplayComponent.h; sourceTree = SOURCE_ROOT; };
 		/* Missing Entity component file references */
 		LLEC0000000000000000000011 /* ArcadeInputComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ArcadeInputComponent.cpp; path = ../../shared/Entity/ArcadeInputComponent.cpp; sourceTree = SOURCE_ROOT; };
 		LLEC0000000000000000000021 /* ArcadeInputComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArcadeInputComponent.h; path = ../../shared/Entity/ArcadeInputComponent.h; sourceTree = SOURCE_ROOT; };
@@ -771,6 +774,8 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 		5D70B6E012B606DC00A1AB17 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				LLEC0000000000000000000026 /* LogDisplayComponent.h */,
+				LLEC0000000000000000000016 /* LogDisplayComponent.cpp */,
 				LLEC0000000000000000000021 /* ArcadeInputComponent.h */,
 				LLEC0000000000000000000011 /* ArcadeInputComponent.cpp */,
 				LLEC0000000000000000000022 /* DPadComponent.h */,
@@ -1244,6 +1249,7 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 				5D70B81112B606DC00A1AB17 /* PlatformSetup.cpp in Sources */,
 				5D70B81212B606DC00A1AB17 /* PlatformPrecomp.cpp in Sources */,
 				5D70B81312B606DC00A1AB17 /* BaseApp.cpp in Sources */,
+				LLEC0000000000000000000006 /* LogDisplayComponent.cpp in Sources */,
 				LLEC0000000000000000000001 /* ArcadeInputComponent.cpp in Sources */,
 				LLEC0000000000000000000002 /* DPadComponent.cpp in Sources */,
 				LLEC0000000000000000000003 /* EmitVirtualKeyComponent.cpp in Sources */,
