@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		5D361D4A2AB83C0E006C5169 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D361D492AB83C0E006C5169 /* libz.tbd */; };
 		5D361D512AB83E04006C5169 /* UTF16TestMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D361D502AB83E03006C5169 /* UTF16TestMenu.cpp */; };
-		5D423E502AB828D300A99994 /* AudioManagerFMODStudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D423E4E2AB828D300A99994 /* AudioManagerFMODStudio.cpp */; };
 		5D70B62512B5FED300A1AB17 /* OSXUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D70B61B12B5FED300A1AB17 /* OSXUtils.mm */; };
 		5D70B62612B5FED300A1AB17 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D70B61E12B5FED300A1AB17 /* main.m */; };
 		5D70B62712B5FED300A1AB17 /* MainController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D70B62012B5FED300A1AB17 /* MainController.mm */; };
@@ -154,8 +153,6 @@ AA000004000000000000AA01 /* AudioManagerSDL.cpp in Sources */ = {isa = PBXBuildF
 		5D8E36DF14BEF45B003BA3DA /* jquant2.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D8E36B114BEF45B003BA3DA /* jquant2.c */; };
 		5D8E36E014BEF45B003BA3DA /* jutils.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D8E36B214BEF45B003BA3DA /* jutils.c */; };
 		5D8E37B114BF0C85003BA3DA /* RenderScissorComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D8E37B014BF0C85003BA3DA /* RenderScissorComponent.cpp */; };
-		5DD5C5952AB8471F00357191 /* libfmod.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DD5C5942AB8471F00357191 /* libfmod.dylib */; };
-		5DD5C5982AB84B7A00357191 /* libfmod.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5DD5C5942AB8471F00357191 /* libfmod.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		5DDE02A512B4F526000C5CC0 /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5DDE02A412B4F526000C5CC0 /* App.cpp */; };
 		5DDE05AA12B58EBD000C5CC0 /* interface in Resources */ = {isa = PBXBuildFile; fileRef = 5DDE05A912B58EBD000C5CC0 /* interface */; };
 		5DEB1B8B12D309CE00A3A6DB /* TouchTestComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5DEB1B8A12D309CE00A3A6DB /* TouchTestComponent.cpp */; };
@@ -169,18 +166,7 @@ AA000004000000000000AA01 /* AudioManagerSDL.cpp in Sources */ = {isa = PBXBuildF
 		AFD4D88A113C504F00C2DE76 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFD4D889113C504F00C2DE76 /* OpenGL.framework */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		5D70BB2712B7208900A1AB17 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				5DD5C5982AB84B7A00357191 /* libfmod.dylib in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
+
 
 /* Begin PBXFileReference section */
 		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -191,8 +177,6 @@ AA000004000000000000AA01 /* AudioManagerSDL.cpp in Sources */ = {isa = PBXBuildF
 		5D361D492AB83C0E006C5169 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		5D361D4F2AB83E01006C5169 /* UTF16TestMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UTF16TestMenu.h; path = ../source/GUI/UTF16TestMenu.h; sourceTree = "<group>"; };
 		5D361D502AB83E03006C5169 /* UTF16TestMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UTF16TestMenu.cpp; path = ../source/GUI/UTF16TestMenu.cpp; sourceTree = "<group>"; };
-		5D423E4E2AB828D300A99994 /* AudioManagerFMODStudio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioManagerFMODStudio.cpp; path = ../../shared/Audio/AudioManagerFMODStudio.cpp; sourceTree = "<group>"; };
-		5D423E4F2AB828D300A99994 /* AudioManagerFMODStudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AudioManagerFMODStudio.h; path = ../../shared/Audio/AudioManagerFMODStudio.h; sourceTree = "<group>"; };
 		5D70B61A12B5FED300A1AB17 /* PlatformSetupOSX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PlatformSetupOSX.h; path = ../../shared/OSX/PlatformSetupOSX.h; sourceTree = SOURCE_ROOT; };
 		5D70B61B12B5FED300A1AB17 /* OSXUtils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = OSXUtils.mm; path = ../../shared/OSX/OSXUtils.mm; sourceTree = SOURCE_ROOT; };
 		5D70B61C12B5FED300A1AB17 /* OSXUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OSXUtils.h; path = ../../shared/OSX/OSXUtils.h; sourceTree = SOURCE_ROOT; };
@@ -430,7 +414,6 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 		5D8E36B214BEF45B003BA3DA /* jutils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jutils.c; path = ../../shared/Irrlicht/source/Irrlicht/jpeglib/jutils.c; sourceTree = SOURCE_ROOT; };
 		5D8E37AF14BF0C85003BA3DA /* RenderScissorComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RenderScissorComponent.h; path = ../../shared/Entity/RenderScissorComponent.h; sourceTree = SOURCE_ROOT; };
 		5D8E37B014BF0C85003BA3DA /* RenderScissorComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenderScissorComponent.cpp; path = ../../shared/Entity/RenderScissorComponent.cpp; sourceTree = SOURCE_ROOT; };
-		5DD5C5942AB8471F00357191 /* libfmod.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libfmod.dylib; sourceTree = "<group>"; };
 		5DDE02A312B4F526000C5CC0 /* App.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = App.h; path = ../source/App.h; sourceTree = SOURCE_ROOT; };
 		5DDE02A412B4F526000C5CC0 /* App.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = App.cpp; path = ../source/App.cpp; sourceTree = SOURCE_ROOT; };
 		5DDE05A912B58EBD000C5CC0 /* interface */ = {isa = PBXFileReference; lastKnownFileType = folder; name = interface; path = ../media/interface; sourceTree = SOURCE_ROOT; };
@@ -453,7 +436,6 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5DD5C5952AB8471F00357191 /* libfmod.dylib in Frameworks */,
 				5D361D4A2AB83C0E006C5169 /* libz.tbd in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				AFD4D88A113C504F00C2DE76 /* OpenGL.framework in Frameworks */,
@@ -532,7 +514,6 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				5DD5C5942AB8471F00357191 /* libfmod.dylib */,
 				5D361D492AB83C0E006C5169 /* libz.tbd */,
 				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
@@ -618,8 +599,6 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 		5D70B6D012B606DC00A1AB17 /* Audio */ = {
 			isa = PBXGroup;
 			children = (
-				5D423E4E2AB828D300A99994 /* AudioManagerFMODStudio.cpp */,
-				5D423E4F2AB828D300A99994 /* AudioManagerFMODStudio.h */,
 				5D70B6D312B606DC00A1AB17 /* AudioManager.cpp */,
 				5D70B6D412B606DC00A1AB17 /* AudioManager.h */,
 				AA000003000000000000AA01 /* AudioManagerSDL.cpp */,
@@ -963,7 +942,6 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 				8D1107290486CEB800E47090 /* Resources */,
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
-				5D70BB2712B7208900A1AB17 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -1087,7 +1065,6 @@ AA000004000000000000AA01 /* AudioManagerSDL.cpp in Sources */,
 				5D70B7F612B606DC00A1AB17 /* L_EffectEmitter.cpp in Sources */,
 				5D70B7F712B606DC00A1AB17 /* L_EffectManager.cpp in Sources */,
 				5D70B7F812B606DC00A1AB17 /* L_ExplosionEffect.cpp in Sources */,
-				5D423E502AB828D300A99994 /* AudioManagerFMODStudio.cpp in Sources */,
 				5D70B7F912B606DC00A1AB17 /* L_MotionController.cpp in Sources */,
 				5D70B7FA12B606DC00A1AB17 /* L_Particle.cpp in Sources */,
 				5D70B7FB12B606DC00A1AB17 /* L_ParticleEffect.cpp in Sources */,
