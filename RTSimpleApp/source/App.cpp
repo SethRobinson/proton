@@ -180,16 +180,10 @@ bool App::Init()
 
 	LogMsg("Save path is %s", GetSavePath().c_str());
 
-	if (!GetFont(FONT_SMALL)->Load("interface/font_arial.rtfont")) 
-	{
-		LogMsg("Can't load font 1");
-		return false;
-	}
+	if (!GetFont(FONT_SMALL)->Load("interface/font_arial.rtfont"))
+		LogMsg("Warning: Can't load font_arial.rtfont - run update_media.sh to generate fonts");
 	if (!GetFont(FONT_LARGE)->Load("interface/font_arial_big.rtfont"))
-	{
-		LogMsg("Can't load font 2");
-		return false;
-	}
+		LogMsg("Warning: Can't load font_arial_big.rtfont - run update_media.sh to generate fonts");
 	//GetFont(FONT_SMALL)->SetSmoothing(false); //if we wanted to disable bilinear filtering on the font
 
 	GetBaseApp()->SetFPSVisible(true);
@@ -223,7 +217,6 @@ void App::Update()
 
 
 
-	if (!m_bDidPostInit)
 	if (!m_bDidPostInit)
 	{
 		m_bDidPostInit = true;

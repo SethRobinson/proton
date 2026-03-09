@@ -108,7 +108,18 @@ brew install sdl2 sdl2_mixer
 
 > **Note:** Homebrew on Apple Silicon only provides arm64 libraries. Use Option A if you need a universal binary.
 
-### 2. Generate the required libpng config header
+### 2. Generate fonts and textures
+
+RTSimpleApp and RTLooneyLadders require `.rtfont` files generated from source assets. Run `update_media.sh` from each app's `media/` folder (requires RTPack — build it first from `RTPack/linux/` on Linux or use the Windows version):
+
+```bash
+cd RTSimpleApp/media && sh update_media.sh
+cd RTLooneyLadders/media && sh update_media.sh
+```
+
+> **Note:** Without this step the apps will still open but text/fonts will not render.
+
+### 3. Generate the required libpng config header
 
 ```bash
 LIBPNG=shared/Irrlicht/source/Irrlicht/libpng
