@@ -23,7 +23,9 @@
                             NSWindowStyleMaskResizable
                     backing:NSBackingStoreBuffered
                       defer:NO];
-    [window setTitle:@"Dink Smallwood HD"];
+    NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
+    if (!appName) appName = @"App";
+    [window setTitle:appName];
     [window setReleasedWhenClosed:NO];
     [window setDelegate:(id<NSWindowDelegate>)self];
 
