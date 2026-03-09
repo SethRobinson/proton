@@ -818,6 +818,7 @@ HEADER_SEARCH_PATHS = (
 			MACOSX_DEPLOYMENT_TARGET = 11.0;
 			"EXCLUDED_SOURCE_FILE_NAMES[arch=x86_64]" = "arm_init.c filter_neon_intrinsics.c palette_neon_intrinsics.c";
 			OTHER_CFLAGS = "-w -Wno-error";
+			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
@@ -845,3 +846,4 @@ HEADER_SEARCH_PATHS = (
 	};
 	rootObject = 29B97313FDCFA39411CA2CEA /* Project object */;
 }
+
