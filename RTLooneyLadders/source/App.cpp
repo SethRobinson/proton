@@ -35,6 +35,8 @@ AudioManagerOS g_audioManager;
 #include "Gamepad/GamepadProviderSDL2.h"
 #include <SDL2/SDL.h>
 AudioManagerSDL g_audioManager;
+// Required by MainController.mm and BaseApp.cpp - defined in SDL2Main.cpp for SDL builds
+bool g_bIsFullScreen = false;
 
 // g_sig_SDLEvent is defined in SDL2Main.cpp for SDL-main builds.
 // For the OSX Cocoa build which doesn't use SDL2Main.cpp, define it here.

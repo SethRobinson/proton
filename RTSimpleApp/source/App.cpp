@@ -34,6 +34,8 @@ FileManager * GetFileManager() {return &g_fileManager;}
 	//it's being compiled as a native OSX app - use SDL audio, no FMOD required
 #include "Audio/AudioManagerSDL.h"
 AudioManagerSDL g_audioManager;
+// Required by MainController.mm and BaseApp.cpp - defined in SDL2Main.cpp for SDL builds
+bool g_bIsFullScreen = false;
 #endif
 	
 #else
