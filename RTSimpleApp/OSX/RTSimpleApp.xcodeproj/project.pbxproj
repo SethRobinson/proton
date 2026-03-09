@@ -183,6 +183,9 @@ AA000004000000000000AA01 /* AudioManagerSDL.cpp in Sources */ = {isa = PBXBuildF
 		BBARM000000000000000000002 /* arm_init.c in Sources */ = {isa = PBXBuildFile; fileRef = BBARM000000000000000000001 /* arm_init.c */; };
 		BBARM000000000000000000102 /* filter_neon_intrinsics.c in Sources */ = {isa = PBXBuildFile; fileRef = BBARM000000000000000000101 /* filter_neon_intrinsics.c */; };
 		BBARM000000000000000000202 /* palette_neon_intrinsics.c in Sources */ = {isa = PBXBuildFile; fileRef = BBARM000000000000000000201 /* palette_neon_intrinsics.c */; };
+		/* SDL2 embed build files */
+		SDLSA00000000000000000001 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = SDLSA00000000000000000011 /* SDL2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		SDLSA00000000000000000002 /* SDL2_mixer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = SDLSA00000000000000000012 /* SDL2_mixer.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 
@@ -448,6 +451,9 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 		AF9DBBC5113C611C00D05754 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		AFBD7715113895850015E685 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		AFD4D889113C504F00C2DE76 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		/* SDL2 framework references */
+		SDLSA00000000000000000011 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = "$(HOME)/Library/Frameworks/SDL2.framework"; sourceTree = "<absolute>"; };
+		SDLSA00000000000000000012 /* SDL2_mixer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_mixer.framework; path = "$(HOME)/Library/Frameworks/SDL2_mixer.framework"; sourceTree = "<absolute>"; };
 		/* libpng file references */
 		BB000001000000000000000001 /* png.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = png.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/png.c; sourceTree = SOURCE_ROOT; };
 		BB000001000000000000000101 /* pngerror.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pngerror.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/pngerror.c; sourceTree = SOURCE_ROOT; };
@@ -468,6 +474,21 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 		BBARM000000000000000000101 /* filter_neon_intrinsics.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = filter_neon_intrinsics.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/arm/filter_neon_intrinsics.c; sourceTree = SOURCE_ROOT; };
 		BBARM000000000000000000201 /* palette_neon_intrinsics.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = palette_neon_intrinsics.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/arm/palette_neon_intrinsics.c; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		SDLSA00000000000000000020 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				SDLSA00000000000000000001 /* SDL2.framework in Frameworks */,
+				SDLSA00000000000000000002 /* SDL2_mixer.framework in Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		8D11072E0486CEB800E47090 /* Frameworks */ = {
@@ -1006,6 +1027,7 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 				8D1107290486CEB800E47090 /* Resources */,
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
+				SDLSA00000000000000000020 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
