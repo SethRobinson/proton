@@ -186,6 +186,12 @@ AA000004000000000000AA01 /* AudioManagerSDL.cpp in Sources */ = {isa = PBXBuildF
 		BDARM000000000000000000002 /* arm_init.c in Sources */ = {isa = PBXBuildFile; fileRef = BDARM000000000000000000001 /* arm_init.c */; };
 		BDARM000000000000000000102 /* filter_neon_intrinsics.c in Sources */ = {isa = PBXBuildFile; fileRef = BDARM000000000000000000101 /* filter_neon_intrinsics.c */; };
 		BDARM000000000000000000202 /* palette_neon_intrinsics.c in Sources */ = {isa = PBXBuildFile; fileRef = BDARM000000000000000000201 /* palette_neon_intrinsics.c */; };
+		/* Gamepad build files */
+		GPLL0000000000000000000001 /* GamepadManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = GPLL0000000000000000000011 /* GamepadManager.cpp */; };
+		GPLL0000000000000000000002 /* GamepadProviderSDL2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = GPLL0000000000000000000012 /* GamepadProviderSDL2.cpp */; };
+		GPLL0000000000000000000003 /* GamepadSDL2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = GPLL0000000000000000000013 /* GamepadSDL2.cpp */; };
+		GPLL0000000000000000000004 /* GamepadProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = GPLL0000000000000000000014 /* GamepadProvider.cpp */; };
+		GPLL0000000000000000000005 /* Gamepad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = GPLL0000000000000000000015 /* Gamepad.cpp */; };
 		/* SDL2 embed build files */
 		SDLLL00000000000000000001 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = SDLLL00000000000000000011 /* SDL2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		SDLLL00000000000000000002 /* SDL2_mixer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = SDLLL00000000000000000012 /* SDL2_mixer.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -433,6 +439,17 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 		AF9DBBC5113C611C00D05754 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		AFBD7715113895850015E685 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		AFD4D889113C504F00C2DE76 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		/* Gamepad file references */
+		GPLL0000000000000000000011 /* GamepadManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GamepadManager.cpp; path = ../../shared/Gamepad/GamepadManager.cpp; sourceTree = SOURCE_ROOT; };
+		GPLL0000000000000000000021 /* GamepadManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GamepadManager.h; path = ../../shared/Gamepad/GamepadManager.h; sourceTree = SOURCE_ROOT; };
+		GPLL0000000000000000000012 /* GamepadProviderSDL2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GamepadProviderSDL2.cpp; path = ../../shared/Gamepad/GamepadProviderSDL2.cpp; sourceTree = SOURCE_ROOT; };
+		GPLL0000000000000000000022 /* GamepadProviderSDL2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GamepadProviderSDL2.h; path = ../../shared/Gamepad/GamepadProviderSDL2.h; sourceTree = SOURCE_ROOT; };
+		GPLL0000000000000000000013 /* GamepadSDL2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GamepadSDL2.cpp; path = ../../shared/Gamepad/GamepadSDL2.cpp; sourceTree = SOURCE_ROOT; };
+		GPLL0000000000000000000023 /* GamepadSDL2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GamepadSDL2.h; path = ../../shared/Gamepad/GamepadSDL2.h; sourceTree = SOURCE_ROOT; };
+		GPLL0000000000000000000014 /* GamepadProvider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GamepadProvider.cpp; path = ../../shared/Gamepad/GamepadProvider.cpp; sourceTree = SOURCE_ROOT; };
+		GPLL0000000000000000000024 /* GamepadProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GamepadProvider.h; path = ../../shared/Gamepad/GamepadProvider.h; sourceTree = SOURCE_ROOT; };
+		GPLL0000000000000000000015 /* Gamepad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Gamepad.cpp; path = ../../shared/Gamepad/Gamepad.cpp; sourceTree = SOURCE_ROOT; };
+		GPLL0000000000000000000025 /* Gamepad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Gamepad.h; path = ../../shared/Gamepad/Gamepad.h; sourceTree = SOURCE_ROOT; };
 		/* SDL2 framework references */
 		SDLLL00000000000000000011 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = "$(HOME)/Library/Frameworks/SDL2.framework"; sourceTree = "<absolute>"; };
 		SDLLL00000000000000000012 /* SDL2_mixer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_mixer.framework; path = "$(HOME)/Library/Frameworks/SDL2_mixer.framework"; sourceTree = "<absolute>"; };
@@ -660,6 +677,23 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 				5D70B6CF12B606DC00A1AB17 /* NetUtils.h */,
 			);
 			name = Network;
+			sourceTree = "<group>";
+		};
+		GPLL0000000000000000000030 /* Gamepad */ = {
+			isa = PBXGroup;
+			children = (
+				GPLL0000000000000000000015 /* Gamepad.cpp */,
+				GPLL0000000000000000000025 /* Gamepad.h */,
+				GPLL0000000000000000000014 /* GamepadProvider.cpp */,
+				GPLL0000000000000000000024 /* GamepadProvider.h */,
+				GPLL0000000000000000000011 /* GamepadManager.cpp */,
+				GPLL0000000000000000000021 /* GamepadManager.h */,
+				GPLL0000000000000000000012 /* GamepadProviderSDL2.cpp */,
+				GPLL0000000000000000000022 /* GamepadProviderSDL2.h */,
+				GPLL0000000000000000000013 /* GamepadSDL2.cpp */,
+				GPLL0000000000000000000023 /* GamepadSDL2.h */,
+			);
+			name = Gamepad;
 			sourceTree = "<group>";
 		};
 		5D70B6D012B606DC00A1AB17 /* Audio */ = {
@@ -987,6 +1021,7 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 				5D70B6DF12B606DC00A1AB17 /* Entity */,
 				5D70B6D512B606DC00A1AB17 /* ClanLib */,
 				5D70B6D012B606DC00A1AB17 /* Audio */,
+				GPLL0000000000000000000030 /* Gamepad */,
 				5D70B6C912B606DC00A1AB17 /* Network */,
 				5D70B6BE12B606DC00A1AB17 /* Managers */,
 				5D70B6B112B606DB00A1AB17 /* FileSystem */,
@@ -1182,6 +1217,11 @@ AA000004000000000000AA01 /* AudioManagerSDL.cpp in Sources */,
 				5D70B81112B606DC00A1AB17 /* PlatformSetup.cpp in Sources */,
 				5D70B81212B606DC00A1AB17 /* PlatformPrecomp.cpp in Sources */,
 				5D70B81312B606DC00A1AB17 /* BaseApp.cpp in Sources */,
+				GPLL0000000000000000000005 /* Gamepad.cpp in Sources */,
+				GPLL0000000000000000000004 /* GamepadProvider.cpp in Sources */,
+				GPLL0000000000000000000001 /* GamepadManager.cpp in Sources */,
+				GPLL0000000000000000000002 /* GamepadProviderSDL2.cpp in Sources */,
+				GPLL0000000000000000000003 /* GamepadSDL2.cpp in Sources */,
 		LL000001000000000000000001 /* BuildingComponent.cpp in Sources */,
 		LL000001000000000000000002 /* Character.cpp in Sources */,
 		LL000001000000000000000003 /* CharComponent.cpp in Sources */,
