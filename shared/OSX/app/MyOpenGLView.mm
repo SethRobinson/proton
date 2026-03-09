@@ -9,7 +9,7 @@
         NSOpenGLPFADoubleBuffer,
         NSOpenGLPFADepthSize, (NSOpenGLPixelFormatAttribute)16,
         NSOpenGLPFAOpenGLProfile, (NSOpenGLPixelFormatAttribute)NSOpenGLProfileVersionLegacy,
-        (NSOpenGLPixelFormatAttribute)nil
+        (NSOpenGLPixelFormatAttribute)0
     };
     NSOpenGLPixelFormat *pf = [[[NSOpenGLPixelFormat alloc] initWithAttributes:attributes] autorelease];
     if (!pf)
@@ -17,7 +17,7 @@
         // Fallback: minimal pixel format
         NSOpenGLPixelFormatAttribute fallback [] = {
             NSOpenGLPFADoubleBuffer,
-            (NSOpenGLPixelFormatAttribute)nil
+            (NSOpenGLPixelFormatAttribute)0
         };
         pf = [[[NSOpenGLPixelFormat alloc] initWithAttributes:fallback] autorelease];
     }
