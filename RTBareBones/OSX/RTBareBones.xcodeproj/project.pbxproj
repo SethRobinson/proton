@@ -76,6 +76,9 @@
 		BC000001000000000000000C02 /* pngwrite.c in Sources */ = {isa = PBXBuildFile; fileRef = BC000001000000000000000C01 /* pngwrite.c */; };
 		BC000001000000000000000D02 /* pngwtran.c in Sources */ = {isa = PBXBuildFile; fileRef = BC000001000000000000000D01 /* pngwtran.c */; };
 		BC000001000000000000000E02 /* pngwutil.c in Sources */ = {isa = PBXBuildFile; fileRef = BC000001000000000000000E01 /* pngwutil.c */; };
+		BCARM000000000000000000002 /* arm_init.c in Sources */ = {isa = PBXBuildFile; fileRef = BCARM000000000000000000001 /* arm_init.c */; };
+		BCARM000000000000000000102 /* filter_neon_intrinsics.c in Sources */ = {isa = PBXBuildFile; fileRef = BCARM000000000000000000101 /* filter_neon_intrinsics.c */; };
+		BCARM000000000000000000202 /* palette_neon_intrinsics.c in Sources */ = {isa = PBXBuildFile; fileRef = BCARM000000000000000000201 /* palette_neon_intrinsics.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -193,6 +196,9 @@
 		BC000001000000000000000C01 /* pngwrite.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pngwrite.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/pngwrite.c; sourceTree = SOURCE_ROOT; };
 		BC000001000000000000000D01 /* pngwtran.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pngwtran.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/pngwtran.c; sourceTree = SOURCE_ROOT; };
 		BC000001000000000000000E01 /* pngwutil.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pngwutil.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/pngwutil.c; sourceTree = SOURCE_ROOT; };
+		BCARM000000000000000000001 /* arm_init.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = arm_init.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/arm/arm_init.c; sourceTree = SOURCE_ROOT; };
+		BCARM000000000000000000101 /* filter_neon_intrinsics.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = filter_neon_intrinsics.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/arm/filter_neon_intrinsics.c; sourceTree = SOURCE_ROOT; };
+		BCARM000000000000000000201 /* palette_neon_intrinsics.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = palette_neon_intrinsics.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/arm/palette_neon_intrinsics.c; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -520,6 +526,9 @@
 				BC000001000000000000000C01 /* pngwrite.c */,
 				BC000001000000000000000D01 /* pngwtran.c */,
 				BC000001000000000000000E01 /* pngwutil.c */,
+				BCARM000000000000000000001 /* arm_init.c */,
+				BCARM000000000000000000101 /* filter_neon_intrinsics.c */,
+				BCARM000000000000000000201 /* palette_neon_intrinsics.c */,
 			);
 			name = libpng;
 			sourceTree = "<group>";
@@ -664,6 +673,9 @@
 				BC000001000000000000000C02 /* pngwrite.c in Sources */,
 				BC000001000000000000000D02 /* pngwtran.c in Sources */,
 				BC000001000000000000000E02 /* pngwutil.c in Sources */,
+				BCARM000000000000000000002 /* arm_init.c in Sources */,
+				BCARM000000000000000000102 /* filter_neon_intrinsics.c in Sources */,
+				BCARM000000000000000000202 /* palette_neon_intrinsics.c in Sources */,
 				5DDE01AC12B4D4F2000C5CC0 /* BaseApp.cpp in Sources */,
 				5DDE02A512B4F526000C5CC0 /* App.cpp in Sources */,
 				5D70B62512B5FED300A1AB17 /* OSXUtils.mm in Sources */,
@@ -774,6 +786,7 @@ HEADER_SEARCH_PATHS = (
 				"$(HOME)/Library/Frameworks/SDL2.framework/Headers",
 			);
 			MACOSX_DEPLOYMENT_TARGET = 11.0;
+			"EXCLUDED_SOURCE_FILE_NAMES[arch=x86_64]" = "arm_init.c filter_neon_intrinsics.c palette_neon_intrinsics.c";
 			OTHER_CFLAGS = "-w -Wno-error";
 			};
 			name = Debug;
@@ -807,6 +820,7 @@ HEADER_SEARCH_PATHS = (
 				"$(HOME)/Library/Frameworks/SDL2.framework/Headers",
 			);
 			MACOSX_DEPLOYMENT_TARGET = 11.0;
+			"EXCLUDED_SOURCE_FILE_NAMES[arch=x86_64]" = "arm_init.c filter_neon_intrinsics.c palette_neon_intrinsics.c";
 			OTHER_CFLAGS = "-w -Wno-error";
 			name = Release;
 		};

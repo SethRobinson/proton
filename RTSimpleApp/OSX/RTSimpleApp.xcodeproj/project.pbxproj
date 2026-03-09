@@ -180,6 +180,9 @@ AA000004000000000000AA01 /* AudioManagerSDL.cpp in Sources */ = {isa = PBXBuildF
 		BB000001000000000000000C02 /* pngwrite.c in Sources */ = {isa = PBXBuildFile; fileRef = BB000001000000000000000C01 /* pngwrite.c */; };
 		BB000001000000000000000D02 /* pngwtran.c in Sources */ = {isa = PBXBuildFile; fileRef = BB000001000000000000000D01 /* pngwtran.c */; };
 		BB000001000000000000000E02 /* pngwutil.c in Sources */ = {isa = PBXBuildFile; fileRef = BB000001000000000000000E01 /* pngwutil.c */; };
+		BBARM000000000000000000002 /* arm_init.c in Sources */ = {isa = PBXBuildFile; fileRef = BBARM000000000000000000001 /* arm_init.c */; };
+		BBARM000000000000000000102 /* filter_neon_intrinsics.c in Sources */ = {isa = PBXBuildFile; fileRef = BBARM000000000000000000101 /* filter_neon_intrinsics.c */; };
+		BBARM000000000000000000202 /* palette_neon_intrinsics.c in Sources */ = {isa = PBXBuildFile; fileRef = BBARM000000000000000000201 /* palette_neon_intrinsics.c */; };
 /* End PBXBuildFile section */
 
 
@@ -461,6 +464,9 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 		BB000001000000000000000C01 /* pngwrite.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pngwrite.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/pngwrite.c; sourceTree = SOURCE_ROOT; };
 		BB000001000000000000000D01 /* pngwtran.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pngwtran.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/pngwtran.c; sourceTree = SOURCE_ROOT; };
 		BB000001000000000000000E01 /* pngwutil.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pngwutil.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/pngwutil.c; sourceTree = SOURCE_ROOT; };
+		BBARM000000000000000000001 /* arm_init.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = arm_init.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/arm/arm_init.c; sourceTree = SOURCE_ROOT; };
+		BBARM000000000000000000101 /* filter_neon_intrinsics.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = filter_neon_intrinsics.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/arm/filter_neon_intrinsics.c; sourceTree = SOURCE_ROOT; };
+		BBARM000000000000000000201 /* palette_neon_intrinsics.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = palette_neon_intrinsics.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/arm/palette_neon_intrinsics.c; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -983,6 +989,9 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 				BB000001000000000000000C01 /* pngwrite.c */,
 				BB000001000000000000000D01 /* pngwtran.c */,
 				BB000001000000000000000E01 /* pngwutil.c */,
+				BBARM000000000000000000001 /* arm_init.c */,
+				BBARM000000000000000000101 /* filter_neon_intrinsics.c */,
+				BBARM000000000000000000201 /* palette_neon_intrinsics.c */,
 			);
 			name = libpng;
 			sourceTree = "<group>";
@@ -1216,6 +1225,9 @@ AA000004000000000000AA01 /* AudioManagerSDL.cpp in Sources */,
 				BB000001000000000000000C02 /* pngwrite.c in Sources */,
 				BB000001000000000000000D02 /* pngwtran.c in Sources */,
 				BB000001000000000000000E02 /* pngwutil.c in Sources */,
+				BBARM000000000000000000002 /* arm_init.c in Sources */,
+				BBARM000000000000000000102 /* filter_neon_intrinsics.c in Sources */,
+				BBARM000000000000000000202 /* palette_neon_intrinsics.c in Sources */,
 				5D8E37B114BF0C85003BA3DA /* RenderScissorComponent.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1264,6 +1276,7 @@ LIBRARY_SEARCH_PATHS = (
 			FRAMEWORK_SEARCH_PATHS = "$(HOME)/Library/Frameworks";
 			OTHER_LDFLAGS = "-framework SDL2 -framework SDL2_mixer -rpath @executable_path/../Frameworks";
 			MACOSX_DEPLOYMENT_TARGET = 11.0;
+				"EXCLUDED_SOURCE_FILE_NAMES[arch=x86_64]" = "arm_init.c filter_neon_intrinsics.c palette_neon_intrinsics.c";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(PRODUCT_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = RTSimpleApp;
 			};
@@ -1287,6 +1300,7 @@ LIBRARY_SEARCH_PATHS = (
 			FRAMEWORK_SEARCH_PATHS = "$(HOME)/Library/Frameworks";
 			OTHER_LDFLAGS = "-framework SDL2 -framework SDL2_mixer -rpath @executable_path/../Frameworks";
 			MACOSX_DEPLOYMENT_TARGET = 11.0;
+				"EXCLUDED_SOURCE_FILE_NAMES[arch=x86_64]" = "arm_init.c filter_neon_intrinsics.c palette_neon_intrinsics.c";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(PRODUCT_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = RTSimpleApp;
 			};
