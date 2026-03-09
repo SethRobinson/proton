@@ -186,6 +186,12 @@ AA000004000000000000AA01 /* AudioManagerSDL.cpp in Sources */ = {isa = PBXBuildF
 		BDARM000000000000000000002 /* arm_init.c in Sources */ = {isa = PBXBuildFile; fileRef = BDARM000000000000000000001 /* arm_init.c */; };
 		BDARM000000000000000000102 /* filter_neon_intrinsics.c in Sources */ = {isa = PBXBuildFile; fileRef = BDARM000000000000000000101 /* filter_neon_intrinsics.c */; };
 		BDARM000000000000000000202 /* palette_neon_intrinsics.c in Sources */ = {isa = PBXBuildFile; fileRef = BDARM000000000000000000201 /* palette_neon_intrinsics.c */; };
+		/* Missing Entity component build files */
+		LLEC0000000000000000000001 /* ArcadeInputComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = LLEC0000000000000000000011 /* ArcadeInputComponent.cpp */; };
+		LLEC0000000000000000000002 /* DPadComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = LLEC0000000000000000000012 /* DPadComponent.cpp */; };
+		LLEC0000000000000000000003 /* EmitVirtualKeyComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = LLEC0000000000000000000013 /* EmitVirtualKeyComponent.cpp */; };
+		LLEC0000000000000000000004 /* EmitVirtualKeyComponentAdvanced.cpp in Sources */ = {isa = PBXBuildFile; fileRef = LLEC0000000000000000000014 /* EmitVirtualKeyComponentAdvanced.cpp */; };
+		LLEC0000000000000000000005 /* TouchHandlerArcadeComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = LLEC0000000000000000000015 /* TouchHandlerArcadeComponent.cpp */; };
 		/* Gamepad build files */
 		GPLL0000000000000000000001 /* GamepadManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = GPLL0000000000000000000011 /* GamepadManager.cpp */; };
 		GPLL0000000000000000000002 /* GamepadProviderSDL2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = GPLL0000000000000000000012 /* GamepadProviderSDL2.cpp */; };
@@ -439,6 +445,17 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 		AF9DBBC5113C611C00D05754 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		AFBD7715113895850015E685 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		AFD4D889113C504F00C2DE76 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		/* Missing Entity component file references */
+		LLEC0000000000000000000011 /* ArcadeInputComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ArcadeInputComponent.cpp; path = ../../shared/Entity/ArcadeInputComponent.cpp; sourceTree = SOURCE_ROOT; };
+		LLEC0000000000000000000021 /* ArcadeInputComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArcadeInputComponent.h; path = ../../shared/Entity/ArcadeInputComponent.h; sourceTree = SOURCE_ROOT; };
+		LLEC0000000000000000000012 /* DPadComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DPadComponent.cpp; path = ../../shared/Entity/DPadComponent.cpp; sourceTree = SOURCE_ROOT; };
+		LLEC0000000000000000000022 /* DPadComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DPadComponent.h; path = ../../shared/Entity/DPadComponent.h; sourceTree = SOURCE_ROOT; };
+		LLEC0000000000000000000013 /* EmitVirtualKeyComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EmitVirtualKeyComponent.cpp; path = ../../shared/Entity/EmitVirtualKeyComponent.cpp; sourceTree = SOURCE_ROOT; };
+		LLEC0000000000000000000023 /* EmitVirtualKeyComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EmitVirtualKeyComponent.h; path = ../../shared/Entity/EmitVirtualKeyComponent.h; sourceTree = SOURCE_ROOT; };
+		LLEC0000000000000000000014 /* EmitVirtualKeyComponentAdvanced.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EmitVirtualKeyComponentAdvanced.cpp; path = ../../shared/Entity/EmitVirtualKeyComponentAdvanced.cpp; sourceTree = SOURCE_ROOT; };
+		LLEC0000000000000000000024 /* EmitVirtualKeyComponentAdvanced.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EmitVirtualKeyComponentAdvanced.h; path = ../../shared/Entity/EmitVirtualKeyComponentAdvanced.h; sourceTree = SOURCE_ROOT; };
+		LLEC0000000000000000000015 /* TouchHandlerArcadeComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TouchHandlerArcadeComponent.cpp; path = ../../shared/Entity/TouchHandlerArcadeComponent.cpp; sourceTree = SOURCE_ROOT; };
+		LLEC0000000000000000000025 /* TouchHandlerArcadeComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TouchHandlerArcadeComponent.h; path = ../../shared/Entity/TouchHandlerArcadeComponent.h; sourceTree = SOURCE_ROOT; };
 		/* Gamepad file references */
 		GPLL0000000000000000000011 /* GamepadManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GamepadManager.cpp; path = ../../shared/Gamepad/GamepadManager.cpp; sourceTree = SOURCE_ROOT; };
 		GPLL0000000000000000000021 /* GamepadManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GamepadManager.h; path = ../../shared/Gamepad/GamepadManager.h; sourceTree = SOURCE_ROOT; };
@@ -754,6 +771,16 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 		5D70B6E012B606DC00A1AB17 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				LLEC0000000000000000000021 /* ArcadeInputComponent.h */,
+				LLEC0000000000000000000011 /* ArcadeInputComponent.cpp */,
+				LLEC0000000000000000000022 /* DPadComponent.h */,
+				LLEC0000000000000000000012 /* DPadComponent.cpp */,
+				LLEC0000000000000000000023 /* EmitVirtualKeyComponent.h */,
+				LLEC0000000000000000000013 /* EmitVirtualKeyComponent.cpp */,
+				LLEC0000000000000000000024 /* EmitVirtualKeyComponentAdvanced.h */,
+				LLEC0000000000000000000014 /* EmitVirtualKeyComponentAdvanced.cpp */,
+				LLEC0000000000000000000025 /* TouchHandlerArcadeComponent.h */,
+				LLEC0000000000000000000015 /* TouchHandlerArcadeComponent.cpp */,
 				5D8E37AF14BF0C85003BA3DA /* RenderScissorComponent.h */,
 				5D8E37B014BF0C85003BA3DA /* RenderScissorComponent.cpp */,
 				5D70B6E112B606DC00A1AB17 /* SliderComponent.h */,
@@ -1217,6 +1244,11 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 				5D70B81112B606DC00A1AB17 /* PlatformSetup.cpp in Sources */,
 				5D70B81212B606DC00A1AB17 /* PlatformPrecomp.cpp in Sources */,
 				5D70B81312B606DC00A1AB17 /* BaseApp.cpp in Sources */,
+				LLEC0000000000000000000001 /* ArcadeInputComponent.cpp in Sources */,
+				LLEC0000000000000000000002 /* DPadComponent.cpp in Sources */,
+				LLEC0000000000000000000003 /* EmitVirtualKeyComponent.cpp in Sources */,
+				LLEC0000000000000000000004 /* EmitVirtualKeyComponentAdvanced.cpp in Sources */,
+				LLEC0000000000000000000005 /* TouchHandlerArcadeComponent.cpp in Sources */,
 				GPLL0000000000000000000005 /* Gamepad.cpp in Sources */,
 				GPLL0000000000000000000004 /* GamepadProvider.cpp in Sources */,
 				GPLL0000000000000000000001 /* GamepadManager.cpp in Sources */,
