@@ -164,6 +164,22 @@ AA000004000000000000AA01 /* AudioManagerSDL.cpp in Sources */ = {isa = PBXBuildF
 		AF9DBBC6113C611C00D05754 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF9DBBC5113C611C00D05754 /* QuartzCore.framework */; };
 		AFBD7716113895850015E685 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = AFBD7714113895850015E685 /* MainMenu.xib */; };
 		AFD4D88A113C504F00C2DE76 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFD4D889113C504F00C2DE76 /* OpenGL.framework */; };
+/* libpng build files */
+BB000001000000000000000002 /* png.c in Sources */ = {isa = PBXBuildFile; fileRef = BB000001000000000000000001 /* png.c */; };
+BB000001000000000000000102 /* pngerror.c in Sources */ = {isa = PBXBuildFile; fileRef = BB000001000000000000000101 /* pngerror.c */; };
+BB000001000000000000000202 /* pngget.c in Sources */ = {isa = PBXBuildFile; fileRef = BB000001000000000000000201 /* pngget.c */; };
+BB000001000000000000000302 /* pngmem.c in Sources */ = {isa = PBXBuildFile; fileRef = BB000001000000000000000301 /* pngmem.c */; };
+BB000001000000000000000402 /* pngpread.c in Sources */ = {isa = PBXBuildFile; fileRef = BB000001000000000000000401 /* pngpread.c */; };
+BB000001000000000000000502 /* pngread.c in Sources */ = {isa = PBXBuildFile; fileRef = BB000001000000000000000501 /* pngread.c */; };
+BB000001000000000000000602 /* pngrio.c in Sources */ = {isa = PBXBuildFile; fileRef = BB000001000000000000000601 /* pngrio.c */; };
+BB000001000000000000000702 /* pngrtran.c in Sources */ = {isa = PBXBuildFile; fileRef = BB000001000000000000000701 /* pngrtran.c */; };
+BB000001000000000000000802 /* pngrutil.c in Sources */ = {isa = PBXBuildFile; fileRef = BB000001000000000000000801 /* pngrutil.c */; };
+BB000001000000000000000902 /* pngset.c in Sources */ = {isa = PBXBuildFile; fileRef = BB000001000000000000000901 /* pngset.c */; };
+BB000001000000000000000A02 /* pngtrans.c in Sources */ = {isa = PBXBuildFile; fileRef = BB000001000000000000000A01 /* pngtrans.c */; };
+BB000001000000000000000B02 /* pngwio.c in Sources */ = {isa = PBXBuildFile; fileRef = BB000001000000000000000B01 /* pngwio.c */; };
+BB000001000000000000000C02 /* pngwrite.c in Sources */ = {isa = PBXBuildFile; fileRef = BB000001000000000000000C01 /* pngwrite.c */; };
+BB000001000000000000000D02 /* pngwtran.c in Sources */ = {isa = PBXBuildFile; fileRef = BB000001000000000000000D01 /* pngwtran.c */; };
+BB000001000000000000000E02 /* pngwutil.c in Sources */ = {isa = PBXBuildFile; fileRef = BB000001000000000000000E01 /* pngwutil.c */; };
 /* End PBXBuildFile section */
 
 
@@ -429,6 +445,22 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 		AF9DBBC5113C611C00D05754 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		AFBD7715113895850015E685 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		AFD4D889113C504F00C2DE76 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+/* libpng file references */
+BB000001000000000000000001 /* png.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = png.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/png.c; sourceTree = SOURCE_ROOT; };
+BB000001000000000000000101 /* pngerror.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pngerror.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/pngerror.c; sourceTree = SOURCE_ROOT; };
+BB000001000000000000000201 /* pngget.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pngget.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/pngget.c; sourceTree = SOURCE_ROOT; };
+BB000001000000000000000301 /* pngmem.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pngmem.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/pngmem.c; sourceTree = SOURCE_ROOT; };
+BB000001000000000000000401 /* pngpread.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pngpread.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/pngpread.c; sourceTree = SOURCE_ROOT; };
+BB000001000000000000000501 /* pngread.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pngread.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/pngread.c; sourceTree = SOURCE_ROOT; };
+BB000001000000000000000601 /* pngrio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pngrio.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/pngrio.c; sourceTree = SOURCE_ROOT; };
+BB000001000000000000000701 /* pngrtran.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pngrtran.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/pngrtran.c; sourceTree = SOURCE_ROOT; };
+BB000001000000000000000801 /* pngrutil.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pngrutil.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/pngrutil.c; sourceTree = SOURCE_ROOT; };
+BB000001000000000000000901 /* pngset.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pngset.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/pngset.c; sourceTree = SOURCE_ROOT; };
+BB000001000000000000000A01 /* pngtrans.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pngtrans.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/pngtrans.c; sourceTree = SOURCE_ROOT; };
+BB000001000000000000000B01 /* pngwio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pngwio.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/pngwio.c; sourceTree = SOURCE_ROOT; };
+BB000001000000000000000C01 /* pngwrite.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pngwrite.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/pngwrite.c; sourceTree = SOURCE_ROOT; };
+BB000001000000000000000D01 /* pngwtran.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pngwtran.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/pngwtran.c; sourceTree = SOURCE_ROOT; };
+BB000001000000000000000E01 /* pngwutil.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pngwutil.c; path = ../../shared/Irrlicht/source/Irrlicht/libpng/pngwutil.c; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -734,6 +766,7 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 			isa = PBXGroup;
 			children = (
 				5D8E368414BEF420003BA3DA /* libjpg */,
+				BB000001000000000000FF01 /* libpng */,
 				5D8E367E14BEF412003BA3DA /* JPGSurfaceLoader.h */,
 				5D8E367F14BEF412003BA3DA /* RTGLESExt.h */,
 				5D8E368014BEF412003BA3DA /* JPGSurfaceLoader.cpp */,
@@ -930,6 +963,28 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 				5D70B7A012B606DC00A1AB17 /* BaseApp.h */,
 			);
 			name = shared;
+			sourceTree = "<group>";
+		};
+BB000001000000000000FF01 /* libpng */ = {
+			isa = PBXGroup;
+			children = (
+				BB000001000000000000000001 /* png.c */,
+				BB000001000000000000000101 /* pngerror.c */,
+				BB000001000000000000000201 /* pngget.c */,
+				BB000001000000000000000301 /* pngmem.c */,
+				BB000001000000000000000401 /* pngpread.c */,
+				BB000001000000000000000501 /* pngread.c */,
+				BB000001000000000000000601 /* pngrio.c */,
+				BB000001000000000000000701 /* pngrtran.c */,
+				BB000001000000000000000801 /* pngrutil.c */,
+				BB000001000000000000000901 /* pngset.c */,
+				BB000001000000000000000A01 /* pngtrans.c */,
+				BB000001000000000000000B01 /* pngwio.c */,
+				BB000001000000000000000C01 /* pngwrite.c */,
+				BB000001000000000000000D01 /* pngwtran.c */,
+				BB000001000000000000000E01 /* pngwutil.c */,
+			);
+			name = libpng;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1146,6 +1201,21 @@ AA000004000000000000AA01 /* AudioManagerSDL.cpp in Sources */,
 				5D8E36DE14BEF45B003BA3DA /* jquant1.c in Sources */,
 				5D8E36DF14BEF45B003BA3DA /* jquant2.c in Sources */,
 				5D8E36E014BEF45B003BA3DA /* jutils.c in Sources */,
+				BB000001000000000000000002 /* png.c in Sources */,
+				BB000001000000000000000102 /* pngerror.c in Sources */,
+				BB000001000000000000000202 /* pngget.c in Sources */,
+				BB000001000000000000000302 /* pngmem.c in Sources */,
+				BB000001000000000000000402 /* pngpread.c in Sources */,
+				BB000001000000000000000502 /* pngread.c in Sources */,
+				BB000001000000000000000602 /* pngrio.c in Sources */,
+				BB000001000000000000000702 /* pngrtran.c in Sources */,
+				BB000001000000000000000802 /* pngrutil.c in Sources */,
+				BB000001000000000000000902 /* pngset.c in Sources */,
+				BB000001000000000000000A02 /* pngtrans.c in Sources */,
+				BB000001000000000000000B02 /* pngwio.c in Sources */,
+				BB000001000000000000000C02 /* pngwrite.c in Sources */,
+				BB000001000000000000000D02 /* pngwtran.c in Sources */,
+				BB000001000000000000000E02 /* pngwutil.c in Sources */,
 				5D8E37B114BF0C85003BA3DA /* RenderScissorComponent.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
