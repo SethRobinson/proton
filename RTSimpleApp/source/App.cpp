@@ -33,6 +33,7 @@ FileManager * GetFileManager() {return &g_fileManager;}
 #else
 	//it's being compiled as a native OSX app - use SDL audio, no FMOD required
 #include "Audio/AudioManagerSDL.h"
+#include <SDL2/SDL.h>
 	AudioManagerSDL g_audioManager;
 	// Required by MainController.mm and BaseApp.cpp - defined in SDL2Main.cpp for SDL builds
 	bool g_bIsFullScreen = false;
@@ -172,7 +173,12 @@ bool App::Init()
 	{
 		return true;
 	}
-	
+
+#if defined(__APPLE__) && !TARGET_OS_IPHONE
+	// Initialize SDL before BaseApp::Init() which triggers SDL audio init
+	SDL_Init(0);
+#endif
+
 	if (!BaseApp::Init()) return false;
 
 
@@ -213,6 +219,9 @@ void App::Kill()
 
 void App::Update()
 {
+#if defined(__APPLE__) && !TARGET_OS_IPHONE
+	SDL_PumpEvents();
+#endif
 	BaseApp::Update();
 
 
