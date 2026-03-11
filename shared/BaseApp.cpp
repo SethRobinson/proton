@@ -2,6 +2,10 @@
 #include "BaseApp.h"
 #include "Renderer/RTGLESExt.h"
 
+#ifdef PLATFORM_OSX
+#include "OSX/OSXUtils.h"
+#endif
+
 #ifdef _IRR_STATIC_LIB_
 #include "Irrlicht/IrrlichtManager.h"
 #endif
@@ -753,12 +757,16 @@ void BaseApp::OnFullscreenToggleRequest()
 
 			savex = GetPrimaryGLX();
 			savey = GetPrimaryGLY();
-	
+
 			GetBaseApp()->SetVideoMode(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), true);
 
 		}
 
 	}
+#endif
+
+#ifdef PLATFORM_OSX
+	OSXToggleFullscreen();
 #endif
 }
 

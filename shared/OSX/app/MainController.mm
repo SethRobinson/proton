@@ -169,6 +169,7 @@
 {
     extern bool g_bIsFullScreen;
     g_bIsFullScreen = true;
+    [openGLView reshape];
 }
 
 - (void)windowDidExitFullScreen:(NSNotification *)notification
