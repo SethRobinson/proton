@@ -5,9 +5,39 @@
 
 @implementation MainController
 
-- (void) awakeFromNib
+
+- (void)applicationDidFinishLaunching:(NSNotification *)notification
 {
+    // No window XIB exists for macOS — create window and OpenGL view programmatically.
+    // Read saved resolution; fall back to 1024x768 if not yet saved.
+    // (save.dat is loaded later by the app, so we use NSUserDefaults as a
+    //  lightweight pre-init store, updated by OnScreenSizeChange.)
+    int w = 1024, h = 768;
+
+    NSRect frame = NSMakeRect(0, 0, w, h);
+    NSWindow *window = [[NSWindow alloc]
+        initWithContentRect:frame
+                  styleMask:NSWindowStyleMaskTitled |
+                            NSWindowStyleMaskClosable |
+                            NSWindowStyleMaskMiniaturizable |
+                            NSWindowStyleMaskResizable
+                    backing:NSBackingStoreBuffered
+                      defer:NO];
+    NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
+    if (!appName) appName = @"App";
+    [window setTitle:appName];
+    [window setReleasedWhenClosed:NO];
+    [window setDelegate:(id<NSWindowDelegate>)self];
+
+    // Create the OpenGL view filling the whole content area
+    openGLView = [[MyOpenGLView alloc] initWithFrame:frame];
+    [window setContentView:openGLView];
+
+    // Trigger the same setup that awakeFromNib would have done via XIB
     [openGLView awakeFromNib];
+
+    [window center];
+    [window makeKeyAndOrderFront:nil];
 }
 
 - (void) dealloc
@@ -61,30 +91,14 @@
 - (NSSize)windowWillResize:(NSWindow*)sender
                     toSize:(NSSize)frameSize
 {
-	
-	
 	frameSize = [self computeFrameSize: frameSize];
-	
-    [self OnResizeFinished];
-    
-	return frameSize;	
-}
-
-- (void) OnResizeFinished
-{
-		NSRect bounds = [openGLView bounds];
-		LogMsg("Finished resizing");
-	//	CGLLockContext( (_CGLContextObject*)[[openGLView openGLContext] CGLContextObj]);
-		InitDeviceScreenInfoEx(bounds.size.width, bounds.size.height, ORIENTATION_LANDSCAPE_LEFT);
-	//	CGLUnlockContext( (_CGLContextObject*) [[openGLView openGLContext] CGLContextObj]);
-	
+	return frameSize;
 }
 
 - (void) windowDidResize: (NSNotification *) aNotification
 {
-   NSLog (@"windowDidResize: called");
-	
-	[openGLView reshape];
+    // reshape updates OpenGL viewport and calls InitDeviceScreenInfoEx with correct new bounds
+    [openGLView reshape];
 }
 
 - (void)windowDidMiniaturize:(NSNotification *)notification
@@ -146,8 +160,27 @@
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender
 {
-	NSLog(@"Last window closed MainController");
-	return YES;
+    // Return NO - we handle termination via applicationWillTerminate
+    // Returning YES was causing immediate exit when window wasn't visible yet
+    return NO;
+}
+
+- (void)windowDidEnterFullScreen:(NSNotification *)notification
+{
+    extern bool g_bIsFullScreen;
+    g_bIsFullScreen = true;
+}
+
+- (void)windowDidExitFullScreen:(NSNotification *)notification
+{
+    extern bool g_bIsFullScreen;
+    g_bIsFullScreen = false;
+    [openGLView reshape];
+}
+
+- (void)windowWillClose:(NSNotification *)notification
+{
+    [NSApp terminate:nil];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification

@@ -31,15 +31,12 @@ FileManager * GetFileManager() {return &g_fileManager;}
 	
 	AudioManagerDenshion g_audioManager;
 #else
-	//it's being compiled as a native OSX app
-   #include "Audio/AudioManagerFMODStudio.h"
-  AudioManagerFMOD g_audioManager; //dummy with no sound
-
-//in theory, CocosDenshion should work for the Mac builds, but right now it seems to want a big chunk of
-//Cocos2d included so I'm not fiddling with it for now
-
-//#include "Audio/AudioManagerDenshion.h"
-//AudioManagerDenshion g_audioManager;
+	//it's being compiled as a native OSX app - use SDL audio, no FMOD required
+#include "Audio/AudioManagerSDL.h"
+#include <SDL2/SDL.h>
+	AudioManagerSDL g_audioManager;
+	// Required by MainController.mm and BaseApp.cpp - defined in SDL2Main.cpp for SDL builds
+	bool g_bIsFullScreen = false;
 #endif
 	
 #else
@@ -176,22 +173,23 @@ bool App::Init()
 	{
 		return true;
 	}
-	
+
+#if defined(__APPLE__) && !TARGET_OS_IPHONE
+	// Initialize SDL before BaseApp::Init() which triggers SDL audio init
+	SDL_Init(0);
+#endif
+
 	if (!BaseApp::Init()) return false;
+
+
 
 
 	LogMsg("Save path is %s", GetSavePath().c_str());
 
-	if (!GetFont(FONT_SMALL)->Load("interface/font_arial.rtfont")) 
-	{
-		LogMsg("Can't load font 1");
-		return false;
-	}
+	if (!GetFont(FONT_SMALL)->Load("interface/font_arial.rtfont"))
+		LogMsg("Warning: Can't load font_arial.rtfont - run update_media.sh to generate fonts");
 	if (!GetFont(FONT_LARGE)->Load("interface/font_arial_big.rtfont"))
-	{
-		LogMsg("Can't load font 2");
-		return false;
-	}
+		LogMsg("Warning: Can't load font_arial_big.rtfont - run update_media.sh to generate fonts");
 	//GetFont(FONT_SMALL)->SetSmoothing(false); //if we wanted to disable bilinear filtering on the font
 
 	GetBaseApp()->SetFPSVisible(true);
@@ -221,7 +219,12 @@ void App::Kill()
 
 void App::Update()
 {
+#if defined(__APPLE__) && !TARGET_OS_IPHONE
+	SDL_PumpEvents();
+#endif
 	BaseApp::Update();
+
+
 
 	if (!m_bDidPostInit)
 	{

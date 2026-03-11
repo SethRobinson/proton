@@ -62,6 +62,89 @@ Credits and links
 - Fatalfeel's [Proton SDK forks](https://github.com/fatalfeel) for GLES 2 support and Cocos2D integration
 - Vita platform support by @NabsiYa
 
+# Building the Demo Apps on macOS
+
+The following demo apps have Xcode projects under their `OSX/` folder:
+
+| App | Xcode Project | Audio | Notes |
+|-----|--------------|-------|-------|
+| **RTBareBones** | `RTBareBones/OSX/RTBareBones.xcodeproj` | Dummy (no audio) | Simplest starting point |
+| **RTSimpleApp** | `RTSimpleApp/OSX/RTSimpleApp.xcodeproj` | SDL2_mixer | Basic app with SDL audio |
+| **RTLooneyLadders** | `RTLooneyLadders/OSX/RTLooneyLadders.xcodeproj` | SDL2_mixer | Full game with gamepad support |
+
+All projects target **macOS 11.0+** and build as **universal binaries** (arm64 + x86_64).
+
+## Prerequisites
+
+### 1. Install SDL2 frameworks
+
+RTSimpleApp and RTLooneyLadders require SDL2 and SDL2_mixer. RTBareBones only requires SDL2 headers (no audio).
+
+The Xcode projects look for both frameworks in `~/Library/Frameworks/` automatically.
+
+**Option A — Universal DMG** (arm64 + x86_64, recommended):
+
+```bash
+# SDL2
+curl -L -o /tmp/SDL2.dmg https://github.com/libsdl-org/SDL/releases/download/release-2.30.9/SDL2-2.30.9.dmg
+hdiutil attach /tmp/SDL2.dmg
+cp -r "/Volumes/SDL2/SDL2.framework" ~/Library/Frameworks/
+hdiutil detach "/Volumes/SDL2"
+
+# SDL2_mixer (needed by RTSimpleApp and RTLooneyLadders)
+curl -L -o /tmp/SDL2_mixer.dmg https://github.com/libsdl-org/SDL_mixer/releases/download/release-2.8.0/SDL2_mixer-2.8.0.dmg
+hdiutil attach /tmp/SDL2_mixer.dmg
+cp -r "/Volumes/SDL2_mixer/SDL2_mixer.framework" ~/Library/Frameworks/
+hdiutil detach "/Volumes/SDL2_mixer"
+```
+
+> These are universal frameworks (arm64 + x86_64) so the resulting `.app` runs on both Intel and Apple Silicon Macs.
+
+**Option B — Homebrew** (native arch only, not suitable for universal binary):
+
+```bash
+brew install sdl2 sdl2_mixer
+```
+
+> **Note:** Homebrew on Apple Silicon only provides arm64 libraries. Use Option A if you need a universal binary.
+
+### 2. Generate fonts and textures
+
+RTSimpleApp and RTLooneyLadders require `.rtfont` files generated from source assets. Run `update_media.sh` from each app's `media/` folder (requires RTPack — build it first from `RTPack/linux/` on Linux or use the Windows version):
+
+```bash
+cd RTSimpleApp/media && sh update_media.sh
+cd RTLooneyLadders/media && sh update_media.sh
+```
+
+> **Note:** Without this step the apps will still open but text/fonts will not render.
+
+### 3. Generate the required libpng config header
+
+```bash
+LIBPNG=shared/Irrlicht/source/Irrlicht/libpng
+cp "$LIBPNG/pnglibconf.h.prebuilt" "$LIBPNG/pnglibconf.h"
+```
+
+## Build
+
+Open the desired Xcode project and build (`⌘B`):
+
+```bash
+# RTBareBones
+open RTBareBones/OSX/RTBareBones.xcodeproj
+
+# RTSimpleApp
+open RTSimpleApp/OSX/RTSimpleApp.xcodeproj
+
+# RTLooneyLadders
+open RTLooneyLadders/OSX/RTLooneyLadders.xcodeproj
+```
+
+> **Note:** The SDL2 frameworks are automatically embedded into the `.app` bundle at build time via `@executable_path/../Frameworks`, so the final app is self-contained and does not require SDL2 to be installed on the target machine.
+
+---
+
 # Want to contribute?
 
 Feel free to submit a pull request! At this point the goal is that all changes be *non-breaking* to existing projects.

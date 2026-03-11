@@ -21,6 +21,11 @@ FileManager * GetFileManager() {return &g_fileManager;}
 AudioManager g_audioManager; //to disable sound, this is a dummy
 AudioManager * GetAudioManager(){return &g_audioManager;}
 
+#ifdef PLATFORM_OSX
+// Required by MainController.mm and BaseApp.cpp - defined in SDL2Main.cpp for SDL builds
+bool g_bIsFullScreen = false;
+#endif
+
 App *g_pApp = NULL;
 
 BaseApp * GetBaseApp() 
