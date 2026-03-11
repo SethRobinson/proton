@@ -93,7 +93,7 @@
     GLint swapInt = 1;
     [[self openGLContext] setValues:&swapInt forParameter:NSOpenGLCPSwapInterval];
 
-    NSRect bounds = [self bounds];
+    NSRect bounds = [self convertRectToBacking:[self bounds]];
     InitDeviceScreenInfoEx(bounds.size.width, bounds.size.height, ORIENTATION_LANDSCAPE_LEFT);
 }
 // ---------------------------------
@@ -101,7 +101,7 @@
 - (void) reshape
 {
     [super reshape];
-    NSRect bounds = [self bounds];
+    NSRect bounds = [self convertRectToBacking:[self bounds]];
     int w = (int)bounds.size.width;
     int h = (int)bounds.size.height;
     if (w > 0 && h > 0)
@@ -127,6 +127,7 @@
     NSOpenGLPixelFormat * pf = [MyOpenGLView basicPixelFormat];
 
     self = [super initWithFrame: frameRect pixelFormat: pf];
+    [self setWantsBestResolutionOpenGLSurface:YES];
     return self;
 }
 
@@ -218,8 +219,10 @@
     // Delegate to the controller object for handling mouse events
     //int shiftDown = ([theEvent modifierFlags] & NSShiftKeyMask);
     //int controlDown = ([theEvent modifierFlags] & NSControlKeyMask);
-     
+
     NSPoint pt = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+    CGFloat scale = [self convertSizeToBacking:NSMakeSize(1,1)].width;
+    pt.x *= scale; pt.y *= scale;
     pt.y = GetPrimaryGLY()-pt.y; //flip it to upper left hand coords
     
     ConvertCoordinatesIfRequired(pt.x, pt.y);
@@ -233,6 +236,8 @@
 {
     // Delegate to the controller object for handling mouse events
     NSPoint pt = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+    CGFloat scale = [self convertSizeToBacking:NSMakeSize(1,1)].width;
+    pt.x *= scale; pt.y *= scale;
     pt.y = GetPrimaryGLY()-pt.y; //flip it to upper left hand coords
     
     ConvertCoordinatesIfRequired(pt.x, pt.y);
@@ -265,6 +270,8 @@
 // Handling mouse dragged events
 - (void)handleMouseDragged:(NSEvent *)theEvent withButtonNumber:(NSInteger)buttonNumber {
     NSPoint pt = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+    CGFloat scale = [self convertSizeToBacking:NSMakeSize(1,1)].width;
+    pt.x *= scale; pt.y *= scale;
     pt.y = GetPrimaryGLY()-pt.y; //flip it to upper left hand coords
 
     ConvertCoordinatesIfRequired(pt.x, pt.y);
@@ -275,6 +282,8 @@
 {
     // Delegate to the controller object for handling mouse events
     NSPoint pt = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+    CGFloat scale = [self convertSizeToBacking:NSMakeSize(1,1)].width;
+    pt.x *= scale; pt.y *= scale;
     pt.y = GetPrimaryGLY()-pt.y; //flip it to upper left hand coords
     
     ConvertCoordinatesIfRequired(pt.x, pt.y);

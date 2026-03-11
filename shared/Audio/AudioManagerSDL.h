@@ -23,7 +23,11 @@
 	#include "SDL/SDL_mixer.h"
 #else
 #include "SDL2/SDL.h"
+#if defined(__APPLE__) && !TARGET_OS_IPHONE
+#include <SDL2_mixer/SDL_mixer.h>
+#else
 #include "SDL2/SDL_mixer.h"
+#endif
 #endif
 
 class SoundObject;
