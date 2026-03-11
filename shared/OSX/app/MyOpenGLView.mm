@@ -93,7 +93,9 @@
     GLint swapInt = 1;
     [[self openGLContext] setValues:&swapInt forParameter:NSOpenGLCPSwapInterval];
 
-    NSRect bounds = [self convertRectToBacking:[self bounds]];
+    NSRect bounds = [self bounds];
+    NSRect backing = [self convertRectToBacking:bounds];
+    glViewport(0, 0, (GLsizei)backing.size.width, (GLsizei)backing.size.height);
     InitDeviceScreenInfoEx(bounds.size.width, bounds.size.height, ORIENTATION_LANDSCAPE_LEFT);
 }
 // ---------------------------------
@@ -101,11 +103,14 @@
 - (void) reshape
 {
     [super reshape];
-    NSRect bounds = [self convertRectToBacking:[self bounds]];
+    NSRect bounds = [self bounds];
+    NSRect backing = [self convertRectToBacking:bounds];
     int w = (int)bounds.size.width;
     int h = (int)bounds.size.height;
     if (w > 0 && h > 0)
     {
+        glViewport(0, 0, (GLsizei)backing.size.width, (GLsizei)backing.size.height);
+        InitDeviceScreenInfoEx(w, h, ORIENTATION_LANDSCAPE_LEFT);
         InitDeviceScreenInfoEx(w, h, ORIENTATION_LANDSCAPE_LEFT);
         [[self openGLContext] update];
     }
@@ -221,10 +226,8 @@
     //int controlDown = ([theEvent modifierFlags] & NSControlKeyMask);
 
     NSPoint pt = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-    CGFloat scale = [self convertSizeToBacking:NSMakeSize(1,1)].width;
-    pt.x *= scale; pt.y *= scale;
     pt.y = GetPrimaryGLY()-pt.y; //flip it to upper left hand coords
-    
+
     ConvertCoordinatesIfRequired(pt.x, pt.y);
     GetMessageManager()->SendGUIEx(MESSAGE_TYPE_GUI_CLICK_START,pt.x, pt.y, buttonNumber );
 
@@ -236,10 +239,8 @@
 {
     // Delegate to the controller object for handling mouse events
     NSPoint pt = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-    CGFloat scale = [self convertSizeToBacking:NSMakeSize(1,1)].width;
-    pt.x *= scale; pt.y *= scale;
     pt.y = GetPrimaryGLY()-pt.y; //flip it to upper left hand coords
-    
+
     ConvertCoordinatesIfRequired(pt.x, pt.y);
     GetMessageManager()->SendGUIEx(MESSAGE_TYPE_GUI_CLICK_END,pt.x, pt.y, buttonNumber);
     // [controller mouseDown:theEvent];
@@ -270,8 +271,6 @@
 // Handling mouse dragged events
 - (void)handleMouseDragged:(NSEvent *)theEvent withButtonNumber:(NSInteger)buttonNumber {
     NSPoint pt = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-    CGFloat scale = [self convertSizeToBacking:NSMakeSize(1,1)].width;
-    pt.x *= scale; pt.y *= scale;
     pt.y = GetPrimaryGLY()-pt.y; //flip it to upper left hand coords
 
     ConvertCoordinatesIfRequired(pt.x, pt.y);
@@ -282,10 +281,8 @@
 {
     // Delegate to the controller object for handling mouse events
     NSPoint pt = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-    CGFloat scale = [self convertSizeToBacking:NSMakeSize(1,1)].width;
-    pt.x *= scale; pt.y *= scale;
     pt.y = GetPrimaryGLY()-pt.y; //flip it to upper left hand coords
-    
+
     ConvertCoordinatesIfRequired(pt.x, pt.y);
     GetMessageManager()->SendGUI(MESSAGE_TYPE_GUI_CLICK_MOVE_RAW,pt.x, pt.y);
 }
