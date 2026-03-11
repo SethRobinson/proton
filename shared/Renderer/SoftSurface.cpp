@@ -2445,20 +2445,19 @@ BMPImageHeader SoftSurface::BuildBitmapHeader()
 	return bmpImageInfo;
 }
 
-// Define the memory buffer structure outside the function
+#ifdef RT_PNG_SUPPORT
 struct PNGMemoryBuffer {
 	uint8* data;
 	size_t size;
 	size_t capacity;
 };
 
-// Define the write function outside the WritePNGToMemory function
 static void WriteDataToMemory(png_structp png_ptr, png_bytep data, png_size_t length)
 {
 	PNGMemoryBuffer* p = (PNGMemoryBuffer*)png_get_io_ptr(png_ptr);
 	size_t new_size = p->size + length;
 	if (new_size > p->capacity) {
-		size_t new_capacity = new_size + 1024; // Allocate additional memory to reduce reallocations
+		size_t new_capacity = new_size + 1024;
 		uint8* new_data = new uint8[new_capacity];
 		if (p->data) {
 			memcpy(new_data, p->data, p->size);
@@ -2470,6 +2469,7 @@ static void WriteDataToMemory(png_structp png_ptr, png_bytep data, png_size_t le
 	memcpy(p->data + p->size, data, length);
 	p->size += length;
 }
+#endif
 
 uint8* SoftSurface::WritePNGToMemory(int compressionLevel, int& outSize)
 {
