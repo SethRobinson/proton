@@ -184,4 +184,5 @@ GetMessageManager()->CallStaticFunction(PlaySound, timeMS, &vList);
 void PlaySound(VariantList* pVList);
 void PlayMusic(VariantList* pVList);
 void StopMusic(VariantList* pVList);
+void PlayMusicOnce(VariantList* pVList);
 #endif // AudioManager_h__

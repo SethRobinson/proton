@@ -6,7 +6,8 @@
 	#include <sys/types.h> 
 	#include <sys/socket.h>
 	#include <sys/wait.h> 
-	#include <netinet/in.h> 
+	#include <netinet/in.h>
+	#include <netinet/tcp.h>
 	#include <netdb.h> 
 	#include <arpa/inet.h>
 
@@ -382,8 +383,14 @@ void NetSocket::SetSocket( int socket )
 	Kill();
 	m_socket = socket;
 	m_idleTimer = GetSystemTimeTick();
-#ifndef WINAPI
+#ifdef WINAPI
+	// Disable Nagle's algorithm for low latency on accepted connections
+	int flag = 1;
+	setsockopt(m_socket, IPPROTO_TCP, TCP_NODELAY, (const char*)&flag, sizeof(flag));
+#else
 	fcntl(m_socket, F_SETFL, O_NONBLOCK);
+	int flag = 1;
+	setsockopt(m_socket, IPPROTO_TCP, TCP_NODELAY, &flag, sizeof(flag));
 #endif
 
 }

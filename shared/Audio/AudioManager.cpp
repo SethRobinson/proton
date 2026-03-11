@@ -86,6 +86,12 @@ void PlayMusic(VariantList* pVList)
 	string fName = pVList->Get(0).GetString();
 	GetAudioManager()->Play(fName, true, true);
 }
+void PlayMusicOnce(VariantList* pVList)
+{
+	string fName = pVList->Get(0).GetString();
+	GetAudioManager()->Play(fName, false, true);
+}
+
 
 void StopMusic(VariantList* pVList)
 {
