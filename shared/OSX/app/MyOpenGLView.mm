@@ -94,8 +94,6 @@
     [[self openGLContext] setValues:&swapInt forParameter:NSOpenGLCPSwapInterval];
 
     NSRect bounds = [self bounds];
-    NSRect backing = [self convertRectToBacking:bounds];
-    glViewport(0, 0, (GLsizei)backing.size.width, (GLsizei)backing.size.height);
     InitDeviceScreenInfoEx(bounds.size.width, bounds.size.height, ORIENTATION_LANDSCAPE_LEFT);
 }
 // ---------------------------------
@@ -103,15 +101,16 @@
 - (void) reshape
 {
     [super reshape];
+    [[self openGLContext] makeCurrentContext];
     NSRect bounds = [self bounds];
-    NSRect backing = [self convertRectToBacking:bounds];
     int w = (int)bounds.size.width;
     int h = (int)bounds.size.height;
     if (w > 0 && h > 0)
     {
-        glViewport(0, 0, (GLsizei)backing.size.width, (GLsizei)backing.size.height);
         InitDeviceScreenInfoEx(w, h, ORIENTATION_LANDSCAPE_LEFT);
-        InitDeviceScreenInfoEx(w, h, ORIENTATION_LANDSCAPE_LEFT);
+        // Force viewport to logical size — fullscreen transitions can
+        // reset the viewport to Retina backing pixels
+        glViewport(0, 0, w, h);
         [[self openGLContext] update];
     }
 }
@@ -132,7 +131,10 @@
     NSOpenGLPixelFormat * pf = [MyOpenGLView basicPixelFormat];
 
     self = [super initWithFrame: frameRect pixelFormat: pf];
-    [self setWantsBestResolutionOpenGLSurface:YES];
+    // Disable Retina backing — the engine assumes viewport == logical points.
+    // On macOS 10.15+ this defaults to YES, giving a 2x backing surface that
+    // breaks glScissor and other pixel-coordinate GL calls.
+    [self setWantsBestResolutionOpenGLSurface:NO];
     return self;
 }
 

@@ -61,6 +61,7 @@ Credits and links
 - Dan Walma (contributions to SoftSurface)
 - Fatalfeel's [Proton SDK forks](https://github.com/fatalfeel) for GLES 2 support and Cocos2D integration
 - Vita platform support by @NabsiYa
+- Mateus Sales Bentes (@mateusbentes) (Mac support improvements)
 
 # Building the Demo Apps on macOS
 
@@ -70,7 +71,7 @@ The following demo apps have Xcode projects under their `OSX/` folder:
 |-----|--------------|-------|-------|
 | **RTBareBones** | `RTBareBones/OSX/RTBareBones.xcodeproj` | Dummy (no audio) | Simplest starting point |
 | **RTSimpleApp** | `RTSimpleApp/OSX/RTSimpleApp.xcodeproj` | SDL2_mixer | Basic app with SDL audio |
-| **RTLooneyLadders** | `RTLooneyLadders/OSX/RTLooneyLadders.xcodeproj` | SDL2_mixer | Full game with gamepad support |
+| **RTLooneyLadders** | `RTLooneyLadders/OSX/RTLooneyLadders.xcodeproj` | SDL2_mixer | Full game with gamepad support (game controllers not yet working on Mac) |
 
 All projects target **macOS 11.0+** and build as **universal binaries** (arm64 + x86_64).
 
