@@ -289,7 +289,7 @@
 		5D7BBD0010144FF50015A90E /* ResourceManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ResourceManager.h; path = Manager/ResourceManager.h; sourceTree = "<group>"; };
 		5D7BBD081014530B0015A90E /* SurfaceAnim.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SurfaceAnim.cpp; path = ../shared/Renderer/SurfaceAnim.cpp; sourceTree = SOURCE_ROOT; };
 		5D7BBD091014530B0015A90E /* SurfaceAnim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SurfaceAnim.h; path = ../shared/Renderer/SurfaceAnim.h; sourceTree = SOURCE_ROOT; };
-		5D7C329E10BBB755009C5324 /* game */ = {isa = PBXFileReference; lastKnownFileType = folder; name = game; path = media/game; sourceTree = "<group>"; };
+		5D7C329E10BBB755009C5324 /* game */ = {isa = PBXFileReference; lastKnownFileType = folder; name = game; path = bin/game; sourceTree = "<group>"; };
 		5D7C32C810BBD401009C5324 /* FilterInputComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FilterInputComponent.cpp; path = Entity/FilterInputComponent.cpp; sourceTree = "<group>"; };
 		5D7C32C910BBD401009C5324 /* FilterInputComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FilterInputComponent.h; path = Entity/FilterInputComponent.h; sourceTree = "<group>"; };
 		5D7C32CA10BBD401009C5324 /* RenderClipComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenderClipComponent.cpp; path = Entity/RenderClipComponent.cpp; sourceTree = "<group>"; };
@@ -325,7 +325,7 @@
 		5D82C88A0FF4BB3F0082EBE7 /* NetUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NetUtils.h; path = Network/NetUtils.h; sourceTree = "<group>"; };
 		5D82C8AF0FF4C02B0082EBE7 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		5D82C8B40FF4C0BF0082EBE7 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
-		5D82C8C20FF4C1500082EBE7 /* audio */ = {isa = PBXFileReference; lastKnownFileType = folder; name = audio; path = media/audio; sourceTree = "<group>"; };
+		5D82C8C20FF4C1500082EBE7 /* audio */ = {isa = PBXFileReference; lastKnownFileType = folder; name = audio; path = bin/audio; sourceTree = "<group>"; };
 		5D841435101583BD00366718 /* InputTextRenderComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = InputTextRenderComponent.cpp; path = Entity/InputTextRenderComponent.cpp; sourceTree = "<group>"; };
 		5D841436101583BD00366718 /* InputTextRenderComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InputTextRenderComponent.h; path = Entity/InputTextRenderComponent.h; sourceTree = "<group>"; };
 		5D8483DD0F923D51007338A2 /* Component.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Component.cpp; path = Entity/Component.cpp; sourceTree = "<group>"; };
@@ -360,7 +360,7 @@
 		5DB488DA10B1313300B84589 /* RenderBatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RenderBatcher.h; path = ../shared/Renderer/RenderBatcher.h; sourceTree = SOURCE_ROOT; };
 		5DC692B00E94852F00E5AC44 /* App.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = App.h; path = source/App.h; sourceTree = "<group>"; };
 		5DC692B10E94852F00E5AC44 /* App.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = App.cpp; path = source/App.cpp; sourceTree = "<group>"; };
-		5DC6D63B0EA47C0E001482E0 /* interface */ = {isa = PBXFileReference; lastKnownFileType = folder; name = interface; path = media/interface; sourceTree = "<group>"; };
+		5DC6D63B0EA47C0E001482E0 /* interface */ = {isa = PBXFileReference; lastKnownFileType = folder; name = interface; path = bin/interface; sourceTree = "<group>"; };
 		5DC6D77B0EA4B397001482E0 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = media/Default.png; sourceTree = "<group>"; };
 		5DC6D77C0EA4B397001482E0 /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon.png; path = media/icon.png; sourceTree = "<group>"; };
 		5DD3272012C1CE500009B0F3 /* GameMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GameMenu.h; path = source/GUI/GameMenu.h; sourceTree = "<group>"; };
