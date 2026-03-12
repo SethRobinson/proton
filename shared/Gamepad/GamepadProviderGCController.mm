@@ -11,7 +11,7 @@
 // Use the GCController pointer address as a stable unique ID
 static eGamepadID IDFromController(GCController* c)
 {
-	return (eGamepadID)(uintptr_t)(__bridge void*)c;
+	return (eGamepadID)(uintptr_t)(void*)c;
 }
 
 GamepadProviderGCController::GamepadProviderGCController()
@@ -101,8 +101,8 @@ bool GamepadProviderGCController::Init()
 			GetGamepadManager()->RemoveGamepadByUniqueID(uid);
 		}];
 
-	m_pConnectObserver    = (__bridge_retained void*)connectObs;
-	m_pDisconnectObserver = (__bridge_retained void*)disconnectObs;
+	m_pConnectObserver    = (void*)CFRetain((__bridge CFTypeRef)connectObs);
+	m_pDisconnectObserver = (void*)CFRetain((__bridge CFTypeRef)disconnectObs);
 
 	return true;
 }
@@ -111,14 +111,16 @@ void GamepadProviderGCController::Kill()
 {
 	if (m_pConnectObserver)
 	{
-		id obs = (__bridge_transfer id)m_pConnectObserver;
+		id obs = (__bridge id)m_pConnectObserver;
 		[[NSNotificationCenter defaultCenter] removeObserver:obs];
+		CFRelease((CFTypeRef)m_pConnectObserver);
 		m_pConnectObserver = nullptr;
 	}
 	if (m_pDisconnectObserver)
 	{
-		id obs = (__bridge_transfer id)m_pDisconnectObserver;
+		id obs = (__bridge id)m_pDisconnectObserver;
 		[[NSNotificationCenter defaultCenter] removeObserver:obs];
+		CFRelease((CFTypeRef)m_pDisconnectObserver);
 		m_pDisconnectObserver = nullptr;
 	}
 }

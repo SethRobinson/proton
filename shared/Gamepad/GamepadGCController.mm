@@ -5,6 +5,26 @@
 #include "GamepadGCController.h"
 #include "GamepadManager.h"
 
+// Button index constants matching SDL_CONTROLLER_BUTTON_* values,
+// used as raw indices into m_buttons[]. No SDL headers needed here.
+enum {
+	GCC_BTN_A             = 0,
+	GCC_BTN_B             = 1,
+	GCC_BTN_X             = 2,
+	GCC_BTN_Y             = 3,
+	GCC_BTN_BACK          = 4,
+	GCC_BTN_GUIDE         = 5,
+	GCC_BTN_START         = 6,
+	GCC_BTN_LEFTSTICK     = 7,
+	GCC_BTN_RIGHTSTICK    = 8,
+	GCC_BTN_LEFTSHOULDER  = 9,
+	GCC_BTN_RIGHTSHOULDER = 10,
+	GCC_BTN_DPAD_UP       = 11,
+	GCC_BTN_DPAD_DOWN     = 12,
+	GCC_BTN_DPAD_LEFT     = 13,
+	GCC_BTN_DPAD_RIGHT    = 14,
+};
+
 GamepadGCController::GamepadGCController()
 {
 	m_pGCController = nullptr;
@@ -27,8 +47,6 @@ void GamepadGCController::Kill()
 {
 	if (m_pGCController)
 	{
-		GCController* controller = (__bridge GCController*)m_pGCController;
-		(void)controller;
 		m_pGCController = nullptr;
 	}
 }
@@ -40,7 +58,7 @@ void GamepadGCController::Update()
 
 void GamepadGCController::InitWithGCController(GCController* controller)
 {
-	m_pGCController = (__bridge void*)controller;
+	m_pGCController = (void*)controller;
 
 	const char* pName = [controller.vendorName UTF8String];
 	if (pName)
@@ -52,21 +70,21 @@ void GamepadGCController::InitWithGCController(GCController* controller)
 	// Same button mapping as GamepadSDL2 Windows path
 	SetRightStickAxis(2, 3);
 
-	m_buttons[SDL_CONTROLLER_BUTTON_A].m_virtualKey            = VIRTUAL_DPAD_BUTTON_DOWN;
-	m_buttons[SDL_CONTROLLER_BUTTON_B].m_virtualKey            = VIRTUAL_DPAD_BUTTON_RIGHT;
-	m_buttons[SDL_CONTROLLER_BUTTON_X].m_virtualKey            = VIRTUAL_DPAD_BUTTON_LEFT;
-	m_buttons[SDL_CONTROLLER_BUTTON_Y].m_virtualKey            = VIRTUAL_DPAD_BUTTON_UP;
-	m_buttons[SDL_CONTROLLER_BUTTON_LEFTSHOULDER].m_virtualKey = VIRTUAL_DPAD_LBUTTON;
-	m_buttons[SDL_CONTROLLER_BUTTON_RIGHTSHOULDER].m_virtualKey= VIRTUAL_DPAD_RBUTTON;
-	m_buttons[SDL_CONTROLLER_BUTTON_BACK].m_virtualKey         = VIRTUAL_DPAD_SELECT;
-	m_buttons[SDL_CONTROLLER_BUTTON_START].m_virtualKey        = VIRTUAL_DPAD_START;
-	m_buttons[SDL_CONTROLLER_BUTTON_GUIDE].m_virtualKey        = VIRTUAL_DPAD_MENU;
-	m_buttons[SDL_CONTROLLER_BUTTON_LEFTSTICK].m_virtualKey    = VIRTUAL_JOYSTICK_BUTTON_LEFT;
-	m_buttons[SDL_CONTROLLER_BUTTON_RIGHTSTICK].m_virtualKey   = VIRTUAL_JOYSTICK_BUTTON_RIGHT;
-	m_buttons[SDL_CONTROLLER_BUTTON_DPAD_UP].m_virtualKey      = VIRTUAL_KEY_DIR_UP;
-	m_buttons[SDL_CONTROLLER_BUTTON_DPAD_DOWN].m_virtualKey    = VIRTUAL_KEY_DIR_DOWN;
-	m_buttons[SDL_CONTROLLER_BUTTON_DPAD_LEFT].m_virtualKey    = VIRTUAL_KEY_DIR_LEFT;
-	m_buttons[SDL_CONTROLLER_BUTTON_DPAD_RIGHT].m_virtualKey   = VIRTUAL_KEY_DIR_RIGHT;
+	m_buttons[GCC_BTN_A].m_virtualKey             = VIRTUAL_DPAD_BUTTON_DOWN;
+	m_buttons[GCC_BTN_B].m_virtualKey             = VIRTUAL_DPAD_BUTTON_RIGHT;
+	m_buttons[GCC_BTN_X].m_virtualKey             = VIRTUAL_DPAD_BUTTON_LEFT;
+	m_buttons[GCC_BTN_Y].m_virtualKey             = VIRTUAL_DPAD_BUTTON_UP;
+	m_buttons[GCC_BTN_LEFTSHOULDER].m_virtualKey  = VIRTUAL_DPAD_LBUTTON;
+	m_buttons[GCC_BTN_RIGHTSHOULDER].m_virtualKey = VIRTUAL_DPAD_RBUTTON;
+	m_buttons[GCC_BTN_BACK].m_virtualKey          = VIRTUAL_DPAD_SELECT;
+	m_buttons[GCC_BTN_START].m_virtualKey         = VIRTUAL_DPAD_START;
+	m_buttons[GCC_BTN_GUIDE].m_virtualKey         = VIRTUAL_DPAD_MENU;
+	m_buttons[GCC_BTN_LEFTSTICK].m_virtualKey     = VIRTUAL_JOYSTICK_BUTTON_LEFT;
+	m_buttons[GCC_BTN_RIGHTSTICK].m_virtualKey    = VIRTUAL_JOYSTICK_BUTTON_RIGHT;
+	m_buttons[GCC_BTN_DPAD_UP].m_virtualKey       = VIRTUAL_KEY_DIR_UP;
+	m_buttons[GCC_BTN_DPAD_DOWN].m_virtualKey     = VIRTUAL_KEY_DIR_DOWN;
+	m_buttons[GCC_BTN_DPAD_LEFT].m_virtualKey     = VIRTUAL_KEY_DIR_LEFT;
+	m_buttons[GCC_BTN_DPAD_RIGHT].m_virtualKey    = VIRTUAL_KEY_DIR_RIGHT;
 
 	GCExtendedGamepad* pad = controller.extendedGamepad;
 	if (!pad)
@@ -79,48 +97,48 @@ void GamepadGCController::InitWithGCController(GCController* controller)
 	GamepadGCController* self = this;
 
 	pad.buttonA.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, SDL_CONTROLLER_BUTTON_A);
+		self->OnButton(pressed, GCC_BTN_A);
 	};
 	pad.buttonB.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, SDL_CONTROLLER_BUTTON_B);
+		self->OnButton(pressed, GCC_BTN_B);
 	};
 	pad.buttonX.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, SDL_CONTROLLER_BUTTON_X);
+		self->OnButton(pressed, GCC_BTN_X);
 	};
 	pad.buttonY.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, SDL_CONTROLLER_BUTTON_Y);
+		self->OnButton(pressed, GCC_BTN_Y);
 	};
 	pad.leftShoulder.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, SDL_CONTROLLER_BUTTON_LEFTSHOULDER);
+		self->OnButton(pressed, GCC_BTN_LEFTSHOULDER);
 	};
 	pad.rightShoulder.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);
+		self->OnButton(pressed, GCC_BTN_RIGHTSHOULDER);
 	};
 	pad.leftThumbstickButton.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, SDL_CONTROLLER_BUTTON_LEFTSTICK);
+		self->OnButton(pressed, GCC_BTN_LEFTSTICK);
 	};
 	pad.rightThumbstickButton.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, SDL_CONTROLLER_BUTTON_RIGHTSTICK);
+		self->OnButton(pressed, GCC_BTN_RIGHTSTICK);
 	};
 	pad.buttonOptions.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, SDL_CONTROLLER_BUTTON_BACK);
+		self->OnButton(pressed, GCC_BTN_BACK);
 	};
 	pad.buttonMenu.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, SDL_CONTROLLER_BUTTON_START);
+		self->OnButton(pressed, GCC_BTN_START);
 	};
 
 	// D-pad
 	pad.dpad.up.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, SDL_CONTROLLER_BUTTON_DPAD_UP);
+		self->OnButton(pressed, GCC_BTN_DPAD_UP);
 	};
 	pad.dpad.down.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+		self->OnButton(pressed, GCC_BTN_DPAD_DOWN);
 	};
 	pad.dpad.left.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+		self->OnButton(pressed, GCC_BTN_DPAD_LEFT);
 	};
 	pad.dpad.right.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+		self->OnButton(pressed, GCC_BTN_DPAD_RIGHT);
 	};
 
 	// Left stick
