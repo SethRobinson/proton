@@ -32,7 +32,7 @@ AudioManagerOS g_audioManager;
 #else
 	//it's being compiled as a native OSX app - use SDL audio, no FMOD required
 #include "Audio/AudioManagerSDL.h"
-#include "Gamepad/GamepadProviderSDL2.h"
+#include "Gamepad/GamepadProviderGCController.h"
 #include <SDL2/SDL.h>
 	AudioManagerSDL g_audioManager;
 	// Required by MainController.mm and BaseApp.cpp - defined in SDL2Main.cpp for SDL builds
@@ -129,8 +129,10 @@ bool App::Init()
 	if (!BaseApp::Init()) return false;
 
 #ifdef PLATFORM_OSX
-	SDL_Init(SDL_INIT_EVENTS | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
-	GetGamepadManager()->AddProvider(new GamepadProviderSDL2());
+	SDL_Init(SDL_INIT_EVENTS);
+	GetGamepadManager()->AddProvider(new GamepadProviderGCController());
+	GetGamepadManager()->m_sig_gamepad_connected.connect(1, boost::bind(&App::OnGamepadConnected, this, _1));
+	GetGamepadManager()->m_sig_gamepad_disconnected.connect(1, boost::bind(&App::OnGamepadDisconnected, this, _1));
 #endif
 
 	LogMsg("Save path is %s", GetSavePath().c_str());
