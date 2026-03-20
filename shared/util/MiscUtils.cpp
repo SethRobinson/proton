@@ -901,7 +901,7 @@ float StringToFloat( const string &s )
 bool StringToBool(const string& s)
 {
 	string lower = ToLowerCaseString(s);
-	if (lower == "true" || lower == "1"| lower == "yes") return true;
+	if (lower == "true" || lower == "1" || lower == "yes") return true;
 	return false;
 }
 
