@@ -135,7 +135,7 @@ public:
      *      parameter is \link IAPManager::eFailureReason <tt>eFailureReason</tt>\endlink as a uint.
      *      See \c GetFailureReason().
      */
-    boost::signal<void (VariantList*)> m_sig_item_purchase_result;
+	boost::signals2::signal<void (VariantList*)> m_sig_item_purchase_result;
     
     /**
      * A signal for reporting an unexpected purchase or refund (happens on android only so far, and can happen at ANY TIME the
@@ -147,7 +147,7 @@ public:
      * - 1: a string that gives more information about the result. (currently unused)
      * - 2: the item id in question (as a string)
      */
-    boost::signal<void (VariantList*)> m_sig_item_unexpected_purchase_result; //something we didn't see coming, like an item
+	boost::signals2::signal<void (VariantList*)> m_sig_item_unexpected_purchase_result; //something we didn't see coming, like an item
     //refund, or buying an item an hour later at any point in the game. (this can only happens on Android)
     
     /**
@@ -156,7 +156,7 @@ public:
      *
      * The parameter variant list contains no items.
      */
-    boost::signal<void (VariantList*)> m_sig_purchased_list_updated;
+	boost::signals2::signal<void (VariantList*)> m_sig_purchased_list_updated;
     
     enum ItemStateCode
     {
