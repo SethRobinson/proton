@@ -89,6 +89,23 @@ std::string toString(C value)
 	return o.str();
 }
 
+//template overloads for uint8 and int8 as they break for the above function:
+template<>
+inline std::string toString<uint8>(uint8 value)
+{
+	std::ostringstream o{};
+	o << (uint32)value; //cast to uint32 so the stream wont treat it as a character but an actual number.
+	return o.str();
+}
+
+template<>
+inline std::string toString<int8>(int8 value)
+{
+	std::ostringstream o{};
+	o << (int32)value; //again, same as above but make it signed.
+	return o.str();
+}
+
 int StringToInt(const std::string &s);
 float StringToFloat(const std::string &s);
 bool StringToBool(const std::string& s);
