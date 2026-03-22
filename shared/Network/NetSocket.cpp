@@ -287,10 +287,7 @@ bool NetSocket::Init( string url, int port )
 	//u_long iMode = 0;
 	//ioctlsocket(m_socket, FIOASYNC, &iMode);
 
-	WSAAsyncSelect(m_socket, GetForegroundWindow(), WM_USER+1, FD_READ); 
-	WSAAsyncSelect(m_socket, GetForegroundWindow(), WM_USER+1, FD_WRITE); 
-	WSAAsyncSelect(m_socket, GetForegroundWindow(), WM_USER+1, FD_CONNECT); 
-	WSAAsyncSelect(m_socket, GetForegroundWindow(), WM_USER+1, FD_OOB); 
+	WSAAsyncSelect(m_socket, GetForegroundWindow(), WM_USER + 1, FD_READ | FD_WRITE | FD_CONNECT | FD_OOB);
 
 #else
 		fcntl (m_socket, F_SETFL, O_NONBLOCK);
@@ -357,11 +354,7 @@ bool NetSocket::InitHost( int port, int connections )
 		return false;
 	}
 	
-	WSAAsyncSelect(m_socket, GetForegroundWindow(), WM_USER+1, FD_READ); 
-	WSAAsyncSelect(m_socket, GetForegroundWindow(), WM_USER+1, FD_WRITE); 
-	WSAAsyncSelect(m_socket, GetForegroundWindow(), WM_USER+1, FD_CONNECT); 
-	WSAAsyncSelect(m_socket, GetForegroundWindow(), WM_USER+1, FD_OOB); 
-
+	WSAAsyncSelect(m_socket, GetForegroundWindow(), WM_USER + 1, FD_READ | FD_WRITE | FD_CONNECT | FD_OOB);
 
 #else
 	//int x;
@@ -399,7 +392,7 @@ string NetSocket::GetClientIPAsString()
 {
 	if (m_socket == INVALID_SOCKET) return "NOT CONNECTED";
 
-	sockaddr_in addr;
+	sockaddr_storage addr{};
 #ifdef WIN32
 	//avoid needing ws2tcpip.h
 	int addrsize = sizeof(addr);
@@ -408,15 +401,58 @@ string NetSocket::GetClientIPAsString()
 	socklen_t addrsize = sizeof(addr);
 #endif
 
-	int result = getpeername(m_socket, (sockaddr*) &addr, &addrsize);
-	//printf("Result = %d\n", result);
-	
-	char* ip = inet_ntoa(addr.sin_addr);
-	int port = addr.sin_port;
-	//printf("IP: %s ... PORT: %d\n", ip, port);
-	return ip;
+	//Note - Preserve old behaviour where getpeername() failure will return 0.0.0.0 so code relying on that won't break (though it would break on windows already even with the old version, but hey!)
 
+	if (getpeername(m_socket, (sockaddr*)&addr, &addrsize) != 0)
+	{
+#ifdef WIN32
+		int err = WSAGetLastError();
+#else
+		int err = errno;
+#endif
+		return "0.0.0.0";
+	}
+	
+	char ipBuf[INET6_ADDRSTRLEN]{};
+
+	switch (addr.ss_family)
+	{
+	case AF_INET6:
+	{
+		//Get IPv6
+		sockaddr_in6* pIn6 = (sockaddr_in6*)&addr;
+		const char* ntopResult = inet_ntop(AF_INET6, &pIn6->sin6_addr, ipBuf, sizeof(ipBuf));
+
+		if (!ntopResult)
+		{
+			return "0.0.0.0";
+		}
+
+		break;
+	}
+	case AF_INET:
+	{
+		//Get IPv4
+		sockaddr_in* pIn = (sockaddr_in*)&addr;
+		
+		const char* ntopResult = inet_ntop(AF_INET, &pIn->sin_addr, ipBuf, sizeof(ipBuf));
+
+		if (!ntopResult)
+		{
+			return "0.0.0.0";
+		}
+
+		break;
+	}
+	default:
+	{
+		return "Unknown socket family";
+	}
+	}
+
+	return std::string(ipBuf);
 }
+
 void NetSocket::Update()
 {	
 	UpdateRead();
