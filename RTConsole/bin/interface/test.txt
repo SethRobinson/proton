@@ -1,2 +1,0 @@
--- File system test loading a text file
-Success
