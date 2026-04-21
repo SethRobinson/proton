@@ -12,6 +12,5 @@
         "cmake.configureSettings": {
             "CMAKE_PREFIX_PATH": "../shared"
         },
-        "clangd.compileCommands": "${workspaceFolder}/win32/build/compile_commands.json"
     }
 }
