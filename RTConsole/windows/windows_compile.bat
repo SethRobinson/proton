@@ -12,6 +12,5 @@ cmake -G Ninja ..\windows
 cmake --build . --config Release
 
 echo Copying binaries to ..\bin directory, run from there!
-xcopy /y RTConsole.exe ..\..\bin
 
 cd ..
