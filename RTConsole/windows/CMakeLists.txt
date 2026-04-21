@@ -7,6 +7,10 @@ project(RTConsole)
 
 add_definitions(-D_CONSOLE -DBOOST_ALL_NO_LIB- -DC_NO_ZLIB -D_CRT_SECURE_NO_WARNINGS)
 
+#set where we want our binaries to go to so no need to copy them from the build folder
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}../../bin)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_BUILD_TYPE "Release")
 
 IF (CMAKE_BUILD_TYPE MATCHES "Debug")

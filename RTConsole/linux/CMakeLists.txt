@@ -8,6 +8,7 @@ project (RTConsole)
 # additional compiler flags -DSIMPLE_PROFILING_ACTIVE
 add_definitions(-D_CONSOLE -DHAS_SOCKLEN_T -DBOOST_ALL_NO_LIB -DC_NO_ZLIB -DRTLINUX)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_BUILD_TYPE "Release")
 
 IF (CMAKE_BUILD_TYPE MATCHES "Debug")
