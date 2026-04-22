@@ -1,0 +1,20 @@
+//workspace file to make vscode adapt to Proton SDK's folder structure.
+{
+    "folders": [
+        {
+            "path": "."
+        },
+        {
+            "path": "../shared" //this will cause all the shared project tools to be visible in vscode, but hey, better than nothing!
+        }
+    ],
+    "settings": {
+        "cmake.configureSettings": {
+            "CMAKE_PREFIX_PATH": "../shared",
+            "CMAKE_C_COMPILER": "gcc",
+            "CMAKE_CXX_COMPILER": "g++"
+        },
+        "cmake.sourceDirectory": "${workspaceFolder}/windows",
+        "cmake.generator": "MinGW Makefiles"
+    }
+}

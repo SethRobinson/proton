@@ -12,5 +12,6 @@
         "cmake.configureSettings": {
             "CMAKE_PREFIX_PATH": "../shared"
         },
+        "cmake.sourceDirectory": "${workspaceFolder}/linux"
     }
 }
