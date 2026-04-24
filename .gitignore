@@ -76,5 +76,6 @@ TempBackup
 shared/android/optional_src/libs/libcurl-android
 **/.cache
 RTConsole/build
+RTConsole/bin/RTConsole
 shared/.vscode
 /.vscode/settings.json
