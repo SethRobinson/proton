@@ -50,7 +50,6 @@ shared/addons/whisper.cpp
 shared/addons/WhisperModded
 RTLooneyLadders/windows/x64
 RTLooneyLadders/windows/log.txt
-.vscode/settings.json
 RTSimpleApp/AndroidGradle/app/libs/fmod.jar
 */windows_vs2017/x64
 shared/win/libVLC
@@ -75,3 +74,6 @@ RTMahjong
 RTLibretroTest_dynamic_link_version
 TempBackup
 shared/android/optional_src/libs/libcurl-android
+*/.cache
+RTConsole/build
+shared/.vscode
