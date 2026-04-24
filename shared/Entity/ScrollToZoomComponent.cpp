@@ -56,8 +56,21 @@ void ScrollToZoomComponent::OnInput(VariantList* pVList)
 
 			//	LogMsg("Mouse wheel: Offet: %.2f", wheelVal);
 			float fDelta = ((float)wheelVal) * (m_pScale2d->x * zoomPower);
+			CL_Vec2f newScale = *m_pScale2d + CL_Vec2f(fDelta, fDelta);
 
-			GetParent()->GetVar("scale2d")->Set(*m_pScale2d + CL_Vec2f(fDelta, fDelta));
+			//Optional Photoshop-style "zoom toward cursor": shift pos2d so the world point
+			//currently under the mouse stays under the mouse after the scale change.
+			//Off by default to preserve historical behavior for callers that don't opt in.
+			if (GetVarWithDefault("zoomTowardCursor", uint32(0))->GetUINT32() != 0
+				&& m_pScale2d->x > 0.0001f)
+			{
+				CL_Vec2f cursorPos = GetBaseApp()->GetTouch(0)->GetPos();
+				float ratio = newScale.x / m_pScale2d->x;
+				CL_Vec2f newPos = cursorPos - (cursorPos - *m_pPos2d) * ratio;
+				GetParent()->GetVar("pos2d")->Set(newPos);
+			}
+
+			GetParent()->GetVar("scale2d")->Set(newScale);
 			char buf[256];
 			sprintf(buf, "Scale: X: %.2f Y: %.2f", m_pScale2d->x, m_pScale2d->y);
 			UpdateStatusMessage(buf); 

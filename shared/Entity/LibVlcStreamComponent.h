@@ -62,6 +62,10 @@ public:
 	void SetTitle(string title) { m_title = title; }
 	void SetControlsTransparency(float alpha);
 	void ResetTimeOfLastTouch();
+	void SetControlsAlwaysVisible(bool bAlwaysVisible);
+	bool GetControlsAlwaysVisible() { return m_bControlsAlwaysVisible; }
+	void SetRestartOnPlay(bool bRestart) { m_bRestartOnPlay = bRestart; }
+	bool GetRestartOnPlay() { return m_bRestartOnPlay; }
 
 protected:
 
@@ -95,6 +99,9 @@ protected:
 	unsigned int m_timeOfLastTouchMS = 0;
 	float m_lastTargetAlpha = -1;
 	bool m_bUseStillPicMode = false;
+	bool m_bControlsAlwaysVisible = false;
+	bool m_bRestartOnPlay = false;
+	bool m_bStartPaused = false; //mirrors VLC_ExtraSettings.startPaused so UpdateProgressBar can pick the right initial play-button icon
 };
 
 //helper

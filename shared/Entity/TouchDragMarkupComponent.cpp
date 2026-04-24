@@ -3,7 +3,7 @@
 #include "EntityUtils.h"
 
 
-int g_markupPenSize = 20;
+int g_markupPenSize = 10;
 
 void SetGlobalMarkupPenSize(int size)
 {
@@ -218,6 +218,10 @@ void TouchDragMarkupComponent::OnOverStart(VariantList* pVList)
 	if (fingerID != m_fingerIDToTrack) return; //only allow left mouse button to drag
 	m_lastPosDrawn = CL_Vec2f(-1, -1);
 
+	//Reset smoothing state so this stroke starts fresh.
+	m_bHavePrev = false;
+	m_bHaveCurr = false;
+
 	m_bIsDraggingLook = true;
 
 	//move it to the top layer
@@ -230,56 +234,129 @@ void TouchDragMarkupComponent::OnOverStart(VariantList* pVList)
 	Draw(vPos);
 
 }
-void TouchDragMarkupComponent::Draw(CL_Vec2f vEndPos)
+void TouchDragMarkupComponent::Draw(CL_Vec2f vPos)
 {
-	//LogMsg("Trying to draw at %s", PrintVector2(vEndPos).c_str());
-
 	// Convert to local coordinates of our surface
-	vEndPos.x = vEndPos.x / m_pScale2d->x;
-	vEndPos.y = vEndPos.y / m_pScale2d->y;
+	vPos.x = vPos.x / m_pScale2d->x;
+	vPos.y = vPos.y / m_pScale2d->y;
 
-	//LogMsg("Now it's %s", PrintVector2(vEndPos).c_str());
-
-	CL_Vec2f vStartPos = m_lastPosDrawn;
-
-	// Check if we have a valid last position
-	if (vStartPos != CL_Vec2f(-1, -1))
+	//FPS-stutter / pen-skip protection: only break the stroke when BOTH wall-clock
+	//time AND distance suggest a real teleport (mouse flicked far during a freeze).
+	//A long time gap with the cursor still near where it was is just a slow frame --
+	//bridging it is correct and expected.  Otherwise heavy drawing work itself can
+	//cause >100ms frames and the stutter check would erroneously break the stroke.
+	const unsigned int now = GetBaseApp()->GetTick();
+	const unsigned int kMaxStutterMS = 250;                       //~15 missed frames at 60Hz
+	const float        kMaxStutterDistanceSq = 300.0f * 300.0f;   //surface-local pixels squared
+	if (m_bHaveCurr)
 	{
-		// Calculate the distance between vStartPos and vEndPos
-		float dx = vEndPos.x - vStartPos.x;
-		float dy = vEndPos.y - vStartPos.y;
-		float distance = sqrt(dx * dx + dy * dy);
-
-		int steps = (int)distance; // Number of steps based on pixel distance
-		if (steps < 1) steps = 1; // Ensure at least one step
-
-		for (int i = 0; i <= steps; i++)
+		const unsigned int dt = now - m_lastSampleTimeMS;
+		const float dx = vPos.x - m_inputCurr.x;
+		const float dy = vPos.y - m_inputCurr.y;
+		if (dt > kMaxStutterMS && (dx * dx + dy * dy) > kMaxStutterDistanceSq)
 		{
-			float t = (float)i / steps;
-			float interpolatedX = vStartPos.x + t * dx;
-			float interpolatedY = vStartPos.y + t * dy;
-			CL_Vec2f interpolatedPos(interpolatedX, interpolatedY);
-
-			m_softSurf.DrawCircleSafe((int)interpolatedPos.x, (int)interpolatedPos.y, glColorBytes(255, 0, 0, 255), GetGlobalMarkupPenSize());
+			m_bHavePrev = false;
+			m_bHaveCurr = false;
 		}
+	}
+	m_lastSampleTimeMS = now;
+
+	const float radius = (float)GetGlobalMarkupPenSize();
+	const glColorBytes col(255, 0, 0, 255);
+
+	if (!m_bHaveCurr)
+	{
+		//First sample of the stroke: stamp a dot so a single click/tap still leaves a mark.
+		m_softSurf.DrawCircleAASafe(vPos.x, vPos.y, col, radius);
+		m_inputCurr = vPos;
+		m_bHaveCurr = true;
 	}
 	else
 	{
-		// Draw a single circle at the end position if we don't have a valid start position
-		m_softSurf.DrawCircleSafe((int)vEndPos.x, (int)vEndPos.y, glColorBytes(255, 0, 0, 255), GetGlobalMarkupPenSize());
-	}
+		//Exponential-moving-average low-pass filter on the input point.  The Bezier
+		//pipeline already gives C1 continuity between segments, but each segment still
+		//passes through the raw points -- so sub-pixel hand jitter and OS pointer
+		//quantization show up as tiny visible kinks.  Blending each new raw point with
+		//the last smoothed point removes that high-frequency noise.  Alpha is the
+		//weight of the new raw input: 1.0 = no smoothing, lower = more smoothing/lag.
+		const float kInputSmoothingAlpha = 0.5f;
+		vPos = m_inputCurr * (1.0f - kInputSmoothingAlpha) + vPos * kInputSmoothingAlpha;
 
-	m_lastPosDrawn = vEndPos;
+		if (!m_bHavePrev)
+		{
+			//Second sample: shift and wait for a third so we have enough points to form a curve.
+			//One frame of latency at the very start of a stroke is not visually noticeable.
+			m_inputPrev = m_inputCurr;
+			m_inputCurr = vPos;
+			m_bHavePrev = true;
+		}
+		else
+		{
+			//Third+ sample: emit a smooth quadratic segment from midpoint(prev,curr) to
+			//midpoint(curr,vPos) using curr as the control point.  Successive segments
+			//are C1-continuous because they share the midpoint, so even fast mouse motion
+			//draws a smooth curve instead of a polygon.
+			StampStroke(m_inputPrev, m_inputCurr, vPos);
+			m_inputPrev = m_inputCurr;
+			m_inputCurr = vPos;
+		}
+	}
 
 	m_softSurf.FlipY();
 	m_softSurf.UpdateGLTexture(&m_surface);
 	m_softSurf.FlipY();
 }
 
+void TouchDragMarkupComponent::StampStroke(CL_Vec2f a, CL_Vec2f b, CL_Vec2f c)
+{
+	//Quadratic Bezier from midpoint(a,b) to midpoint(b,c) with b as the control point.
+	CL_Vec2f mAB = (a + b) * 0.5f;
+	CL_Vec2f mBC = (b + c) * 0.5f;
+
+	float lenAB_x = mAB.x - b.x;
+	float lenAB_y = mAB.y - b.y;
+	float lenBC_x = b.x - mBC.x;
+	float lenBC_y = b.y - mBC.y;
+	float curveLength = sqrtf(lenAB_x * lenAB_x + lenAB_y * lenAB_y)
+	                  + sqrtf(lenBC_x * lenBC_x + lenBC_y * lenBC_y);
+
+	const float radius = (float)GetGlobalMarkupPenSize();
+	float spacing = radius * 0.25f;
+	if (spacing < 1.0f) spacing = 1.0f;
+
+	int steps = 1;
+	if (curveLength > 0.0f) steps = (int)ceilf(curveLength / spacing);
+	if (steps < 1) steps = 1;
+
+	const glColorBytes col(255, 0, 0, 255);
+
+	for (int i = 0; i <= steps; i++)
+	{
+		float t = (float)i / (float)steps;
+		float u = 1.0f - t;
+		CL_Vec2f pt = mAB * (u * u) + b * (2.0f * u * t) + mBC * (t * t);
+		m_softSurf.DrawCircleAASafe(pt.x, pt.y, col, radius);
+	}
+}
+
 void TouchDragMarkupComponent::OnOverEnd(VariantList* pVList)
 {
 	int fingerID = pVList->Get(2).GetUINT32(); //0 is left mouse button
 	if (fingerID != m_fingerIDToTrack) return; //only allow left mouse button to drag
+
+	//Flush trailing half-segment so the stroke ends exactly at the last input point
+	//instead of stopping at midpoint(prev, curr).  StampStroke(prev, curr, curr)
+	//collapses to a straight line from midpoint(prev, curr) to curr.
+	if (m_bHavePrev && m_bHaveCurr)
+	{
+		StampStroke(m_inputPrev, m_inputCurr, m_inputCurr);
+		m_softSurf.FlipY();
+		m_softSurf.UpdateGLTexture(&m_surface);
+		m_softSurf.FlipY();
+	}
+
+	m_bHavePrev = false;
+	m_bHaveCurr = false;
 
 	m_bIsDraggingLook = false;
 }
@@ -292,5 +369,9 @@ void TouchDragMarkupComponent::OnClearActiveMarkups(VariantList* pVList)
 	m_softSurf.FlipY();
 	m_softSurf.UpdateGLTexture(&m_surface);
 	m_softSurf.FlipY();
+
+	//Reset smoothing state so any in-progress stroke starts fresh.
+	m_bHavePrev = false;
+	m_bHaveCurr = false;
 }
 

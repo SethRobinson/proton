@@ -465,7 +465,16 @@ bool libVLC_RTSP::Init(const std::string& rtsp_url, int cachingMS, SurfaceAnim* 
 
     InitVideoSurfaces();
 
-    libvlc_media_player_play(m_pVlcMediaPlayer);
+    //Honor settings.startPaused: if set, the caller wants the media loaded but
+    //silent until something explicitly starts it (typically the user clicking
+    //the play button, which routes through SetPause(false)'s "else" branch and
+    //calls libvlc_media_player_play() at that point).  Skipping play() here is
+    //the only way to truly avoid an audible blip - calling play() then pause()
+    //still ships some samples to the audio device before pause takes effect.
+    if (!settings.startPaused)
+    {
+        libvlc_media_player_play(m_pVlcMediaPlayer);
+    }
 
     return true;
 }

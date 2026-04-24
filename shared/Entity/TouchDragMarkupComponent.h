@@ -37,6 +37,18 @@ public:
 
 	const int m_fingerIDToTrack = 1;
 	CL_Vec2f m_lastPosDrawn;
+
+	//Quadratic-Bezier-through-midpoints smoothing state (in surface-local coords).
+	//We need three input points (prev, curr, next) to emit a smooth segment, so
+	//we hold back one sample of latency at the start of a stroke.
+	CL_Vec2f m_inputPrev;
+	CL_Vec2f m_inputCurr;
+	bool m_bHaveCurr = false;
+	bool m_bHavePrev = false;
+
+	//Wall-clock time of the last input sample we processed, used to detect FPS
+	//stutters and break the stroke instead of bridging a long unreliable jump.
+	unsigned int m_lastSampleTimeMS = 0;
 	
 protected:
 
@@ -51,6 +63,7 @@ protected:
 	void InitMarkupBoard();
 	void UpdateStatusMessage(string msg);
 	void Draw(CL_Vec2f pPos);
+	void StampStroke(CL_Vec2f a, CL_Vec2f b, CL_Vec2f c);
 
 	void OnTouchDragUpdate(VariantList* pVList);
 	void OnOverStart(VariantList* pVList);

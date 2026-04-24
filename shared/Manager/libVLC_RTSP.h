@@ -21,6 +21,13 @@ struct WebcamConfig
 struct VLC_ExtraSettings
 {
 	rtRect cropRect = rtRect(0,0,0,0); //all 0's if unused
+
+	//If true, libVLC_RTSP::Init skips the libvlc_media_player_play() call so the
+	//media is loaded but no audio/video frames are produced.  Use this to create
+	//a stream entity that sits silently until the user presses the play button
+	//(or a script issues set_stream_pause|paused|0).  Avoids the brief audible
+	//blip you'd otherwise get from "play, then immediately pause".
+	bool startPaused = false;
 };
 
 class libVLC_RTSP

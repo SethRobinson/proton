@@ -114,6 +114,48 @@ public:
 		}
 	}
 
+	//Source-over alpha blend a single RGBA pixel.  Safe against out-of-bounds.
+	void BlendPixelSafe(int x, int y, glColorBytes c)
+	{
+		if (x < 0 || y < 0 || x >= m_width || y >= m_height) return;
+		if (m_surfaceType != SURFACE_RGBA) return;
+		uint8 *p = m_pPixels + (y * m_usedPitch + x * 4);
+		const int sa = c.a;
+		const int ia = 255 - sa;
+		p[0] = (uint8)((c.r * sa + p[0] * ia) / 255);
+		p[1] = (uint8)((c.g * sa + p[1] * ia) / 255);
+		p[2] = (uint8)((c.b * sa + p[2] * ia) / 255);
+		p[3] = (uint8)(sa + (p[3] * ia) / 255);
+	}
+
+	//Anti-aliased filled circle stamp.  The outer ~1.5 px ring fades from full
+	//coverage to zero, and incoming color alpha is multiplied by coverage before
+	//being source-over blended, so overlapping stamps merge cleanly.
+	void DrawCircleAASafe(float cx, float cy, glColorBytes color, float radius)
+	{
+		const float rOuter = radius;
+		const float rInner = radius - 1.5f;
+		const int xMin = (int)floorf(cx - rOuter);
+		const int xMax = (int)ceilf (cx + rOuter);
+		const int yMin = (int)floorf(cy - rOuter);
+		const int yMax = (int)ceilf (cy + rOuter);
+		for (int y = yMin; y <= yMax; y++)
+		{
+			for (int x = xMin; x <= xMax; x++)
+			{
+				float dx = (x + 0.5f) - cx;
+				float dy = (y + 0.5f) - cy;
+				float d  = sqrtf(dx * dx + dy * dy);
+				if (d > rOuter) continue;
+				float coverage = (d <= rInner) ? 1.0f : (rOuter - d) / (rOuter - rInner);
+				if (coverage <= 0.0f) continue;
+				glColorBytes c = color;
+				c.a = (uint8)(color.a * coverage);
+				BlendPixelSafe(x, y, c);
+			}
+		}
+	}
+
 	
 	void SetPixel( int x, int y, uint8 color )
 	{

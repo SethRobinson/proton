@@ -41,9 +41,13 @@ void LibVlcStreamComponent::OnAdd(Entity* pEnt)
 
 void LibVlcStreamComponent::OnSetPause(VariantList* pList)
 {
-	//LogMsg("Looping changed to %d", pVariant->GetUINT32());
-	//m_libVlcRTSP
-	m_libVlcRTSP.SetPause(pList->Get(0).GetUINT32() != 0);
+	bool bWantPaused = pList->Get(0).GetUINT32() != 0;
+	//if restart-on-play is enabled and we're transitioning paused -> playing, rewind first
+	if (!bWantPaused && m_bRestartOnPlay && m_libVlcRTSP.GetPause())
+	{
+		m_libVlcRTSP.SetPlaybackPosition(0.0f);
+	}
+	m_libVlcRTSP.SetPause(bWantPaused);
 
 	//UpdateControlButtons();
 }
@@ -107,10 +111,15 @@ void LibVlcStreamComponent::Init(std::string url, int cacheMS, VLC_ExtraSettings
 
 	m_url = url;
 	m_cacheMS = cacheMS;
+	m_bStartPaused = settings.startPaused;
 	
-	//default to a size good for audio.  If it's video we load, it will auto-resize to the correct video size
-	int width = 400;
-	int height = 70;
+	//default to a size good for audio.  If it's video we load, it will auto-resize to the correct video size.
+	//Compact dimensions for audio-only players - the bottom-anchored controls strip is 32px tall,
+	//and the play button (32px) + 16px spacer + 100px volume slider + 16px spacer = 164px of fixed
+	//horizontal width before the progress bar starts, so 240px width leaves ~76px for the bar.
+	//Drag area above the controls = height - 32 = 23px (tight but enough to grab the panel).
+	int width = 240;
+	int height = 55;
 
 	m_pSurface = new SurfaceAnim();
 
@@ -181,8 +190,9 @@ void LibVlcStreamComponent::Init(std::string url, int cacheMS, VLC_ExtraSettings
 				else
 				{
 					m_libVlcRTSP.SetLooping(*m_pLooping != 0);
-					//default color, if the stream isn't video, it will stay like this forever
-					m_pSurface->FillColor(glColorBytes(50, 50, 50, 255));
+					//default color, if the stream isn't video, it will stay like this forever.
+					//A clearly visible dark panel so audio-only players show their bounds and feel grabbable.
+					m_pSurface->FillColor(glColorBytes(40, 40, 50, 240));
 				}
 			}
 		}
@@ -190,10 +200,27 @@ void LibVlcStreamComponent::Init(std::string url, int cacheMS, VLC_ExtraSettings
 
 	if (!m_title.empty())
 	{
-		//oh, we want to show the 'title' in a text dialog box that won't go off the screen
-		Entity* pEnt = CreateTextBoxEntity(GetParent(), "TitleText", CL_Vec2f(3, 3), CL_Vec2f(400, 50), m_title, 0.7f, ALIGNMENT_UPPER_LEFT);
+		//Render the title as a single-line label that auto-scales to fit the widget width.
+		//We measure at scale 1.0 then compute the scale needed to fit (width - 6px padding).
+		//Capped at 0.6 so short titles don't look comically huge on a small audio widget,
+		//and floored at 0.25 so a really long title shrinks gracefully instead of disappearing.
+		Entity* pEnt = CreateTextLabelEntity(GetParent(), "TitleText", 3, 2, m_title);
+
+		eFont fontID = FONT_LARGE;
+		float scale = 0.6f;
+		float availWidth = m_pSize2d->x - 6;
+		if (availWidth > 0)
+		{
+			CL_Vec2f vSize = GetBaseApp()->GetFont(fontID)->MeasureText(m_title, 1.0f);
+			if (vSize.x > 0)
+			{
+				scale = availWidth / vSize.x;
+				if (scale > 0.6f) scale = 0.6f;
+				if (scale < 0.25f) scale = 0.25f;
+			}
+		}
+		SetupTextEntity(pEnt, fontID, scale);
 		TypeTextLabelEntity(pEnt, 0, 20);
-		//Entity* pEnt = CreateTextLabelEntity(GetParent(), "TitleText", 0, 0, m_title);
 	}
 
 } 
@@ -442,10 +469,42 @@ void LibVlcStreamComponent::SetControlsTransparency(float alpha)
 	
 }
 
+void LibVlcStreamComponent::SetControlsAlwaysVisible(bool bAlwaysVisible)
+{
+	m_bControlsAlwaysVisible = bAlwaysVisible;
+	if (bAlwaysVisible)
+	{
+		//show right away; UpdateProgressBar will keep it pinned from now on
+		ResetTimeOfLastTouch();
+		SetControlsTransparency(1.0f);
+	}
+}
+
 void LibVlcStreamComponent::OnPlayButtonClicked(VariantList* pVList)
 {
 	//LogMsg("They clicked the play toggle button");
 	bool bIsPaused = m_libVlcRTSP.GetPause();
+
+	//Handle the "never started" state created by VLC_ExtraSettings.startPaused: the
+	//player is loaded but has never entered the playing state, so GetPause() is
+	//false (state is NothingSpecial/Stopped, not libvlc_Paused) AND is_playing is
+	//also false.  The plain toggle below would call SetPause(true), which falls
+	//through libVLC_RTSP::SetPause's else-branch and does nothing - leaving the
+	//play button visually inert.  Detect that case and start playback explicitly.
+	libvlc_media_player_t* pMP = m_libVlcRTSP.GetMP();
+	bool bIsPlaying = pMP && libvlc_media_player_is_playing(pMP) != 0;
+	if (!bIsPaused && !bIsPlaying)
+	{
+		if (m_bRestartOnPlay) m_libVlcRTSP.SetPlaybackPosition(0.0f);
+		m_libVlcRTSP.SetPause(false); //else-branch in SetPause kicks playback off
+		return;
+	}
+
+	//if restart-on-play is enabled and we're transitioning paused -> playing, rewind first
+	if (bIsPaused && m_bRestartOnPlay)
+	{
+		m_libVlcRTSP.SetPlaybackPosition(0.0f);
+	}
 	m_libVlcRTSP.SetPause(!bIsPaused);
 	//UpdateControlButtons();
 }
@@ -504,9 +563,13 @@ void LibVlcStreamComponent::UpdateProgressBar()
 		SetTouchPaddingEntity(m_pProgressEnt, CL_Rectf(0, 0, 0, 0));
 
 		//oh, hey, we should add a button (based on buttons.png for the image)
+		//buttons.png frames: 0 = play-arrow icon, 1 = pause-bars icon.  Start on frame 0
+		//(play-arrow) so audio widgets that haven't played yet show the right icon.  Video
+		//streams that auto-play will flip to frame 1 within a frame or two via the
+		//C_STATUS_UNPAUSED event handler in OnStatusUpdated.
 		Entity* pButton = CreateOverlayButtonEntity(m_pControlsEnt, "buttonPlay", "interface/buttons.png",0,0);
 		SetAlignmentEntity(pButton, ALIGNMENT_UPPER_LEFT);
-		SetupAnimEntity(pButton, 6, 1, 1, 0);
+		SetupAnimEntity(pButton, 6, 1, 0, 0);
 		SetButtonClickSound(pButton, "");
 		pButton->GetFunction("OnButtonSelected")->sig_function.connect(1, boost::bind(&LibVlcStreamComponent::OnPlayButtonClicked, this, _1));
 		SetButtonRepeatDelayMS(pButton, 50);
@@ -532,7 +595,12 @@ void LibVlcStreamComponent::UpdateProgressBar()
 	SetProgressBarPercent(m_pProgressEnt, m_libVlcRTSP.GetPlaybackPosition(), true);
 
 	//compare m_timeOfLastTouchMS to GetTick(), if more than 2 seconds have passed, we'll fade it out
-	if (GetTick() - m_timeOfLastTouchMS > 2000)
+	//(skip the fade if a script has pinned the controls visible via set_controls_locked)
+	if (m_bControlsAlwaysVisible)
+	{
+		SetControlsTransparency(1.0f);
+	}
+	else if (GetTick() - m_timeOfLastTouchMS > 2000)
 	{
 		SetControlsTransparency(0.0f);
 	}
