@@ -15,7 +15,7 @@ set(SOURCES
     ../../shared/win/WinUtils.cpp
 )
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+#CMAKE_EXPORT_COMPILE_COMMANDS is set by rtconsole.cmake above
 set(CMAKE_BUILD_TYPE "Release")
 
 IF (CMAKE_BUILD_TYPE MATCHES "Debug")
