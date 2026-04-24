@@ -5,6 +5,5 @@ mkdir -p ../build
 cd ../build
 cmake -DDEFINE_RELEASE=ON ../linux
 make -j 4
-echo Copying binaries to ../bin directory, run from there!
-cp RTConsole ../bin
+echo Build complete. Binary is in ../bin/RTConsole - run from there!
 cd ..

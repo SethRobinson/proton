@@ -1,6 +1,6 @@
 #this particular CMakeLists.txt does it all here, but more advanced samples do it in a more elegant way, check RTBareBones for that example
 
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.10)
 
 ENABLE_LANGUAGE(C)
 
