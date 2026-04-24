@@ -4,7 +4,8 @@
 
 add_definitions(-D_CONSOLE -DBOOST_ALL_NO_LIB -DC_NO_ZLIB)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}../../bin)
+#put binary in RTConsole/bin/. CMAKE_CURRENT_LIST_DIR is the dir of this .cmake (RTConsole/), so this works no matter which platform CMakeLists.txt includes us.
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/bin)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include_directories(
