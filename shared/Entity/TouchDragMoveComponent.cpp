@@ -62,18 +62,6 @@ void TouchDragMoveComponent::UpdateStatusMessage(string msg)
 	
 	if (GetVarWithDefault("showCoords", (uint32)1)->GetUINT32() == 0) return;
 
-	//Coordinate readouts during drag are useful for debugging layouts but visually noisy
-	//during normal use, so gate them behind the Ctrl key (Windows-only - other platforms
-	//keep the legacy always-on behavior).  Set the entity var "showCoordsRequiresCtrl" to 0
-	//to opt out of this gating and always show coords (the pre-Ctrl-gate behavior).
-#ifdef _WIN32
-	if (GetVarWithDefault("showCoordsRequiresCtrl", (uint32)1)->GetUINT32() != 0)
-	{
-		bool bCtrlDown = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
-		if (!bCtrlDown) return;
-	}
-#endif
-
 	int timeMS = 1000;
 
 	Entity *pOldEnt = GetParent()->GetEntityByName("DebugText");
