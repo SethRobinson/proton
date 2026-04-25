@@ -200,6 +200,9 @@ AA000004000000000000AA01 /* AudioManagerSDL.cpp in Sources */ = {isa = PBXBuildF
 		GPLL0000000000000000000003 /* GamepadSDL2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = GPLL0000000000000000000013 /* GamepadSDL2.cpp */; };
 		GPLL0000000000000000000004 /* GamepadProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = GPLL0000000000000000000014 /* GamepadProvider.cpp */; };
 		GPLL0000000000000000000005 /* Gamepad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = GPLL0000000000000000000015 /* Gamepad.cpp */; };
+		GPLL0000000000000000000006 /* GamepadProviderGCController.mm in Sources */ = {isa = PBXBuildFile; fileRef = GPLL0000000000000000000016 /* GamepadProviderGCController.mm */; };
+		GPLL0000000000000000000007 /* GamepadGCController.mm in Sources */ = {isa = PBXBuildFile; fileRef = GPLL0000000000000000000017 /* GamepadGCController.mm */; };
+		GPLL0000000000000000000008 /* GameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = GPLL0000000000000000000018 /* GameController.framework */; };
 		/* SDL2 embed build files */
 		SDLLL00000000000000000001 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = SDLLL00000000000000000011 /* SDL2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		SDLLL00000000000000000002 /* SDL2_mixer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = SDLLL00000000000000000012 /* SDL2_mixer.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -473,6 +476,11 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 		GPLL0000000000000000000024 /* GamepadProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GamepadProvider.h; path = ../../shared/Gamepad/GamepadProvider.h; sourceTree = SOURCE_ROOT; };
 		GPLL0000000000000000000015 /* Gamepad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Gamepad.cpp; path = ../../shared/Gamepad/Gamepad.cpp; sourceTree = SOURCE_ROOT; };
 		GPLL0000000000000000000025 /* Gamepad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Gamepad.h; path = ../../shared/Gamepad/Gamepad.h; sourceTree = SOURCE_ROOT; };
+		GPLL0000000000000000000016 /* GamepadProviderGCController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = GamepadProviderGCController.mm; path = ../../shared/Gamepad/GamepadProviderGCController.mm; sourceTree = SOURCE_ROOT; };
+		GPLL0000000000000000000026 /* GamepadProviderGCController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GamepadProviderGCController.h; path = ../../shared/Gamepad/GamepadProviderGCController.h; sourceTree = SOURCE_ROOT; };
+		GPLL0000000000000000000017 /* GamepadGCController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = GamepadGCController.mm; path = ../../shared/Gamepad/GamepadGCController.mm; sourceTree = SOURCE_ROOT; };
+		GPLL0000000000000000000027 /* GamepadGCController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GamepadGCController.h; path = ../../shared/Gamepad/GamepadGCController.h; sourceTree = SOURCE_ROOT; };
+		GPLL0000000000000000000018 /* GameController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameController.framework; path = System/Library/Frameworks/GameController.framework; sourceTree = SDKROOT; };
 		/* SDL2 framework references */
 		SDLLL00000000000000000011 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = "$(HOME)/Library/Frameworks/SDL2.framework"; sourceTree = "<absolute>"; };
 		SDLLL00000000000000000012 /* SDL2_mixer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_mixer.framework; path = "$(HOME)/Library/Frameworks/SDL2_mixer.framework"; sourceTree = "<absolute>"; };
@@ -521,6 +529,7 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				AFD4D88A113C504F00C2DE76 /* OpenGL.framework in Frameworks */,
 				AF9DBBC6113C611C00D05754 /* QuartzCore.framework in Frameworks */,
+				GPLL0000000000000000000008 /* GameController.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -558,6 +567,7 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
 				AFD4D889113C504F00C2DE76 /* OpenGL.framework */,
 				AF9DBBC5113C611C00D05754 /* QuartzCore.framework */,
+				GPLL0000000000000000000018 /* GameController.framework */,
 			);
 			name = "Linked Frameworks";
 			sourceTree = "<group>";
@@ -715,6 +725,10 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 				GPLL0000000000000000000022 /* GamepadProviderSDL2.h */,
 				GPLL0000000000000000000013 /* GamepadSDL2.cpp */,
 				GPLL0000000000000000000023 /* GamepadSDL2.h */,
+				GPLL0000000000000000000016 /* GamepadProviderGCController.mm */,
+				GPLL0000000000000000000026 /* GamepadProviderGCController.h */,
+				GPLL0000000000000000000017 /* GamepadGCController.mm */,
+				GPLL0000000000000000000027 /* GamepadGCController.h */,
 			);
 			name = Gamepad;
 			sourceTree = "<group>";
@@ -1266,6 +1280,8 @@ AA000003000000000000AA02 /* AudioManagerSDL.h */ = {isa = PBXFileReference; file
 				GPLL0000000000000000000001 /* GamepadManager.cpp in Sources */,
 				GPLL0000000000000000000002 /* GamepadProviderSDL2.cpp in Sources */,
 				GPLL0000000000000000000003 /* GamepadSDL2.cpp in Sources */,
+				GPLL0000000000000000000006 /* GamepadProviderGCController.mm in Sources */,
+				GPLL0000000000000000000007 /* GamepadGCController.mm in Sources */,
 				LL000001000000000000000001 /* BuildingComponent.cpp in Sources */,
 				LL000001000000000000000002 /* Character.cpp in Sources */,
 				LL000001000000000000000003 /* CharComponent.cpp in Sources */,
