@@ -388,71 +388,104 @@ bool FreeTypeManager::TextToSoftSurface(SoftSurface *pSoftSurf, CL_Vec2f surface
 	}
 
 	use_kerning = FT_HAS_KERNING(m_face);
+	(void)use_kerning;
 
 	pSoftSurf->Init(surfaceSizeToCreate.x, surfaceSizeToCreate.y, SoftSurface::SURFACE_RGBA);
 	pSoftSurf->FillColor(bgColor);
 
 	FT_GlyphSlot  slot = m_face->glyph;  /* a small shortcut */
-	int           pen_x, pen_y;
 
-	pen_x = 0;
-	//pen_y = (m_face->size->metrics.ascender+ m_face->size->metrics.descender) / 64;
-	pen_y = GetAscenderAmount();
-	float baseY = pen_y;
-	
-	FT_UInt lastChar = 0;
-	float kerning = 0;
-	int lineCount = 0;
+	const float baseY = (float)GetAscenderAmount();
+	//Recommended typeface line spacing at the current pixel size; stable regardless of
+	//which glyph was last loaded.  Used to advance pen_y between rendered lines.
+	const int lineHeight = (int)(m_face->size->metrics.height >> 6);
 
-	if (wordWrapX == 0 && pOptionalLineStarts && pOptionalLineStarts->size() > lineCount)
+	//Build the list of physical lines we'll render.  When wordWrapX > 0 we use the
+	//existing measurement-side word-wrap (which already understands `code pairs and
+	//breaks at the last whitespace before the limit), giving real word wrap instead
+	//of the previous mid-word character break.
+	deque<wstring> lines;
+	if (wordWrapX > 0)
 	{
-		pen_x = pOptionalLineStarts->at(lineCount).x;
-		pen_y = baseY + pOptionalLineStarts->at(lineCount).y;
+		wstring wText(utf16line.begin(), utf16line.end());
+		CL_Vec2f vEnclosing(0, 0);
+		MeasureTextAndAddByLinesIntoDeque(
+			CL_Vec2f(wordWrapX, surfaceSizeToCreate.y),
+			wText, &lines, pixelHeight, vEnclosing,
+			bUseActualWidthForSpacing);
+	}
+	else
+	{
+		//No wrap: split only on hard newlines (preserves pOptionalLineStarts behavior).
+		wstring cur;
+		for (auto c : utf16line)
+		{
+			if (c == L'\n') { lines.push_back(cur); cur.clear(); }
+			else            { cur.push_back((wchar_t)c); }
+		}
+		lines.push_back(cur); //trailing line (may be empty if input ended with \n)
 	}
 
-	for (int n = 0; n < utf16line.size(); n++)
+	//Single state stack persists across wrapped lines so a `5 in line 1 carries into
+	//line 2 until a `` pops it (matches RTFont::DrawWrapped semantics).  Bottom of the
+	//stack is the script-supplied fgColor so non-coded text uses it.
+	FontStateStack state;
+	state.push_front(FontState('\0', MAKE_RGBA(fgColor.r, fgColor.g, fgColor.b, 255)));
+
+	int lineIndex = 0;
+	int pen_y = (int)baseY;
+	if (wordWrapX == 0 && pOptionalLineStarts && (int)pOptionalLineStarts->size() > 0)
 	{
-		/* load glyph image into the slot (erase previous one) */
-	
-		bool bForceCR = (wordWrapX > 0 && pen_x != 0 && pen_x > (wordWrapX - (slot->advance.x / 64)));
+		pen_y = (int)(baseY + pOptionalLineStarts->at(0).y);
+	}
 
-		if (utf16line[n] == '\n' || bForceCR)
+	for (const wstring& line : lines)
+	{
+		int pen_x = 0;
+		if (wordWrapX == 0 && pOptionalLineStarts && (int)pOptionalLineStarts->size() > lineIndex)
 		{
+			pen_x = (int)pOptionalLineStarts->at(lineIndex).x;
+		}
 
-			if (bForceCR && utf16line[n] != '\n')
+		for (size_t n = 0; n < line.size(); n++)
+		{
+			//Backtick color code?  Push/pop state and skip both chars (the ` and the trigger).
+			if (IsFontCode((const WCHAR*)&line[n], &state))
 			{
-				n--; //do this letter again
+				if (n + 1 < line.size()) n++;
+				continue;
 			}
-			pen_x = 0;
-			pen_y += slot->metrics.vertAdvance >> 6;
-			lastChar = 0;
-			lineCount++;
-			if (wordWrapX == 0 && pOptionalLineStarts && pOptionalLineStarts->size() > lineCount)
+
+			error = FT_Load_Char(m_face, line[n], FT_LOAD_RENDER);
+			if (error) continue;
+
+			//Active color from top of state stack; alpha stays equal to the script-supplied
+			//fg alpha so |fg|R,G,B,A| keeps controlling overall opacity even when colors switch.
+			uint32 stateColor = state.front().m_color;
+			glColorBytes glyphColor(GET_RED(stateColor), GET_GREEN(stateColor), GET_BLUE(stateColor), fgColor.a);
+
+			draw_bitmap(&slot->bitmap,
+				pen_x + slot->bitmap_left,
+				pen_y - slot->bitmap_top, pSoftSurf, glyphColor);
+
+			if (bUseActualWidthForSpacing)
 			{
-				pen_x = pOptionalLineStarts->at(lineCount).x;
-				pen_y = baseY+pOptionalLineStarts->at(lineCount).y;
+				pen_x += slot->bitmap.width + 2;
 			}
-			continue;
+			else
+			{
+				pen_x += slot->advance.x / 64;
+			}
 		}
 
-		error = FT_Load_Char(m_face, utf16line[n], FT_LOAD_RENDER);
-		if (error)
-			continue;  /* ignore errors */
+		pen_y += lineHeight;
+		lineIndex++;
 
-		draw_bitmap(&slot->bitmap,
-			pen_x + slot->bitmap_left,
-			pen_y-slot->bitmap_top, pSoftSurf, fgColor);
-			
-		/* increment pen position */
-		if (bUseActualWidthForSpacing)
+		//pOptionalLineStarts only applies on the no-wrap path.
+		if (wordWrapX == 0 && pOptionalLineStarts && (int)pOptionalLineStarts->size() > lineIndex)
 		{
-			pen_x += slot->bitmap.width + 2;
+			pen_y = (int)(baseY + pOptionalLineStarts->at(lineIndex).y);
 		}
-		else
-		{
-			pen_x += slot->advance.x / 64;
-		}
-		lastChar = utf16line[n];
 	}
 
 	return true;

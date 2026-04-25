@@ -47,6 +47,11 @@ public:
 	unsigned int GetColorFromString(const char *pText);
 	Surface * GetSurface() {return &m_surf;}
 
+	//Color-code palette loaded from the .rtfont file (e.g. `5, `$, etc.).  Exposed
+	//so other renderers (FreeTypeManager) can reuse the same trigger->color map and
+	//render backtick codes the same way as RTFont does.
+	const vector<FontState>& GetFontStates() const { return m_fontStates; }
+
 protected:
 	
 private:

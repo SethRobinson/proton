@@ -44,6 +44,13 @@ public:
 		bool bUseActualWidthForSpacing);
 	void SetFontName(string fontName) { m_fontName = fontName; }
 
+	//Color-code palette: triggers like 'X' here mean a `X in the text switches to that color
+	//and `` pops back. Mirrors the rtfont palette concept; typically populated by copying
+	//from a loaded RTFont via SetFontStates(pRTFont->GetFontStates()).
+	void SetFontStates(const vector<FontState>& states) { m_fontStates = states; }
+	void AddFontState(char triggerChar, unsigned int color) { m_fontStates.push_back(FontState(triggerChar, color)); }
+	void ClearFontStates() { m_fontStates.clear(); }
+
 protected:
 
 	float GetDescenderAmount();
