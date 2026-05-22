@@ -9,6 +9,7 @@
 
 #ifndef NetSocket_h__
 #define NetSocket_h__
+#include "PlatformSetup.h"
 
 #ifndef SOCKET_ERROR
 #define SOCKET_ERROR (-1)
