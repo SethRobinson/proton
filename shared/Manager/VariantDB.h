@@ -40,9 +40,9 @@ public:
 
 #else
 
-#if defined( __APPLE__) || defined(RTLINUX)|| defined(PLATFORM_LINUX)||ANDROID_NDK || defined(PLATFORM_FLASH) || defined(PLATFORM_HTML5) || defined(PLATFORM_PSP2)
+#if defined( __APPLE__) || defined(RTLINUX)|| defined(PLATFORM_LINUX)||ANDROID_NDK || defined(PLATFORM_FLASH) || defined(PLATFORM_HTML5) || defined(PLATFORM_PSP2) || defined(_MSC_VER)
 
-#ifdef PLATFORM_HTML5
+#if defined(PLATFORM_HTML5) || defined(_MSC_VER)
 
 
 	#include <unordered_map>
