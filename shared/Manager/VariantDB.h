@@ -46,8 +46,8 @@ public:
 
 
 	#include <unordered_map>
-	typedef unordered_map<string, Variant*> dataList;
-	typedef unordered_map<string, FunctionObject*> functionList;
+	typedef std::unordered_map<std::string, Variant*> dataList;
+	typedef std::unordered_map<std::string, FunctionObject*> functionList;
 
 
 #else
