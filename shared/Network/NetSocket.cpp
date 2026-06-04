@@ -57,6 +57,7 @@
 #else
 
 #include <ws2tcpip.h>
+#include <mstcpip.h> //for tcp_keepalive / SIO_KEEPALIVE_VALS
 #pragma comment(lib, "Ws2_32.lib")
 
 #ifndef ECONNREFUSED
@@ -328,6 +329,17 @@ bool NetSocket::InitHost( int port, int connections )
 		return false;
 	}
 
+	//Allow re-binding the port immediately after the app closes/restarts instead of waiting
+	//out the kernel's TIME_WAIT (which otherwise makes a quick restart fail to bind).
+	{
+		int reuse = 1;
+#ifdef WINAPI
+		setsockopt(m_socket, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuse, sizeof(reuse));
+#else
+		setsockopt(m_socket, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
+#endif
+	}
+
 	//u_long arg = 1;
 	
 	
@@ -377,15 +389,50 @@ void NetSocket::SetSocket( int socket )
 {
 	Kill();
 	m_socket = socket;
-	m_idleTimer = GetSystemTimeTick();
+	//Initialize BOTH idle timers - SetSocket() is used for accepted (incoming) connections,
+	//and callers that cull dead peers rely on GetIdleReadTimeMS() being meaningful from the
+	//start.  Without this, m_idleReadTimer is left at its (often zero) default and the very
+	//first idle check would think the connection had been silent since the epoch.
+	m_idleTimer = m_idleReadTimer = GetSystemTimeTick();
 #ifdef WINAPI
 	// Disable Nagle's algorithm for low latency on accepted connections
 	int flag = 1;
 	setsockopt(m_socket, IPPROTO_TCP, TCP_NODELAY, (const char*)&flag, sizeof(flag));
+
+	// Enable TCP keepalive so a peer that drops off the network (e.g. a WiFi device that
+	// roams away or powers off) is detected at the OS level instead of leaving a half-open
+	// socket that recv() never reports.  Tune it to probe aggressively (~5s idle, 1s apart)
+	// so detection happens in seconds rather than the default ~2 hours.
+	int keepAlive = 1;
+	setsockopt(m_socket, SOL_SOCKET, SO_KEEPALIVE, (const char*)&keepAlive, sizeof(keepAlive));
+
+	struct tcp_keepalive ka = {};
+	ka.onoff = 1;
+	ka.keepalivetime = 5000;     //start probing after 5s of idle
+	ka.keepaliveinterval = 1000; //then probe every 1s
+	DWORD bytesReturned = 0;
+	WSAIoctl(m_socket, SIO_KEEPALIVE_VALS, &ka, sizeof(ka), NULL, 0, &bytesReturned, NULL, NULL);
 #else
 	fcntl(m_socket, F_SETFL, O_NONBLOCK);
 	int flag = 1;
 	setsockopt(m_socket, IPPROTO_TCP, TCP_NODELAY, &flag, sizeof(flag));
+
+	//Same intent as the Windows branch: turn on keepalive and (where supported) tighten the
+	//probe timing so half-open connections die quickly.
+	int keepAlive = 1;
+	setsockopt(m_socket, SOL_SOCKET, SO_KEEPALIVE, &keepAlive, sizeof(keepAlive));
+#ifdef TCP_KEEPIDLE
+	int keepIdle = 5;
+	setsockopt(m_socket, IPPROTO_TCP, TCP_KEEPIDLE, &keepIdle, sizeof(keepIdle));
+#endif
+#ifdef TCP_KEEPINTVL
+	int keepIntvl = 1;
+	setsockopt(m_socket, IPPROTO_TCP, TCP_KEEPINTVL, &keepIntvl, sizeof(keepIntvl));
+#endif
+#ifdef TCP_KEEPCNT
+	int keepCnt = 3;
+	setsockopt(m_socket, IPPROTO_TCP, TCP_KEEPCNT, &keepCnt, sizeof(keepCnt));
+#endif
 #endif
 
 }
