@@ -91,6 +91,12 @@
 - (NSSize)windowWillResize:(NSWindow*)sender
                     toSize:(NSSize)frameSize
 {
+	//AppKit also calls this while entering/leaving native (green button) fullscreen.
+	//Forcing 4:3 there makes the window taller than the display and the game gets
+	//cropped top and bottom, so let the system size it; the engine letterboxes.
+	if (inFullScreenTransition || ([sender styleMask] & NSWindowStyleMaskFullScreen))
+		return frameSize;
+
 	frameSize = [self computeFrameSize: frameSize];
 	return frameSize;
 }
@@ -165,10 +171,21 @@
     return NO;
 }
 
+- (void)windowWillEnterFullScreen:(NSNotification *)notification
+{
+    inFullScreenTransition = YES;
+}
+
+- (void)windowWillExitFullScreen:(NSNotification *)notification
+{
+    inFullScreenTransition = YES;
+}
+
 - (void)windowDidEnterFullScreen:(NSNotification *)notification
 {
     extern bool g_bIsFullScreen;
     g_bIsFullScreen = true;
+    inFullScreenTransition = NO;
     [openGLView reshape];
 }
 
@@ -176,6 +193,7 @@
 {
     extern bool g_bIsFullScreen;
     g_bIsFullScreen = false;
+    inFullScreenTransition = NO;
     [openGLView reshape];
 }
 

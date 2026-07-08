@@ -576,7 +576,11 @@ int GetTouchesReceived()
 void OSXToggleFullscreen()
 {
 	dispatch_async(dispatch_get_main_queue(), ^{
+		//mainWindow is nil while the app isn't active (e.g. launched from a script
+		//or still starting up), so fall back to any window we've got
 		NSWindow *window = [NSApp mainWindow];
+		if (!window) window = [NSApp keyWindow];
+		if (!window && [[NSApp windows] count] > 0) window = [[NSApp windows] objectAtIndex:0];
 		[window toggleFullScreen:nil];
 	});
 }

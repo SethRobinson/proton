@@ -14,6 +14,7 @@
 	IBOutlet MyOpenGLView *openGLView;
 
 	BOOL isAnimating;
+	BOOL inFullScreenTransition;
 	CFAbsoluteTime renderTime;
 }
 
