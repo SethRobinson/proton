@@ -24,13 +24,22 @@
     return pf;
 }
 
+// The game only ticks on draws we initiate from the timer. On modern macOS the
+// layer-backed NSOpenGLView emulation marks the view dirty after every flush,
+// so AppKit schedules its own drawRect: per frame on top of ours; running the
+// game from those too doubled the frame rate and the game speed (120 FPS on a
+// 60 Hz display).
+static BOOL g_drawInitiatedByTimer = NO;
+
 // per-window timer function, basic time based animation preformed here
 - (void)animationTimer:(NSTimer *)timer
 {
     // Use display instead of calling drawRect directly -
     // this properly triggers the display cycle and ensures
     // the OpenGL context is current before drawing
+    g_drawInitiatedByTimer = YES;
     [self display];
+    g_drawInitiatedByTimer = NO;
 }
 
 - (void) drawRect:(NSRect)rect
@@ -59,6 +68,14 @@
 
     if (GetBaseApp()->IsInitted())
     {
+        if (!g_drawInitiatedByTimer)
+        {
+            // AppKit-initiated draw (dirty-marking after each flush, expose,
+            // etc). The backing layer still shows the last frame we presented
+            // and the timer redraws within 16ms, so don't tick the game again.
+            return;
+        }
+
         // Drain the OS message queue - this is how SetVideoMode, quit, etc. reach us.
         // On other platforms SDL2Main.cpp or LinuxMain.cpp does this; on macOS we do it here.
         while (!GetBaseApp()->GetOSMessages()->empty())
