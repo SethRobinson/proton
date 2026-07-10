@@ -16,7 +16,7 @@ public:
 	virtual void Update();
 
 protected:
-	void AddControllerByIndex(int index);
+	void AddController(void* gcController); // takes a GCController*, void* keeps this header C++-safe
 
 	void* m_pConnectObserver;    // id<NSObject> stored as void*
 	void* m_pDisconnectObserver; // id<NSObject> stored as void*

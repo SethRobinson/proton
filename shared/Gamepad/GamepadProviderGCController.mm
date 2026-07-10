@@ -25,17 +25,13 @@ GamepadProviderGCController::~GamepadProviderGCController()
 	Kill();
 }
 
-void GamepadProviderGCController::AddControllerByIndex(int index)
+void GamepadProviderGCController::AddController(void* gcController)
 {
-	NSArray<GCController*>* controllers = [GCController controllers];
-	if (index < 0 || index >= (int)[controllers count])
-		return;
-
-	GCController* controller = controllers[index];
+	GCController* controller = (__bridge GCController*)gcController;
 
 	if (!controller.extendedGamepad)
 	{
-		LogMsg("GCController at index %d has no extendedGamepad, skipping", index);
+		LogMsg("GCController has no extendedGamepad profile, skipping");
 		return;
 	}
 
@@ -49,8 +45,7 @@ void GamepadProviderGCController::AddControllerByIndex(int index)
 
 	GamepadGCController* pPad = new GamepadGCController();
 	pPad->SetProvider(this);
-	pPad->Init();
-	GetGamepadManager()->AddGamepad(pPad, uid);
+	GetGamepadManager()->AddGamepad(pPad, uid); //this calls pPad->Init()
 	pPad->InitWithGCController(controller);
 }
 
@@ -61,9 +56,9 @@ bool GamepadProviderGCController::Init()
 	// Enumerate already-connected controllers
 	NSArray<GCController*>* controllers = [GCController controllers];
 	LogMsg("GCController: %d controller(s) already connected", (int)[controllers count]);
-	for (int i = 0; i < (int)[controllers count]; i++)
+	for (GCController* controller in controllers)
 	{
-		AddControllerByIndex(i);
+		AddController((__bridge void*)controller);
 	}
 
 	// Watch for future connect/disconnect
@@ -74,20 +69,7 @@ bool GamepadProviderGCController::Init()
 		object:nil
 		queue:[NSOperationQueue mainQueue]
 		usingBlock:^(NSNotification* note) {
-			GCController* controller = note.object;
-			if (!controller.extendedGamepad)
-			{
-				LogMsg("GCController connected but has no extendedGamepad, skipping");
-				return;
-			}
-			eGamepadID uid = IDFromController(controller);
-			if (GetGamepadManager()->GetGamepadByUniqueID(uid))
-				return;
-			GamepadGCController* pPad = new GamepadGCController();
-			pPad->SetProvider(self);
-			pPad->Init();
-			GetGamepadManager()->AddGamepad(pPad, uid);
-			pPad->InitWithGCController(controller);
+			self->AddController((__bridge void*)note.object);
 		}];
 
 	id disconnectObs = [[NSNotificationCenter defaultCenter]
@@ -127,7 +109,7 @@ void GamepadProviderGCController::Kill()
 
 void GamepadProviderGCController::Update()
 {
-	// GCController callbacks are delivered on the main queue — nothing to poll
+	// GCController callbacks are delivered on the main queue, nothing to poll
 }
 
 #endif // PLATFORM_OSX

@@ -45,10 +45,38 @@ bool GamepadGCController::Init()
 
 void GamepadGCController::Kill()
 {
-	if (m_pGCController)
-	{
-		m_pGCController = nullptr;
-	}
+	if (!m_pGCController) return;
+
+	GCController* controller = (__bridge GCController*)m_pGCController;
+
+	//clear every handler so no block can call into this object after it's deleted
+	//(the blocks capture our raw C++ this pointer)
+	GCExtendedGamepad* pad = controller.extendedGamepad;
+
+	pad.buttonA.valueChangedHandler = nil;
+	pad.buttonB.valueChangedHandler = nil;
+	pad.buttonX.valueChangedHandler = nil;
+	pad.buttonY.valueChangedHandler = nil;
+	pad.leftShoulder.valueChangedHandler = nil;
+	pad.rightShoulder.valueChangedHandler = nil;
+	pad.leftThumbstickButton.valueChangedHandler = nil;
+	pad.rightThumbstickButton.valueChangedHandler = nil;
+	pad.buttonOptions.valueChangedHandler = nil;
+	pad.buttonMenu.valueChangedHandler = nil;
+	pad.buttonHome.valueChangedHandler = nil;
+	pad.dpad.up.valueChangedHandler = nil;
+	pad.dpad.down.valueChangedHandler = nil;
+	pad.dpad.left.valueChangedHandler = nil;
+	pad.dpad.right.valueChangedHandler = nil;
+	pad.leftThumbstick.xAxis.valueChangedHandler = nil;
+	pad.leftThumbstick.yAxis.valueChangedHandler = nil;
+	pad.rightThumbstick.xAxis.valueChangedHandler = nil;
+	pad.rightThumbstick.yAxis.valueChangedHandler = nil;
+	pad.leftTrigger.valueChangedHandler = nil;
+	pad.rightTrigger.valueChangedHandler = nil;
+
+	CFRelease((CFTypeRef)m_pGCController);
+	m_pGCController = nullptr;
 }
 
 void GamepadGCController::Update()
@@ -58,7 +86,8 @@ void GamepadGCController::Update()
 
 void GamepadGCController::InitWithGCController(GCController* controller)
 {
-	m_pGCController = (void*)controller;
+	//keep the controller alive so Kill() can safely clear its handlers later
+	m_pGCController = (void*)CFRetain((__bridge CFTypeRef)controller);
 
 	const char* pName = [controller.vendorName UTF8String];
 	if (pName)
@@ -93,7 +122,7 @@ void GamepadGCController::InitWithGCController(GCController* controller)
 		return;
 	}
 
-	// Capture a weak ref to self for the block
+	//the blocks capture our raw C++ pointer; Kill() clears all these handlers before this object is deleted
 	GamepadGCController* self = this;
 
 	pad.buttonA.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
@@ -125,6 +154,9 @@ void GamepadGCController::InitWithGCController(GCController* controller)
 	};
 	pad.buttonMenu.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
 		self->OnButton(pressed, GCC_BTN_START);
+	};
+	pad.buttonHome.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
+		self->OnButton(pressed, GCC_BTN_GUIDE);
 	};
 
 	// D-pad
