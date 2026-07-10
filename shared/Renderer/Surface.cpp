@@ -563,6 +563,15 @@ bool Surface::LoadFileFromMemory(uint8 *pMem, int inputSize)
 	CHECK_GL_ERROR();
 	if (bReturn)
 	{
+		if (m_glTextureID == NO_TEXTURE_LOADED && m_texType != TYPE_NOT_OWNER)
+		{
+			//the decode "succeeded" but glGenTextures never delivered an ID, which
+			//means GL calls are no-oping (usually no GL context current on this
+			//thread). Fail here: SetSmoothing()->Bind() would see the missing ID
+			//and ReloadImage() until the stack overflows.
+			LogError("Surface: %s decoded but no GL texture was created (no GL context current?)", m_textureLoaded.c_str());
+			return false;
+		}
 		SetSmoothing(m_bSmoothing);
 	}
 	return bReturn;

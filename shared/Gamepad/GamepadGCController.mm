@@ -79,8 +79,24 @@ void GamepadGCController::Kill()
 	m_pGCController = nullptr;
 }
 
+void GamepadGCController::QueueButton(bool bDown, int buttonID)
+{
+	//called from GCController handler blocks on the main queue; Update() runs on
+	//the same thread (the game tick is NSTimer driven), so no locking is needed
+	ButtonEvent e;
+	e.m_bDown = bDown;
+	e.m_buttonID = buttonID;
+	m_pendingButtonEvents.push_back(e);
+}
+
 void GamepadGCController::Update()
 {
+	for (size_t i = 0; i < m_pendingButtonEvents.size(); i++)
+	{
+		OnButton(m_pendingButtonEvents[i].m_bDown, m_pendingButtonEvents[i].m_buttonID);
+	}
+	m_pendingButtonEvents.clear();
+
 	Gamepad::Update();
 }
 
@@ -126,51 +142,51 @@ void GamepadGCController::InitWithGCController(GCController* controller)
 	GamepadGCController* self = this;
 
 	pad.buttonA.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, GCC_BTN_A);
+		self->QueueButton(pressed, GCC_BTN_A);
 	};
 	pad.buttonB.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, GCC_BTN_B);
+		self->QueueButton(pressed, GCC_BTN_B);
 	};
 	pad.buttonX.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, GCC_BTN_X);
+		self->QueueButton(pressed, GCC_BTN_X);
 	};
 	pad.buttonY.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, GCC_BTN_Y);
+		self->QueueButton(pressed, GCC_BTN_Y);
 	};
 	pad.leftShoulder.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, GCC_BTN_LEFTSHOULDER);
+		self->QueueButton(pressed, GCC_BTN_LEFTSHOULDER);
 	};
 	pad.rightShoulder.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, GCC_BTN_RIGHTSHOULDER);
+		self->QueueButton(pressed, GCC_BTN_RIGHTSHOULDER);
 	};
 	pad.leftThumbstickButton.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, GCC_BTN_LEFTSTICK);
+		self->QueueButton(pressed, GCC_BTN_LEFTSTICK);
 	};
 	pad.rightThumbstickButton.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, GCC_BTN_RIGHTSTICK);
+		self->QueueButton(pressed, GCC_BTN_RIGHTSTICK);
 	};
 	pad.buttonOptions.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, GCC_BTN_BACK);
+		self->QueueButton(pressed, GCC_BTN_BACK);
 	};
 	pad.buttonMenu.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, GCC_BTN_START);
+		self->QueueButton(pressed, GCC_BTN_START);
 	};
 	pad.buttonHome.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, GCC_BTN_GUIDE);
+		self->QueueButton(pressed, GCC_BTN_GUIDE);
 	};
 
 	// D-pad
 	pad.dpad.up.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, GCC_BTN_DPAD_UP);
+		self->QueueButton(pressed, GCC_BTN_DPAD_UP);
 	};
 	pad.dpad.down.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, GCC_BTN_DPAD_DOWN);
+		self->QueueButton(pressed, GCC_BTN_DPAD_DOWN);
 	};
 	pad.dpad.left.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, GCC_BTN_DPAD_LEFT);
+		self->QueueButton(pressed, GCC_BTN_DPAD_LEFT);
 	};
 	pad.dpad.right.valueChangedHandler = ^(GCControllerButtonInput*, float, BOOL pressed) {
-		self->OnButton(pressed, GCC_BTN_DPAD_RIGHT);
+		self->QueueButton(pressed, GCC_BTN_DPAD_RIGHT);
 	};
 
 	// Left stick
