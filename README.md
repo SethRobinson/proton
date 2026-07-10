@@ -71,7 +71,7 @@ The following demo apps have Xcode projects under their `OSX/` folder:
 |-----|--------------|-------|-------|
 | **RTBareBones** | `RTBareBones/OSX/RTBareBones.xcodeproj` | Dummy (no audio) | Simplest starting point |
 | **RTSimpleApp** | `RTSimpleApp/OSX/RTSimpleApp.xcodeproj` | SDL2_mixer | Basic app with SDL audio |
-| **RTLooneyLadders** | `RTLooneyLadders/OSX/RTLooneyLadders.xcodeproj` | SDL2_mixer | Full game with gamepad support (game controllers not yet working on Mac) |
+| **RTLooneyLadders** | `RTLooneyLadders/OSX/RTLooneyLadders.xcodeproj` | SDL2_mixer | Full game with gamepad support |
 
 All projects target **macOS 11.0+** and build as **universal binaries** (arm64 + x86_64).
 

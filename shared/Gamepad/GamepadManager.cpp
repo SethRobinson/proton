@@ -79,7 +79,7 @@ void GamepadManager::AddGamepad( Gamepad * pad, eGamepadID customID) //0 means a
 	if (pad->Init())
 	{
 		m_gamepads.push_back(pad);
-		LogMsg("Located gamepad %s (ID %d)", pad->GetName().c_str(), pad->GetID());
+		LogMsg("Located gamepad %s (ID %ld)", pad->GetName().c_str(), pad->GetID());
 		if (m_defaultGamepadID == GAMEPAD_ID_NONE)
 		{
 			m_defaultGamepadID = pad->GetID();
@@ -194,7 +194,7 @@ void GamepadManager::RemoveGamepadsByProvider( GamepadProvider *provider )
 			{
 				m_defaultGamepadID = GAMEPAD_ID_NONE;
 			}
-			int tempID = m_gamepads[i]->GetID();
+			eGamepadID tempID = m_gamepads[i]->GetID();
 			
 			delete m_gamepads[i];
 			m_gamepads.erase(m_gamepads.begin()+i);
