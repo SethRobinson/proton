@@ -1,4 +1,30 @@
-NotShared/
+# Whitelist approach: ignore everything at the top level by default, then
+# re-include only the files/folders that belong in the repo. A new project
+# folder dropped into the root is ignored automatically; to start tracking
+# one, add a "!/FolderName/" line below.
+/*
+!/.gitignore
+!/AGENTS.md
+!/README.md
+!/LICENSE.md
+!/license.txt
+!/Programmer Readme.txt
+!/base_setup.bat
+!/CopyStuffToPi.bat
+!/MakeZipOfThirdPartyLibs.bat
+!/ArduboySim/
+!/RTBareBones/
+!/RTConsole/
+!/RTLooneyLadders/
+!/RTPack/
+!/RTSimpleApp/
+!/shared/
+
+# Must never be committed (see AGENTS.md), kept explicit even though the
+# top-level whitelist already excludes it
+agents_secret.md
+
+# Build/IDE junk (applies inside the whitelisted folders too)
 *.zip
 *.ncb
 *.bsc
@@ -11,72 +37,64 @@ NotShared/
 *.pdb
 *.iobj
 *.ipdb
-RTSimpleApp/media/interface/*.rttex
-RTSimpleApp/media/interface/*.rtfont
-RTSimpleApp/bin/
-shared/win/utils/log.txt
-.vs
 *.tlog
 *.log
 *.recipe
 *.vcxproj.user
+.vs
+xcuserdata
+**/.cache
 **/bin/log.txt
 **/bin/*.exe
-RTDink/
-RTMindWall/
-UGT/
-RTDScroll/
-RTGameShow/
-RTLibretroTest
-RTSlideShow
-RTWhisperApp
-shared/android/optional_src/libs/f
-shared/android/optional_src/libs/libcurl_ssl
-shared/android/optional_src/libs/libopenssl
-shared/android/optional_src/libs/fmodstudio
-shared/html5/fmodstudio
-shared/win/fmodstudio
-RTBareBones/linux/build
-RTSimpleApp/linux/build
-RTPack/linux/build
-RTSimpleApp/linux/build
-RTSimpleApp/build
-RTBareBones/build
-RTLooneyLadders/bin/
-shared/win/opencv
-Amigo
-AmigoMedia
-shared/addons/whisper.cpp
-shared/addons/WhisperModded
-RTLooneyLadders/windows/x64
-RTLooneyLadders/windows/log.txt
-RTSimpleApp/AndroidGradle/app/libs/fmod.jar
 */windows_vs2017/x64
-shared/win/libVLC
-RTPack/source/PVRTexLib
-RTPack/bin/RTPack.iobj
-RTPack/bin/RTPack.ipdb
-xcuserdata
-RTPack.vcxproj.FileListAbsolute.txt
-DMODTester/
-RTConsole/windows_vc2017/RTConsole.vcxproj
-RTConsole/windows_vc2017/RTConsole.vcxproj.filters
 */html5/WebLoaderData
 */html5/temp*
 */html5/*.wasm
 */html5/*.data
 */html5/*.js
 */html5/*.html
-_ignore
-Arduino
-RTLooneyLadders/windows/save.dat
-RTMahjong
-RTLibretroTest_dynamic_link_version
-TempBackup
-shared/android/optional_src/libs/libcurl-android
-**/.cache
+
+# RTSimpleApp
+RTSimpleApp/media/interface/*.rttex
+RTSimpleApp/media/interface/*.rtfont
+RTSimpleApp/bin/
+RTSimpleApp/build
+RTSimpleApp/linux/build
+RTSimpleApp/AndroidGradle/app/libs/fmod.jar
+
+# RTBareBones
+RTBareBones/build
+RTBareBones/linux/build
+
+# RTPack
+RTPack/linux/build
+RTPack/source/PVRTexLib
+RTPack.vcxproj.FileListAbsolute.txt
+
+# RTConsole
+RTConsole/windows_vc2017/RTConsole.vcxproj
+RTConsole/windows_vc2017/RTConsole.vcxproj.filters
 RTConsole/build
 RTConsole/bin/RTConsole
+
+# RTLooneyLadders
+RTLooneyLadders/bin/
+RTLooneyLadders/windows/x64
+RTLooneyLadders/windows/save.dat
+RTLooneyLadders/windows/log.txt
+
+# shared (third-party libs and local-only bits)
+shared/win/opencv
+shared/win/opencv_contrib
+shared/win/fmodstudio
+shared/win/libVLC
+shared/html5/fmodstudio
+shared/android/optional_src/libs/f
+shared/android/optional_src/libs/libcurl_ssl
+shared/android/optional_src/libs/libcurl-android
+shared/android/optional_src/libs/libopenssl
+shared/android/optional_src/libs/fmodstudio
+shared/win/utils/log.txt
+shared/addons/whisper.cpp
+shared/addons/WhisperModded
 shared/.vscode
-/.vscode/settings.json
-BlipArcade/

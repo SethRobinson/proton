@@ -37,6 +37,10 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
 
 ## Git
 
+- `.gitignore` uses a whitelist: `/*` ignores everything at the repo root, and
+  tracked projects/files are re-included with `!/Name/` lines at the top of the
+  file. New project folders in the root are ignored by default; to start
+  tracking one, add a `!/FolderName/` line (do not add per-file ignore lists).
 - Never add OpenAI/Codex/Claude etc as a co-author on git commits.
 - NEVER `git commit` unless explicitly told to commit.
 - NEVER `git push` unless explicitly told to push. "Commit" means commit
