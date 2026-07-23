@@ -589,11 +589,48 @@ void Sleep(long ms)
 	#endif
 }
 
+#ifdef RT_HTML5_USE_CUSTOM_MAIN
+//Touch coords arrive as CSS pixels relative to the canvas, so the game's screen size must
+//always match the canvas CSS size.  We used to only resync on the window resize event, but
+//on iOS home screen web apps (standalone mode) that event can fire before the layout has
+//actually updated, or not at all, leaving touch X/Y mapped against the old orientation's
+//size after rotating.  So we poll the CSS size and do a full resync whenever it changes.
+void SyncScreenToCanvasCSSSize()
+{
+	double cssW, cssH;
+	if (emscripten_get_element_css_size("#canvas", &cssW, &cssH) != EMSCRIPTEN_RESULT_SUCCESS) return;
+
+	//ignore bogus sizes seen mid-layout/hidden
+	if (cssW < 32 || cssH < 32) return;
+
+	if (abs((int)cssW - g_winVideoScreenX) <= 1 && abs((int)cssH - g_winVideoScreenY) <= 1) return; //no real change
+
+	LogMsg("Canvas CSS size is now %d, %d (game thought %d, %d), resyncing", (int)cssW, (int)cssH, g_winVideoScreenX, g_winVideoScreenY);
+	g_winVideoScreenX = (int)cssW;
+	g_winVideoScreenY = (int)cssH;
+	emscripten_set_canvas_element_size("#canvas", int(cssW), int(cssH));
+	glViewport(0, 0, GetPrimaryGLX(), GetPrimaryGLY());
+	SetupScreenInfo(GetPrimaryGLX(), GetPrimaryGLY(), ORIENTATION_PORTRAIT);
+	GetBaseApp()->OnScreenSizeChange();
+}
+#endif
+
 void MainEventLoop()
 {
 
 	static int oldWidth = GetScreenSizeX();
 	static int oldHeight = GetScreenSizeY();
+
+#ifdef RT_HTML5_USE_CUSTOM_MAIN
+	//poll for rotation/layout changes a few times a second, the resize event alone can't be
+	//trusted (see SyncScreenToCanvasCSSSize comment)
+	static int canvasCSSCheckCounter = 0;
+	if (++canvasCSSCheckCounter >= 15)
+	{
+		canvasCSSCheckCounter = 0;
+		SyncScreenToCanvasCSSSize();
+	}
+#endif
 	
 	int width, height, isfs;
 	
@@ -810,48 +847,11 @@ EM_BOOL uievent_callback(int eventType, const EmscriptenUiEvent *e, void *userDa
 		*/
 
 #ifdef RT_HTML5_USE_CUSTOM_MAIN
-	double cssW, cssH;
-	emscripten_get_element_css_size("#canvas", &cssW, &cssH);
-	//ResetOrthoFlag();
-
-	g_winVideoScreenX = cssW;
-	g_winVideoScreenY = cssH;
-	emscripten_set_canvas_element_size("#canvas",
-		int(cssW), int(cssH));
-	
-	/*
-	emscripten_set_canvas_element_size(0,
-		int(cssW), int(cssH));
-
-	
-	InitSDLScreen();
-	
-	//emscripten_set_canvas_size(int(g_winVideoScreenX), int(g_winVideoScreenY));
-
-	//emscripten_webgl_get_drawing_buffer_size
-	//emscripten_set_resize_callback(nullptr, nullptr, false, uievent_callback);
-	if (emscripten_webgl_get_current_context() == 0)
-	{
-		LogMsg("There is no context");
-}
-	else
-	{
-		EMSCRIPTEN_RESULT res;
-		int drawingBufferWidth = -1;
-		int drawingBufferHeight = -1;
-		res = emscripten_webgl_get_drawing_buffer_size(emscripten_webgl_get_current_context(), &drawingBufferWidth, &drawingBufferHeight);
-		LogMsg("WebGL drawingBuffer size is %d, %d", drawingBufferWidth, drawingBufferHeight);
-	}
-
-	LogMsg("Changing size to %d, %d", g_winVideoScreenX, g_winVideoScreenY);
-	//GetBaseApp()->InitializeGLDefaults();
-	*/
-
-	glViewport(0, 0, GetPrimaryGLX(), GetPrimaryGLY());
-	SetupScreenInfo(GetPrimaryGLX(), GetPrimaryGLY(), ORIENTATION_PORTRAIT);
-	GetBaseApp()->OnScreenSizeChange();
+	//same resync the main loop poll does; keeping the event handler too so we react instantly
+	//when the browser does deliver a good resize event
+	SyncScreenToCanvasCSSSize();
 #endif
-	
+
 	return 0;
 }
 
