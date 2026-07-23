@@ -2,26 +2,29 @@
 mergeInto(LibraryManager.library, 
 {
 
+//allocateUTF8 was removed in newer emscriptens (6.x), stringToNewUTF8 is the same thing; the
+//__deps entries make the linker actually include it (JS library code isn't scanned for it)
+JLIB_EnterString__deps: ['$stringToNewUTF8'],
 JLIB_EnterString: function(message, defaultText)
 {
         var pMessage = UTF8ToString(message);
         var pURL = UTF8ToString(defaultText);
 	var person = prompt(pMessage, pURL);
-	
+
 	if (person == null) return 0;
-	
+
 	 console.log("Got "+person);
-	 
+
 	 // Create a pointer using the 'Glue' method and the String value
-        var ptr = allocateUTF8(person);
+        var ptr = stringToNewUTF8(person);
     return ptr;
 },
 
-
+JLIB_GetURL__deps: ['$stringToNewUTF8'],
 JLIB_GetURL: function ()
 {
     //console.log("Querystring: "+decodeURIComponent(window.location.href));
-    var ptr = allocateUTF8(decodeURIComponent(window.location.href));
+    var ptr = stringToNewUTF8(decodeURIComponent(window.location.href));
     return ptr;
 },
 
