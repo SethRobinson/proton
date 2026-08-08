@@ -35,6 +35,37 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
 - Build OSX demo apps with e.g. `xcodebuild -project RTLooneyLadders/OSX/RTLooneyLadders.xcodeproj -target RTLooneyLadders -configuration Debug build` (run from the repo root). SDL2/SDL2_mixer frameworks are installed in `~/Library/Frameworks` on that machine.
 - GUI apps launched over ssh do run (a console session is active), so smoke tests via running the built binary and reading stdout work.
 
+## HTML5 / Emscripten gotchas
+
+- Emscripten lives at `d:\pro\emsdk` (6.0.3), set as `EMSCRIPTEN_ROOT` by
+  `base_setup.bat`. A good HTML5 smoke build is
+  `RTSocketCity\html5\build_release.bat nopause`, which compiles `shared/html5/`
+  plus most of `shared/`. Note it defines both `RT_HTML5_USE_CUSTOM_MAIN` and
+  `RT_EMTERPRETER_ENABLED`, so it exercises the emterpreter `while(1)` path in
+  `HTML5Main.cpp`, not the `emscripten_set_main_loop` path.
+- If an AI assistant's shell has `NoDefaultCurrentDirectoryInExePath=1` (common in
+  sandboxed tooling), `cmd` refuses to run batch files from the current directory and
+  these build scripts fail with "'emsdk_env.bat' is not recognized". Clear it for the
+  child process: `cmd /c "set NoDefaultCurrentDirectoryInExePath=&& <script>.bat"`.
+  The scripts themselves are fine; this is purely a caller-environment issue.
+- Never use `clock()` for timing in the HTML5/wasm build. `clock_t` is 32-bit there
+  and `CLOCKS_PER_SEC` is 1,000,000, so it overflows after 2^31 microseconds
+  (~35.8 minutes). Emscripten enables non-trapping float-to-int by default, so it
+  saturates at `INT32_MAX` and never advances again rather than wrapping. That froze
+  `GetSystemTimeTick()` permanently and hung the FPS limiter's wait loop (fixed in
+  PR #50). Use `emscripten_get_now()` instead.
+- When converting a large `double` to an integer on wasm, cast to `uint64` first if
+  you want modulo wrap-around. A direct `double`->`unsigned int` cast saturates at
+  `UINT32_MAX` (same trap as above) instead of wrapping.
+- `GetSystemTimeTick()` has no common epoch across platforms (time since boot on
+  Windows, Unix epoch ms on iOS/OSX, time since page load on HTML5), so never assume
+  a starting value. It also rolls over every ~49 days on every platform. Engine-level
+  timing goes through `GetSystemTimeAccurateRangeChecked()` in
+  `shared/Manager/GameTimer.cpp`, which clamps each delta to 100 ms and uses wrap-safe
+  unsigned subtraction. Prefer `GetTick()`/`GetDeltaTick()` over raw
+  `GetSystemTimeTick()` for anything that must survive a roll-over or a backgrounded
+  browser tab.
+
 ## Git
 
 - `.gitignore` uses a whitelist: `/*` ignores everything at the repo root, and

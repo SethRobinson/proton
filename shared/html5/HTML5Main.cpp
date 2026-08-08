@@ -779,22 +779,32 @@ void MainEventLoop()
 			break;
 		}
 	}
-	static float fpsTimer = 0;
+	//double, not float:  a float can't resolve single milliseconds once the timer gets large, so adding
+	//the frame time below starts snapping to the wrong value.  At ~6 days of uptime a 16.67 ms frame
+	//rounds to 32 ms (60 fps silently becomes 30), and by ~40 days it rounds away to nothing and the
+	//limiter stops limiting entirely.
+	static double fpsTimer = 0;
 
 
 	if (g_frameDelayMS != 0)
 	{
-		
-	
-		while (fpsTimer > GetSystemTimeAccurate())
+		//this should be 1000 not lower, but without this SetFPS(60) results in 55
+		double frameMS = 1000.0 / double(g_frameDelayMS);
+
+		//GetSystemTimeAccurate rolls over about every 49 days.  When it does, fpsTimer is left sitting
+		//far in the "future" and this wait would spin forever, so also give up if we'd have to wait
+		//longer than a single frame.
+		double waitMS = fpsTimer - GetSystemTimeAccurate();
+
+		while (waitMS > 0 && waitMS <= frameMS)
 		{
 			//emscripten_sleep(1);
 			//Sleep(0);
+			waitMS = fpsTimer - GetSystemTimeAccurate();
 		}
 
-		//this should be 1000 not lower, but without this SetFPS(60) results in 55
-		fpsTimer = float(GetSystemTimeAccurate()) + (1000.0f / (float(g_frameDelayMS)));
-		
+		fpsTimer = GetSystemTimeAccurate() + frameMS;
+
 	}
 
 
@@ -1325,7 +1335,7 @@ void mainHTML()
 	while(1)
 	{
 		//our main loop
-		static float fpsTimer = 0;
+		static double fpsTimer = 0; //double for the same reason as the fpsTimer in MainEventLoop
 
 		
 		if (!g_bRanInit && IsStillLoadingPersistentData())
@@ -1355,15 +1365,22 @@ void mainHTML()
 
 			if (g_frameDelayMS != 0)
 			{
-				while (fpsTimer > GetSystemTimeAccurate())
+				//this should be 1000 not lower, but without this SetFPS(60) results in 55
+				double frameMS = 850.0 / double(g_frameDelayMS);
+
+				//also give up if we'd wait longer than a frame, otherwise the ~49 day timer roll-over
+				//would leave fpsTimer in the "future" and trap us here
+				double waitMS = fpsTimer - GetSystemTimeAccurate();
+
+				while (waitMS > 0 && waitMS <= frameMS)
 				{
 					bRanSleep = true;
 					emscripten_sleep(1);
 					//Sleep(0);
+					waitMS = fpsTimer - GetSystemTimeAccurate();
 				}
 
-				//this should be 1000 not lower, but without this SetFPS(60) results in 55
-				fpsTimer = float(GetSystemTimeAccurate()) + (850.0f / (float(g_frameDelayMS)));
+				fpsTimer = GetSystemTimeAccurate() + frameMS;
 			}
 
 			if (!bRanSleep)
