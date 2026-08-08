@@ -226,33 +226,11 @@ int GetYOffset()
 
 unsigned int GetSystemTimeTick()
 {
+	//Use emscripten's API to get high precision system time. This has the same limitation as other platforms GetSystemTimeTick where
+	//this will roll over in 49 days of running. Emscripten's own docs refer it to use Date.now or performance.now as a reference.
 
-	//Note:  Due to using an unsigned int for millseconds, the timer kept rolling over on my linux game server I wrote for
-	//Tanked - so I changed this to start at 0, which gives me 46 days of running before the roll-over.  Why don't I just change
-	//my stuff to handle timing roll-overs or perhaps use a bigger type for timing?  Well.. hmm.  Ok, maybe, but for now this. -Seth
-	
-	static unsigned int incrementingTimer = 0;
-	static double buildUp = 0;
-	static double lastTime = 0;
-
-    
-	/*
-	struct timespec time;
-	clock_gettime(CLOCK_MONOTONIC, &time);
-	double timeDouble = time.tv_sec*1000 + time.tv_nsec/1000000;
-	*/
-
-	//Well, the above doesn't work on the iPhone, it returns 0 only.  So let's use this instead:
-	double timeDouble = clock()/1000;
-
-	double change = timeDouble -lastTime;
-	if (change > 0 && change < (1000*120) )
-	{
-		incrementingTimer += change;
-	}
-	lastTime = timeDouble;
-	
-	return incrementingTimer;
+	static const double startTime = emscripten_get_now();
+	return (unsigned int)(uint64)(emscripten_get_now() - startTime);
 }
 
 uint64 GetSystemTimeTickLong()
