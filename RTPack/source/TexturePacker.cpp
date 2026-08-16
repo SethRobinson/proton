@@ -194,7 +194,7 @@ void EmbedImageFileAsRTTEX(string outputFile, string fileToImbed, SoftSurface &p
 			return;
 		}
 
-		fread(pBuff, embedFileSize, 1, fEmbed);
+		size_t freadResult = fread(pBuff, embedFileSize, 1, fEmbed); (void)freadResult; //don't care, but gcc wants the return value looked at
 
 		//append it to our current file we're writing
 		fwrite(pBuff, embedFileSize, 1, pFileOut);

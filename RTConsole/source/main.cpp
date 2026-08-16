@@ -84,7 +84,7 @@ void LogError ( const char* traceStr, ... )
 	vsnprintf( buffer, logSize, traceStr, argsVA );
 	va_end( argsVA );
 
-	printf ((char*)buffer);
+	printf ("%s", buffer);
 	printf ("\r\n");
 	fflush(stdout);
 

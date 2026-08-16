@@ -102,6 +102,10 @@ void TouchTestComponent::OnInput( VariantList *pVList )
 			assert(!"impossible!");
 			return;
 		}
+		break;
+
+		default:
+			break;
 	}
 
 	switch (type)
@@ -119,6 +123,9 @@ void TouchTestComponent::OnInput( VariantList *pVList )
 	case MESSAGE_TYPE_GUI_CLICK_MOVE:
 		m_touch[finger].m_vPos = pt;
 		break;
-	}	
+
+	default:
+		break;
+	}
 
 }

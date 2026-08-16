@@ -219,7 +219,7 @@ void AttachGamepadsIfPossible()
 			LogMsg("Connecting gamepads...");
 			for (int i = 0; i < GetGamepadManager()->GetGamepadCount(); i++)
 			{
-				Gamepad* pPad = GetGamepadManager()->GetGamepad((eGamepadID)i);
+				Gamepad* pPad = GetGamepadManager()->GetGamepad(i);
 				pPad->ConnectToArcadeComponent(pComp, true, true);
 
 				//if we cared about the analog sticks too, we'd do this:

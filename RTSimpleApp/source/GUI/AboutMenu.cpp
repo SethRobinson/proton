@@ -8,10 +8,6 @@ void AboutMenuOnSelect(VariantList *pVList) //0=vec2 point of click, 1=entity se
 {
 	Entity *pEntClicked = pVList->Get(1).GetEntity();
 	LogMsg("Clicked %s entity at %s", pEntClicked->GetName().c_str(),pVList->m_variant[1].Print().c_str());
-	Entity *pMenu = GetEntityRoot()->GetEntityByName("AboutMenu"); //we're sort of cheating by just grabbing the top level parent
-	//entity by name instead of GetParent() a bunch of times to reach the top level, but meh
-	
-	
 	if (pEntClicked->GetName() == "Back")
 	{
 		DisableAllButtonsEntity(pEntClicked->GetParent());
@@ -156,12 +152,12 @@ Entity * AboutMenuCreate( Entity *pParentEnt)
 	pScrollComp->GetVar("fingerTracking")->Set(uint32(1)); 
 
 	//note: If you don't want to see a scroll bar progress indicator, comment out the next line.
-	EntityComponent *pScrollBarComp = pScroll->AddComponent(new ScrollBarRenderComponent); 	//add a visual way to see the scroller position
+	pScroll->AddComponent(new ScrollBarRenderComponent); 	//add a visual way to see the scroller position
 	
 	//if we wanted to change the scroll bar color we could do it this way:
 	//pScroll->GetVar("color")->Set(MAKE_RGBA(61,155, 193, 255)); 
 	
-	Entity *pScrollChild = pScroll->AddEntity(new Entity("scroll_child"));
+	pScroll->AddEntity(new Entity("scroll_child"));
 	
 	pScroll->AddComponent(new RenderScissorComponent()); //so the text/etc won't get drawn outside our scroll box
 	pScroll->AddComponent(new FilterInputComponent); //lock out taps that are not in our scroll area

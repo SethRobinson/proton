@@ -154,6 +154,9 @@ tryAgain:
 
 
 		break;
+
+	default:
+		break;
 	}
 	
 	if (PutItemOnFloor(&m_floors[floorID], type, cellMin, cellMax))
@@ -275,6 +278,9 @@ void BuildingComponent::MarkReachableCellsFromCell(FloorMap *pMap, BFloor *pFloo
 					MarkReachableCellsFromCell(pMap, &m_floors[pCell->m_elevatorTargetFloor], pCell->m_elevatorTargetCell, DIR_RIGHT);
 				}
 				break;
+
+			default:
+				break;
 		}
 
 		} else
@@ -351,9 +357,8 @@ void BuildingComponent::GetReachableCellByCount(FloorMap *pMap,int index, uint32
 }
 BFloor * BuildingComponent::GetFirstUnreachableFromBottomLeft(FloorMap *pMap,  int *cellOut, bool bMustBeEmpty)
 {
-	
+
 	int reachable = 0;
-	int unreachable = 0;
 
 	for (int i=0; i < pMap->size(); i++)
 	{
@@ -419,7 +424,7 @@ void BuildingComponent::MakeAllRoomsReachable()
   int cell;
   BFloor *pFloor = NULL;
 
-  while (pFloor =GetFirstUnreachableFromBottomLeft(&map, &cell, true))
+  while ((pFloor = GetFirstUnreachableFromBottomLeft(&map, &cell, true)) != NULL)
   {
 	  //let's make this reachable.. by someone..
 	  int reachable = PrintMappingStatistics(&map, true);
@@ -527,6 +532,9 @@ void BuildingComponent::DrawCell(BCell *pCell, CL_Vec2f vScreenPos, CL_Vec2f vSc
 	case BCell::TYPE_ELEVATOR:
 	case BCell::TYPE_DOOR1:
 		bDrawBG = true;
+		break;
+
+	default:
 		break;
 	}
 

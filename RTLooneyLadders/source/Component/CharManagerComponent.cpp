@@ -82,7 +82,6 @@ void CharManagerComponent::OnRemove()
 
 void CharManagerComponent::OnRender(VariantList *pVList)
 {
-	CL_Vec2f vFinalPos = pVList->m_variant[0].GetVector2()+*m_pPos2d;
 }
 
 void CharManagerComponent::OnUpdate(VariantList *pVList)

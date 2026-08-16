@@ -64,7 +64,6 @@ void ShowBigMessage(string msg)
 void GameMenuOnSelect(VariantList *pVList) //0=vec2 point of click, 1=entity sent from
 {
 	Entity *pEntClicked = pVList->m_variant[1].GetEntity();
-	Entity *pMenu = GetEntityRoot()->GetEntityByName("GameMenu");
 
 	if (pEntClicked->GetName() == "Back")
 	{
@@ -214,7 +213,7 @@ Entity * GameMenuCreate(Entity *pParentEnt)
 
 	//setup level
 	Entity *pLevel = pBG->AddEntity(new Entity("Level"));
-	EntityComponent *pBuilding = pLevel->AddComponent(new BuildingComponent);
+	pLevel->AddComponent(new BuildingComponent);
 	
 	uint32 floors = 5;
 	uint32 cellsPerFloor = 10;
@@ -340,7 +339,7 @@ Entity * GameMenuCreate(Entity *pParentEnt)
 		//simple to do
 
 		Entity *pDPADEnt = pBG->AddEntity(new Entity("DPAD"));
-		EntityComponent *pPadComp = pDPADEnt->AddComponent(new DPadComponent);
+		pDPADEnt->AddComponent(new DPadComponent);
 
 		//move it to a good place on the screen
 		pDPADEnt->GetVar("pos2d")->Set(CL_Vec2f(90,GetScreenSizeYf()-90));

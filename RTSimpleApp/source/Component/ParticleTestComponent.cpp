@@ -132,6 +132,9 @@ void ParticleTestComponent::OnInput( VariantList *pVList )
 	case MESSAGE_TYPE_GUI_CLICK_MOVE:
 		m_explodeFire.set_position(pt.x, pt.y);
 		break;
-	}	
+
+	default:
+		break;
+	}
 
 }

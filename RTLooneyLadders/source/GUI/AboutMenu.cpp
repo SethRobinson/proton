@@ -8,10 +8,6 @@ void AboutMenuOnSelect(VariantList *pVList) //0=vec2 point of click, 1=entity se
 {
 	Entity *pEntClicked = pVList->m_variant[1].GetEntity();
 	LogMsg("Clicked %s entity at %s", pEntClicked->GetName().c_str(),pVList->m_variant[1].Print().c_str());
-	Entity *pMenu = GetEntityRoot()->GetEntityByName("AboutMenu"); //we're sort of cheating by just grabbing the top level parent
-	//entity by name instead of GetParent() a bunch of times to reach the top level, but meh
-	
-	
 	if (pEntClicked->GetName() == "Back")
 	{
 		DisableAllButtonsEntity(pEntClicked->GetParent());
@@ -84,14 +80,14 @@ Entity * AboutMenuCreate( Entity *pParentEnt)
 	pScroll->GetVar("size2d")->Set(vTextAreaBounds);
 	pScroll->AddComponent(new TouchHandlerComponent);
 
-	EntityComponent *pFilter = pScroll->AddComponent(new FilterInputComponent);
-	EntityComponent *pScrollComp = pScroll->AddComponent(new ScrollComponent);
+	pScroll->AddComponent(new FilterInputComponent);
+	pScroll->AddComponent(new ScrollComponent);
 	
 	//note: If you don't want to see a scroll bar progress indicator, comment out the next line.  Also note that it only draws
 	//a vertical progress bar if needed but doesn't draw a horizontal if needed (I just haven't needed a horizontal scroll bar yet)
-	EntityComponent *pScrollBarComp = pScroll->AddComponent(new ScrollBarRenderComponent); 	//also let's add a visual way to see the scroller position
-	//pScroll->GetVar("color")->Set(MAKE_RGBA(61,155, 193, 255)); 
-	Entity *pScrollChild = pScroll->AddEntity(new Entity("scroll_child"));
+	pScroll->AddComponent(new ScrollBarRenderComponent); 	//also let's add a visual way to see the scroller position
+	//pScroll->GetVar("color")->Set(MAKE_RGBA(61,155, 193, 255));
+	pScroll->AddEntity(new Entity("scroll_child"));
 	
 	//but the nicest way is to blit a matching bar at the bottom with transparency:
 	Entity *pOverlay = CreateOverlayEntity(pBG, "", "interface/bg_overlay.rttex", 0, GetScreenSizeYf()+1); 

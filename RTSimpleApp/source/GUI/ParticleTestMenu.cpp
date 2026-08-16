@@ -25,7 +25,7 @@ Entity * ParticleTestCreate(Entity *pParentEnt)
 	Entity *pBG = CreateOverlayEntity(pParentEnt, "ParticleTest", "interface/summary_bg.rttex", 0,0);
 	AddFocusIfNeeded(pBG);
 
-	Entity *pParticleEnt = pBG->AddEntity(new Entity(new ParticleTestComponent));
+	pBG->AddEntity(new Entity(new ParticleTestComponent));
 	
 	Entity *pButtonEntity;
 	pButtonEntity = CreateTextButtonEntity(pBG, "Back", 240, 290, "Back"); 

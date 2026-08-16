@@ -25,7 +25,7 @@ Entity * TouchTestMenuCreate(Entity *pParentEnt)
 	Entity *pBG = CreateOverlayEntity(pParentEnt, "TouchTest", "interface/summary_bg.rttex", 0,0);
 	AddFocusIfNeeded(pBG);
 
-	Entity *pTouchTestEnt = pBG->AddEntity(new Entity(new TouchTestComponent));
+	pBG->AddEntity(new Entity(new TouchTestComponent));
 
 	Entity *pButtonEntity;
 	pButtonEntity = CreateTextButtonEntity(pBG, "Back", 240, 290, "Back"); 
