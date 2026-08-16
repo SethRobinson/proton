@@ -359,6 +359,7 @@ BFloor * BuildingComponent::GetFirstUnreachableFromBottomLeft(FloorMap *pMap,  i
 {
 
 	int reachable = 0;
+	//int unreachable = 0;
 
 	for (int i=0; i < pMap->size(); i++)
 	{

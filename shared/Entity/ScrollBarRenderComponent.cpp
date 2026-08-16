@@ -183,6 +183,7 @@ void ScrollBarRenderComponent::OnTargetOverMove(VariantList* pVList)
 
 	CL_Vec2f vMousePos = pVList->m_variant[0].GetVector2();
 	int touchID = pVList->m_variant[2].GetUINT32();
+	//Entity* pPosParent = pVList->Get(1).GetEntity();
 
 	if (touchID != 0) return; //only care about the first touch (for now
 	GetBaseApp()->GetTouch(0)->SetWasHandled(true, GetParent());

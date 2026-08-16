@@ -1861,6 +1861,9 @@ void SoftSurface::BlitRGBFromRGBA( int dstX, int dstY, SoftSurface *pSrc, int sr
 
 void SoftSurface::BlitRGBAFromRGB(int dstX, int dstY, SoftSurface *pSrc, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/)
 {
+	//uint8 *pDestImage = GetPointerToPixel(dstX, dstY);
+	//uint8 *pSrcImage = pSrc->GetPointerToPixel(srcX, srcY);
+	//int bytesPerPixelSource = pSrc->GetBytesPerPixel();
 
 	for (int y = 0; y < srcHeight; y++)
 	{

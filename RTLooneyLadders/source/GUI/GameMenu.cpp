@@ -64,6 +64,7 @@ void ShowBigMessage(string msg)
 void GameMenuOnSelect(VariantList *pVList) //0=vec2 point of click, 1=entity sent from
 {
 	Entity *pEntClicked = pVList->m_variant[1].GetEntity();
+	//Entity *pMenu = GetEntityRoot()->GetEntityByName("GameMenu");
 
 	if (pEntClicked->GetName() == "Back")
 	{

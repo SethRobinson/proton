@@ -454,6 +454,11 @@ string NetSocket::GetClientIPAsString()
 
 	if (getpeername(m_socket, (sockaddr*)&addr, &addrsize) != 0)
 	{
+#ifdef WIN32
+		//int err = WSAGetLastError();
+#else
+		//int err = errno;
+#endif
 		return "0.0.0.0";
 	}
 	

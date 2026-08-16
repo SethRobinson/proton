@@ -62,6 +62,8 @@ void TouchHandlerComponent::HandleClickStart(CL_Vec2f &pt, uint32 fingerID)
 
 void TouchHandlerComponent::HandleClickMove( CL_Vec2f &pt, uint32 fingerID )
 {
+	//TouchTrackInfo *pTouch = GetBaseApp()->GetTouch(fingerID);
+
 	if (*m_pIgnoreTouchesOutsideRect != 0)
 	{
 		if (!m_touchArea.contains(pt))
