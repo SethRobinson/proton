@@ -287,7 +287,8 @@ void AppInput(VariantList *pVList)
 	 
 	switch (msgType)
 	{
-	
+	default: break; //only logging the message types below
+
 	case MESSAGE_TYPE_GUI_CLICK_START:
 		LogMsg("Touch start: X: %.2f Y: %.2f (Finger %d)", pt.x, pt.y, fingerID);
 		break;

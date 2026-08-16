@@ -57,10 +57,11 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   plus most of `shared/`. Note it defines both `RT_HTML5_USE_CUSTOM_MAIN` and
   `RT_EMTERPRETER_ENABLED`, so it exercises the emterpreter `while(1)` path in
   `HTML5Main.cpp`, not the `emscripten_set_main_loop` path.
-- `RTSimpleApp\html5\build_release.bat nopause` also works now (Aug 2026: it
-  needed `-sUSE_SDL=1` added for newer Emscriptens; without it the SDL includes
-  in `HTML5Main.cpp` silently fail and the .bat still exits 0). The other old
-  html5 scripts (RTConsole, ArduboySim) may need the same flag treatment.
+- `RTSimpleApp\html5\build_release.bat nopause` and RTBareBones' equivalent also
+  work now (Aug 2026: both needed `-sUSE_SDL=1` added for newer Emscriptens;
+  without it the SDL includes in `HTML5Main.cpp` fail and the .bat still exits
+  0, so check the output for errors). ArduboySim's html5 script likely needs the
+  same flag treatment.
 - If an AI assistant's shell has `NoDefaultCurrentDirectoryInExePath=1` (common in
   sandboxed tooling), `cmd` refuses to run batch files from the current directory and
   these build scripts fail with "'emsdk_env.bat' is not recognized". Clear it for the

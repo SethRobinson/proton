@@ -777,6 +777,9 @@ void MainEventLoop()
 				}
 			}
 			break;
+
+		default:
+			break; //we don't handle the other message types here
 		}
 	}
 	//double, not float:  a float can't resolve single milliseconds once the timer gets large, so adding

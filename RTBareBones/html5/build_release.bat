@@ -78,7 +78,7 @@ REM **************************************** END SOURCE
 :To skip font loading so it needs no resource files or zlib, add  -DC_NO_ZLIB
 :-Wno-c++11-compat-deprecated-writable-strings -Wno-shift-negative-value
 
-SET CUSTOM_FLAGS=-DHAS_SOCKLEN_T -DBOOST_ALL_NO_LIB -DPLATFORM_HTML5 -DRT_USE_SDL_AUDIO -DC_GL_MODE -s LEGACY_GL_EMULATION=1 -s TOTAL_MEMORY=16MB -Wno-deprecated-builtins -Wno-c++11-compat-deprecated-writable-strings ^
+SET CUSTOM_FLAGS=-DHAS_SOCKLEN_T -DBOOST_ALL_NO_LIB -DPLATFORM_HTML5 -DRT_USE_SDL_AUDIO -DC_GL_MODE -s LEGACY_GL_EMULATION=1 -sUSE_SDL=1 -s TOTAL_MEMORY=16MB -Wno-deprecated-builtins -Wno-c++11-compat-deprecated-writable-strings ^
 -Wno-shift-negative-value -Wno-deprecated-non-prototype -s ALLOW_MEMORY_GROWTH=1
 
 SET SECOND_CUSTOM_FLAGS=-
