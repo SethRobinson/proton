@@ -30,6 +30,10 @@
 #include "jpeglib.h"
 #include "jmemsys.h"		/* import the system-dependent declarations */
 
+#ifdef _MSC_VER
+#pragma warning (disable:4267)	/* size_t to long conversions, fine for jpeg's pool bookkeeping */
+#endif
+
 #ifndef NO_GETENV
 #ifndef HAVE_STDLIB_H		/* <stdlib.h> should declare getenv() */
 extern char * getenv JPP((const char * name));

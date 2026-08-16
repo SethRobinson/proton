@@ -32,6 +32,8 @@
 #ifdef WIN32
 #ifdef _MSC_VER
 # pragma warning (disable:4786)
+# pragma warning (disable:4244) // conversion from 'double' to 'float', the math sources do this constantly by design
+# pragma warning (disable:4146) // unary minus applied to unsigned type in template instantiations
 #endif
 #include <windows.h>
 #include <cstdlib>

@@ -17,6 +17,11 @@
 #define JPEG_INTERNALS
 #include "jinclude.h"
 #include "jpeglib.h"
+
+#if defined(__clang__)
+/* quiet warnings from the huffman bit-twiddling in this vendored file */
+#pragma clang diagnostic ignored "-Wshift-negative-value"
+#endif
 #include "jdhuff.h"		/* Declarations shared with jdhuff.c */
 
 

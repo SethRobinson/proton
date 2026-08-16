@@ -41,6 +41,12 @@ woven in by Terry Thorsen 1/2003.
 #include "zlib.h"
 #include "unzip.h"
 
+#if defined(__clang__)
+/* quiet warnings in this vendored file rather than editing its code */
+#pragma clang diagnostic ignored "-Wparentheses-equality"
+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+#endif
+
 #ifdef STDC
 #  include <stddef.h>
 #  include <string.h>
