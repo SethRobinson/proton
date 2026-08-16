@@ -756,7 +756,7 @@ BCell * BuildingComponent::GetCellByWorldPos( CL_Vec2f vPos )
 {
 	vPos.y += 1; 
 	uint32 floor = (uint32)(-(vPos.y/m_cellSize.y));
-	uint32 cell = (uint32)vPos.x/m_cellSize.x;
+	uint32 cell = (uint32)(vPos.x/m_cellSize.x);
 	assert(floor >= 0 && floor < m_floors.size());
 	assert(cell >= 0 && cell < *m_pCellsPerFloor);
 
@@ -802,7 +802,7 @@ BCell* BuildingComponent::GetEmptyCellOnFloor(uint32 floorID)
 
 BCell * BuildingComponent::GetClosestCellByTypeInThisDir( bool bRight, BCell::eCellType type, uint32 floorID, float x )
 {
-	uint32 cell = x/m_cellSize.x;
+	uint32 cell = (uint32)(x/m_cellSize.x);
 
 	if (bRight)
 	{

@@ -19,7 +19,6 @@
 #include <sstream>
 #include <shellapi.h>
 #include <locale>
-#include <codecvt>
  
 using namespace std;
 
@@ -227,8 +226,12 @@ string GetClipboardText()
 		CloseClipboard();
 	}
 
-	wstring_convert<codecvt_utf8<wchar_t>, wchar_t> converter;
-	return converter.to_bytes(text);
+	//convert UTF-16 to UTF-8 using the Win32 API, the old wstring_convert/<codecvt> way is deprecated as of C++17
+	if (text.empty()) return "";
+	int utf8Size = WideCharToMultiByte(CP_UTF8, 0, text.c_str(), (int)text.size(), NULL, 0, NULL, NULL);
+	string utf8(utf8Size, 0);
+	WideCharToMultiByte(CP_UTF8, 0, text.c_str(), (int)text.size(), &utf8[0], utf8Size, NULL, NULL);
+	return utf8;
 }
 
 bool IsIPhone3GS()

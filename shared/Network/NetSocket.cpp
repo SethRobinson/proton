@@ -70,7 +70,7 @@
 
 NetSocket::NetSocket()
 {
-	m_socket = INVALID_SOCKET;
+	m_socket = (int)INVALID_SOCKET; //it's 64 bit on win64 but truncating to -1 compares back fine
 	m_bWasDisconnected = false;
 }
 
@@ -91,7 +91,7 @@ void NetSocket::Kill()
 		//LogMsg("Killed socket %d", m_socket);
 		#endif
 		rt_closesocket(m_socket);
-		m_socket = INVALID_SOCKET;
+		m_socket = (int)INVALID_SOCKET;
 	}
 
 	m_readBuffer.clear();

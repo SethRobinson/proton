@@ -121,7 +121,7 @@ void ExplosionComponent::OnRender(VariantList *pVList)
 	//vFinalPos.y += 160;
 	vFinalPos = WorldToScreenPos(vFinalPos);
 
-	m_explodeFire.draw(vFinalPos.x, vFinalPos.y, vScale.x, vScale.y);
+	m_explodeFire.draw((int)vFinalPos.x, (int)vFinalPos.y, vScale.x, vScale.y);
 //	m_dropper.set_position(current_pos.x, current_pos.y);
 
 }
