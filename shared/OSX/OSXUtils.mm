@@ -29,7 +29,7 @@ void LogMsg(const char *lpFormat, ...)
 	
 	std::va_list argPtr ;
 	va_start( argPtr, lpFormat ) ;
-	NSLogv([NSString stringWithCString:lpFormat], argPtr) ;
+	NSLogv([NSString stringWithCString:lpFormat encoding:NSUTF8StringEncoding], argPtr) ;
 	
 	const int logSize = 4096;
 	char buffer[logSize];
@@ -317,7 +317,7 @@ unsigned int GetSystemTimeTick()
 {
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
-	return tv.tv_usec/1000 + tv.tv_sec*1000;
+	return (unsigned int)(tv.tv_usec/1000 + tv.tv_sec*1000); //rolls over every ~49 days, that's expected
 }
 
 double GetSystemTimeAccurate()
@@ -370,7 +370,7 @@ unsigned int GetFreeMemory ()
         LogMsg("Failed to fetch vm statistics");
  
     /* Stats in bytes */ 
-	 natural_t mem_free = vm_stat.free_count * pagesize;
+	 natural_t mem_free = (natural_t)(vm_stat.free_count * pagesize);
 	 //natural_t mem_total = mem_used + mem_free;
 	 //natural_t mem_used = (vm_stat.active_count + vm_stat.inactive_count + vm_stat.wire_count) * pagesize;
 	 // LogMsg("Mem used: %u free: %u total: %u", mem_used, mem_free, mem_total);
@@ -400,8 +400,8 @@ vector<string> GetDirectoriesAtPath(string path)
 	vector<string> v;
 	
 	NSString *str =  [NSString stringWithCString: path.c_str() encoding: [NSString defaultCStringEncoding]];
-	NSArray *origContents = [[NSFileManager defaultManager] directoryContentsAtPath:str];
-	NSLog(@"Number of files = %d", origContents.count);
+	NSArray *origContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:str error:nil];
+	NSLog(@"Number of files = %lu", (unsigned long)origContents.count);
 	
 	string dir;
 	
@@ -425,7 +425,7 @@ vector<string> GetFilesAtPath(string path)
 	vector<string> v;
 	
 	NSString *str =  [NSString stringWithCString: path.c_str() encoding: [NSString defaultCStringEncoding]];
-	NSArray *origContents = [[NSFileManager defaultManager] directoryContentsAtPath:str];
+	NSArray *origContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:str error:nil];
 	//NSLog(@"Number of files = %d", origContents.count);
 	
 	string dir;
@@ -452,7 +452,7 @@ bool IsIphoneOriPad()
 string GetClipboardText()
 {
 	NSPasteboard *pb = [NSPasteboard generalPasteboard];
-	NSString *info = [pb stringForType: NSStringPboardType];
+	NSString *info = [pb stringForType: NSPasteboardTypeString];
     string text = [info cStringUsingEncoding:NSUTF8StringEncoding];
 	return text;
 }

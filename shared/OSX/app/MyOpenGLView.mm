@@ -108,7 +108,11 @@ static BOOL g_drawInitiatedByTimer = NO;
     [super prepareOpenGL];
 
     GLint swapInt = 1;
+//the whole NSOpenGL API is deprecated with no direct replacement (Apple wants Metal), so just quiet the warning
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     [[self openGLContext] setValues:&swapInt forParameter:NSOpenGLCPSwapInterval];
+#pragma clang diagnostic pop
 
     NSRect bounds = [self bounds];
     InitDeviceScreenInfoEx(bounds.size.width, bounds.size.height, ORIENTATION_LANDSCAPE_LEFT);
@@ -199,10 +203,14 @@ static BOOL g_drawInitiatedByTimer = NO;
     [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
     [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSEventTrackingRunLoopMode];
 
+//deprecated along with the rest of the NSOpenGLView era stuff, no replacement short of moving to Metal
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(reshape)
                                                  name:NSViewGlobalFrameDidChangeNotification
                                                object:self];
+#pragma clang diagnostic pop
 }
 
 
@@ -248,7 +256,7 @@ static BOOL g_drawInitiatedByTimer = NO;
     pt.y = GetPrimaryGLY()-pt.y; //flip it to upper left hand coords
 
     ConvertCoordinatesIfRequired(pt.x, pt.y);
-    GetMessageManager()->SendGUIEx(MESSAGE_TYPE_GUI_CLICK_START,pt.x, pt.y, buttonNumber );
+    GetMessageManager()->SendGUIEx(MESSAGE_TYPE_GUI_CLICK_START,pt.x, pt.y, (int)buttonNumber );
 
     //LogMsg("Got mouse down: %.2f, %0.2f", pt.x, pt.y);
     // [controller mouseDown:theEvent];
@@ -261,7 +269,7 @@ static BOOL g_drawInitiatedByTimer = NO;
     pt.y = GetPrimaryGLY()-pt.y; //flip it to upper left hand coords
 
     ConvertCoordinatesIfRequired(pt.x, pt.y);
-    GetMessageManager()->SendGUIEx(MESSAGE_TYPE_GUI_CLICK_END,pt.x, pt.y, buttonNumber);
+    GetMessageManager()->SendGUIEx(MESSAGE_TYPE_GUI_CLICK_END,pt.x, pt.y, (int)buttonNumber);
     // [controller mouseDown:theEvent];
 }
 
@@ -293,7 +301,7 @@ static BOOL g_drawInitiatedByTimer = NO;
     pt.y = GetPrimaryGLY()-pt.y; //flip it to upper left hand coords
 
     ConvertCoordinatesIfRequired(pt.x, pt.y);
-    GetMessageManager()->SendGUIEx(MESSAGE_TYPE_GUI_CLICK_MOVE, pt.x, pt.y, buttonNumber);
+    GetMessageManager()->SendGUIEx(MESSAGE_TYPE_GUI_CLICK_MOVE, pt.x, pt.y, (int)buttonNumber);
 }
 
 - (void)mouseMovedMessage:(NSEvent *)theEvent

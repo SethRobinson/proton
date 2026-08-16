@@ -15,11 +15,7 @@
 + (NSOpenGLPixelFormat*) basicPixelFormat;
 
 
-- (void) updateObjectRotationForTimeDelta:(CFAbsoluteTime)deltaTime;
 - (void)animationTimer:(NSTimer *)timer;
-
-
--(IBAction) info: (id) sender;
 
 - (void)keyDown:(NSEvent *)theEvent;
 

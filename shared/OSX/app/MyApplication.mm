@@ -49,7 +49,7 @@ bool g_controlDown = false;
 	 }
 	 */
 	
-	if ([anEvent type] == NSFlagsChanged)
+	if ([anEvent type] == NSEventTypeFlagsChanged)
 	{
 		bool bKeyDown;
 		
@@ -57,7 +57,7 @@ bool g_controlDown = false;
 		{
 		case 54:
 		case 55:
-				bKeyDown = [anEvent modifierFlags]&NSCommandKeyMask;
+				bKeyDown = [anEvent modifierFlags]&NSEventModifierFlagCommand;
 				if (bKeyDown != g_commandDown)
 				{
 					g_commandDown = bKeyDown;
@@ -67,7 +67,7 @@ bool g_controlDown = false;
 
 			case 56:
 			case 60:
-				bKeyDown = [anEvent modifierFlags]&NSShiftKeyMask;
+				bKeyDown = [anEvent modifierFlags]&NSEventModifierFlagShift;
 				if (bKeyDown != g_shiftDown)
 				{
 					g_shiftDown = bKeyDown;
@@ -77,7 +77,7 @@ bool g_controlDown = false;
 				
 			case 59:
 			case 62:
-				bKeyDown = [anEvent modifierFlags]&NSControlKeyMask;
+				bKeyDown = [anEvent modifierFlags]&NSEventModifierFlagControl;
 				if (bKeyDown != g_controlDown)
 				{
 					g_controlDown = bKeyDown;
@@ -87,7 +87,7 @@ bool g_controlDown = false;
 	
 			case 58:
 			case 61:
-				bKeyDown = [anEvent modifierFlags]&NSAlternateKeyMask;
+				bKeyDown = [anEvent modifierFlags]&NSEventModifierFlagOption;
 				if (bKeyDown != g_optionDown)
 				{
 					g_optionDown = bKeyDown;
