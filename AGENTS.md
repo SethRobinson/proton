@@ -5,6 +5,7 @@ Project operating instructions for AI assistants working in this repository.
 ## Shared Project Memory
 
 - At the start of each new task or thread involving this repository, read this file before inspecting files, running commands, making a plan, or taking any other project action.
+- Also read `agents_local.md` if it exists. It is untracked and holds machine-specific environment notes (ssh build/test boxes, local SDK paths, WSL setup) for the computer you are running on. Anything tied to one person's machines goes there, never in this file, since this file ships in the public repo.
 - Treat follow-up replies in the same continuous task as part of that task. Do not reread this file unless the repository or working directory changes, this file is modified, or its instructions are no longer available in context.
 - Treat this file as the shared project memory for AI assistants.
 - Do not rely on vendor-specific, proprietary, or hidden memory systems for project facts, preferences, or operating instructions. (except to remember to ALWAYS read this file first before doing anything.  Remember that.)
@@ -29,18 +30,15 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
 - Do not put secrets in commit messages, logs, issue text, pull request descriptions, generated docs, or other tracked files.
 - Before committing, review staged changes for accidental secrets.
 
-## Mac build/test machine
+## Build/test machines
 
-- A Mac for building and testing is reachable at `ssh seth@studiomac.local` (key auth already set up from Seth's PC). Proton checkout lives at `~/projects/proton` there.
-- Build OSX demo apps with e.g. `xcodebuild -project RTLooneyLadders/OSX/RTLooneyLadders.xcodeproj -target RTLooneyLadders -configuration Debug build` (run from the repo root). SDL2/SDL2_mixer frameworks are installed in `~/Library/Frameworks` on that machine.
-- GUI apps launched over ssh do run (a console session is active), so smoke tests via running the built binary and reading stdout work.
-- To test without touching the real checkout, tar the tracked files over and build in `~/proton_warncheck` instead.
+- Cross-platform testing (OSX via xcodebuild over ssh, Linux via a remote box or WSL) uses whatever machines are described in `agents_local.md` on the current computer. Building OSX demo apps looks like `xcodebuild -project RTLooneyLadders/OSX/RTLooneyLadders.xcodeproj -target RTLooneyLadders -configuration Debug build` from the repo root.
+- To test on a remote machine without disturbing a real checkout there, tar the git-tracked files over and build in a scratch dir (e.g. `~/proton_warncheck`).
 
-## Linux build/test machine
+## Linux build notes
 
-- An Ubuntu box is reachable at `ssh glados@glados.local` (key auth set up; the `glados` host alias in ssh config also works). No proton checkout lives there; tar tracked files to `~/proton_warncheck` to test.
-- No passwordless sudo, and libsdl2-dev/zlib1g-dev are NOT installed, so only console targets build there (RTConsole works, it uses Proton's internal zlib). For zlib-needing console builds (RTPack), the local WSL `Ubuntu-24.04` distro has zlib1g-dev and works: `cmake -S RTPack/linux -B ~/rtpack_build && make -C ~/rtpack_build`. Full GL/SDL app builds need libsdl2-dev installed somewhere first.
 - RTPack's linux CMake only enables the Raspberry Pi GLES path when `/opt/vc/include/bcm_host.h` exists (fixed Aug 2026; it used to force it on and fail linking `-lbcm_host` on PCs).
+- RTConsole's linux build needs no system dev packages (it uses Proton's internal zlib); RTPack needs zlib1g-dev; the GL/SDL app builds need libsdl2-dev and friends.
 
 ## Compiler warnings policy (cleanup pass done Aug 2026)
 
@@ -51,12 +49,13 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
 
 ## HTML5 / Emscripten gotchas
 
-- Emscripten lives at `d:\pro\emsdk` (6.0.3), set as `EMSCRIPTEN_ROOT` by
-  `base_setup.bat`. A good HTML5 smoke build is
-  `RTSocketCity\html5\build_release.bat nopause`, which compiles `shared/html5/`
-  plus most of `shared/`. Note it defines both `RT_HTML5_USE_CUSTOM_MAIN` and
-  `RT_EMTERPRETER_ENABLED`, so it exercises the emterpreter `while(1)` path in
-  `HTML5Main.cpp`, not the `emscripten_set_main_loop` path.
+- The html5 build scripts expect `EMSCRIPTEN_ROOT` to be set, normally by
+  `base_setup.bat` (the local emsdk install path belongs in `agents_local.md`).
+  A good HTML5 smoke build is `RTSocketCity\html5\build_release.bat nopause`,
+  which compiles `shared/html5/` plus most of `shared/`. Note it defines both
+  `RT_HTML5_USE_CUSTOM_MAIN` and `RT_EMTERPRETER_ENABLED`, so it exercises the
+  emterpreter `while(1)` path in `HTML5Main.cpp`, not the
+  `emscripten_set_main_loop` path.
 - `RTSimpleApp\html5\build_release.bat nopause` and RTBareBones' equivalent also
   work now (Aug 2026: both needed `-sUSE_SDL=1` added for newer Emscriptens;
   without it the SDL includes in `HTML5Main.cpp` fail and the .bat still exits
