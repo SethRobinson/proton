@@ -34,6 +34,20 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
 - A Mac for building and testing is reachable at `ssh seth@studiomac.local` (key auth already set up from Seth's PC). Proton checkout lives at `~/projects/proton` there.
 - Build OSX demo apps with e.g. `xcodebuild -project RTLooneyLadders/OSX/RTLooneyLadders.xcodeproj -target RTLooneyLadders -configuration Debug build` (run from the repo root). SDL2/SDL2_mixer frameworks are installed in `~/Library/Frameworks` on that machine.
 - GUI apps launched over ssh do run (a console session is active), so smoke tests via running the built binary and reading stdout work.
+- To test without touching the real checkout, tar the tracked files over and build in `~/proton_warncheck` instead.
+
+## Linux build/test machine
+
+- An Ubuntu box is reachable at `ssh glados@glados.local` (key auth set up; the `glados` host alias in ssh config also works). No proton checkout lives there; tar tracked files to `~/proton_warncheck` to test.
+- No passwordless sudo, and libsdl2-dev/zlib1g-dev are NOT installed, so only console targets build there (RTConsole works, it uses Proton's internal zlib). For zlib-needing console builds (RTPack), the local WSL `Ubuntu-24.04` distro has zlib1g-dev and works: `cmake -S RTPack/linux -B ~/rtpack_build && make -C ~/rtpack_build`. Full GL/SDL app builds need libsdl2-dev installed somewhere first.
+- RTPack's linux CMake only enables the Raspberry Pi GLES path when `/opt/vc/include/bcm_host.h` exists (fixed Aug 2026; it used to force it on and fail linking `-lbcm_host` on PCs).
+
+## Compiler warnings policy (cleanup pass done Aug 2026)
+
+- The tracked projects build warning-free on MSVC /W3 (VS18), Apple clang (Xcode 26), GCC 13 default flags, and Emscripten 6. Please keep new code warning-clean.
+- Vendored libs (ClanLib math, jpeglib, minizip) are quieted via targeted pragmas in `shared/ClanLib-2.0/Sources/Core/precomp.h`, `jmemmgr.c`, `jdhuff.c`, `jdphuff.c`, and `shared/util/unzip/unzip.c` rather than code edits.
+- Intentionally left alone: RTPack Win32 Debug's LNK4075 (EditAndContinue vs /SAFESEH project setting), and Xcode project-level warnings (CFBundleIdentifier vs PRODUCT_BUNDLE_IDENTIFIER mismatch, ONLY_ACTIVE_ARCH, duplicate -rpath) since fixing those means touching pbxproj build settings.
+- The legacy `if (this == 0)` null guards in BaseApp.cpp/HTTPComponent.cpp are kept but wrapped in clang pragmas; they are technically UB and a modern optimizer may delete them.
 
 ## HTML5 / Emscripten gotchas
 
@@ -43,6 +57,10 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   plus most of `shared/`. Note it defines both `RT_HTML5_USE_CUSTOM_MAIN` and
   `RT_EMTERPRETER_ENABLED`, so it exercises the emterpreter `while(1)` path in
   `HTML5Main.cpp`, not the `emscripten_set_main_loop` path.
+- `RTSimpleApp\html5\build_release.bat nopause` also works now (Aug 2026: it
+  needed `-sUSE_SDL=1` added for newer Emscriptens; without it the SDL includes
+  in `HTML5Main.cpp` silently fail and the .bat still exits 0). The other old
+  html5 scripts (RTConsole, ArduboySim) may need the same flag treatment.
 - If an AI assistant's shell has `NoDefaultCurrentDirectoryInExePath=1` (common in
   sandboxed tooling), `cmd` refuses to run batch files from the current directory and
   these build scripts fail with "'emsdk_env.bat' is not recognized". Clear it for the
@@ -73,7 +91,6 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   file. New project folders in the root are ignored by default; to start
   tracking one, add a `!/FolderName/` line (do not add per-file ignore lists).
 - Never add OpenAI/Codex/Claude etc as a co-author on git commits.
-- NEVER `git commit` unless explicitly told to commit.
 - NEVER `git push` unless explicitly told to push. "Commit" means commit
   locally only; committing is not permission to push.
 
