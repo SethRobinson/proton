@@ -19,6 +19,9 @@
 
 #else
 
+#ifndef BOOST_BIND_GLOBAL_PLACEHOLDERS
+#define BOOST_BIND_GLOBAL_PLACEHOLDERS //keep _1, _2 etc in the global namespace like older boost did, also silences boost's pragma message about it
+#endif
 #include "util/boost/boost/signals2.hpp"
 #include "util/boost/boost/bind.hpp"
 using namespace boost::placeholders;

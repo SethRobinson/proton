@@ -42,9 +42,10 @@ public:
 
 #if defined( __APPLE__) || defined(RTLINUX)|| defined(PLATFORM_LINUX)||ANDROID_NDK || defined(PLATFORM_FLASH) || defined(PLATFORM_HTML5) || defined(PLATFORM_PSP2) || defined(_MSC_VER)
 
-#if defined(PLATFORM_HTML5) || defined(_MSC_VER)
+#if defined(PLATFORM_HTML5) || defined(_MSC_VER) || (defined(__cplusplus) && __cplusplus >= 201103L)
 
 
+	//any C++11 or newer compiler gets std::unordered_map, the old hash_map paths below are only for ancient toolchains
 	#include <unordered_map>
 	typedef std::unordered_map<std::string, Variant*> dataList;
 	typedef std::unordered_map<std::string, FunctionObject*> functionList;

@@ -281,21 +281,27 @@ void Variant::Interpolate(Variant *pA,Variant *pB, float curPos, eInterpolateTyp
 		break;
 
 	case INTERPOLATE_EASE_TO_QUARTIC:
-		curPos = 1 - (curPos = 1 - curPos) * curPos * curPos * curPos;
+		//rewritten from the JS-style one liner, modifying and reading curPos in the same expression is undefined behavior in C++
+		curPos = 1 - curPos;
+		curPos = 1 - curPos * curPos * curPos * curPos;
 		break;
 	case INTERPOLATE_EASE_FROM_QUARTIC:
 		curPos = curPos * curPos * curPos * curPos;
 		break;
 
 	case INTERPOLATE_BOUNCE_TO:
+		//rewritten from the JS-style one liners, modifying and reading curPos in the same expression is undefined behavior in C++
 		if (curPos < 0.36363636f) {
 			curPos = 7.5625f * curPos * curPos;
 		} else if (curPos < 0.72727273f) {
-			curPos = 7.5625f * (curPos -= 0.54545455f) * curPos + 0.75f;
+			curPos -= 0.54545455f;
+			curPos = 7.5625f * curPos * curPos + 0.75f;
 		} else if (curPos < 0.90909091f) {
-			curPos = 7.5625f * (curPos -= 0.81818182f) * curPos + 0.9375f;
+			curPos -= 0.81818182f;
+			curPos = 7.5625f * curPos * curPos + 0.9375f;
 		} else {
-			curPos = 7.5625f * (curPos -= 0.95454545f) * curPos + 0.984375f;
+			curPos -= 0.95454545f;
+			curPos = 7.5625f * curPos * curPos + 0.984375f;
 		}
 		break;
 
@@ -569,7 +575,7 @@ bool VariantList::SerializeFromMem(uint8 *pSrc, int bufferSize, int *pBytesReadO
 		case Variant::TYPE_VECTOR2:
 			{
 				CL_Vec2f v;
-				memcpy(&v, pSrc, sizeof(CL_Vec2f));
+				memcpy((void*)&v, pSrc, sizeof(CL_Vec2f));
 				pSrc += sizeof(CL_Vec2f);
 				m_variant[index].Set(v);
 				break;
@@ -579,7 +585,7 @@ bool VariantList::SerializeFromMem(uint8 *pSrc, int bufferSize, int *pBytesReadO
 		case Variant::TYPE_VECTOR3:
 			{
 				CL_Vec3f v;
-				memcpy(&v, pSrc, sizeof(CL_Vec3f));
+				memcpy((void*)&v, pSrc, sizeof(CL_Vec3f));
 				pSrc += sizeof(CL_Vec3f);
 				m_variant[index].Set(v);
 				break;
@@ -588,7 +594,7 @@ bool VariantList::SerializeFromMem(uint8 *pSrc, int bufferSize, int *pBytesReadO
 		case Variant::TYPE_RECT:
 			{
 				CL_Rectf v;
-				memcpy(&v, pSrc, sizeof(CL_Rectf));
+				memcpy((void*)&v, pSrc, sizeof(CL_Rectf));
 				pSrc += sizeof(CL_Rectf);
 				m_variant[index].Set(v);
 				break;
