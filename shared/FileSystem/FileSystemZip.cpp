@@ -182,7 +182,7 @@ uint8 * FileSystemZip::Get( string fileName, int *pSizeOut )
 	if (pBytes)
 	{
 		//memory allocated
-		*pSizeOut =  file_info.uncompressed_size;
+		*pSizeOut =  (int)file_info.uncompressed_size;
 		pBytes[file_info.uncompressed_size] = 0;
 	}   else
 	{
@@ -198,7 +198,7 @@ uint8 * FileSystemZip::Get( string fileName, int *pSizeOut )
 		return NULL;
 	}
 
-	err = unzReadCurrentFile(m_uf,pBytes,file_info.uncompressed_size);
+	err = unzReadCurrentFile(m_uf,pBytes,(unsigned int)file_info.uncompressed_size);
 	if (err<0)	
 	{
 		LogError("error %d with zipfile in unzReadCurrentFile",err);

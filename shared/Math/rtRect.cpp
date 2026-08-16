@@ -157,7 +157,7 @@ bool rtRectf::IsInside( float x, float y )
 
 rtRect32::rtRect32(rtRectf r)
 {
-	left = r.left; top = r.top; right = r.right; bottom = r.bottom; 
+	left = (int32)r.left; top = (int32)r.top; right = (int32)r.right; bottom = (int32)r.bottom;
 };
 
 void rtRect32::ScaleCentered(float f)

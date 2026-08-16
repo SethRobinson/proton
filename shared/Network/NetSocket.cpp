@@ -107,12 +107,12 @@ char *get_ip_str(const struct sockaddr *sa, char *s, size_t maxlen)
 	switch(sa->sa_family) {
 		case AF_INET:
 			inet_ntop(AF_INET, &(((struct sockaddr_in *)sa)->sin_addr),
-				s, maxlen);
+				s, (socklen_t)maxlen);
 			break;
 
 		case AF_INET6:
 			inet_ntop(AF_INET6, &(((struct sockaddr_in6 *)sa)->sin6_addr),
-				s, maxlen);
+				s, (socklen_t)maxlen);
 			break;
 
 		default:
@@ -454,11 +454,6 @@ string NetSocket::GetClientIPAsString()
 
 	if (getpeername(m_socket, (sockaddr*)&addr, &addrsize) != 0)
 	{
-#ifdef WIN32
-		int err = WSAGetLastError();
-#else
-		int err = errno;
-#endif
 		return "0.0.0.0";
 	}
 	
@@ -518,7 +513,7 @@ void NetSocket::UpdateRead()
 
 	do
 	{
-		bytesRead = ::recv (m_socket, &buff[0], (int)buff.size(), 0);
+		bytesRead = (int)::recv (m_socket, &buff[0], (int)buff.size(), 0);
 	
 		if (bytesRead == 0)
 		{
@@ -561,7 +556,7 @@ void NetSocket::UpdateWrite()
 	
 	if (m_socket == INVALID_SOCKET || m_writeBuffer.empty()) return;
 
-	int bytesWritten = ::send (m_socket, &m_writeBuffer[0], (int)m_writeBuffer.size(), 0);
+	int bytesWritten = (int)::send (m_socket, &m_writeBuffer[0], (int)m_writeBuffer.size(), 0);
 
 	if (bytesWritten <= 0)
 	{

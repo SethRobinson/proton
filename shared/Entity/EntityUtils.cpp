@@ -1210,8 +1210,6 @@ void SetTextShadowColor(Entity *pEnt, uint32 color)
 void GetFontAndScaleToFitThisStringInWidthPixels(eFont *pFontIDOut, float *pFontScaleOut, string text, float desiredWidth)
 {
 	*pFontIDOut = FONT_SMALL;
-	float sizeY = GetBaseApp()->GetFont(*pFontIDOut)->GetLineHeight(1.0f);
-
 	*pFontScaleOut = 1.0f;
 
 	CL_Vec2f vSize = GetBaseApp()->GetFont(*pFontIDOut)->MeasureText(text, *pFontScaleOut);
@@ -1365,7 +1363,7 @@ Entity * CreateScrollingTextBoxEntity(Entity *pParent, string entName, CL_Vec2f 
 	EntityComponent *pScrollComp = pScroll->AddComponent(new ScrollComponent);
 	pScroll->AddComponent(new FilterInputComponent); //lock out taps that are not in our scroll area
 	pScrollComp->GetVar("fingerTracking")->Set(uint32(1));
-	EntityComponent *pScrollBarComp = pScroll->AddComponent(new ScrollBarRenderComponent); 	//also let's add a visual way to see the scroller position
+	pScroll->AddComponent(new ScrollBarRenderComponent); 	//also let's add a visual way to see the scroller position
 	//pScroll->GetVar("color")->Set(MAKE_RGBA(61,155, 193, 255)); 
 	Entity *pScrollChild = pScroll->AddEntity(new Entity("scroll_child"));
 

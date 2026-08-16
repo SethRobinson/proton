@@ -96,8 +96,6 @@ public:
 
 	void DrawCircleSafe(int centerX, int centerY, glColorBytes color, int radius)
 	{
-		int xStart = centerX - radius;
-		int yStart = centerY - radius;
 		int diameter = 2 * radius;
 
 		for (int x = 0; x <= diameter; x++)

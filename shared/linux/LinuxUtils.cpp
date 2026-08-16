@@ -39,7 +39,7 @@ void LogMsg( const char* traceStr, ... )
 	va_end( argsVA );
 	
 	//__Linux_log_write(Linux_LOG_ERROR,GetAppName(), buffer);
-	printf ((char*)buffer);
+	printf ("%s", buffer);
 	printf ("\r\n");
 	fflush(stdout);
 
@@ -59,7 +59,7 @@ void LogMsg( const char* traceStr, ... )
 string GetBaseAppPath()
 {
 	char szDir[1024];
-	getcwd( szDir, 1024);
+	if (getcwd( szDir, 1024) == NULL) szDir[0] = 0; //won't ever fail, but gcc wants the result checked
 	return string(szDir)+"/";
 
 }
@@ -352,7 +352,7 @@ vector<string> GetDirectoriesAtPath(string path)
 	//LogMsg("GetDirectoriesAtPath: %s", path.c_str());
 #endif
 
-	dirent * buf, * ent;
+	dirent * ent;
 	DIR *dp;
 
 	dp = opendir(path.c_str());
@@ -362,8 +362,7 @@ vector<string> GetDirectoriesAtPath(string path)
 		return v;
 	}
 
-	buf = (dirent*) malloc(sizeof(dirent)+512);
-	while (readdir_r(dp, buf, &ent) == 0 && ent)
+	while ((ent = readdir(dp)) != NULL) //readdir_r is deprecated in modern glibc, readdir is the recommended replacement
 	{
 		if (ent->d_name[0] == '.' && ent->d_name[1] == 0) continue;
 		if (ent->d_name[0] == '.' && ent->d_name[1] == '.' && ent->d_name[2] == 0) continue;
@@ -376,7 +375,6 @@ vector<string> GetDirectoriesAtPath(string path)
 		}
 	}
 
-	free (buf);
 	closedir(dp);
 	return v;
 }
@@ -388,7 +386,7 @@ vector<string> GetFilesAtPath(string path)
 #endif
 
 	vector<string> v;
-	dirent * buf, * ent;
+	dirent * ent;
 	DIR *dp;
 
 	dp = opendir(path.c_str());
@@ -398,8 +396,7 @@ vector<string> GetFilesAtPath(string path)
 		return v;
 	}
 
-	buf = (dirent*) malloc(sizeof(dirent)+512);
-	while (readdir_r(dp, buf, &ent) == 0 && ent)
+	while ((ent = readdir(dp)) != NULL) //readdir_r is deprecated in modern glibc, readdir is the recommended replacement
 	{
 		if (ent->d_name[0] == '.' && ent->d_name[1] == 0) continue;
 		if (ent->d_name[0] == '.' && ent->d_name[1] == '.' && ent->d_name[2] == 0) continue;
@@ -411,7 +408,6 @@ vector<string> GetFilesAtPath(string path)
 		}
 	}
 
-	free (buf);
 	closedir(dp);
 	return v;
 }
@@ -420,7 +416,7 @@ bool RemoveDirectoryRecursively(string path)
 {
 //	LogMsg(" RemoveDirectoryRecursively: %s", path.c_str());
 	
-	dirent * buf, * ent;
+	dirent * ent;
 	DIR *dp;
 
 	dp = opendir(path.c_str());
@@ -441,8 +437,7 @@ bool RemoveDirectoryRecursively(string path)
 		return false;
 	}
 
-	buf = (dirent*) malloc(sizeof(dirent)+512);
-	while (readdir_r(dp, buf, &ent) == 0 && ent)
+	while ((ent = readdir(dp)) != NULL) //readdir_r is deprecated in modern glibc, readdir is the recommended replacement
 	{
 		
 		if (ent->d_name[0] == '.' && ent->d_name[1] == 0) continue;
@@ -468,7 +463,6 @@ bool RemoveDirectoryRecursively(string path)
 		}
 	}
 
-	free (buf);
 	closedir(dp);
 
 	//delete the final dir as well

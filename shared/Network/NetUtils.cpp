@@ -202,7 +202,7 @@ string URLDecoder::decode(string str)
 			hex[1] = buff[++i];
 			hex[2] = '\0';		
 			//int hex_i = atoi(hex);
-			sprintf(tmp,"%c",convertToDec(hex));
+			snprintf(tmp,sizeof(tmp),"%c",convertToDec(hex));
 			ret = ret + tmp;
 		}else {
 			ret = ret + buff[i];
@@ -242,7 +242,7 @@ vector<uint8> URLDecoder::decodeData(const string str)
 int URLDecoder::convertToDec(const char* hex)
 {
 	char buff[12];
-	sprintf(buff,"%s",hex);
+	snprintf(buff,sizeof(buff),"%s",hex);
 	int ret = 0;
 	int len = (int)strlen(buff);
 	for(int i=0;i<len;i++) 
@@ -319,7 +319,7 @@ void BreakDownURLIntoPieces(string url, string &domainOut, string &requestOut, i
 	int pos = (int)url.find(":");
 	if (pos != string::npos)
 	{
-		port = atol( url.substr(pos+1, url.size()- (pos+1)).c_str());
+		port = (int)atol( url.substr(pos+1, url.size()- (pos+1)).c_str());
 		url.erase(pos, url.size()-pos);
 	}
 

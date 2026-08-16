@@ -211,7 +211,7 @@ void RTFont::MeasureText( rtRectf *pRectOut, const char *pText, int len, float s
 
 	for (int i=0; i < len; i++)
 	{
-		seqLen = utf8::internal::sequence_length<const char*>(&pText[i]);
+		seqLen = (uint8)utf8::internal::sequence_length<const char*>(&pText[i]);
 		if (seqLen > 2)
 		{
 			//we do not support these characters, because firstChar and lastChar are shorts
@@ -342,7 +342,7 @@ void RTFont::DrawScaled( float x, float y, const string &text, float scale /*= 1
 
 	for (unsigned int i=0; i < text.length(); i++)
 	{
-		seqLen = utf8::internal::sequence_length<const char*>(&text.c_str()[i]);
+		seqLen = (uint8)utf8::internal::sequence_length<const char*>(&text.c_str()[i]);
 		if (seqLen > 2)
 		{ 
 			//we do not support these characters, because firstChar and lastChar are shorts
@@ -508,7 +508,7 @@ void RTFont::DrawScaledSolidColor( float x, float y, const string &text, float s
 
 	for (unsigned int i=0; i < text.length(); i++)
 	{
-		seqLen = utf8::internal::sequence_length<const char*>(&text.c_str()[i]);
+		seqLen = (uint8)utf8::internal::sequence_length<const char*>(&text.c_str()[i]);
 		if (seqLen > 2)
 		{
 			//we do not support these characters, because firstChar and lastChar are shorts
@@ -973,7 +973,7 @@ string RTFont::FilterOutInvalidChars(const string& input, bool bStrict) {
 
 	for (size_t i = 0; i < input.length(); i++)
 	{
-		seqLen = utf8::internal::sequence_length<const char*>(&input.c_str()[i]);
+		seqLen = (uint8)utf8::internal::sequence_length<const char*>(&input.c_str()[i]);
 		if (seqLen > 2)
 		{
 			i += seqLen - 1;
@@ -1037,7 +1037,6 @@ int RTFont::CountCharsThatFitX( float sizeX, const string &text, float scale /*=
 	uint16 curChar, lastChar;
 	uint8 seqLen;
 
-	int lines = 0;
 	float curX = 0;
 	lastChar = 0;
 	pCharData = NULL;
@@ -1053,7 +1052,7 @@ int RTFont::CountCharsThatFitX( float sizeX, const string &text, float scale /*=
 
 		lastGood = i;
 
-		seqLen = utf8::internal::sequence_length<const char*>(&text.c_str()[i]);
+		seqLen = (uint8)utf8::internal::sequence_length<const char*>(&text.c_str()[i]);
 		if (seqLen > 2)
 		{
 			//we do not support these characters, because firstChar and lastChar are shorts

@@ -37,17 +37,17 @@ bool LoadFromFile(string &str, FILE *fp)
 
 #ifdef RT_FORCE_32BIT_INTS_FOR_FILES
 	int32 size;
-	fread(&size, sizeof(int32), 1, fp);
+	size_t freadResult = fread(&size, sizeof(int32), 1, fp); (void)freadResult; //don't care, but gcc wants the return value looked at
 
 #else
 	int size;
-	fread(&size, sizeof(int), 1, fp);
+	size_t freadResult = fread(&size, sizeof(int), 1, fp); (void)freadResult;
 #endif
 
 	if (size > 0)
 	{
 		str.resize(size, ' ');
-		fread(&str[0], size, 1, fp);
+		freadResult = fread(&str[0], size, 1, fp); (void)freadResult;
 	}
 	else
 	{
@@ -94,43 +94,43 @@ bool SaveToFile(float num, FILE *fp)
 
 bool LoadFromFile(int32 &num, FILE *fp)
 {
-	fread(&num, sizeof(int32), 1, fp);
+	size_t freadResult = fread(&num, sizeof(int32), 1, fp); (void)freadResult;
 	return true;
 }
 
 bool LoadFromFile(float &num, FILE *fp)
 {
-	fread(&num, sizeof(float), 1, fp);
+	size_t freadResult = fread(&num, sizeof(float), 1, fp); (void)freadResult;
 	return true;
 }
 
 bool LoadFromFile(bool &num, FILE *fp)
 {
-	fread(&num, sizeof(bool), 1, fp);
+	size_t freadResult = fread(&num, sizeof(bool), 1, fp); (void)freadResult;
 	return true;
 }
 bool LoadFromFile(uint32 &num, FILE *fp)
 {
-	fread(&num, sizeof(uint32), 1, fp);
+	size_t freadResult = fread(&num, sizeof(uint32), 1, fp); (void)freadResult;
 	return true;
 }
 
 #ifndef CLANLIB_1
 bool LoadFromFile(CL_Vec2f &num, FILE *fp)
 {
-	fread(&num, sizeof(CL_Vec2f), 1, fp);
+	size_t freadResult = fread((void*)&num, sizeof(CL_Vec2f), 1, fp); (void)freadResult;
 	return true;
 }
 
 bool LoadFromFile(CL_Vec3f &num, FILE *fp)
 {
-	fread(&num, sizeof(CL_Vec3f), 1, fp);
+	size_t freadResult = fread((void*)&num, sizeof(CL_Vec3f), 1, fp); (void)freadResult;
 	return true;
 }
 
 bool LoadFromFile(CL_Rectf &num, FILE *fp)
 {
-	fread(&num, sizeof(CL_Rectf), 1, fp);
+	size_t freadResult = fread((void*)&num, sizeof(CL_Rectf), 1, fp); (void)freadResult;
 	return true;
 }
 #endif
@@ -219,7 +219,7 @@ uint8 * LoadFileIntoMemoryBasic(string fileName, unsigned int *length, bool bUse
 	}
 
 	fseek(fp, 0, SEEK_END);
-	*length = ftell(fp);
+	*length = (unsigned int)ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
 	uint8 *pData = new uint8[(*length) +1];
@@ -230,8 +230,8 @@ uint8 * LoadFileIntoMemoryBasic(string fileName, unsigned int *length, bool bUse
 		*length = UINT_MAX; //signal a mem error
 		return NULL;
 	}
-	pData[*length] = 0; 
-	fread(pData, *length, 1, fp);
+	pData[*length] = 0;
+	size_t freadResult = fread(pData, *length, 1, fp); (void)freadResult;
 	fclose(fp);
 
 	//we add an extra null at the end to be nice, when loading text files this can be useful
@@ -241,7 +241,7 @@ uint8 * LoadFileIntoMemoryBasic(string fileName, unsigned int *length, bool bUse
 
 bool SaveStringToFile(const string& str, string fileName, bool bUseSavePath, bool bAddBasePath)
 {
-	return SaveMemoryIntoFileBasic((uint8*)str.c_str(), str.size(), fileName, bUseSavePath, bAddBasePath);
+	return SaveMemoryIntoFileBasic((uint8*)str.c_str(), (unsigned int)str.size(), fileName, bUseSavePath, bAddBasePath);
 }
 
 bool SaveMemoryIntoFileBasic(uint8* pData, unsigned int length, std::string fileName, bool bUseSavePath, bool bAddBasePath)
@@ -419,7 +419,7 @@ uint8 * zlibDeflateToMemory(uint8 *pInput, int sizeBytes, int *pSizeCompressedOu
 
 	//	assert(ret == Z_STREAM_END);
 	deflateEnd(&strm);
-	*pSizeCompressedOut = strm.total_out;
+	*pSizeCompressedOut = (int)strm.total_out;
 	return pOut;
 
 }
@@ -577,7 +577,7 @@ int GetFileSize(const string &fName)
 	if(file)
 	{
 		fseek(file, 0, SEEK_END);
-		fileSizeBytes = ftell(file);
+		fileSizeBytes = (int)ftell(file);
 		fseek(file, 0, SEEK_SET);
 		fclose(file);
 	} else

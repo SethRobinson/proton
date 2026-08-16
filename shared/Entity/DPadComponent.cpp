@@ -79,7 +79,7 @@ void DPadComponent::OnAdd(Entity *pEnt)
 	}
 	m_pArrowEnt = CreateOverlayEntity(GetParent(), "arrow_gui", *m_pDpadImage, 0, 0);
 
-	EntityComponent *pStripComp = m_pArrowEnt->AddComponent(new TouchStripComponent);
+	m_pArrowEnt->AddComponent(new TouchStripComponent);
 	
 
 	m_pArrowEnt->GetVarWithDefault(string("touchPadding"), Variant(CL_Rectf(*m_ptouchAreaPadding, *m_ptouchAreaPadding, *m_ptouchAreaPadding, *m_ptouchAreaPadding)))->GetRect();
@@ -167,6 +167,9 @@ void DPadComponent::SendKey(eVirtualKeys key, bool bIsDown)
 			break;
 		case VIRTUAL_KEY_DIR_DOWN:
 			m_button[BUTTON_DOWN].OnButtonChange(key, bIsDown);
+			break;
+
+		default:
 			break;
 		}
 }
@@ -305,7 +308,6 @@ void DPadComponent::OnStripUpdate(VariantList *pVList)
 
 void DPadComponent::OnRender(VariantList *pVList)
 {
-	CL_Vec2f vFinalPos = pVList->m_variant[0].GetVector2()+*m_pPos2d;
 }
 
 void DPadComponent::OnUpdate(VariantList *pVList)

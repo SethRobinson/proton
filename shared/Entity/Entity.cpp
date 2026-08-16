@@ -647,8 +647,6 @@ void Entity::GetEntitiesByName(std::vector<Entity*> *pEnts, string name)
 
 		EntityListItor itor = m_children.begin();
 
-		Entity* pEnt = NULL;
-
 		while (itor != m_children.end())
 		{
 			(*itor)->GetEntitiesByName(pEnts, name);

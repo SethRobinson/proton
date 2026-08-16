@@ -600,7 +600,7 @@ void ReadDataFromInputStream(png_structp png_ptr, png_bytep outBytes,
 		return;   
 	std::pair<unsigned char*, int>& inputStream = *(std::pair<unsigned char*, int>*)io_ptr;
 	int length = 0;
-	if (byteCountToRead > inputStream.second)
+	if (byteCountToRead > (png_size_t)inputStream.second)
 	{
 		length = inputStream.second;
 	}
@@ -935,7 +935,6 @@ bool SoftSurface::IsCheckerboardSolidShadowPixel(glColorBytes * pImg, int x, int
 			glColorBytes* lBottomRightPixel = ((y == (m_height - 1) || x == (m_width - 1)) ? NULL : &pImg[(y + 1)*m_width + (x + 1)]);
 			bool lBottomRightPixelAlpha = (lBottomRightPixel == NULL || lBottomRightPixel->a != 255);
 
-			int lKiddyCornerAlphaPixelCount = 0;
 			if (lTopPixelAlpha && !lTopLeftPixelAlpha && !lTopRightPixelAlpha)
 			{
 				lResult = true;
@@ -1863,11 +1862,6 @@ void SoftSurface::BlitRGBFromRGBA( int dstX, int dstY, SoftSurface *pSrc, int sr
 void SoftSurface::BlitRGBAFromRGB(int dstX, int dstY, SoftSurface *pSrc, int srcX /*= 0*/, int srcY /*= 0*/, int srcWidth /*= 0*/, int srcHeight /*= 0*/)
 {
 
-	uint8 *pDestImage = GetPointerToPixel(dstX, dstY);
-	uint8 *pSrcImage = pSrc->GetPointerToPixel(srcX, srcY);
-
-	int bytesPerPixelSource = pSrc->GetBytesPerPixel();
-
 	for (int y = 0; y < srcHeight; y++)
 	{
 		for (int x = 0; x < srcWidth; x++)
@@ -2563,7 +2557,7 @@ uint8* SoftSurface::WritePNGToMemory(int compressionLevel, int& outSize)
 	// Prepare the output buffer
 	uint8* result = new uint8[memBuf.size];
 	memcpy(result, memBuf.data, memBuf.size);
-	outSize = memBuf.size;
+	outSize = (int)memBuf.size;
 	// Clean up memory buffer
 	delete[] memBuf.data;
 	return (uint8*)result;
@@ -2808,8 +2802,6 @@ float SoftSurface::GetAverageLumaFromRect(const CL_Vec2i vAreaPos, const CL_Vec2
 	assert(vAreaPos.x + vAreaSize.x < GetWidth() && "Area too wide");
 	assert(vAreaPos.y + vAreaSize.y < GetHeight() && "Area too tall");
 
-	uint8 *pPixels = GetPointerToPixel(0, 0);
-
 	float totalLuma = 0;
 
 	int pixelsToLookAt = vAreaSize.x * vAreaSize.y;
@@ -2837,8 +2829,6 @@ float SoftSurface::GetAverageComplexityFromRect(const CL_Vec2i vAreaPos, const C
 	assert(vAreaSize.x >= 1 && vAreaSize.y >= 1 && "Can't ask for an area this small");
 	assert(vAreaPos.x + vAreaSize.x < GetWidth() && "Area too wide");
 	assert(vAreaPos.y + vAreaSize.y < GetHeight() && "Area too tall");
-
-	uint8 *pPixels = GetPointerToPixel(0, 0);
 
 	long totalComplexity = 0;
 

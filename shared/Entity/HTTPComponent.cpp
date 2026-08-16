@@ -152,7 +152,15 @@ void HTTPComponent::OnUpdate(VariantList *pVList)
 	if (m_netHTTP.GetState() == NetHTTP::STATE_FINISHED)
 	{
 		//all done! send a pointer to us, and the data we made
+//legacy null safety check, technically UB (a modern optimizer is free to delete it) but keeping behavior as-is
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wtautological-undefined-compare"
+#endif
 		if (this == 0) LogMsg("We got probs");
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 #ifdef _DEBUG
 		LogMsg("Downloaded %d bytes", m_netHTTP.GetDownloadedBytes());
 #endif
@@ -178,6 +186,7 @@ void HTTPComponent::OnOS(VariantList *pVList)
 	switch (mType)
 	{
 	case MESSAGE_TYPE_OS_CONNECTION_CHECKED:
+	{
 		eOSSTreamEvent event = (eOSSTreamEvent)(int) pVList->m_variant[1].GetVector2().x;
 		//LogMsg("Connection is %d", event);
 
@@ -232,7 +241,11 @@ void HTTPComponent::OnOS(VariantList *pVList)
             }
 			break;
 		}
-	
+
+		break;
+	}
+
+	default:
 		break;
 	}
 }

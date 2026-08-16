@@ -49,6 +49,7 @@ void FilterInputComponent::FilterOnInput(VariantList *pVList)
 		//let's only apply this to some messages
 		switch (eMessageType( int(pVList->Get(0).GetFloat())))
 		{
+		default: break; //only the message types below matter to us
 		case MESSAGE_TYPE_GUI_CLICK_START:
 		case MESSAGE_TYPE_GUI_CLICK_MOVE:
 			CL_Vec2f pt = pVList->Get(1).GetVector2();
@@ -75,6 +76,7 @@ void FilterInputComponent::FilterOnInput(VariantList *pVList)
 		//let's only apply this to some messages
 		switch (eMessageType( int(pVList->Get(0).GetFloat())))
 		{
+		default: break; //only the message types below matter to us
 		case MESSAGE_TYPE_GUI_CLICK_START:
 		case MESSAGE_TYPE_GUI_CLICK_MOVE:
 		case MESSAGE_TYPE_GUI_CLICK_END:
@@ -114,6 +116,7 @@ void FilterInputComponent::FilterOnInput(VariantList *pVList)
 		//let's only apply this to some messages
 		switch (eMessageType( int(pVList->Get(0).GetFloat())))
 		{
+		default: break; //only the message types below matter to us
 		case MESSAGE_TYPE_GUI_CLICK_START:
 		case MESSAGE_TYPE_GUI_CLICK_MOVE:
 		case MESSAGE_TYPE_GUI_CLICK_END:
@@ -143,6 +146,7 @@ void FilterInputComponent::FilterOnInput(VariantList *pVList)
 		//let's only apply this to some messages
 		switch (eMessageType( int(pVList->Get(0).GetFloat())))
 		{
+		default: break; //only the message types below matter to us
 		case MESSAGE_TYPE_GUI_CLICK_START:
 		case MESSAGE_TYPE_GUI_CLICK_MOVE:
 		case MESSAGE_TYPE_GUI_CLICK_END:
@@ -168,6 +172,7 @@ void FilterInputComponent::FilterOnInput(VariantList *pVList)
 		//let's only apply this to some messages
 		switch (eMessageType( int(pVList->Get(0).GetFloat())))
 		{
+		default: break; //only the message types below matter to us
 		case MESSAGE_TYPE_GUI_CLICK_START:
 		case MESSAGE_TYPE_GUI_CLICK_MOVE:
 		case MESSAGE_TYPE_GUI_CLICK_END:
@@ -193,6 +198,7 @@ void FilterInputComponent::FilterOnInput(VariantList *pVList)
 		//let's only apply this to some messages
 		switch (eMessageType( int(pVList->Get(0).GetFloat())))
 		{
+		default: break; //only the message types below matter to us
 		case MESSAGE_TYPE_GUI_CLICK_START:
 		case MESSAGE_TYPE_GUI_CLICK_MOVE:
 		case MESSAGE_TYPE_GUI_CLICK_END:

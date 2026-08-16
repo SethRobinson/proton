@@ -102,9 +102,9 @@ bool NetHTTP::AddPostData( const string &name, const uint8 *pData, int len/*=-1*
 
 	if (!name.empty())
 	{
-		encoder.encodeData((const uint8*)name.c_str(), name.length(), m_postData);
+		encoder.encodeData((const uint8*)name.c_str(), (int)name.length(), m_postData);
 		m_postData += '=';
-		if (len == -1) len = strlen((const char*) pData);
+		if (len == -1) len = (int)strlen((const char*) pData);
 
 		encoder.encodeData(pData, len, m_postData);
 	} else
@@ -139,7 +139,7 @@ bool NetHTTP::AddPostData( const string &name, const uint8 *pData, int len/*=-1*
 
 bool NetHTTP::AddPutData( const string data )
 {
-	return AddPostData("",  (uint8*)data.c_str(),data.size());
+	return AddPostData("",  (uint8*)data.c_str(),(int)data.size());
 }
 
 void NetHTTP::SetPostHeaderOverride(string header)
@@ -256,7 +256,7 @@ int NetHTTP::ScanDownloadedHeader()
 	string temp = t.GetParmString("Content-Length", 1, ":");
 	m_expectedFileBytes = atoi(temp.c_str());
 
-	int resultCode = atol(SeparateStringSTL(t.m_lines[0], 1, ' ').c_str());
+	int resultCode = (int)atol(SeparateStringSTL(t.m_lines[0], 1, ' ').c_str());
 	switch (resultCode)
 	{
 		case 404:
@@ -374,7 +374,7 @@ void NetHTTP::Update()
 					if (s.size() > 0)
 					{
 						//write this to file
-						int bytesWritten = fwrite(&s[0], 1, s.size(), m_pFile);
+						int bytesWritten = (int)fwrite(&s[0], 1, s.size(), m_pFile);
 						if (bytesWritten != s.size())
 						{
 							OnError(ERROR_WRITING_FILE);
@@ -448,8 +448,8 @@ void NetHTTP::FinishDownload()
 		case END_OF_DATA_SIGNAL_RTSOFT_MARKER:
 			{
 
-			int downloadSize = s.size() - m_downloadHeader.length();
-			int markerSize = strlen(C_END_DOWNLOAD_MARKER_STRING);
+			int downloadSize = (int)(s.size() - m_downloadHeader.length());
+			int markerSize = (int)strlen(C_END_DOWNLOAD_MARKER_STRING);
 
 				if (downloadSize >= markerSize)
 				{
@@ -484,7 +484,7 @@ int NetHTTP::GetDownloadedBytes()
 	}
 	
 	if (m_downloadData.size() == 0) return 0;
-	return m_downloadData.size()-1; //the -1 is for the null we added
+	return (int)m_downloadData.size()-1; //the -1 is for the null we added
 }
 
 #endif

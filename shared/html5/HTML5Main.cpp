@@ -1056,7 +1056,7 @@ void ForceEmscriptenResize()
 {
 	double cssW, cssH;
 	EMSCRIPTEN_RESULT r;
-	emscripten_get_element_css_size(0, &cssW, &cssH);
+	emscripten_get_element_css_size("#canvas", &cssW, &cssH); //passing 0 for the target is no longer allowed in newer emscriptens
 }
 
 bool IsStillLoadingPersistentData()

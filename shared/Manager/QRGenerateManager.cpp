@@ -10,7 +10,7 @@ vector<string> printQr(const QrCode &qr)
 	vector<string> lines;
 	int border = 4;
 	char blockAscii[32];
-	sprintf(blockAscii, "%c%c", 219, 219);
+	snprintf(blockAscii, sizeof(blockAscii), "%c%c", 219, 219);
 
 	for (int y = -border; y < qr.getSize() + border; y++) 
 	{

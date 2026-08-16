@@ -146,7 +146,7 @@ void SliderComponent::OnInput( VariantList *pVList )
 	break;
 
 	case MESSAGE_TYPE_GUI_CLICK_MOVE:
-
+	{
 		int fingerID = pVList->Get(2).GetUINT32();
 		TouchTrackInfo *pTouch = GetBaseApp()->GetTouch(fingerID);
 
@@ -154,7 +154,11 @@ void SliderComponent::OnInput( VariantList *pVList )
 		{
 			SetPositionWithMouseClick(pt);
 		}
-	
+
 		break;
-	}	
+	}
+
+	default:
+		break; //don't care about the other message types
+	}
 }

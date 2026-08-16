@@ -1528,6 +1528,6 @@ void Surface::OnEnterForeground(VariantList *pVList)
 string PrintGLColor(glColorBytes color)
 {
 	char st[128];
-	sprintf(st, "%d, %d, %d, %d", color.r, color.g, color.b, color.a);
+	snprintf(st, sizeof(st), "%d, %d, %d, %d", color.r, color.g, color.b, color.a);
 	return string(st);
 }

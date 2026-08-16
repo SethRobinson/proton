@@ -45,14 +45,14 @@ CL_Rectf ScaleRect2D(const CL_Rectf &r, CL_Vec2f vScale)
 string PrintVector2(CL_Vec2f v)
 {
 	char st[128];
-	sprintf(st, "%.2f, %.2f", v.x, v.y);
+	snprintf(st, sizeof(st), "%.2f, %.2f", v.x, v.y);
 	return string(st);
 }
 
 string PrintVector3(CL_Vec3f v)
 {
 	char st[128];
-	sprintf(st, "%.3f, %.3f, %.3f", v.x, v.y, v.z);
+	snprintf(st, sizeof(st), "%.3f, %.3f, %.3f", v.x, v.y, v.z);
 	return string(st);
 }
 
@@ -62,7 +62,7 @@ string PrintMatrix(CL_Mat4f v)
 	char st[128];
 	for (int i=0; i < 4; i++)
 	{
-		sprintf(st, "%.3f, %.3f, %.3f %.3f\n", v.matrix[i*4], v.matrix[i*4+1], v.matrix[i*4+2], v.matrix[i*4+3]);
+		snprintf(st, sizeof(st), "%.3f, %.3f, %.3f %.3f\n", v.matrix[i*4], v.matrix[i*4+1], v.matrix[i*4+2], v.matrix[i*4+3]);
 		r += st;
 	}
 	return r;
@@ -71,26 +71,26 @@ string PrintMatrix(CL_Mat4f v)
 string PrintRect(CL_Rect v)
 {
 	char st[128];
-	sprintf(st, "%d, %d, %d, %d", v.left, v.top, v.right, v.bottom);
+	snprintf(st, sizeof(st), "%d, %d, %d, %d", v.left, v.top, v.right, v.bottom);
 	return string(st);
 }
 string PrintRect(CL_Rectf v)
 {
 	char st[128];
-	sprintf(st, "%.3f, %.3f, %.3f, %.3f", v.left, v.top, v.right, v.bottom);
+	snprintf(st, sizeof(st), "%.3f, %.3f, %.3f, %.3f", v.left, v.top, v.right, v.bottom);
 	return string(st);
 }
 
 string PrintRect(rtRectf v)
 {
 	char st[128];
-	sprintf(st, "%.3f, %.3f, %.3f, %.3f", v.left, v.top, v.right, v.bottom);
+	snprintf(st, sizeof(st), "%.3f, %.3f, %.3f, %.3f", v.left, v.top, v.right, v.bottom);
 	return string(st);
 }
 string PrintColor(uint32 color)
 {
 	char st[128];
-	sprintf(st, "%d, %d, %d, %d", GET_RED(color), GET_GREEN(color), GET_BLUE(color), GET_ALPHA(color));
+	snprintf(st, sizeof(st), "%d, %d, %d, %d", GET_RED(color), GET_GREEN(color), GET_BLUE(color), GET_ALPHA(color));
 	return string(st);
 }
 
@@ -231,7 +231,7 @@ bool IntersectRaySphere(CL_Vec2f p, CL_Vec2f d, rtCircle s, float &t, CL_Vec2f &
 	float b = m.dot(d);
 	float c = m.dot(m) - s.r * s.r;
 
-	// Exit if r’s origin outside s (c > 0) and r pointing away from s (b > 0)
+	// Exit if rï¿½s origin outside s (c > 0) and r pointing away from s (b > 0)
 	if (c > 0.0f && b > 0.0f) return false;
 	float discr = b*b - c;
 	// A negative discriminant corresponds to ray missing sphere

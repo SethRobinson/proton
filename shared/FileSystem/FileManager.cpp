@@ -49,8 +49,6 @@ FileManager::FileManager()
 
 FileManager::~FileManager()
 {
-	list<FileSystem*>::iterator itor = m_fileSystems.begin();
-
 	while (!m_fileSystems.empty())
 	{
 		FileSystem *pFileSystem = *m_fileSystems.begin();
@@ -131,7 +129,7 @@ uint8 * FileManager::Get( string fileName, int *pSizeOut, bool bAddBasePath, boo
 			}
 
 			fseek(fp, 0, SEEK_END);
-			*pSizeOut = ftell(fp);
+			*pSizeOut = (int)ftell(fp);
 			fseek(fp, 0, SEEK_SET);
 
 			pData = (uint8*)new uint8[( (*pSizeOut) +1)];
@@ -141,8 +139,8 @@ uint8 * FileManager::Get( string fileName, int *pSizeOut, bool bAddBasePath, boo
 				return 0;
 			}
 			//we add an extra null at the end to be nice, when loading text files this can be useful
-			pData[*pSizeOut] = 0; 
-			fread(pData, *pSizeOut, 1, fp);
+			pData[*pSizeOut] = 0;
+			size_t freadResult = fread(pData, *pSizeOut, 1, fp); (void)freadResult; //don't care, but gcc wants the return value looked at
 			fclose(fp);
 		}
 

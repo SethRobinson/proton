@@ -174,7 +174,7 @@ void BaseApp::Draw()
 	if (GetFPSVisible())
 	{
 		char stTemp[256];
-		sprintf(stTemp, "fps: %d - M: %.2f, T: %.2f A: %.2f F: %.2f", m_gameTimer.GetFPS(),  (float(m_memUsed)/1024)/1024, (float(m_texMemUsed)/1024)/1024,  float(GetAudioManager()->GetMemoryUsed()/1024)/ 1024, float(GetFreeMemory()/1024)/ 1024);
+		snprintf(stTemp, sizeof(stTemp), "fps: %d - M: %.2f, T: %.2f A: %.2f F: %.2f", m_gameTimer.GetFPS(),  (float(m_memUsed)/1024)/1024, (float(m_texMemUsed)/1024)/1024,  float(GetAudioManager()->GetMemoryUsed()/1024)/ 1024, float(GetFreeMemory()/1024)/ 1024);
 	
 #ifdef _IRR_STATIC_LIB_
 		int prims = 0;
@@ -445,10 +445,13 @@ void BaseApp::OnMessage(Message &m)
 					m_sig_input(&v);
 					break;
 				}
+
+			default:
+				break; //the game can subscribe to these messages itself, we don't need to do anything
 			}
-		
+
 	break;
-		
+
 	case MESSAGE_CLASS_GAME:
 
 		switch (m.GetType())
@@ -490,7 +493,13 @@ void BaseApp::OnMessage(Message &m)
 				GetAudioManager()->Vibrate(m.Get().GetUINT32());
 			}
 			break;
+
+		default:
+			break;
 		}
+		break;
+
+	default:
 		break;
 	}
 }
@@ -787,7 +796,15 @@ void BaseApp::ResetTouches()
 
 TouchTrackInfo * BaseApp::GetTouch( int index )
 {
+//legacy null safety check, technically UB (a modern optimizer is free to delete it) but keeping behavior as-is
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wtautological-undefined-compare"
+#endif
 	if (this == 0) return NULL;
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 	if (index >= C_MAX_TOUCHES_AT_ONCE)
 	{
 		assert(!"Uh no");

@@ -5,7 +5,7 @@
 #include "util/utf8.h"
 
 #ifdef PLATFORM_HTML5
-#include "html5/SharedJSLIB.h";
+#include "html5/SharedJSLIB.h"
 int GetTouchesReceived();
 #endif
 
@@ -517,6 +517,7 @@ void InputTextRenderComponent::OnInput( VariantList *pVList )
 	
 	switch (messageType)
 	{
+	default: break; //only the message types below matter to us
 	case MESSAGE_TYPE_GUI_PASTE:
 		{
 			string paste = pVList->Get(2).GetString();
@@ -637,7 +638,7 @@ void InputTextRenderComponent::OnInput( VariantList *pVList )
 			break;
 		}
 		break;
-	}	
+	}
 }
 
 void InputTextRenderComponent::OnTruncateTextIfNeededChanged(Variant *pDataObject)

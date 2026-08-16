@@ -230,7 +230,7 @@ bool VariantDB::Load( const string &fileName, bool *pFileExistedOut, bool bAddBa
 	
 	while (!feof(fp))
 	{
-		fread(&varType, 1, sizeof(uint32), fp);
+		size_t freadResult = fread(&varType, 1, sizeof(uint32), fp); (void)freadResult; //don't care, but gcc wants the return value looked at
 
 		if (varType == Variant::TYPE_UNUSED)
 		{

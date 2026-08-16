@@ -248,7 +248,7 @@ char *float_to_money( double num, char *buf, int dec)
 	 
 	
 
-	  sprintf(tmp, "%.9f", fabs(num));
+	  snprintf(tmp, sizeof(tmp), "%.9f", fabs(num));
       StringReverse(tmp);
       if(dec)
       {
@@ -302,7 +302,7 @@ string DataToByteHexDisplay(string data, int maxNumCharsToShow)
 	char temp[255];
 	for (int i = 0; i < maxNumCharsToShow && i < (int)data.length(); i++)
 	{
-		sprintf(temp, "%hhx,", data[i]);
+		snprintf(temp, sizeof(temp), "%hhx,", data[i]);
 		hexData += (string(temp) + " ");
 	}
 	
@@ -317,7 +317,7 @@ string DataToByteHexDisplay(uint8 *pData, int maxNumCharsToShow)
 	char temp[255];
 	for (int i = 0; i < maxNumCharsToShow; i++)
 	{
-		sprintf(temp, "%hhx,", pData[i]);
+		snprintf(temp, sizeof(temp), "%hhx,", pData[i]);
 		hexData += (string(temp) + " ");
 	}
 
@@ -794,13 +794,13 @@ string IntToTimeSeconds(uint32 seconds, bool bTextFormat, bool showDays) //conve
 		if (hours > 0 || days > 0)
 		{
 			if(showDays)
-				sprintf(temp, "%d:%02d:%02d", days , hours, minutes);
+				snprintf(temp, sizeof(temp), "%d:%02d:%02d", days , hours, minutes);
 			else
-				sprintf(temp, "%d:%02d:%02d", hours+(days*24), minutes, seconds);
+				snprintf(temp, sizeof(temp), "%d:%02d:%02d", hours+(days*24), minutes, seconds);
 
 		} else
 		{
-			sprintf(temp, "%d:%02d", minutes, seconds);
+			snprintf(temp, sizeof(temp), "%d:%02d", minutes, seconds);
 		}
 		
 		return string(temp);

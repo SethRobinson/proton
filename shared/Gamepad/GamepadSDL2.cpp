@@ -28,7 +28,7 @@ void GamepadSDL2::InitExtraSDLStuff(SDL_GameController* pController, SDL_Joystic
 	m_pSDLJoy = pJoystick;
 	m_pSDLController = pController;
 
-	const char *pName = SDL_JoystickNameForIndex(GetID() - SDL_JOYSTICK_ID_OFFSET);
+	const char *pName = SDL_JoystickNameForIndex((int)(GetID() - SDL_JOYSTICK_ID_OFFSET));
 	m_name = "Unknown";
 	if (m_pSDLController)
 	{

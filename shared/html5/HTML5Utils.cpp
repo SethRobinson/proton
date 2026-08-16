@@ -44,7 +44,7 @@ void LogMsg( const char* traceStr, ... )
 	va_end( argsVA );
 	
 	//__Linux_log_write(Linux_LOG_ERROR,GetAppName(), buffer);
-	printf ((char*)buffer);
+	printf ("%s", buffer);
 	printf ("\r\n");
 	fflush(stdout);
 
