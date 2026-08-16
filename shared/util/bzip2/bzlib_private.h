@@ -32,6 +32,13 @@
 
 #include "bzlib.h"
 
+#ifdef _MSC_VER
+/* quiet warnings in this vendored lib rather than editing its code */
+#pragma warning (disable:4244 4267 4996)
+#endif
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+#endif
 
 
 /*-- General stuff. --*/

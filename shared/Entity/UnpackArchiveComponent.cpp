@@ -91,6 +91,9 @@ void UnpackArchiveComponent::OnUpdate(VariantList *pVList)
 				GetFunction("OnError")->sig_function(&vList);
 			}
 			break;
+
+		default:
+			break; //STATE_ERROR and STATE_DONE need no processing here
 	}
-	
+
 }

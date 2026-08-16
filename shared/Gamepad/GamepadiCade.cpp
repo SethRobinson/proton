@@ -162,8 +162,11 @@ void GamepadiCade::OnHardwareMessage( VariantList *pVList )
 			//box active to be able to read keystrokes from the bluetooth keyboard, unlike Android/Win
             ActivateFakeKeyboardIOS();
             break;
+
+	default:
+		break; //don't care about the other message types
 	}
-	
+
 }
 
 void GamepadiCade::Kill()

@@ -19,7 +19,7 @@
 #include <fcntl.h>
 
 #else
-	#include <sys/fcntl.h>
+	#include <fcntl.h> //not sys/fcntl.h, emscripten warns about that spelling
 #endif
 
 #ifndef PLATFORM_PSP2
@@ -39,7 +39,7 @@
 #include <sys/errno.h>
 
 #elif defined (PLATFORM_HTML5)
-#include <sys/errno.h>
+#include <errno.h> //not sys/errno.h, emscripten warns about that spelling
 #elif defined (PLATFORM_PSP2)
 #include <psp2/sysmodule.h>
 #include <psp2/net/net.h>
@@ -195,8 +195,8 @@ bool NetSocket::Init( string url, int port )
 			//LogMsg("Protocol is %d",p->ai_protocol );
 		}
 
-		if ((m_socket = socket(p->ai_family, p->ai_socktype,
-			p->ai_protocol)) == -1) 
+		if ((m_socket = (int)socket(p->ai_family, p->ai_socktype,
+			p->ai_protocol)) == -1)
 		{
 			//LogMsg("Skipping socket...");
 			continue;
@@ -233,7 +233,7 @@ bool NetSocket::Init( string url, int port )
 
 #endif
 
-		if (connect(m_socket, p->ai_addr, p->ai_addrlen) == -1) 
+		if (connect(m_socket, p->ai_addr, (int)p->ai_addrlen) == -1)
 		{
 
 			if (errno != 115 && errno != 36) //EINPROGRESS is 115 or 36, depending.   but not defined on some platforms so doing it manually
@@ -290,6 +290,7 @@ bool NetSocket::Init( string url, int port )
 	//u_long iMode = 0;
 	//ioctlsocket(m_socket, FIOASYNC, &iMode);
 
+#pragma warning(suppress:4996) //WSAAsyncSelect is deprecated but the window-message based notify is what we want here
 	WSAAsyncSelect(m_socket, GetForegroundWindow(), WM_USER + 1, FD_READ | FD_WRITE | FD_CONNECT | FD_OOB);
 
 #else
@@ -367,7 +368,8 @@ bool NetSocket::InitHost( int port, int connections )
 		LogError("ioctlsocket() failed \n");
 		return false;
 	}
-	
+
+#pragma warning(suppress:4996) //WSAAsyncSelect is deprecated but the window-message based notify is what we want here
 	WSAAsyncSelect(m_socket, GetForegroundWindow(), WM_USER + 1, FD_READ | FD_WRITE | FD_CONNECT | FD_OOB);
 
 #else

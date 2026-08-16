@@ -113,10 +113,10 @@ bool NetHTTP::AddPostData(const string &name, const uint8 *pData, int len/*=-1*/
 	{
 		m_bHasEncodedPostData = true;
 
-		encoder.encodeData((const uint8*)name.c_str(), name.length(), m_postData);
+		encoder.encodeData((const uint8*)name.c_str(), (int)name.length(), m_postData);
 		m_postData += '=';
 		
-		if (len == -1) len = strlen((const char*)pData);
+		if (len == -1) len = (int)strlen((const char*)pData);
 
 		encoder.encodeData(pData, len, m_postData);
 	}
@@ -250,7 +250,7 @@ size_t NetHTTP::CURLWriteMemoryCallback(void* contents, size_t size, size_t nmem
 	if (pCURLInstance->m_pFile)
 	{
 		fwrite(contents, realsize, 1, pCURLInstance->m_pFile);
-		pCURLInstance->m_bytesWrittenToFile += realsize;
+		pCURLInstance->m_bytesWrittenToFile += (int)realsize;
 		pCURLInstance->m_receivedSize += realsize;
 
 		return realsize;
@@ -293,7 +293,7 @@ size_t NetHTTP::CURLWriteMemoryCallback(void* contents, size_t size, size_t nmem
 		}
 
 		pCURLInstance->m_pReceiveBuff = ptr;
-		pCURLInstance->m_receiveBuffCapacity = newCapacity;
+		pCURLInstance->m_receiveBuffCapacity = (int)newCapacity;
 	}
 
 	// Copy the new data into the buffer
@@ -302,7 +302,7 @@ size_t NetHTTP::CURLWriteMemoryCallback(void* contents, size_t size, size_t nmem
 	pCURLInstance->m_pReceiveBuff[pCURLInstance->m_receivedSize] = 0;
 
 	// Update progress less frequently for large downloads
-		pCURLInstance->SetProgress(pCURLInstance->m_receivedSize, -1);
+		pCURLInstance->SetProgress((int)pCURLInstance->m_receivedSize, -1);
 	
 	return realsize;
 }
@@ -310,7 +310,7 @@ size_t NetHTTP::CURLWriteMemoryCallback(void* contents, size_t size, size_t nmem
 size_t NetHTTP::CURLReadMemoryCallback(void* ptr, size_t size, size_t nmemb, void* pThisInstance)
 {
 
-	int maxBytesToRead = size * nmemb;
+	int maxBytesToRead = (int)(size * nmemb);
 
 	if (maxBytesToRead < 1)
 	{
@@ -327,7 +327,7 @@ size_t NetHTTP::CURLReadMemoryCallback(void* ptr, size_t size, size_t nmemb, voi
 	/* copy as much data as possible into the 'ptr' buffer, but no more than
 	   'size' * 'nmemb' bytes! */
 
-	int bytesToRead = rt_min(maxBytesToRead, pCURLInstance->m_postData.size() - pCURLInstance->m_CURL_bytesSent);
+	int bytesToRead = (int)rt_min((size_t)maxBytesToRead, pCURLInstance->m_postData.size() - pCURLInstance->m_CURL_bytesSent);
 	
 	memcpy(ptr, (uint8*)pCURLInstance->m_postData.c_str()+ pCURLInstance->m_CURL_bytesSent, bytesToRead);
 	pCURLInstance->m_CURL_bytesSent += bytesToRead;
@@ -751,7 +751,7 @@ void NetHTTP::Update()
 				OnError(ERROR_404_FILE_NOT_FOUND);
 			}
 
-			SetBuffer(pMe->m_pReceiveBuff, pMe->m_receivedSize);
+			SetBuffer(pMe->m_pReceiveBuff, (int)pMe->m_receivedSize);
 			m_downloadData.push_back(0); //useful if used like a string
 			FinishDownload();
 			m_state = STATE_FINISHED;
@@ -812,7 +812,7 @@ int NetHTTP::GetDownloadedBytes()
 	}
 
 	if (m_downloadData.size() == 0) return 0;
-	return m_downloadData.size() - 1; //the -1 is for the null we added
+	return (int)m_downloadData.size() - 1; //the -1 is for the null we added
 }
 
 void NetHTTP::SetBuffer(const char *pData, int byteSize)
