@@ -144,7 +144,8 @@ endmacro(_proton_include_jpeg_sources)
 
 macro(_proton_include_png_sources)
 	set(PROTON_PNG "${PROTON_SHARED}/Irrlicht/source/Irrlicht/libpng")
-	list(APPEND PROTON_SOURCES "${PROTON_PNG}/png.c" "${PROTON_PNG}/pngerror.c" "${PROTON_PNG}/pnggccrd.c" "${PROTON_PNG}/pngget.c" "${PROTON_PNG}/pngmem.c" "${PROTON_PNG}/pngpread.c" "${PROTON_PNG}/pngread.c" "${PROTON_PNG}/pngrio.c" "${PROTON_PNG}/pngrtran.c" "${PROTON_PNG}/pngrutil.c" "${PROTON_PNG}/pngset.c" "${PROTON_PNG}/pngtrans.c" "${PROTON_PNG}/pngvcrd.c" "${PROTON_PNG}/pngwio.c" "${PROTON_PNG}/pngwtran.c")
+	#note: pnggccrd.c and pngvcrd.c no longer exist since the libpng 1.6.55 update; pngwrite.c and pngwutil.c are needed now
+	list(APPEND PROTON_SOURCES "${PROTON_PNG}/png.c" "${PROTON_PNG}/pngerror.c" "${PROTON_PNG}/pngget.c" "${PROTON_PNG}/pngmem.c" "${PROTON_PNG}/pngpread.c" "${PROTON_PNG}/pngread.c" "${PROTON_PNG}/pngrio.c" "${PROTON_PNG}/pngrtran.c" "${PROTON_PNG}/pngrutil.c" "${PROTON_PNG}/pngset.c" "${PROTON_PNG}/pngtrans.c" "${PROTON_PNG}/pngwio.c" "${PROTON_PNG}/pngwrite.c" "${PROTON_PNG}/pngwtran.c" "${PROTON_PNG}/pngwutil.c")
 endmacro(_proton_include_png_sources)
 
 # Enables JPEG support in the project. Defines RT_JPG_SUPPORT and includes

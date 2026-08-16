@@ -603,7 +603,6 @@
     <ClCompile Include="..\..\shared\Irrlicht\source\Irrlicht\jpeglib\jutils.c" />
     <ClCompile Include="..\..\shared\Irrlicht\source\Irrlicht\libpng\png.c" />
     <ClCompile Include="..\..\shared\Irrlicht\source\Irrlicht\libpng\pngerror.c" />
-    <ClCompile Include="..\..\shared\Irrlicht\source\Irrlicht\libpng\pnggccrd.c" />
     <ClCompile Include="..\..\shared\Irrlicht\source\Irrlicht\libpng\pngget.c" />
     <ClCompile Include="..\..\shared\Irrlicht\source\Irrlicht\libpng\pngmem.c" />
     <ClCompile Include="..\..\shared\Irrlicht\source\Irrlicht\libpng\pngpread.c" />
@@ -613,7 +612,6 @@
     <ClCompile Include="..\..\shared\Irrlicht\source\Irrlicht\libpng\pngrutil.c" />
     <ClCompile Include="..\..\shared\Irrlicht\source\Irrlicht\libpng\pngset.c" />
     <ClCompile Include="..\..\shared\Irrlicht\source\Irrlicht\libpng\pngtrans.c" />
-    <ClCompile Include="..\..\shared\Irrlicht\source\Irrlicht\libpng\pngvcrd.c" />
     <ClCompile Include="..\..\shared\Irrlicht\source\Irrlicht\libpng\pngwio.c" />
     <ClCompile Include="..\..\shared\Irrlicht\source\Irrlicht\libpng\pngwrite.c" />
     <ClCompile Include="..\..\shared\Irrlicht\source\Irrlicht\libpng\pngwtran.c" />
