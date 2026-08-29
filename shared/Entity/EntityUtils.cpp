@@ -2125,7 +2125,7 @@ EntityComponent * CreateSlider(Entity *pBG, float x, float y, float sizeX, strin
 
 	//SetTouchPaddingEntity(pSliderButton, CL_Rectf(0,0,0,0));
 	SetAlignmentEntity(pSliderButton, ALIGNMENT_CENTER);
-	pSliderComp->GetVar("sliderButton")->Set(pSliderButton);
+	pSliderEnt->GetVar("sliderButton")->Set(pSliderButton); //the SliderComponent looks for this on its parent entity
 	return pSliderComp;
 }
 

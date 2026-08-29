@@ -84,6 +84,20 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   `GetSystemTimeTick()` for anything that must survive a roll-over or a backgrounded
   browser tab.
 
+## Automated GUI testing on Windows
+
+- The Win32 demo apps can be driven programmatically without touching the real
+  mouse: the input path in `shared/win/app/main.cpp` reads click coordinates
+  straight from lParam and only requires the window to have focus
+  (`ShouldIgnoreMouseButtonMessage` checks `g_bHasFocus`, nothing else). So
+  `SetForegroundWindow` + `PostMessage` of WM_LBUTTONDOWN/WM_LBUTTONUP (client
+  coords packed in lParam), WM_MOUSEMOVE for drags, and WM_MOUSEWHEEL (screen
+  coords) for ScrollComponent areas all work. Screenshot the client area with
+  GetClientRect/ClientToScreen + Graphics.CopyFromScreen to verify visually.
+  Run the exe with working dir = the project's `bin/` folder (media lives there).
+  A crash shows up as the process going not-responding with a WER dialog; the
+  Application event log (Id 1000) has the exception code.
+
 ## Git
 
 - `.gitignore` uses a whitelist: `/*` ignores everything at the repo root, and

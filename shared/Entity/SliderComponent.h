@@ -29,7 +29,7 @@ private:
 	void OnRender(VariantList *pVList);
 	void OnUpdate(VariantList *pVList);
 	void OnProgressChanged(Variant *pDataObject);
-	void OnSliderButtonChanged(Variant *pDataObject);
+	Entity * GetSliderButton();
 
 	void SetPositionWithMouseClick(CL_Vec2f pt);
 	void OnInput( VariantList *pVList );

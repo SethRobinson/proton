@@ -65,15 +65,26 @@ void SliderComponent::SetSliderPosition(float value)
 }
 
 
-void SliderComponent::SetSliderPosition()
+Entity * SliderComponent::GetSliderButton()
 {
 	if (!m_pSliderButton)
 	{
-		m_pSliderButton = GetParent()->GetEntityByName("sliderButton");
+		//the button entity usually doesn't exist yet when our OnAdd runs (CreateSlider adds us first), so locate it now
+		m_pSliderButton = GetParent()->GetVar("sliderButton")->GetEntity();
 
+		if (!m_pSliderButton)
+		{
+			m_pSliderButton = GetParent()->GetEntityByName("sliderButton");
+		}
 	}
-//	assert(m_pSliderButton && "Must set var 'sliderButton' to a valid entity");
-	
+
+	return m_pSliderButton;
+}
+
+void SliderComponent::SetSliderPosition()
+{
+	if (!GetSliderButton()) return;
+
 	CL_Vec2f vPos = m_pSliderButton->GetVar("pos2d")->GetVector2();
 	vPos.x = m_pSize2d->x* *m_pProgress;
 	m_pSliderButton->GetVar("pos2d")->Set(vPos);
@@ -81,6 +92,8 @@ void SliderComponent::SetSliderPosition()
 
 void SliderComponent::UpdatePositionByTouch(CL_Vec2f pt)
 {
+		if (!GetSliderButton()) return;
+
 		CL_Vec2f vPos = m_pSliderButton->GetVar("pos2d")->GetVector2();
 		vPos.x += (pt-m_pClickStartPos).x;
 		ForceRange(vPos.x, 0, m_pSize2d->x);
@@ -92,6 +105,8 @@ void SliderComponent::UpdatePositionByTouch(CL_Vec2f pt)
 
 void SliderComponent::SetPositionWithMouseClick(CL_Vec2f pt)
 {
+	if (!GetSliderButton()) return;
+
 	CL_Vec2f vOrigPos = GetPos2DEntity(m_pSliderButton);
 	vOrigPos.x = pt.x - m_pPos2d->x;
 
