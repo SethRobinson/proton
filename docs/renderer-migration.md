@@ -120,7 +120,18 @@ and the existing compatibility/legacy contexts on Windows/Linux/macOS (GLSL
   the pre-existing jitter floor), with engine ms/frame on the iPad down
   38% (0.612 -> 0.377). Still to do: Android as default (opt-in exists),
   store-build flips (RTDink iOS etc. live in their own repos).
-- **Phase 4**: public shader + render-to-texture APIs.
+- **Phase 4 (delivered with Phase 2/3)**: the public APIs shipped in
+  Milestone 5 (RTShader class, SetActiveShader, Surface render targets), and
+  the **RTShader example app** (Aug 2026) is the reference for using them: a
+  minimal, heavily commented app that renders a scene to a texture and blits
+  it through selectable GLSL post-process effects, with projects for every
+  platform. Verified in the suite at 0.000% (win/WebGL) and ~0.005%
+  (iOS sim + real device). Building it flushed out two engine fixes:
+  BeginRenderTarget now works when called from raw-GL 3D mode (it sets up
+  full SetupOrtho-equivalent state itself and EndRenderTarget restores the
+  caller's mode; previously everything drawn after EndRenderTarget was
+  invisible if the caller was in 3D mode), and RTShader::SetUniform* on a
+  missing/optimized-out uniform warns once instead of every frame.
 - **Phase 5**: delete the legacy path (tag first).
 
 ## RenderPipeline.h (the Phase 1 funnel)

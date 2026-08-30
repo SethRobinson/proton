@@ -98,8 +98,8 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
 ## Renderer regression tests (tests/)
 
 - Test-app policy (per Seth, Aug 2026): only use apps tracked in the proton
-  repo (RTBareBones, RTSimpleApp, RTLooneyLadders, ArduboySim, RTConsole,
-  RTPack) plus RTDink, RTDScroll, and RTMindWall for testing. Do not use the
+  repo (RTBareBones, RTShader, RTSimpleApp, RTLooneyLadders, ArduboySim,
+  RTConsole, RTPack) plus RTDink, RTDScroll, and RTMindWall for testing. Do not use the
   other app folders that may exist locally (RTGameShow, Amigo, RTWhisperApp,
   BlipArcade, RTSocketCity, RTLibretroTest...). BlipArcade was removed from
   the suite under this policy; it was the only app exercising app-level raw
