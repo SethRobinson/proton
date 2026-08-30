@@ -169,9 +169,18 @@ function Invoke-Html5Capture([string]$pageDir, [string]$pageName, [int]$settleMs
                 {
                     $ms = New-Object System.IO.MemoryStream
                     $req.InputStream.CopyTo($ms)
-                    [IO.File]::WriteAllBytes($bmpOutPath, $ms.ToArray())
+                    $uploadName = $req.QueryString['name']
+                    if ($uploadName -like '*.perf.txt')
+                    {
+                        [IO.File]::WriteAllBytes("$bmpOutPath.perf.txt", $ms.ToArray())
+                    }
+                    else
+                    {
+                        # the BMP upload is the "capture finished" signal
+                        [IO.File]::WriteAllBytes($bmpOutPath, $ms.ToArray())
+                        $gotShot = $true
+                    }
                     $resp.StatusCode = 200
-                    $gotShot = $true
                 }
                 else
                 {
@@ -238,6 +247,7 @@ function Invoke-IosCapture([string]$projectPath, [string]$appName, [int]$settleM
     if ($LASTEXITCODE -ne 0) { throw 'remote iOS capture failed (see output above)' }
     & scp -q "$MacHost`:$remoteBmp" $bmpOutPath
     if ($LASTEXITCODE -ne 0 -or -not (Test-Path $bmpOutPath)) { throw "scp of $remoteBmp failed" }
+    & scp -q "$MacHost`:$remoteBmp.perf.txt" "$bmpOutPath.perf.txt" 2>$null # best effort
 }
 
 # ---------------------------------------------------------------------------
@@ -264,6 +274,7 @@ function Invoke-AndroidCapture([string]$package, [string]$activity, [int]$settle
     if (-not $found) { throw "app never wrote $remoteBmp (check adb logcat)" }
     & adb exec-out run-as $package cat files/proton_harness.bmp > $bmpOutPath
     if (-not (Test-Path $bmpOutPath) -or (Get-Item $bmpOutPath).Length -lt 1000) { throw "adb pull of screenshot failed" }
+    & adb exec-out run-as $package cat files/proton_harness.bmp.perf.txt > "$bmpOutPath.perf.txt" 2>$null # best effort
 }
 
 $scenarios = Import-PowerShellDataFile (Join-Path $PSScriptRoot 'scenarios.psd1')
@@ -434,6 +445,53 @@ foreach ($entry in $scenarios.Apps)
             $color = if ($pass) { 'Green' } else { 'Red' }
             Write-Host ("  {0}    {1}  ({2:N3}% differ, limit {3}%; {4})" -f $status, $shotName, $cmp.DiffPct, $maxPct, $cmp.Note) -ForegroundColor $color
             $results += @{ App = $entry.Name; Step = $step.Name; Status = $status; Note = ("{0:N3}%" -f $cmp.DiffPct) }
+        }
+
+        # Speed check: the engine writes a perf sidecar (frames rendered on the
+        # locked timestep vs the wall clock they took). The first sighting (or a
+        # golden run) records a baseline next to the goldens; after that,
+        # dropping below MinFpsRatio of the baseline (default 0.5) fails - a
+        # wide margin, meant to catch "everything got horribly slower" bugs
+        # without flaking on system load. Note the fps ceiling per target:
+        # vsync is uncapped on win, but html5/ios are capped near 60 by the
+        # browser/display, so those only catch drops below the cap.
+        $perfPath = "$bmpPath.perf.txt"
+        if (Test-Path $perfPath)
+        {
+            $perfRaw = Get-Content $perfPath -Raw
+            $fps = 0.0; $engMS = 0.0
+            if ($perfRaw -match 'fps=([0-9.]+)') { $fps = [double]$Matches[1] }
+            if ($perfRaw -match 'engineMS=([0-9.]+)') { $engMS = [double]$Matches[1] }
+            $perfBasePath = Join-Path $goldenDir ($shotName -replace '\.png$', '.perf.txt')
+            if ($fps -le 0) { }
+            elseif ($Mode -eq 'golden' -or -not (Test-Path $perfBasePath))
+            {
+                Copy-Item $perfPath $perfBasePath -Force
+                Write-Host ('  PERF    baseline recorded: {0:0.0} fps, {1:0.000} engine ms/frame' -f $fps, $engMS)
+            }
+            else
+            {
+                $baseRaw = Get-Content $perfBasePath -Raw
+                $baseFps = 0.0; $baseEngMS = 0.0
+                if ($baseRaw -match 'fps=([0-9.]+)') { $baseFps = [double]$Matches[1] }
+                if ($baseRaw -match 'engineMS=([0-9.]+)') { $baseEngMS = [double]$Matches[1] }
+                $minRatio = if ($entry.ContainsKey('MinFpsRatio')) { $entry.MinFpsRatio } else { 0.5 }
+                # two signals: wall fps floor (catches anything, but display/browser caps
+                # limit its ceiling), and engine ms/frame (vsync-immune; only meaningful
+                # above 1ms so sub-ms cache noise can't flake)
+                $fpsFail = ($baseFps -gt 0 -and $fps -lt $baseFps * $minRatio)
+                $engFail = ($baseEngMS -gt 0 -and $engMS -gt 1.0 -and $engMS -gt $baseEngMS * 2.0 -and $engMS -gt $baseEngMS + 0.5)
+                if ($fpsFail -or $engFail)
+                {
+                    $anyFailed = $true
+                    Write-Host ('  PERF    FAIL  {0:0.0} fps / {1:0.000} eng-ms vs baseline {2:0.0} / {3:0.000}' -f $fps, $engMS, $baseFps, $baseEngMS) -ForegroundColor Red
+                    $results += @{ App = $entry.Name; Step = "$($step.Name)/perf"; Status = 'FAIL'; Note = ('{0:0.0}fps {1:0.000}ms vs {2:0.0}fps {3:0.000}ms' -f $fps, $engMS, $baseFps, $baseEngMS) }
+                }
+                else
+                {
+                    Write-Host ('  PERF    ok    {0:0.0} fps, {1:0.000} engine ms/frame (baseline {2:0.0} / {3:0.000})' -f $fps, $engMS, $baseFps, $baseEngMS)
+                }
+            }
         }
     }
     catch

@@ -436,6 +436,10 @@ protected:
     string m_autoScreenshotFile;
     unsigned int m_autoScreenshotAtMS;
     bool m_autoScreenshotQuit;
+    int m_autoScreenshotFrames;
+    double m_autoScreenshotStartWallMS;
+    double m_autoScreenshotUpdateStampMS;
+    double m_autoScreenshotEngineMS; //accumulated Update+Draw time, excludes the swap/vsync wait
 };
 
 BaseApp * GetBaseApp(); //supply this yourself.  You create it on the first call if needed.

@@ -118,6 +118,11 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
 - Goldens are GPU/driver specific and NOT tracked in git (tests/goldens/ is
   ignored); record a fresh set with `-Mode golden` on the current renderer
   before starting renderer work on any machine.
+- The suite also trips on big slowdowns: the engine writes a perf sidecar
+  (wall fps + engine ms/frame) with each capture; the harness baselines it
+  next to the goldens and fails at <50% fps or >2x engine-ms. See "Speed
+  check" in tests/README.md. Delete goldens/*.perf.txt to re-baseline after
+  intentional perf changes.
 
 ## Automated GUI testing on Windows
 

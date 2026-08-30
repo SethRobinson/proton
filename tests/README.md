@@ -91,3 +91,25 @@ Per-target notes:
   app with `-autoscreenshot` gives locked-timestep fixed-seed behavior on
   every platform, so the same approach can drive Mac/Linux/HTML5 harnesses
   later.
+
+## Speed check
+
+Because the locked timestep fixes the number of frames until capture, the
+wall clock those frames take is a benchmark for free. The engine writes a
+`<shot>.bmp.perf.txt` sidecar with three numbers: frames, wall fps, and
+**engine ms/frame** (average Update+Draw cost, measured from Update start to
+Draw end so the swap/vsync wait is excluded). The harness records a baseline
+next to the goldens on first sighting (or in `-Mode golden`) and fails a
+later run when:
+
+- wall fps drops below `MinFpsRatio` (default 0.5) of the baseline, or
+- engine ms/frame exceeds 2x baseline AND baseline+0.5ms AND 1.0ms absolute
+  (the guards keep sub-millisecond cache noise from flaking).
+
+This is a tripwire for "everything got horribly slower" bugs, not a profiler.
+Notes: on Windows, `-autoscreenshot` disables vsync and bypasses the app's
+SetFPSLimit so throughput is real, but DWM still caps windowed wall fps near
+the monitor refresh (hence engine-ms as the vsync-immune signal). On
+html5/ios the browser/display cap (~60-120) applies to fps. Baselines are
+per-machine like the goldens; delete the `.perf.txt` files in goldens/ to
+re-baseline after intentional perf changes.

@@ -49,6 +49,10 @@ BaseApp::BaseApp()
 		m_autoScreenshotParmsChecked = false;
 		m_autoScreenshotAtMS = 0;
 		m_autoScreenshotQuit = false;
+		m_autoScreenshotFrames = 0;
+		m_autoScreenshotStartWallMS = 0;
+		m_autoScreenshotUpdateStampMS = 0;
+		m_autoScreenshotEngineMS = 0;
 		
 		m_touchTracker.resize(C_MAX_TOUCHES_AT_ONCE);
 		ClearError();
@@ -211,7 +215,27 @@ void BaseApp::ProcessAutoScreenshot()
 {
 	CheckAutoScreenshotParms(); //normally already done in Init(), but some platforms deliver parms late
 
-	if (m_autoScreenshotFile.empty() || m_gameTimer.GetTick() < m_autoScreenshotAtMS) return;
+	if (m_autoScreenshotFile.empty()) return;
+
+	//speed check: with the locked timestep the frame count until capture is fixed,
+	//so the wall clock those frames take is a benchmark.  Count from the first
+	//frame (skipping it, since it carries startup costs) to the capture.
+	if (m_autoScreenshotStartWallMS == 0)
+	{
+		m_autoScreenshotStartWallMS = GetSystemTimeAccurate();
+	}
+	else
+	{
+		m_autoScreenshotFrames++;
+		if (m_autoScreenshotUpdateStampMS != 0)
+		{
+			//engine time this frame: from Update() start to here (end of Draw),
+			//which excludes the platform loop's swap/vsync wait
+			m_autoScreenshotEngineMS += GetSystemTimeAccurate() - m_autoScreenshotUpdateStampMS;
+		}
+	}
+
+	if (m_gameTimer.GetTick() < m_autoScreenshotAtMS) return;
 
 #ifndef _CONSOLE
 	//SoftSurface::BlitFromScreenFixed doesn't exist in console builds
@@ -222,14 +246,33 @@ void BaseApp::ProcessAutoScreenshot()
 		s.WriteBMPOut(m_autoScreenshotFile);
 		LogMsg("Wrote autoscreenshot to %s at tick %u", m_autoScreenshotFile.c_str(), m_gameTimer.GetTick());
 
+		//the perf sidecar the test harness reads to catch "everything got slower" bugs.
+		//fps is wall-clock (display/browser caps apply); engineMS is the average
+		//Update+Draw cost per frame, which vsync can't hide.
+		double elapsedMS = GetSystemTimeAccurate() - m_autoScreenshotStartWallMS;
+		float fps = (elapsedMS > 0) ? float(double(m_autoScreenshotFrames) * 1000.0 / elapsedMS) : 0.0f;
+		float engineMS = (m_autoScreenshotFrames > 0) ? float(m_autoScreenshotEngineMS / double(m_autoScreenshotFrames)) : 0.0f;
+		string perfFile = m_autoScreenshotFile + ".perf.txt";
+		FILE *fp = fopen(perfFile.c_str(), "wb");
+		if (fp)
+		{
+			fprintf(fp, "frames=%d elapsedMS=%d fps=%.1f engineMS=%.3f\n", m_autoScreenshotFrames, int(elapsedMS), fps, engineMS);
+			fclose(fp);
+		}
+		LogMsg("autoscreenshot perf: %d frames in %d ms = %.1f fps, %.3f engine ms/frame", m_autoScreenshotFrames, int(elapsedMS), fps, engineMS);
+
 #ifdef PLATFORM_HTML5
-		//on the web the "file" only exists in MEMFS, so hand it to whoever served
-		//the page (the test harness runs a tiny local server that accepts this)
+		//on the web the files only exist in MEMFS, so hand them to whoever served
+		//the page (the test harness runs a tiny local server that accepts these).
+		//The perf sidecar goes first; the BMP upload is the harness's "done" signal.
 		EM_ASM({
 			try {
 				var name = UTF8ToString($0);
-				var data = FS.readFile(name);
-				fetch('autoscreenshot_upload?name=' + encodeURIComponent(name), { method: 'POST', body: data });
+				var perfName = name + '.perf.txt';
+				fetch('autoscreenshot_upload?name=' + encodeURIComponent(perfName), { method: 'POST', body: FS.readFile(perfName) })
+					.finally(function() {
+						fetch('autoscreenshot_upload?name=' + encodeURIComponent(name), { method: 'POST', body: FS.readFile(name) });
+					});
 			} catch(e) { console.log('autoscreenshot upload failed: ' + e); }
 		}, m_autoScreenshotFile.c_str());
 #endif
@@ -339,6 +382,11 @@ void RunStaticUpdateThing();
 
 void BaseApp::Update()
 {
+	if (!m_autoScreenshotFile.empty())
+	{
+		m_autoScreenshotUpdateStampMS = GetSystemTimeAccurate(); //perf sidecar: frame's engine work starts here
+	}
+
 	m_gameTimer.Update();
 #ifdef RT_RUN_STATIC_UPDATE
 //Don't ask, for Seth

@@ -67,6 +67,8 @@ bool g_bAppCanRunInBackground = true;
 bool g_bAppCanRunInBackground = false;
 #endif
 
+bool g_autoScreenshotMode = false; //true when the -autoscreenshot parm is in use (render regression harness)
+
 void InitVideoSize()
 {
 #ifdef RT_WEBOS_ARM
@@ -1906,6 +1908,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLin
 			if (ToLowerCaseString(parms[i]) == "-autoscreenshot")
 			{
 				g_bAppCanRunInBackground = true;
+				g_autoScreenshotMode = true;
 			}
 		}
 	}
@@ -1947,7 +1950,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLin
 	{
 		goto cleanup;
 	}
-	
+
+#ifdef C_GL_MODE
+	if (g_autoScreenshotMode)
+	{
+		//uncap vsync so the fps number in the autoscreenshot perf sidecar actually
+		//measures render speed instead of the monitor's refresh rate
+		typedef BOOL (WINAPI *PFNWGLSWAPINTERVALEXTPROC)(int interval);
+		PFNWGLSWAPINTERVALEXTPROC pWglSwapInterval = (PFNWGLSWAPINTERVALEXTPROC) wglGetProcAddress("wglSwapIntervalEXT");
+		if (pWglSwapInterval)
+		{
+			pWglSwapInterval(0);
+			LogMsg("autoscreenshot: vsync disabled for perf measurement");
+		}
+	}
+#endif
+
 	if (!GetBaseApp()->Init())
 	{
 		assert(!"Unable to init - did you run media/update_media.bat to build the resources?");
@@ -2004,11 +2022,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLin
 			Sleep(50);
 		}
 
-		if (g_fpsLimit != 0)
+		if (g_fpsLimit != 0 && !g_autoScreenshotMode) //no fps limit during automated captures, game speed is tick-driven there and uncapped runs measure real throughput (and finish faster)
 		{
 			while (fpsTimer > GetSystemTimeAccurate())
 			{
-				
+
 				Sleep(0); //sleep(1) makes dink smallwood run at 35 fps instead of 60, uhh...
 			}
 			fpsTimer = float(GetSystemTimeAccurate())+(1000.0f/ (float(g_fpsLimit)));
