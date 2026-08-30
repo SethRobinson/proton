@@ -80,6 +80,12 @@ bool App::Init()
 #endif
 
 	GetBaseApp()->SetFPSVisible(true);
+
+	//run uncapped (vsync off, platform timers freed) so the FPS display shows
+	//real render throughput.  Android stays display-synced (GLSurfaceView),
+	//and phone/tablet displays still limit what you can SEE, but everywhere
+	//the number is what the hardware can actually do.
+	SetFPSLimit(0);
 	return true;
 }
 

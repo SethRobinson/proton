@@ -405,6 +405,7 @@ public:
     string GetAppVersion();
 protected:
 
+
     void ProcessAutoScreenshot(); //handles the -autoscreenshot/-autoquit command line parms, called from Draw()
     void CheckAutoScreenshotParms(); //parses those parms and enables deterministic mode (locked timestep + fixed rand seed), called from Init()
 
@@ -453,6 +454,7 @@ ResourceManager * GetResourceManager();
 unsigned int GetTick(eTimingSystem timingSystem = GetBaseApp()->GetActiveTimingSystem()); //faster to write
 eTimingSystem GetTiming();
 extern RenderBatcher g_globalBatcher; //can be used by anyone
+extern bool g_autoScreenshotRespectFpsLimit; //set by -autoscreenshotfps; platform main loops honor the fps limit during captures when true
 bool GetDefaultSmoothing(); //default antialising on or off
 void SetDefaultSmoothing(bool bNew);
 

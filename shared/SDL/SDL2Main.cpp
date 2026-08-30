@@ -987,8 +987,10 @@ int SDL_main(int argc, char *argv[])
 					if (m.m_x == 0.0f)
 					{
 						frameDelayMS = 0;
+						SDL_GL_SetSwapInterval(0); //truly uncapped: vsync off too
 					} else
 					{
+						SDL_GL_SetSwapInterval(1);
 						frameDelayMS = (int)(1000.0f / m.m_x);
 					}
 					break;

@@ -349,6 +349,17 @@ static BOOL g_drawInitiatedByTimer = NO;
 }
 
 
+//kill and recreate the animation timer with a new interval (there's no
+//property for it on the OSX view like iOS has; the timer is scheduled once
+//in awakeFromNib)
+- (void)rescheduleAnimationTimer:(double)interval
+{
+    [timer invalidate];
+    timer = [NSTimer timerWithTimeInterval:interval target:self selector:@selector(animationTimer:) userInfo:nil repeats:YES];
+    [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
+    [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSEventTrackingRunLoopMode];
+}
+
 - (void)onOSMessage:(OSMessage *)pMsg
 {
     
@@ -367,8 +378,15 @@ static BOOL g_drawInitiatedByTimer = NO;
             SetIsUsingNativeUI(false);
             break;
         case OSMessage::MESSAGE_SET_FPS_LIMIT:
-            //glView.animationIntervalSave = 1.0/pMsg->m_x;
+        {
+            //0 = truly uncapped: run the animation timer flat out and disable
+            //vsync so the FPS display shows real render throughput; any other
+            //value caps the timer to that fps (with vsync on)
+            GLint swapInterval = (pMsg->m_x == 0.0f) ? 0 : 1;
+            [[self openGLContext] setValues:&swapInterval forParameter:NSOpenGLContextParameterSwapInterval];
+            [self rescheduleAnimationTimer:((pMsg->m_x == 0.0f) ? (1.0/2000.0) : (1.0/pMsg->m_x))];
             break;
+        }
         case OSMessage::MESSAGE_SET_ACCELEROMETER_UPDATE_HZ:
             break;
         case OSMessage::MESSAGE_FINISH_APP:

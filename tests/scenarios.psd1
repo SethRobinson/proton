@@ -85,6 +85,12 @@ Apps = @(
         Name = 'RTDink'
         Exe = 'RTDink\bin\winRTDink_Debug GL.exe'
         ShaderReady = $true
+        # Dink's menu only appears after its online update check answers, a
+        # WALL-clock event; uncapped captures blast to the capture tick in
+        # under a second so the menu isn't up yet.  -autoscreenshotfps makes
+        # the engine honor fps limits during the capture, restoring a sane
+        # wall pace (Dink itself then sets 60).
+        ExtraParms = '-autoscreenshotfps 120'
         SettleMs = 12000
         Steps = @(
             @{ Action = 'capture'; Name = 'mainmenu' }

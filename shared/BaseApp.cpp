@@ -184,6 +184,11 @@ void DrawConsole()
 //engine to a deterministic mode (a locked 16ms timestep and a fixed random seed) so
 //animations and particles are in identical poses every run and shots can be compared
 //pixel for pixel.  Completely inert without the parms.
+
+//set by -autoscreenshotfps: platform main loops that normally ignore the fps
+//limit during captures honor it when this is true
+bool g_autoScreenshotRespectFpsLimit = false;
+
 void BaseApp::CheckAutoScreenshotParms()
 {
 	if (m_autoScreenshotParmsChecked) return;
@@ -210,6 +215,21 @@ void BaseApp::CheckAutoScreenshotParms()
 		if (parm == "-autoquit")
 		{
 			m_autoScreenshotQuit = true;
+		}
+
+		//captures normally run uncapped (finishes fast, and the perf sidecar
+		//measures real throughput), but a scenario that depends on wall-clock
+		//events (e.g. RTDink's online update check finishing before the menu
+		//appears) can pin its capture speed with -autoscreenshotfps <n>
+		if (parm == "-autoscreenshotfps" && i + 1 < m_commandLineParms.size())
+		{
+			int fps = atoi(m_commandLineParms[i + 1].c_str());
+			if (fps > 0)
+			{
+				g_autoScreenshotRespectFpsLimit = true;
+				SetFPSLimit(float(fps));
+				LogMsg("autoscreenshot: capture speed pinned to %d fps", fps);
+			}
 		}
 	}
 
@@ -298,6 +318,27 @@ void BaseApp::ProcessAutoScreenshot()
 	}
 }
 
+//where the FPS/debug overlay starts.  On iOS the physical screen's rounded
+//corners clip the top-left, so nudge it inward (20,5 in logical pixels,
+//scaled so it's the same physical distance on retina displays)
+static float GetDebugOverlayX()
+{
+#ifdef PLATFORM_IOS
+	return 2.0f + 20.0f * GetProtonPixelScaleFactor();
+#else
+	return 2.0f;
+#endif
+}
+
+static float GetDebugOverlayY()
+{
+#ifdef PLATFORM_IOS
+	return 2.0f + 5.0f * GetProtonPixelScaleFactor();
+#else
+	return 2.0f;
+#endif
+}
+
 void BaseApp::Draw()
 {
 
@@ -340,7 +381,7 @@ void BaseApp::Draw()
 
 		if (GetFont(FONT_SMALL)->IsLoaded())
 		{
-			GetFont(FONT_SMALL)->DrawScaled(2,2, stTemp, 0.7f);
+			GetFont(FONT_SMALL)->DrawScaled(GetDebugOverlayX(), GetDebugOverlayY(), stTemp, 0.7f);
 		}
 	}
 
@@ -353,11 +394,11 @@ void BaseApp::Draw()
 	switch (GetLastError())
 	{
 	case ERROR_MEM:
-		GetFont(FONT_SMALL)->DrawScaled(2,14, "LOW MEM!", 0.7f);
+		GetFont(FONT_SMALL)->DrawScaled(GetDebugOverlayX(), GetDebugOverlayY()+12, "LOW MEM!", 0.7f);
 		break;
 
 	case ERROR_SPACE:
-		GetFont(FONT_SMALL)->DrawScaled(2,14, "LOW STORAGE SPACE!", 0.7f);
+		GetFont(FONT_SMALL)->DrawScaled(GetDebugOverlayX(), GetDebugOverlayY()+12, "LOW STORAGE SPACE!", 0.7f);
 		break;
             
         case ERROR_NONE:

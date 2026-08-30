@@ -701,9 +701,21 @@ void MainEventLoop()
 			break;
 
 		case OSMessage::MESSAGE_SET_FPS_LIMIT:
-			
+
 			g_frameDelayMS = int(m.m_x);
-			
+#ifndef RT_EMTERPRETER_ENABLED
+			if (m.m_x == 0.0f)
+			{
+				//truly uncapped: swap the requestAnimationFrame loop (which is
+				//locked to the display refresh) for a setTimeout(0) loop so we
+				//render as fast as the browser lets us
+				emscripten_set_main_loop_timing(EM_TIMING_SETTIMEOUT, 0);
+			}
+			else
+			{
+				emscripten_set_main_loop_timing(EM_TIMING_RAF, 1); //the normal display-synced loop
+			}
+#endif
 			break;
 
 		case OSMessage::MESSAGE_SET_VIDEO_MODE:

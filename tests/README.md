@@ -131,9 +131,12 @@ render-to-texture demo), and `ExtraParms` (extra command line parms, passed
 via URL on html5).
 
 This is a tripwire for "everything got horribly slower" bugs, not a profiler.
-Notes: on Windows, `-autoscreenshot` disables vsync and bypasses the app's
-SetFPSLimit so throughput is real, but DWM still caps windowed wall fps near
-the monitor refresh (hence engine-ms as the vsync-immune signal). On
-html5/ios the browser/display cap (~60-120) applies to fps. Baselines are
-per-machine like the goldens; delete the `.perf.txt` files in goldens/ to
+Notes: `-autoscreenshot` runs genuinely uncapped (vsync off, fps limits
+bypassed, platform timers freed), so wall fps measures real throughput and
+captures finish in a fraction of the scenario's tick time (expect thousands
+of fps on a desktop GPU). A scenario that depends on WALL-clock events can
+pin its capture pace with `ExtraParms = '-autoscreenshotfps <n>'`, which
+makes the engine honor fps limits during the capture: RTDink needs this
+because its menu only appears after the online update check answers.
+Baselines are per-machine like the goldens; delete the `.perf.txt` files in goldens/ to
 re-baseline after intentional perf changes.

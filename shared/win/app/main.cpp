@@ -174,6 +174,7 @@ int g_winVideoScreenX = 0;
 int g_winVideoScreenY = 0;
 bool g_bIsFullScreen = false;
 int g_fpsLimit = 0; //0 for no fps limit (default)  Use MESSAGE_SET_FPS_LIMIT to set
+int g_vsyncEnabled = 1; //cleared when an app explicitly calls SetFPSLimit(0), meaning "truly uncapped"
 bool g_bIsMinimized = false;
 
 void SetPrimaryScreenSize(int width, int height)
@@ -1841,21 +1842,34 @@ void CheckIfMouseLeftWindowArea()
 		}
 }
 
+bool g_vsyncCacheDirty = false; //set after a GL context recreation so SetVSync reapplies
+
 void SetVSync(int sync)
 {
+	//called every frame from the main loop, so cache the function pointer and
+	//only touch the driver when the value actually changes
 	typedef BOOL(APIENTRY* PFNWGLSWAPINTERVALPROC)(int);
-	PFNWGLSWAPINTERVALPROC wglSwapIntervalEXT = 0;
+	static PFNWGLSWAPINTERVALPROC wglSwapIntervalEXT = 0;
+	static bool bTriedInit = false;
+	static int appliedSync = -1;
 
-	const char* extensions = (char*)glGetString(GL_EXTENSIONS);
+	if (!bTriedInit)
+	{
+		bTriedInit = true;
+		wglSwapIntervalEXT = (PFNWGLSWAPINTERVALPROC)wglGetProcAddress("wglSwapIntervalEXT");
+		if (!wglSwapIntervalEXT) LogMsg("Can't do wglSwapIntervalEXT");
+	}
 
-	wglSwapIntervalEXT = (PFNWGLSWAPINTERVALPROC)wglGetProcAddress("wglSwapIntervalEXT");
+	if (g_vsyncCacheDirty)
+	{
+		g_vsyncCacheDirty = false;
+		appliedSync = -1;
+	}
 
-	if (wglSwapIntervalEXT)
+	if (wglSwapIntervalEXT && sync != appliedSync)
 	{
 		wglSwapIntervalEXT(sync);
-	} else
-	{
-		LogMsg("Can't do wglSwapIntervalEXT");
+		appliedSync = sync;
 	}
 }
 
@@ -1954,15 +1968,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLin
 #ifdef C_GL_MODE
 	if (g_autoScreenshotMode)
 	{
-		//uncap vsync so the fps number in the autoscreenshot perf sidecar actually
-		//measures render speed instead of the monitor's refresh rate
-		typedef BOOL (WINAPI *PFNWGLSWAPINTERVALEXTPROC)(int interval);
-		PFNWGLSWAPINTERVALEXTPROC pWglSwapInterval = (PFNWGLSWAPINTERVALEXTPROC) wglGetProcAddress("wglSwapIntervalEXT");
-		if (pWglSwapInterval)
-		{
-			pWglSwapInterval(0);
-			LogMsg("autoscreenshot: vsync disabled for perf measurement");
-		}
+		//the main loop's SetVSync call keeps vsync off for the whole capture, so
+		//the fps number in the perf sidecar measures render speed, not the
+		//monitor's refresh rate
+		LogMsg("autoscreenshot: vsync disabled for perf measurement");
 	}
 #endif
 
@@ -1987,8 +1996,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLin
 	while(1)
 	{
 		
-		//wglSwapIntervalEXT(0);
-		SetVSync(true);
+		//vsync on by default; off when the app asked for no fps limit
+		//(SetFPSLimit(0) = truly uncapped) or during automated captures
+		SetVSync((g_vsyncEnabled && !g_autoScreenshotMode) ? 1 : 0);
 	
 		/*
 		if (GetAsyncKeyState('Q') && GetAsyncKeyState(VK_MENU))
@@ -2022,7 +2032,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLin
 			Sleep(50);
 		}
 
-		if (g_fpsLimit != 0 && !g_autoScreenshotMode) //no fps limit during automated captures, game speed is tick-driven there and uncapped runs measure real throughput (and finish faster)
+		if (g_fpsLimit != 0 && (!g_autoScreenshotMode || g_autoScreenshotRespectFpsLimit)) //no fps limit during automated captures (game speed is tick-driven there and uncapped runs measure real throughput and finish faster), unless -autoscreenshotfps pinned it for wall-clock-dependent scenarios
 		{
 			while (fpsTimer > GetSystemTimeAccurate())
 			{
@@ -2058,10 +2068,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLin
 			
 			case OSMessage::MESSAGE_SET_FPS_LIMIT:
 				g_fpsLimit = int(m.m_x);
+				//an explicit 0 means "run as fast as possible", so drop vsync
+				//too; any positive limit keeps vsync on (the soft limiter and
+				//the swap wait cooperate fine)
+				g_vsyncEnabled = (g_fpsLimit != 0) ? 1 : 0;
+				g_vsyncCacheDirty = true;
 				break;
-			
+
 			case OSMessage::MESSAGE_SET_VIDEO_MODE:
-			
+
+				g_vsyncCacheDirty = true; //the GL context may be recreated below
 				SwapBuffers(g_hDC);
 				GetBaseApp()->Draw();
 

@@ -278,7 +278,10 @@
             [self KillTextBox];
             break;
         case OSMessage::MESSAGE_SET_FPS_LIMIT:
-            glView.animationIntervalSave = 1.0/pMsg->m_x;
+            //0 = uncapped: run the timer flat out (the display still limits
+            //what you SEE, but the FPS display shows real render throughput;
+            //this also used to divide by zero)
+            glView.animationIntervalSave = (pMsg->m_x == 0.0f) ? (1.0/2000.0) : (1.0/pMsg->m_x);
             break;
         case OSMessage::MESSAGE_SET_ACCELEROMETER_UPDATE_HZ:
             if (pMsg->m_x == 0)
