@@ -1,5 +1,6 @@
 #include "PlatformPrecomp.h"
 #include "Surface.h"
+#include "RenderPipeline.h"
 #include "bitmap.h"
 #include "BaseApp.h"
 #include "RTGLESExt.h"
@@ -662,28 +663,28 @@ void Surface::ApplyBlendingMode(uint32 rgba)
 		switch (m_blendingMode)
 		{
 		case BLENDING_NORMAL:
-			glColor4x(GET_RED(rgba) << 8, GET_GREEN(rgba) << 8, GET_BLUE(rgba) << 8, GET_ALPHA(rgba) << 8);
+			rtColor4x(GET_RED(rgba) << 8, GET_GREEN(rgba) << 8, GET_BLUE(rgba) << 8, GET_ALPHA(rgba) << 8);
 			break;
 
 		case BLENDING_ADDITIVE:
 			glBlendFunc( GL_SRC_ALPHA, GL_ONE);
-			glColor4x(GET_RED(rgba) << 8, GET_GREEN(rgba) << 8, GET_BLUE(rgba) << 8, GET_ALPHA(rgba) << 8);
+			rtColor4x(GET_RED(rgba) << 8, GET_GREEN(rgba) << 8, GET_BLUE(rgba) << 8, GET_ALPHA(rgba) << 8);
 			break;
 
 		case BLENDING_PREMULTIPLIED_ALPHA: {
 			glBlendFunc( GL_ONE, GL_ONE_MINUS_SRC_ALPHA );
 			const int alpha = GET_ALPHA(rgba);
-			glColor4x( GET_RED(rgba) * alpha, GET_GREEN(rgba) * alpha, GET_BLUE(rgba) * alpha, alpha << 8);
+			rtColor4x( GET_RED(rgba) * alpha, GET_GREEN(rgba) * alpha, GET_BLUE(rgba) * alpha, alpha << 8);
 										   }
 			break;
 
 		case BLENDING_MULTIPLY:
 			glBlendFunc(GL_DST_COLOR, GL_ZERO);
-			glColor4x(GET_RED(rgba) << 8, GET_GREEN(rgba) << 8, GET_BLUE(rgba) << 8, GET_ALPHA(rgba) << 8);
+			rtColor4x(GET_RED(rgba) << 8, GET_GREEN(rgba) << 8, GET_BLUE(rgba) << 8, GET_ALPHA(rgba) << 8);
 			break;
 		case BLENDING_DARKEN:
 			glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
-			glColor4x(GET_RED(rgba) << 8, GET_GREEN(rgba) << 8, GET_BLUE(rgba) << 8, GET_ALPHA(rgba) << 8);
+			rtColor4x(GET_RED(rgba) << 8, GET_GREEN(rgba) << 8, GET_BLUE(rgba) << 8, GET_ALPHA(rgba) << 8);
 			break;
 		}
 	}
@@ -711,7 +712,7 @@ void Surface::RemoveBlendingMode(uint32 rgba)
 
 	if (UsesAlpha() || rgba != PURE_WHITE || m_blendingMode != BLENDING_NORMAL)
 	{
-		glColor4x(1 << 16, 1 << 16, 1 << 16, 1 << 16);
+		rtColor4x(1 << 16, 1 << 16, 1 << 16, 1 << 16);
 		glDisable( GL_BLEND );
 
 		if (m_blendingMode != BLENDING_NORMAL)
@@ -818,10 +819,10 @@ if (GetBaseApp()->GetDisableSubPixelBlits())
 	pTex->y = 1-(texH*(src.bottom /(float(m_originalHeight))));
 	pTex++;
 
-	glVertexPointer(3, GL_FLOAT, 0, vertices);
-	glTexCoordPointer(2, GL_FLOAT,  0, vTexCoords);
+	rtVertexPointer(3, GL_FLOAT, 0, vertices);
+	rtTexCoordPointer(2, GL_FLOAT,  0, vTexCoords);
 
-	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+	rtDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 	CHECK_GL_ERROR();
 	EndRender(rotation, rgba);
 }
@@ -894,13 +895,13 @@ void Surface::Blit( float x, float y, unsigned int rgba, float rotationDegrees, 
 			0, 1-texH
 		};
 	
-		glVertexPointer(3, GL_FLOAT, 0, vertices);
-		glTexCoordPointer(2, GL_FLOAT,  0, vTexCoords);
+		rtVertexPointer(3, GL_FLOAT, 0, vertices);
+		rtTexCoordPointer(2, GL_FLOAT,  0, vTexCoords);
 		CHECK_GL_ERROR();
 
 		assert((rgba&0xFF)*256 != 0 && "Why send something with zero alpha?");
 	
-		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+		rtDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 		CHECK_GL_ERROR();
 
 		EndRender(rotationDegrees, rgba);

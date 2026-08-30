@@ -1,5 +1,6 @@
 #include "PlatformPrecomp.h"
 #include "RenderClipComponent.h"
+#include "Renderer/RenderPipeline.h"
 #include "BaseApp.h"
 
 
@@ -57,7 +58,7 @@ void RenderClipComponent::FilterOnRender(VariantList *pVList)
 
 	CL_Vec2f vFinalPos = pVList->m_variant[0].GetVector2()+*m_pPos2d;
 	//vFinalPos -= GetAlignmentOffset(*m_pSize2d, eAlignment(*m_pAlignment));	
-	glEnable(GL_CLIP_PLANE0);
+	rtEnable(GL_CLIP_PLANE0);
 	
 	//clip to the bottom of us.. see the .h to see what I plan to add for more control..
 	rtPlane planeA;
@@ -82,7 +83,7 @@ void RenderClipComponent::FilterOnRender(VariantList *pVList)
 
 	}
 	
-	glClipPlane(GL_CLIP_PLANE0, (GLdouble*) planeA.plane);
+	rtClipPlane(GL_CLIP_PLANE0, (const float*) planeA.plane);
 
 #endif
 }
@@ -91,7 +92,7 @@ void RenderClipComponent::PostOnRender(VariantList *pVList)
 {
 	#ifndef PLATFORM_HTML5
 	g_globalBatcher.Flush();
-	glDisable(GL_CLIP_PLANE0);
+	rtDisable(GL_CLIP_PLANE0);
 	#endif
 }
 

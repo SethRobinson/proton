@@ -2,6 +2,7 @@
 #include "BaseApp.h"
 #include "Renderer/RTGLESExt.h"
 #include "Renderer/SoftSurface.h"
+#include "Renderer/RenderPipeline.h"
 
 #ifdef PLATFORM_HTML5
 #include <emscripten/emscripten.h>
@@ -81,22 +82,22 @@ void BaseApp::PrintGLString(const char *name, GLenum s)
 
 void BaseApp::InitializeGLDefaults()
 {
-	glMatrixMode(GL_MODELVIEW);
+	rtMatrixMode(GL_MODELVIEW);
 	glDepthMask(GL_TRUE);
-	glEnable(GL_TEXTURE_2D);
+	rtEnable(GL_TEXTURE_2D);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_ALPHA_TEST);
+	rtDisable(GL_ALPHA_TEST);
 	glDisable( GL_BLEND );
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);	
-	glEnableClientState(GL_VERTEX_ARRAY);	
-	glDisableClientState(GL_COLOR_ARRAY);	
-	glDisableClientState(GL_NORMAL_ARRAY);
-	glDisable( GL_LIGHTING );
+	rtEnableClientState(GL_TEXTURE_COORD_ARRAY);	
+	rtEnableClientState(GL_VERTEX_ARRAY);	
+	rtDisableClientState(GL_COLOR_ARRAY);	
+	rtDisableClientState(GL_NORMAL_ARRAY);
+	rtDisable(GL_LIGHTING);
 	glDepthFunc(GL_LEQUAL);
 	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-	glColor4x(1 << 16, 1 << 16, 1 << 16, 1 << 16);
+	rtColor4x(1 << 16, 1 << 16, 1 << 16, 1 << 16);
 	glClearColor(0,0,0,255);
 }
 

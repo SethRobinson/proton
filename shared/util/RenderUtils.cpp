@@ -9,6 +9,7 @@
 
 #include "PlatformPrecomp.h"
 #include "RenderUtils.h"
+#include "Renderer/RenderPipeline.h"
 #include "BaseApp.h"
 
 //defaults
@@ -229,23 +230,23 @@ void RenderGLTriangle()
 		0.0f, triSize, 0.0f
 	};
 	glDisable(GL_BLEND);
-	glDisable(GL_ALPHA_TEST);
+	rtDisable(GL_ALPHA_TEST);
 
-	glDisable(GL_TEXTURE_2D);
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(3, GL_FLOAT,  0, vVertices);
+	rtDisable(GL_TEXTURE_2D);
+	rtEnableClientState(GL_VERTEX_ARRAY);
+	rtVertexPointer(3, GL_FLOAT,  0, vVertices);
 
 	unsigned int rgba = MAKE_RGBA(255,0,0,255);
-	glColor4x( (rgba >>8 & 0xFF)*256,  (rgba>>16& 0xFF)*256, (rgba>>24& 0xFF)*256, (rgba&0xFF)*256);
-	glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+	rtColor4x( (rgba >>8 & 0xFF)*256,  (rgba>>16& 0xFF)*256, (rgba>>24& 0xFF)*256, (rgba&0xFF)*256);
+	rtDisableClientState( GL_TEXTURE_COORD_ARRAY );
 
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	rtDrawArrays(GL_TRIANGLES, 0, 3);
 	//fix the color back to white
-	glColor4x(1 << 16, 1 << 16, 1 << 16, 1 << 16);
+	rtColor4x(1 << 16, 1 << 16, 1 << 16, 1 << 16);
 
 
-	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
-	glEnable(GL_TEXTURE_2D);
+	rtEnableClientState( GL_TEXTURE_COORD_ARRAY );
+	rtEnable(GL_TEXTURE_2D);
 	CHECK_GL_ERROR();
 }
 
@@ -253,25 +254,25 @@ void RenderGLTriangle()
 void RenderSpinningTriangle()
 {
 
-	glPushMatrix();
+	rtPushMatrix();
 	
-    glLoadIdentity();
-	glTranslatef(0,0,-2);
-	glRotatef(float( (GetBaseApp()->GetGameTick()/10) %360) , 0, 1, 0); //rotate it
+    rtLoadIdentity();
+	rtTranslatef(0,0,-2);
+	rtRotatef(float( (GetBaseApp()->GetGameTick()/10) %360) , 0, 1, 0); //rotate it
 	glDisable(GL_CULL_FACE); //so we can see the back of the triangle too
 	RenderGLTriangle();
 	glEnable(GL_CULL_FACE); //so we can see the back of the triangle too
-	glPopMatrix();
+	rtPopMatrix();
 	CHECK_GL_ERROR();
 }
 
 void RenderTexturedGLTriangle()
 {
 
-	glPushMatrix();
-	//glLoadIdentity();
-	//glTranslatef(0,0,-2);
-	glRotatef(float( (GetBaseApp()->GetGameTick()/10) %360) , 0, 1, 0); //rotate it
+	rtPushMatrix();
+	//rtLoadIdentity();
+	//rtTranslatef(0,0,-2);
+	rtRotatef(float( (GetBaseApp()->GetGameTick()/10) %360) , 0, 1, 0); //rotate it
 	glDisable(GL_CULL_FACE); //so we can see the back of the triangle too
 
 	//let's draw a simple triangle 
@@ -296,26 +297,26 @@ void RenderTexturedGLTriangle()
 		0.5,1
 	};
 	//unsigned int rgba = MAKE_RGBA(255,255,255,255);
-	//glColor4x( (rgba >>8 & 0xFF)*256,  (rgba>>16& 0xFF)*256, (rgba>>24& 0xFF)*256, (rgba&0xFF)*256);
+	//rtColor4x( (rgba >>8 & 0xFF)*256,  (rgba>>16& 0xFF)*256, (rgba>>24& 0xFF)*256, (rgba&0xFF)*256);
 	
-	glVertexPointer(3, GL_FLOAT,  0, vVertices);
-	glTexCoordPointer(2, GL_FLOAT,  0, vTexCoords);
+	rtVertexPointer(3, GL_FLOAT,  0, vVertices);
+	rtTexCoordPointer(2, GL_FLOAT,  0, vTexCoords);
 
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	rtEnableClientState(GL_VERTEX_ARRAY);
+	rtEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	
 	glEnable(GL_BLEND);
-	glEnable(GL_ALPHA_TEST);
+	rtEnable(GL_ALPHA_TEST);
 	glDisable(GL_CULL_FACE); //so we can see the back of the triangle too
 
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	rtDrawArrays(GL_TRIANGLES, 0, 3);
 	glEnable(GL_CULL_FACE);
 	glDisable(GL_BLEND);
-	glDisable(GL_ALPHA_TEST);
+	rtDisable(GL_ALPHA_TEST);
 	CHECK_GL_ERROR();
 
 	glEnable(GL_CULL_FACE); //so we can see the back of the triangle too
-	glPopMatrix();
+	rtPopMatrix();
 	CHECK_GL_ERROR();
 }
 
@@ -324,10 +325,10 @@ void RenderTexturedGLTriangle()
 void RenderTexturedGLTriangleWithDrawElements()
 {
 
-	glPushMatrix();
-	glLoadIdentity();
-	glTranslatef(0,0,-2);
-	glRotatef(float( (GetBaseApp()->GetGameTick()/10) %360) , 0, 1, 0); //rotate it
+	rtPushMatrix();
+	rtLoadIdentity();
+	rtTranslatef(0,0,-2);
+	rtRotatef(float( (GetBaseApp()->GetGameTick()/10) %360) , 0, 1, 0); //rotate it
 	glDisable(GL_CULL_FACE); //so we can see the back of the triangle too
 
 
@@ -358,26 +359,26 @@ void RenderTexturedGLTriangleWithDrawElements()
 		0.5,1
 	};
 	//unsigned int rgba = MAKE_RGBA(255,255,255,255);
-	//glColor4x( (rgba >>8 & 0xFF)*256,  (rgba>>16& 0xFF)*256, (rgba>>24& 0xFF)*256, (rgba&0xFF)*256);
+	//rtColor4x( (rgba >>8 & 0xFF)*256,  (rgba>>16& 0xFF)*256, (rgba>>24& 0xFF)*256, (rgba&0xFF)*256);
 	
 #ifdef RT_GLES_ADAPTOR_MODE
 	//glVertexPointerEx(3, GL_FLOAT,  0, vVertices, 5);
 
 	//make sure doing it the dumb way still works too
-	glVertexPointer(3, GL_FLOAT,  0, vVertices);
+	rtVertexPointer(3, GL_FLOAT,  0, vVertices);
 #else
-	glVertexPointer(3, GL_FLOAT,  0, vVertices);
+	rtVertexPointer(3, GL_FLOAT,  0, vVertices);
 #endif
-	glTexCoordPointer(2, GL_FLOAT,  0, vTexCoords);
+	rtTexCoordPointer(2, GL_FLOAT,  0, vTexCoords);
 
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	rtEnableClientState(GL_VERTEX_ARRAY);
+	rtEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	
 	glEnable(GL_BLEND);
-	glEnable(GL_ALPHA_TEST);
+	rtEnable(GL_ALPHA_TEST);
 	glDisable(GL_CULL_FACE); //so we can see the back of the triangle too
 
-	//glDrawArrays(GL_TRIANGLES, 0, 3);
+	//rtDrawArrays(GL_TRIANGLES, 0, 3);
 	
 	uint16 index[5];
 	index[0] = 0;
@@ -387,15 +388,15 @@ void RenderTexturedGLTriangleWithDrawElements()
 	index[4] = 4;
 
 	//setup to start at an offset, needed this to test something
-	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, &index[2]);
+	rtDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, &index[2]);
 	
 	glEnable(GL_CULL_FACE);
 	glDisable(GL_BLEND);
-	glDisable(GL_ALPHA_TEST);
+	rtDisable(GL_ALPHA_TEST);
 	CHECK_GL_ERROR();
 
 	glEnable(GL_CULL_FACE); //so we can see the back of the triangle too
-	glPopMatrix();
+	rtPopMatrix();
 	CHECK_GL_ERROR();
 }
 
@@ -423,20 +424,20 @@ void RenderTexturedRectangle(float RectSize)
 		0, 1
 	};
 	//unsigned int rgba = MAKE_RGBA(255,255,255,255);
-	//glColor4x( (rgba >>8 & 0xFF)*256,  (rgba>>16& 0xFF)*256, (rgba>>24& 0xFF)*256, (rgba&0xFF)*256);
-	glVertexPointer(3, GL_FLOAT,  0, vVertices);
-	glTexCoordPointer(2, GL_FLOAT,  0, vTexCoords);
+	//rtColor4x( (rgba >>8 & 0xFF)*256,  (rgba>>16& 0xFF)*256, (rgba>>24& 0xFF)*256, (rgba&0xFF)*256);
+	rtVertexPointer(3, GL_FLOAT,  0, vVertices);
+	rtTexCoordPointer(2, GL_FLOAT,  0, vTexCoords);
 
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	rtEnableClientState(GL_VERTEX_ARRAY);
+	rtEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	glEnable(GL_BLEND);
-	glEnable(GL_ALPHA_TEST);
+	rtEnable(GL_ALPHA_TEST);
 	
-	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+	rtDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 	
 	glDisable(GL_BLEND);
-	glDisable(GL_ALPHA_TEST);
+	rtDisable(GL_ALPHA_TEST);
 }
 
 
@@ -948,8 +949,8 @@ void  ScreenToWorld(CL_Vec2f pt, CL_Vec3f *pReturnA, float dist)
 	y =  tanffov * y;
 
 	CL_Mat4f mat16, projMat16;
-	glGetFloatv(GL_MODELVIEW_MATRIX, mat16);
-	glGetFloatv(GL_PROJECTION_MATRIX, projMat16);
+	rtGetMatrixf(GL_MODELVIEW_MATRIX, mat16);
+	rtGetMatrixf(GL_PROJECTION_MATRIX, projMat16);
 
 	mat16.inverse();
 	

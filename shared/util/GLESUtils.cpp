@@ -1,5 +1,6 @@
 #include "PlatformPrecomp.h"
 #include "GLESUtils.h"
+#include "../Renderer/RenderPipeline.h"
 #include "../Renderer/Surface.h"
 #include "BaseApp.h"
 
@@ -91,9 +92,9 @@ void gluLookAt(GLfloat eyex, GLfloat eyey, GLfloat eyez,
 
 #undef M
 
-	glMultMatrixf(m);
+	rtMultMatrixf(m);
 	/* Translate Eye to Origin */
-	glTranslatef(-eyex, -eyey, -eyez);
+	rtTranslatef(-eyex, -eyey, -eyez);
 }
 float g_extraScreenRotation = 0;
 void SetExtraScreenRotationDegrees(float degrees)
@@ -131,14 +132,14 @@ void RotateGLIfNeeded()
 	if (GetBaseApp()->GetManualRotationMode())
 	{
 		float degrees = OrientationToDegrees(GetOrientation());
-		glRotatef(degrees, 0.0f, 0.0f, 1.0f);
+		rtRotatef(degrees, 0.0f, 0.0f, 1.0f);
 
 		
 	}
     
     if (g_extraScreenRotation != 0)
     {
-        glRotatef(-g_extraScreenRotation, 0,0,1);
+        rtRotatef(-g_extraScreenRotation, 0,0,1);
     }
 
 }
@@ -163,10 +164,10 @@ void GenerateSetPerspectiveFOV(float fovy, float aspect, float zNear, float zFar
 {
 	PrepareForGL();
 
-	glMatrixMode(GL_PROJECTION);
+	rtMatrixMode(GL_PROJECTION);
 	
 	//we use Clanlib to setup our matrix manually because if we do it in HW we can't always extract it again as android gl doesn't support that
-	glLoadIdentity();
+	rtLoadIdentity();
 	CL_Mat4f mat = CL_Mat4f::identity();
 
 	RotateGLIfNeeded(mat);
@@ -181,9 +182,9 @@ void GenerateSetPerspectiveFOV(float fovy, float aspect, float zNear, float zFar
 	mat.multiply( CL_Mat4f::frustum(xmin, xmax, ymin, ymax, zNear, zFar));
 	*GetBaseApp()->GetProjectionMatrix() = mat;
 	//glFrustumf(xmin, xmax, ymin, ymax, zNear, zFar);
-	glLoadMatrixf((GLfloat*)mat);
+	rtLoadMatrixf((GLfloat*)mat);
 
-	glMatrixMode(GL_MODELVIEW);
+	rtMatrixMode(GL_MODELVIEW);
 }
 
 
@@ -302,8 +303,8 @@ void DrawEllipse (const int segments, CL_Vec2f vPos, float radianWidth, float ra
 
 	SetupOrtho();
 
-	glPushMatrix();
-	glTranslatef(vPos.x, vPos.y, 0.0);
+	rtPushMatrix();
+	rtTranslatef(vPos.x, vPos.y, 0.0);
 	vector<float> vertices;
 	vertices.resize(segments*2);
 	glEnable (GL_LINE_SMOOTH);
@@ -313,28 +314,28 @@ void DrawEllipse (const int segments, CL_Vec2f vPos, float radianWidth, float ra
 		vertices[count++] = (float(cos(DEG2RAD(i)))*radianWidth);
 		vertices[count++] = (float(sin(DEG2RAD(i)))*radiusHeight);
 	}
-	glColor4x( (color >>8 & 0xFF)*256,  (color>>16& 0xFF)*256, (color>>24& 0xFF)*256, (color&0xFF)*256);
+	rtColor4x( (color >>8 & 0xFF)*256,  (color>>16& 0xFF)*256, (color>>24& 0xFF)*256, (color&0xFF)*256);
 	if (GET_ALPHA(color) != 255)
 	{
 		glEnable(GL_BLEND);
-		glEnable(GL_ALPHA_TEST);
+		rtEnable(GL_ALPHA_TEST);
 
 	}
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);	
-	glDisable(GL_TEXTURE_2D);	
-	glVertexPointer (2, GL_FLOAT , 0, &vertices.at(0)); 
-	glDrawArrays ((vFilled) ? GL_TRIANGLE_FAN : GL_LINE_LOOP, 0, segments);
+	rtDisableClientState(GL_TEXTURE_COORD_ARRAY);	
+	rtDisable(GL_TEXTURE_2D);	
+	rtVertexPointer (2, GL_FLOAT , 0, &vertices.at(0)); 
+	rtDrawArrays ((vFilled) ? GL_TRIANGLE_FAN : GL_LINE_LOOP, 0, segments);
 	
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);	
-	glEnable(GL_TEXTURE_2D);	
+	rtEnableClientState(GL_TEXTURE_COORD_ARRAY);	
+	rtEnable(GL_TEXTURE_2D);	
 	if (GET_ALPHA(color) != 255)
 	{
 		glDisable(GL_BLEND);
-		glDisable(GL_ALPHA_TEST);
+		rtDisable(GL_ALPHA_TEST);
 
 	}
-	glColor4x(1 << 16, 1 << 16, 1 << 16, 1 << 16);
-	glPopMatrix();
+	rtColor4x(1 << 16, 1 << 16, 1 << 16, 1 << 16);
+	rtPopMatrix();
 }
 #endif
 
@@ -351,10 +352,10 @@ void  DrawLine( GLuint rgba,   float ax, float ay, float bx, float by, float lin
 {
 	SetupOrtho();
 
-	glDisable( GL_TEXTURE_2D );
+	rtDisable(GL_TEXTURE_2D);
 
-	glEnableClientState(GL_VERTEX_ARRAY);	
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	rtEnableClientState(GL_VERTEX_ARRAY);	
+	rtDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	GLfloat	vertices[] = 
 	{
 		ax,ay, 0,
@@ -363,20 +364,20 @@ void  DrawLine( GLuint rgba,   float ax, float ay, float bx, float by, float lin
 	
 		glLineWidth(lineWidth); 
 		glEnable (GL_LINE_SMOOTH);
-		//glDisable(GL_LINE_SMOOTH);
-		glHint (GL_LINE_SMOOTH_HINT, GL_NICEST);
+		//rtDisable(GL_LINE_SMOOTH);
+		rtHint (GL_LINE_SMOOTH_HINT, GL_NICEST);
 
-		glVertexPointer(3, GL_FLOAT, 0, vertices);
+		rtVertexPointer(3, GL_FLOAT, 0, vertices);
 		//glColor4f(1, 1, 1, 1);
 		glEnable( GL_BLEND );
-		glColor4x( (rgba >>8 & 0xFF)*256,  (rgba>>16& 0xFF)*256, (rgba>>24& 0xFF)*256, (rgba&0xFF)*256);
+		rtColor4x( (rgba >>8 & 0xFF)*256,  (rgba>>16& 0xFF)*256, (rgba>>24& 0xFF)*256, (rgba&0xFF)*256);
 
-		glDrawArrays(GL_LINES, 0, 2);
-		glColor4x(1 << 16, 1 << 16, 1 << 16, 1 << 16);
+		rtDrawArrays(GL_LINES, 0, 2);
+		rtColor4x(1 << 16, 1 << 16, 1 << 16, 1 << 16);
 
 		glDisable( GL_BLEND );
-		glEnable( GL_TEXTURE_2D );
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);	
+		rtEnable(GL_TEXTURE_2D);
+		rtEnableClientState(GL_TEXTURE_COORD_ARRAY);	
 		CHECK_GL_ERROR();
 }
 #else
@@ -385,10 +386,10 @@ void  DrawLine( GLuint rgba,   float ax, float ay, float bx, float by, float lin
 	SetupOrtho();
 	g_globalBatcher.Flush();
 
-	glDisable( GL_TEXTURE_2D );
+	rtDisable(GL_TEXTURE_2D);
 
-	glEnableClientState(GL_VERTEX_ARRAY);	
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	rtEnableClientState(GL_VERTEX_ARRAY);	
+	rtDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glDisable(GL_CULL_FACE);
 
 	static GLfloat	vertices[3*4];
@@ -434,19 +435,19 @@ void  DrawLine( GLuint rgba,   float ax, float ay, float bx, float by, float lin
 	vertices[2*3+2] = 0;
 	vertices[3*3+2] = 0;
 	
-	glVertexPointer(3, GL_FLOAT, 0, vertices);
+	rtVertexPointer(3, GL_FLOAT, 0, vertices);
 	//glColor4f(1, 1, 1, 1);
 	glEnable( GL_BLEND );
-	glColor4x( (rgba >>8 & 0xFF)*256,  (rgba>>16& 0xFF)*256, (rgba>>24& 0xFF)*256, (rgba&0xFF)*256);
+	rtColor4x( (rgba >>8 & 0xFF)*256,  (rgba>>16& 0xFF)*256, (rgba>>24& 0xFF)*256, (rgba&0xFF)*256);
 
-	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-	glColor4x(1 << 16, 1 << 16, 1 << 16, 1 << 16);
+	rtDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+	rtColor4x(1 << 16, 1 << 16, 1 << 16, 1 << 16);
 
 	glEnable(GL_CULL_FACE);
 
 	glDisable( GL_BLEND );
-	glEnable( GL_TEXTURE_2D );
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);	
+	rtEnable(GL_TEXTURE_2D);
+	rtEnableClientState(GL_TEXTURE_COORD_ARRAY);	
 	CHECK_GL_ERROR();
 }
 
@@ -456,7 +457,7 @@ void  GenerateFillRect( GLuint rgba, float x, float y, float w, float h )
 	SetupOrtho();
 
 	//disable depth testing and depth writing
-	glDisable( GL_TEXTURE_2D );
+	rtDisable(GL_TEXTURE_2D);
 	
 	if (GetBaseApp()->GetDisableSubPixelBlits())
 	{
@@ -478,40 +479,40 @@ void  GenerateFillRect( GLuint rgba, float x, float y, float w, float h )
 		x +w,			y+h,		0.0,
 		x ,		 y+h,		0.0 };
 
-		glEnableClientState(GL_VERTEX_ARRAY);	
+		rtEnableClientState(GL_VERTEX_ARRAY);	
 	
-		glVertexPointer(3, GL_FLOAT, 0, vertices);
+		rtVertexPointer(3, GL_FLOAT, 0, vertices);
 		//glColor4f(1, 1, 1, 1);
 		assert((rgba&0xFF)*256 != 0 && "Why send something with zero alpha?");
 		glEnable( GL_BLEND );
-		glDisable( GL_TEXTURE_2D );
-		glEnable(GL_ALPHA_TEST);
+		rtDisable(GL_TEXTURE_2D);
+		rtEnable(GL_ALPHA_TEST);
 
-		glColor4x( (rgba >>8 & 0xFF)*256,  (rgba>>16& 0xFF)*256, (rgba>>24& 0xFF)*256, (rgba&0xFF)*256);
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);	
+		rtColor4x( (rgba >>8 & 0xFF)*256,  (rgba>>16& 0xFF)*256, (rgba>>24& 0xFF)*256, (rgba&0xFF)*256);
+		rtDisableClientState(GL_TEXTURE_COORD_ARRAY);	
 
-		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-		glColor4x(1 << 16, 1 << 16, 1 << 16, 1 << 16);
+		rtDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+		rtColor4x(1 << 16, 1 << 16, 1 << 16, 1 << 16);
 
 		glDisable( GL_BLEND );
-		glEnable( GL_TEXTURE_2D );
-		glDisable(GL_ALPHA_TEST);
+		rtEnable(GL_TEXTURE_2D);
+		rtDisable(GL_ALPHA_TEST);
 
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);	
+		rtEnableClientState(GL_TEXTURE_COORD_ARRAY);	
 	CHECK_GL_ERROR();	
 }
 
 void PushRotationMatrix(float rotationDegrees, CL_Vec2f vRotatePt)
 {
-	glPushMatrix();
-	glTranslatef(vRotatePt.x, vRotatePt.y, 0);
-	glRotatef(rotationDegrees, 0, 0, 1);
+	rtPushMatrix();
+	rtTranslatef(vRotatePt.x, vRotatePt.y, 0);
+	rtRotatef(rotationDegrees, 0, 0, 1);
 }
 
 void PopRotationMatrix()
 {
 	//Wrap this in case I do something more fancy later
-	glPopMatrix();
+	rtPopMatrix();
 }
 
 bool g_OrthoRenderSizeActive = false;
@@ -527,21 +528,21 @@ void SetOrthoRenderSize(float x, float y, int screenOffsetX, int screenOffsetY)
 	}
 	
 	g_OrthoRenderSizeActive = true;
-	glMatrixMode(GL_PROJECTION);
+	rtMatrixMode(GL_PROJECTION);
 	
-	glPopMatrix();
-	glPushMatrix();
+	rtPopMatrix();
+	rtPushMatrix();
 
-	glLoadIdentity();
+	rtLoadIdentity();
 	RotateGLIfNeeded();
 	g_renderOrthoRenderSizeX = x;
 	g_renderOrthoRenderSizeY = y;
 	
 	float offset = 0;
-	glOrthof( (-screenOffsetX)+offset, (x+offset), y+offset, screenOffsetY+offset,  -1, 1 );		
-	//glTranslatef(0.5f, 0.5f, 0); //fixes a gl glitch where pixels don't know which side to be on
+	rtOrthof( (-screenOffsetX)+offset, (x+offset), y+offset, screenOffsetY+offset,  -1, 1 );		
+	//rtTranslatef(0.5f, 0.5f, 0); //fixes a gl glitch where pixels don't know which side to be on
 
-	glMatrixMode(GL_MODELVIEW);
+	rtMatrixMode(GL_MODELVIEW);
 	CHECK_GL_ERROR();
 }
 
@@ -553,18 +554,18 @@ void RemoveOrthoRenderSize()
 	
 	if (g_OrthoRenderSizeActive)
 	{
-		glMatrixMode(GL_PROJECTION);
-		glPopMatrix();
-		glPushMatrix();
+		rtMatrixMode(GL_PROJECTION);
+		rtPopMatrix();
+		rtPushMatrix();
 
-		glLoadIdentity();
+		rtLoadIdentity();
 		RotateGLIfNeeded();
 		g_renderOrthoRenderSizeX = GetScreenSizeXf();
 		g_renderOrthoRenderSizeY = GetScreenSizeYf();
 	
 		float offset = 0.0f;
-		glOrthof( offset,  g_renderOrthoRenderSizeX+offset, g_renderOrthoRenderSizeY+offset, offset,  -1, 1 );		
-		glMatrixMode(GL_MODELVIEW);
+		rtOrthof( offset,  g_renderOrthoRenderSizeX+offset, g_renderOrthoRenderSizeY+offset, offset,  -1, 1 );		
+		rtMatrixMode(GL_MODELVIEW);
 		CHECK_GL_ERROR();
 	}
 
@@ -578,18 +579,18 @@ void SetupOrtho()
 	g_globalBatcher.Flush();
 
 	CHECK_GL_ERROR();
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
+	rtMatrixMode(GL_PROJECTION);
+	rtPushMatrix();
+	rtLoadIdentity();
 
-	glScalef(GetForceAspectSquishModifer().x, GetForceAspectSquishModifer().y, 1.0f);
+	rtScalef(GetForceAspectSquishModifer().x, GetForceAspectSquishModifer().y, 1.0f);
 
 
-	glEnable(GL_TEXTURE_2D);
-	glEnableClientState(GL_VERTEX_ARRAY);	
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);	
-	glDisableClientState(GL_COLOR_ARRAY);	
-	glDisableClientState(GL_NORMAL_ARRAY);
+	rtEnable(GL_TEXTURE_2D);
+	rtEnableClientState(GL_VERTEX_ARRAY);	
+	rtEnableClientState(GL_TEXTURE_COORD_ARRAY);	
+	rtDisableClientState(GL_COLOR_ARRAY);	
+	rtDisableClientState(GL_NORMAL_ARRAY);
 
 	CHECK_GL_ERROR();
 	RotateGLIfNeeded();
@@ -619,15 +620,15 @@ void SetupOrtho()
 
     CHECK_GL_ERROR();
 
-	glOrthof(0,  tempX, tempY, 0,  -1, 1 );
+	rtOrthof(0,  tempX, tempY, 0,  -1, 1 );
 	
 	CHECK_GL_ERROR();
 
 
 
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
+	rtMatrixMode(GL_MODELVIEW);
+	rtPushMatrix();
+	rtLoadIdentity();
 	
 	
 	
@@ -646,17 +647,17 @@ void PrepareForGL()
 	g_globalBatcher.Flush();
 	CHECK_GL_ERROR();
 	
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
+	rtMatrixMode(GL_PROJECTION);
+	rtPopMatrix();
 	CHECK_GL_ERROR();
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
+	rtMatrixMode(GL_MODELVIEW);
+	rtPopMatrix();
 	CHECK_GL_ERROR();
 	glDepthMask(GL_TRUE);
 	glEnable(GL_DEPTH_TEST);   
 	CHECK_GL_ERROR();
 	glCullFace(GL_BACK);
-	glLoadIdentity();
+	rtLoadIdentity();
 	CHECK_GL_ERROR();
 	ResetOrthoFlag();
 }

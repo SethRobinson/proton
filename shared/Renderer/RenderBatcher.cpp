@@ -1,5 +1,6 @@
 #include "PlatformPrecomp.h"
 #include "RenderBatcher.h"
+#include "RenderPipeline.h"
 #include "SoftSurface.h"
 #include "util/GLESUtils.h"
 #include "BaseApp.h"
@@ -154,11 +155,11 @@ void RenderBatcher::Flush(eFlushMode mode)
 		}
 
 		glEnable(GL_BLEND);
-		glVertexPointer(3, GL_FLOAT, sizeof(BatchVert), &m_verts[0].vPos.x);
-		glTexCoordPointer(2, GL_FLOAT,  sizeof(BatchVert), &m_verts[0].vUv.x);
-		glColorPointer(4, GL_UNSIGNED_BYTE,  sizeof(BatchVert), &m_verts[0].color);
-		glEnableClientState(GL_COLOR_ARRAY);
-		glColor4x(1 << 16, 1 << 16, 1 << 16, 1 << 16);
+		rtVertexPointer(3, GL_FLOAT, sizeof(BatchVert), &m_verts[0].vPos.x);
+		rtTexCoordPointer(2, GL_FLOAT,  sizeof(BatchVert), &m_verts[0].vUv.x);
+		rtColorPointer(4, GL_UNSIGNED_BYTE,  sizeof(BatchVert), &m_verts[0].color);
+		rtEnableClientState(GL_COLOR_ARRAY);
+		rtColor4x(1 << 16, 1 << 16, 1 << 16, 1 << 16);
 		//glColor4f(1,1,1,0);
 	}
 
@@ -191,7 +192,7 @@ void RenderBatcher::Flush(eFlushMode mode)
 				//glBlendFunc( GL_ONE, GL_ONE_MINUS_SRC_ALPHA );
 				//glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 			}
-			::glDrawArrays(GL_TRIANGLES,curPrim,event.m_vertCount);
+			rtDrawArrays(GL_TRIANGLES,curPrim,event.m_vertCount);
 			if (event.m_pSurf)
 			{
 				event.m_pSurf->RemoveBlendingMode(color);
@@ -205,8 +206,8 @@ void RenderBatcher::Flush(eFlushMode mode)
 	if (mode == FLUSH_UNSETUP || mode == FLUSH_SETUP_RENDER_UNSETUP)
 	{
 		glDisable( GL_BLEND );
-		glDisableClientState(GL_COLOR_ARRAY);
-		glColor4x(1 << 16, 1 << 16, 1 << 16, 1 << 16); //need this for some gl drivers
+		rtDisableClientState(GL_COLOR_ARRAY);
+		rtColor4x(1 << 16, 1 << 16, 1 << 16, 1 << 16); //need this for some gl drivers
 
 		m_verts.clear();
 		assert(m_batchEvents.empty());
@@ -254,25 +255,25 @@ void RenderBatcher::BlitRawImage(int dstX, int dstY,  uint8 *pRaw, int width, in
 	}
 	
 	SetupOrtho();
-	glDisable(GL_TEXTURE_2D);
-	glDisableClientState( GL_TEXTURE_COORD_ARRAY );
-	glEnableClientState(GL_COLOR_ARRAY);
-	glColorPointer(4, GL_UNSIGNED_BYTE, 0, pRaw);
+	rtDisable(GL_TEXTURE_2D);
+	rtDisableClientState( GL_TEXTURE_COORD_ARRAY );
+	rtEnableClientState(GL_COLOR_ARRAY);
+	rtColorPointer(4, GL_UNSIGNED_BYTE, 0, pRaw);
 
 	if (bNeedsAlpha)
 	{
 		glEnable(GL_BLEND);
 	}
 
-	glVertexPointer(3, GL_SHORT, 0, &vertBuff[0]);
-	glPushMatrix();
-	//glTranslatef(-0.5f, 0.5f, 0);
-	::glDrawArrays(GL_POINTS, 0, dataSize);
-	glPopMatrix();
+	rtVertexPointer(3, GL_SHORT, 0, &vertBuff[0]);
+	rtPushMatrix();
+	//rtTranslatef(-0.5f, 0.5f, 0);
+	rtDrawArrays(GL_POINTS, 0, dataSize);
+	rtPopMatrix();
 
-	glDisableClientState(GL_COLOR_ARRAY);
-	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
-	glEnable(GL_TEXTURE_2D);
+	rtDisableClientState(GL_COLOR_ARRAY);
+	rtEnableClientState( GL_TEXTURE_COORD_ARRAY );
+	rtEnable(GL_TEXTURE_2D);
 	if (bNeedsAlpha)
 	{
 		glDisable(GL_BLEND);
@@ -341,45 +342,45 @@ void RenderBatcher::Flush3D( bool bUseNormals, bool bUseTextures, bool bUseColor
 	
 	CHECK_GL_ERROR();
 	if (m_verts.empty()) return;
-	glVertexPointer(3, GL_FLOAT, sizeof(BatchVert), &m_verts[0].vPos.x);
+	rtVertexPointer(3, GL_FLOAT, sizeof(BatchVert), &m_verts[0].vPos.x);
 	CHECK_GL_ERROR();
 	if (bUseTextures)
 	{
 		m_pSurf->Bind();
-		glTexCoordPointer(2, GL_FLOAT,  sizeof(BatchVert), &m_verts[0].vUv.x);
+		rtTexCoordPointer(2, GL_FLOAT,  sizeof(BatchVert), &m_verts[0].vUv.x);
 	} else
 	{
-		glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+		rtDisableClientState( GL_TEXTURE_COORD_ARRAY );
 	}
 
 	if (bUseNormals)
 	{
-		glEnableClientState(GL_NORMAL_ARRAY);	
-		glNormalPointer(GL_FLOAT,  sizeof(BatchVert), &m_verts[0].vNormal.x);
+		rtEnableClientState(GL_NORMAL_ARRAY);	
+		rtNormalPointer(GL_FLOAT,  sizeof(BatchVert), &m_verts[0].vNormal.x);
 	}
 
 	if (bUseColorByte)
 	{
-		glColorPointer(4, GL_UNSIGNED_BYTE,  sizeof(BatchVert), &m_verts[0].color);
-		glEnableClientState(GL_COLOR_ARRAY);
-		glColor4x(1 << 16, 1 << 16, 1 << 16, 1 << 16);
+		rtColorPointer(4, GL_UNSIGNED_BYTE,  sizeof(BatchVert), &m_verts[0].color);
+		rtEnableClientState(GL_COLOR_ARRAY);
+		rtColor4x(1 << 16, 1 << 16, 1 << 16, 1 << 16);
 	}
 	
 	CHECK_GL_ERROR();
 
-	::glDrawArrays(GL_TRIANGLES, 0, (GLsizei) m_verts.size());
+	rtDrawArrays(GL_TRIANGLES, 0, (GLsizei) m_verts.size());
 	CHECK_GL_ERROR();
 	glDisable( GL_BLEND );
 
 	if (bUseColorByte)
 	{
-		glDisableClientState(GL_COLOR_ARRAY);
-		glColor4x(1 << 16, 1 << 16, 1 << 16, 1 << 16); //need this for some gl drivers
+		rtDisableClientState(GL_COLOR_ARRAY);
+		rtColor4x(1 << 16, 1 << 16, 1 << 16, 1 << 16); //need this for some gl drivers
 	}
 
 	if (bUseNormals)
 	{
-		glDisableClientState(GL_NORMAL_ARRAY);	
+		rtDisableClientState(GL_NORMAL_ARRAY);	
 	}
 
 	if (bUseTextures)
@@ -387,7 +388,7 @@ void RenderBatcher::Flush3D( bool bUseNormals, bool bUseTextures, bool bUseColor
 
 	} else
 	{
-		glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+		rtEnableClientState( GL_TEXTURE_COORD_ARRAY );
 	}
 	m_verts.clear();
 }
