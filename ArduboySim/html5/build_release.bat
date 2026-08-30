@@ -2,7 +2,23 @@
 :Windows explorer will build the html5 (javascript webbrowser version)
 :See http://www.rtsoft.com/wiki/doku.php?id=proton:html5_setup for info on how to setup Emscripten
 
-call ../app_info_setup.bat
+set CURPATH=%cd%
+cd ..
+call app_info_setup.bat
+:um, why does the emsdk_env.bat not fully work unless I'm in the emscripten dir?  Whatever, we'll move there and then back
+cd %EMSCRIPTEN_ROOT%
+call emsdk_env.bat
+:Move back to original directory
+cd %CURPATH%
+
+where /q emcc
+
+if ERRORLEVEL 1 (
+    ECHO You need the environmental EMSCRIPTEN_ROOT set.  This should be set in setup_base.bat in proton's main dir, then called from app_info_setup.bat.
+     %RT_UTIL%\beeper
+     pause
+     exit
+)
 
 :Set below to DEBUG=1 for debug mode builds - slower but way easier to see problems
 SET DEBUG=0
@@ -32,10 +48,9 @@ set SRC= %SHARED%\PlatformSetup.cpp  %SHARED%\html5\HTML5Main.cpp %SHARED%\html5
 %SHARED%\Audio\AudioManager.cpp %SHARED%\Audio\AudioManagerSDL.cpp %CLANMATH%\angle.cpp %CLANMATH%\mat3.cpp %CLANMATH%\mat4.cpp %CLANMATH%\rect.cpp %CLANMATH%\vec2.cpp %CLANMATH%\vec3.cpp ^
 %CLANMATH%\vec4.cpp %SHARED%\Entity\Entity.cpp %SHARED%\Entity\Component.cpp %SHARED%\GUI\RTFont.cpp %SHARED%\Manager\Console.cpp %SHARED%\FileSystem\FileManager.cpp ^
 %SHARED%\Manager\GameTimer.cpp %SHARED%\Manager\MessageManager.cpp %SHARED%\Manager\ResourceManager.cpp %SHARED%\Manager\VariantDB.cpp %SHARED%\Math\rtPlane.cpp ^
-%SHARED%\Math\rtRect.cpp %SHARED%\Renderer\RenderBatcher.cpp %SHARED%\Renderer\SoftSurface.cpp %SHARED%\Renderer\Surface.cpp %SHARED%\Renderer\SurfaceAnim.cpp ^
+%SHARED%\Math\rtRect.cpp %SHARED%\Renderer\RenderBatcher.cpp %SHARED%\Renderer\ShaderPipeline.cpp %SHARED%\Renderer\SoftSurface.cpp %SHARED%\Renderer\Surface.cpp %SHARED%\Renderer\SurfaceAnim.cpp ^
 %SHARED%\util\CRandom.cpp %SHARED%\util\GLESUtils.cpp %SHARED%\util\MathUtils.cpp %SHARED%\util\MiscUtils.cpp %SHARED%\util\RenderUtils.cpp %SHARED%\util\ResourceUtils.cpp ^
-%SHARED%\util\Variant.cpp %SHARED%\util\boost\libs\signals\src\connection.cpp %SHARED%\util\boost\libs\signals\src\named_slot_map.cpp %SHARED%\util\boost\libs\signals\src\signal_base.cpp ^
-%SHARED%\util\boost\libs\signals\src\slot.cpp %SHARED%\util\boost\libs\signals\src\trackable.cpp %SHARED%\FileSystem\StreamingInstance.cpp %SHARED%\FileSystem\StreamingInstanceZip.cpp ^
+%SHARED%\util\Variant.cpp %SHARED%\FileSystem\StreamingInstance.cpp %SHARED%\FileSystem\StreamingInstanceZip.cpp ^
 %SHARED%\FileSystem\StreamingInstanceFile.cpp %SHARED%\BaseApp.cpp %SHARED%\util\unzip\unzip.c %SHARED%\util\unzip\ioapi.c %SHARED%\Entity\EntityUtils.cpp
 
 
@@ -51,7 +66,7 @@ set COMPONENT_SRC=%COMPPATH%\Button2DComponent.cpp %COMPPATH%\FilterInputCompone
 %COMPPATH%\RenderScissorComponent.cpp %COMPPATH%\ArcadeInputComponent.cpp %COMPPATH%\TouchHandlerArcadeComponent.cpp %COMPPATH%\EmitVirtualKeyComponentAdvanced.cpp
 
 SET ARDUBOY_SRC=%SHARED_ARDUBOY%\Arduboy.cpp %SHARED_ARDUBOY%\ab_printer.cpp %SHARED_ARDUBOY%\ArduboyPlaytune.cpp %SHARED_ARDUBOY%\EEPROM.cpp %SHARED_ARDUBOY%\MyEEPROM.cpp ^
-%SHARED_ARDUBOY%\Print.cpp %SHARED_ARDUBOY%\ab_logo.c %SHARED_ARDUBOY%\Print.cpp %SHARED_ARDUBOY%\glcdfont.c %SHARED_ARDUBOY%\WString.cpp %SHARED_ARDUBOY%\WMath.cpp ^
+%SHARED_ARDUBOY%\Print.cpp %SHARED_ARDUBOY%\ab_logo.c %SHARED_ARDUBOY%\glcdfont.c %SHARED_ARDUBOY%\WString.cpp %SHARED_ARDUBOY%\WMath.cpp ^
 %SHARED_ARDUBOY%\core\core.cpp %SHARED_ARDUBOY%\audio\audio.cpp
 
 
@@ -61,7 +76,7 @@ REM **************************************** END SOURCE
 
 :unused so far: -s USE_GLFW=3 -s TOTAL_MEMORY=67108864 -s NO_EXIT_RUNTIME=1 -s FORCE_ALIGNED_MEMORY=1
 :To skip font loading so it needs no resource files or zlib, add  -DC_NO_ZLIB
-SET CUSTOM_FLAGS= -DHAS_SOCKLEN_T -DBOOST_ALL_NO_LIB -DPLATFORM_HTML5 -DRT_USE_SDL_AUDIO -DNDEBUG -DC_GL_MODE -s LEGACY_GL_EMULATION=1 --memory-init-file 0 -Wno-switch -D__AVR_ATmega32U4__ -DRT_ARDUDEV -DRT_RUNS_IN_BACKGROUND -DRT_EMTERPRETER_ENABLED -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1
+SET CUSTOM_FLAGS= -DHAS_SOCKLEN_T -DBOOST_ALL_NO_LIB -DPLATFORM_HTML5 -DRT_USE_SDL_AUDIO -DNDEBUG -DRT_SHADER_PIPELINE_AVAILABLE -DRT_SHADER_PIPELINE_ONLY -s FULL_ES2=1 -sUSE_SDL=1 -s ALLOW_MEMORY_GROWTH=1 -Wno-switch -Wno-deprecated-builtins -Wno-c++11-compat-deprecated-writable-strings -Wno-shift-negative-value -Wno-deprecated-non-prototype -Wno-register -D__AVR_ATmega32U4__ -DRT_ARDUDEV -DRT_RUNS_IN_BACKGROUND -DRT_EMTERPRETER_ENABLED -sASYNCIFY
 
 :unused:   -s FULL_ES2=1
 
@@ -80,12 +95,13 @@ del %APP_NAME%.js
 del %APP_NAME%.html
 
 call emcc %CUSTOM_FLAGS% %INCLUDE_DIRS% ^
-%ZLIB_SRC% %SRC% -o temp.bc
+%ZLIB_SRC% %SRC% -r -o temp.o
 
 call emcc %CUSTOM_FLAGS% %INCLUDE_DIRS% ^
-%APP_SRC% %ARDUBOY_SRC% %COMPONENT_SRC% temp.bc ^
+%APP_SRC% %ARDUBOY_SRC% %COMPONENT_SRC% temp.o ^
+--js-library %SHARED%\html5\SharedJSLIB.js -lidbfs.js ^
 --embed-file ../bin/interface@interface/ --embed-file ../bin/audio@audio/ -o %APP_NAME%.html
-del temp.bc
+del temp.o
 
 REM Make sure the file compiled ok
 if not exist %APP_NAME%.js beeper.exe /p

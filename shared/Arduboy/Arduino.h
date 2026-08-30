@@ -23,6 +23,15 @@
 #include "PlatformPrecomp.h"
 #include <stdlib.h>
 
+//the Arduino "byte" type.  On old MSVC the engine's PlatformSetupWin typedef
+//covered this by accident; modern clang/emscripten resolves an undefined
+//"byte" to C++17's std::byte instead, so define it Arduino-style here.  A
+//macro rather than a typedef, since some engine headers do "using namespace
+//std" which would otherwise make an unqualified "byte" ambiguous.
+#ifndef byte
+	#define byte uint8_t
+#endif
+
 #include <string.h>
 #include <math.h>
 

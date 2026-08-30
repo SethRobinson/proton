@@ -116,6 +116,7 @@ import android.view.ViewTreeObserver;
 	public static String PackageName= "com.rtsoft.something";
 	public static String dllname= "rtsomething";
 	public static boolean securityEnabled = false; //if false, it won't try to use the online license stuff
+	public static boolean useGLES2 = false; //set true in your Main.java when the native side is built with the ES2 shader pipeline (RT_SHADER_PIPELINE_ONLY)
 	public static boolean bIsShuttingDown = false;
 	public static boolean IAPEnabled = false; //if false, IAB won't be initted.  I call it IAP because I'm used to it from iOS land
 	
@@ -1871,7 +1872,13 @@ class AppGLSurfaceView extends GLSurfaceView
 
 		//setEGLConfigChooser(8, 8, 8, 8, 16, 0);
 		//getHolder().setFormat(PixelFormat.TRANSLUCENT);
-		
+
+		if (SharedActivity.useGLES2)
+		{
+			Log.d(app.PackageName, "Requesting a GLES2 context for the shader pipeline");
+			setEGLContextClientVersion(2);
+		}
+
 		mRenderer = new AppRenderer(_app);
 		setRenderer(mRenderer);
 	

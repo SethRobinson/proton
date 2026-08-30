@@ -12,9 +12,10 @@
 # (default 0.5). RTDink expects a previous save to exist (it captures the
 # "Continue your last session?" prompt).
 #
-# Exe paths are relative to the repo root. RTDink, BlipArcade, and RTMindWall
-# live in sibling checkouts/folders (separate repos); the harness skips any
-# app whose exe is missing. Build configs used: Debug GL (Win32 for
+# Exe paths are relative to the repo root. Per Seth: only apps tracked in the
+# proton repo plus RTDink, RTDScroll, and RTMindWall may be used for testing.
+# RTDink and RTMindWall live in sibling checkouts/folders; the harness skips
+# any app whose exe is missing. Build configs used: Debug GL (Win32 for
 # RTBareBones; x64 for the rest). Several Win32 configs are stale: they hit
 # 0xc000007b at launch loading 64-bit DLLs from bin, or have outdated file
 # exclusion lists, so prefer x64.
@@ -73,15 +74,6 @@ Apps = @(
         SettleMs = 12000
         Steps = @(
             @{ Action = 'capture'; Name = 'mainmenu' }
-        )
-    }
-    @{
-        Name = 'BlipArcade'
-        Exe = 'BlipArcade\bin\BlipArcade_debug.exe'
-        ShaderReady = $true
-        SettleMs = 8000
-        Steps = @(
-            @{ Action = 'capture'; Name = 'main' }
         )
     }
     @{

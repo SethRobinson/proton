@@ -24,6 +24,8 @@ public class Main extends SharedActivity
 
 		dllname= "RTAndroidApp"; //this doesn't need to be changed
 
+		useGLES2 = true; //this app's native side is built with the ES2 shader pipeline (see AndroidGradle/app/src/main/cpp/CMakeLists.txt)
+
 		System.loadLibrary(dllname);
 		super.onCreate(savedInstanceState);
     }

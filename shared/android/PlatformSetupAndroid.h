@@ -6,7 +6,17 @@
 #include <unistd.h>
 #include <stdint.h>
 #include "AndroidUtils.h"
-#include <GLES/gl.h>
+
+#ifdef RT_SHADER_PIPELINE_ONLY
+	//the ES2/shader-pipeline build: pure GLES2 headers, no fixed-function GL.
+	//The java side must request a matching context (SharedActivity.useGLES2)
+	#include <GLES2/gl2.h>
+	#include "Renderer/GLES2TokenCompat.h"
+	#define glTexParameterx glTexParameteri
+#else
+	#include <GLES/gl.h>
+#endif
+
 #include <stdarg.h>
 
 

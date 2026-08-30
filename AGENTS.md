@@ -93,6 +93,15 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
 
 ## Renderer regression tests (tests/)
 
+- Test-app policy (per Seth, Aug 2026): only use apps tracked in the proton
+  repo (RTBareBones, RTSimpleApp, RTLooneyLadders, ArduboySim, RTConsole,
+  RTPack) plus RTDink, RTDScroll, and RTMindWall for testing. Do not use the
+  other app folders that may exist locally (RTGameShow, Amigo, RTWhisperApp,
+  BlipArcade, RTSocketCity, RTLibretroTest...). BlipArcade was removed from
+  the suite under this policy; it was the only app exercising app-level raw
+  client-side vertex arrays and clip planes, so that coverage now rests on
+  the engine paths only.
+
 - `tests/harness.ps1` captures golden screenshots of the example apps and
   diffs them after renderer changes; read `tests/README.md` before touching
   renderer code. Run `.\harness.ps1 -Mode test` from `tests/` after any change

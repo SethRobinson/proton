@@ -28,6 +28,10 @@ include_directories("${APP}")
 
 add_definitions(-Wno-error=format-security -DBOOST_BIND_GLOBAL_PLACEHOLDERS -DANDROID_NDK -DBOOST_ALL_NO_LIB -DBUILD_ANDROID -DPLATFORM_ANDROID )
 
+# The ES2 shader pipeline (see docs/renderer-migration.md in the proton repo).
+# Main.java sets SharedActivity.useGLES2 = true to request the matching context.
+add_definitions(-DRT_SHADER_PIPELINE_AVAILABLE -DRT_SHADER_PIPELINE_ONLY)
+
 message("Building ${CMAKE_BUILD_TYPE}")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -55,7 +59,7 @@ add_library( # Sets the name of the library.
 ${CLANMATH}/angle.cpp ${CLANMATH}/mat3.cpp ${CLANMATH}/mat4.cpp ${CLANMATH}/rect.cpp ${CLANMATH}/vec2.cpp ${CLANMATH}/vec3.cpp ${CLANMATH}/vec4.cpp 
 ${SHARED}/Entity/Entity.cpp ${SHARED}/Entity/Component.cpp ${SHARED}/GUI/RTFont.cpp ${SHARED}/Manager/Console.cpp ${SHARED}/FileSystem/FileManager.cpp 
 ${SHARED}/Manager/GameTimer.cpp ${SHARED}/Manager/MessageManager.cpp ${SHARED}/Manager/ResourceManager.cpp ${SHARED}/Manager/VariantDB.cpp ${SHARED}/Math/rtPlane.cpp 
-${SHARED}/Math/rtRect.cpp ${SHARED}/Renderer/RenderBatcher.cpp ${SHARED}/Renderer/SoftSurface.cpp ${SHARED}/Renderer/Surface.cpp ${SHARED}/Renderer/SurfaceAnim.cpp 
+${SHARED}/Math/rtRect.cpp ${SHARED}/Renderer/RenderBatcher.cpp ${SHARED}/Renderer/ShaderPipeline.cpp ${SHARED}/Renderer/SoftSurface.cpp ${SHARED}/Renderer/Surface.cpp ${SHARED}/Renderer/SurfaceAnim.cpp
 ${SHARED}/util/CRandom.cpp ${SHARED}/util/GLESUtils.cpp ${SHARED}/util/MathUtils.cpp ${SHARED}/util/MiscUtils.cpp ${SHARED}/util/RenderUtils.cpp ${SHARED}/util/ResourceUtils.cpp 
 ${SHARED}/util/Variant.cpp ${SHARED}/BaseApp.cpp ${SHARED}/FileSystem/FileSystem.cpp 
 ${SHARED}/FileSystem/FileSystemZip.cpp ${SHARED}/util/unzip/unzip.c ${SHARED}/util/unzip/ioapi.c ${SHARED}/FileSystem/StreamingInstance.cpp 
@@ -99,4 +103,4 @@ target_link_libraries( # Specifies the target library.
 
         # Links the target library to the log library
         # included in the NDK.
-        ${log-lib} dl GLESv1_CM z)
+        ${log-lib} dl GLESv2 z)
