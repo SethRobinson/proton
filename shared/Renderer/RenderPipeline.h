@@ -27,42 +27,53 @@
 #ifndef RenderPipeline_h__
 #define RenderPipeline_h__
 
+//Projects that compile Renderer/ShaderPipeline.cpp and define
+//RT_SHADER_PIPELINE_AVAILABLE (project-wide!) get a runtime-selectable shader
+//backend: launching with the -shaderpipeline parm routes every rt* call to it.
+//Everything else compiles these as pure fixed-function passthroughs.
+#ifdef RT_SHADER_PIPELINE_AVAILABLE
+	#include "Renderer/ShaderPipeline.h"
+	#define RT_PIPE(spCall, glCall) { if (g_bShaderPipelineActive) { spCall; } else { glCall; } }
+#else
+	#define RT_PIPE(spCall, glCall) { glCall; }
+#endif
+
 //---------------------------------------------------------------------------
 // Matrix stack
 //---------------------------------------------------------------------------
 
-inline void rtMatrixMode(GLenum mode) { glMatrixMode(mode); }
-inline void rtPushMatrix() { glPushMatrix(); }
-inline void rtPopMatrix() { glPopMatrix(); }
-inline void rtLoadIdentity() { glLoadIdentity(); }
-inline void rtTranslatef(float x, float y, float z) { glTranslatef(x, y, z); }
-inline void rtRotatef(float degrees, float x, float y, float z) { glRotatef(degrees, x, y, z); }
-inline void rtScalef(float x, float y, float z) { glScalef(x, y, z); }
-inline void rtOrthof(float left, float right, float bottom, float top, float zNear, float zFar) { glOrthof(left, right, bottom, top, zNear, zFar); }
-inline void rtLoadMatrixf(const float *pMat16) { glLoadMatrixf(pMat16); }
-inline void rtMultMatrixf(const float *pMat16) { glMultMatrixf(pMat16); }
+inline void rtMatrixMode(GLenum mode) RT_PIPE(SP_MatrixMode(mode), glMatrixMode(mode))
+inline void rtPushMatrix() RT_PIPE(SP_PushMatrix(), glPushMatrix())
+inline void rtPopMatrix() RT_PIPE(SP_PopMatrix(), glPopMatrix())
+inline void rtLoadIdentity() RT_PIPE(SP_LoadIdentity(), glLoadIdentity())
+inline void rtTranslatef(float x, float y, float z) RT_PIPE(SP_Translatef(x, y, z), glTranslatef(x, y, z))
+inline void rtRotatef(float degrees, float x, float y, float z) RT_PIPE(SP_Rotatef(degrees, x, y, z), glRotatef(degrees, x, y, z))
+inline void rtScalef(float x, float y, float z) RT_PIPE(SP_Scalef(x, y, z), glScalef(x, y, z))
+inline void rtOrthof(float left, float right, float bottom, float top, float zNear, float zFar) RT_PIPE(SP_Orthof(left, right, bottom, top, zNear, zFar), glOrthof(left, right, bottom, top, zNear, zFar))
+inline void rtLoadMatrixf(const float *pMat16) RT_PIPE(SP_LoadMatrixf(pMat16), glLoadMatrixf(pMat16))
+inline void rtMultMatrixf(const float *pMat16) RT_PIPE(SP_MultMatrixf(pMat16), glMultMatrixf(pMat16))
 
 //pname is GL_MODELVIEW_MATRIX or GL_PROJECTION_MATRIX
-inline void rtGetMatrixf(GLenum pname, float *pMat16Out) { glGetFloatv(pname, pMat16Out); }
+inline void rtGetMatrixf(GLenum pname, float *pMat16Out) RT_PIPE(SP_GetMatrixf(pname, pMat16Out), glGetFloatv(pname, pMat16Out))
 
 //---------------------------------------------------------------------------
 // Current color (16.16 fixed point, matching the engine's existing usage)
 //---------------------------------------------------------------------------
 
-inline void rtColor4x(int r, int g, int b, int a) { glColor4x(r, g, b, a); }
+inline void rtColor4x(int r, int g, int b, int a) RT_PIPE(SP_Color4x(r, g, b, a), glColor4x(r, g, b, a))
 
 //---------------------------------------------------------------------------
 // Client-side vertex arrays + draws
 //---------------------------------------------------------------------------
 
-inline void rtEnableClientState(GLenum array) { glEnableClientState(array); }
-inline void rtDisableClientState(GLenum array) { glDisableClientState(array); }
-inline void rtVertexPointer(GLint size, GLenum type, GLsizei stride, const void *pData) { glVertexPointer(size, type, stride, pData); }
-inline void rtTexCoordPointer(GLint size, GLenum type, GLsizei stride, const void *pData) { glTexCoordPointer(size, type, stride, pData); }
-inline void rtColorPointer(GLint size, GLenum type, GLsizei stride, const void *pData) { glColorPointer(size, type, stride, pData); }
-inline void rtNormalPointer(GLenum type, GLsizei stride, const void *pData) { glNormalPointer(type, stride, pData); }
-inline void rtDrawArrays(GLenum mode, GLint first, GLsizei count) { glDrawArrays(mode, first, count); }
-inline void rtDrawElements(GLenum mode, GLsizei count, GLenum type, const void *pIndices) { glDrawElements(mode, count, type, pIndices); }
+inline void rtEnableClientState(GLenum array) RT_PIPE(SP_EnableClientState(array), glEnableClientState(array))
+inline void rtDisableClientState(GLenum array) RT_PIPE(SP_DisableClientState(array), glDisableClientState(array))
+inline void rtVertexPointer(GLint size, GLenum type, GLsizei stride, const void *pData) RT_PIPE(SP_VertexPointer(size, type, stride, pData), glVertexPointer(size, type, stride, pData))
+inline void rtTexCoordPointer(GLint size, GLenum type, GLsizei stride, const void *pData) RT_PIPE(SP_TexCoordPointer(size, type, stride, pData), glTexCoordPointer(size, type, stride, pData))
+inline void rtColorPointer(GLint size, GLenum type, GLsizei stride, const void *pData) RT_PIPE(SP_ColorPointer(size, type, stride, pData), glColorPointer(size, type, stride, pData))
+inline void rtNormalPointer(GLenum type, GLsizei stride, const void *pData) RT_PIPE(SP_NormalPointer(type, stride, pData), glNormalPointer(type, stride, pData))
+inline void rtDrawArrays(GLenum mode, GLint first, GLsizei count) RT_PIPE(SP_DrawArrays(mode, first, count), glDrawArrays(mode, first, count))
+inline void rtDrawElements(GLenum mode, GLsizei count, GLenum type, const void *pIndices) RT_PIPE(SP_DrawElements(mode, count, type, pIndices), glDrawElements(mode, count, type, pIndices))
 
 //---------------------------------------------------------------------------
 // Fixed-function state bits.  ONLY for enums that die in the shader pipeline:
@@ -71,14 +82,14 @@ inline void rtDrawElements(GLenum mode, GLsizei count, GLenum type, const void *
 // GL_SCISSOR_TEST, GL_CULL_FACE) keeps using glEnable/glDisable directly.
 //---------------------------------------------------------------------------
 
-inline void rtEnable(GLenum cap) { glEnable(cap); }
-inline void rtDisable(GLenum cap) { glDisable(cap); }
-inline void rtHint(GLenum target, GLenum mode) { glHint(target, mode); } //GL_LINE_SMOOTH_HINT is the only engine use
+inline void rtEnable(GLenum cap) RT_PIPE(SP_Enable(cap), glEnable(cap))
+inline void rtDisable(GLenum cap) RT_PIPE(SP_Disable(cap), glDisable(cap))
+inline void rtHint(GLenum target, GLenum mode) RT_PIPE(SP_Hint(target, mode), glHint(target, mode)) //GL_LINE_SMOOTH_HINT is the only engine use
 
-//pEq4 points at 4 floats.  Note: this preserves the engine's historical call
-//exactly; on desktop GL the cast means the doubles read are garbage bits, so
-//user clip planes have likely only ever worked correctly on real GLES1 -
-//documenting, not fixing, while the suite guards for zero behavior change.
-inline void rtClipPlane(GLenum plane, const float *pEq4) { glClipPlane(plane, (GLdouble*)pEq4); }
+//pEq4 points at 4 floats.  Note: the legacy path preserves the engine's
+//historical call exactly; on desktop GL the cast means the doubles read are
+//garbage bits, so user clip planes have likely only ever worked correctly on
+//real GLES1.  The shader path implements the plane properly.
+inline void rtClipPlane(GLenum plane, const float *pEq4) RT_PIPE(SP_ClipPlane(plane, pEq4), glClipPlane(plane, (GLdouble*)pEq4))
 
 #endif // RenderPipeline_h__

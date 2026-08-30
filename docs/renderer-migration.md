@@ -24,11 +24,23 @@ and the existing compatibility/legacy contexts on Windows/Linux/macOS (GLSL
 - **Phase 1 (done, Aug 2026)**: every fixed-function GL call the engine makes
   now goes through `shared/Renderer/RenderPipeline.h` (see below). Verified
   bit-identical: 0.000% pixel diff on all six suite apps, all platforms build.
-- **Phase 2 (next)**: the shader backend implementing RenderPipeline's surface
-  behind a define (CPU matrix stacks -> MVP uniform, client arrays ->
-  streaming VBO, ubershader cache keyed on a small state bitfield, alpha
-  test/clip plane -> discard), plus a gl-name compatibility shim for app-level
-  raw GL, ES2 context creation per platform, and FBO render targets.
+- **Phase 2 (in progress)**: `shared/Renderer/ShaderPipeline.cpp/.h`, the
+  shader implementation of RenderPipeline's surface: CPU matrix stacks
+  feeding uProj/uMV uniforms, an ubershader cache keyed on
+  texture/vertex-color/clip bits, client arrays fed straight to
+  glVertexAttribPointer (a streaming VBO comes with the WebGL flip), and a
+  proper eye-space clip plane. Runtime-selectable: projects that compile the
+  file and define RT_SHADER_PIPELINE_AVAILABLE (currently RTBareBones and
+  RTSimpleApp Debug GL configs) accept a `-shaderpipeline` launch parm;
+  without it the legacy path runs untouched. Milestone 1 (Aug 2026): both
+  apps render pixel-identical (0.000%) to the fixed-function goldens on
+  Windows via `harness.ps1 -Mode test -ShaderPipe`. Still to do: the gl-name
+  compatibility shim so apps with raw GL (RTDink/BlipArcade/RTMindWall) can
+  run on it, ES2 context creation per platform, the WebGL flip (streaming
+  VBO + dropping LEGACY_GL_EMULATION), FBO render targets, and the public
+  shader API. Notable finding recorded in ShaderPipeline.cpp: GL_ALPHA_TEST
+  was always a no-op in Proton (glAlphaFunc never called, GL default is
+  GL_ALWAYS), so the shader path needs no alpha discard.
 - **Phase 3**: flip defaults per platform (HTML5 first).
 - **Phase 4**: public shader + render-to-texture APIs.
 - **Phase 5**: delete the legacy path (tag first).

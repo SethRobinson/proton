@@ -26,6 +26,7 @@ Apps = @(
         Html5Page = 'RTBareBones\html5\RTBareBones.html'
         IosProject = 'RTBareBones\RTBareBones.xcodeproj'
         AndroidPackage = 'com.rtsoft.RTAndroidApp'
+        ShaderReady = $true
         SettleMs = 6000
         Steps = @(
             @{ Action = 'capture'; Name = 'main' }
@@ -35,6 +36,7 @@ Apps = @(
         Name = 'RTSimpleApp'
         Exe = 'RTSimpleApp\bin\RTSimpleApp_Debug_GL.exe'
         Html5Page = 'RTSimpleApp\html5\RTSimpleApp.html'
+        ShaderReady = $true
         SettleMs = 8000
         Steps = @(
             @{ Action = 'capture'; Name = 'mainmenu' }

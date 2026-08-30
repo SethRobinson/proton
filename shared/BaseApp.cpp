@@ -786,6 +786,17 @@ void BaseApp::OnEnterForeground()
 void BaseApp::AddCommandLineParm( string parm )
 {
 	m_commandLineParms.push_back(parm);
+
+#ifdef RT_SHADER_PIPELINE_AVAILABLE
+	//flip this as early as possible so the very first GL default setup already
+	//routes through the shader backend's state tracking
+	if (ToLowerCaseString(parm) == "-shaderpipeline")
+	{
+		SP_ResetState();
+		g_bShaderPipelineActive = true;
+		LogMsg("Shader pipeline requested via command line parm");
+	}
+#endif
 }
 
 vector<string> BaseApp::GetCommandLineParms()
