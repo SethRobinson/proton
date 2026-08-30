@@ -88,11 +88,20 @@ typedef uint8_t uint8;
 
 typedef intptr_t CSSM_INTPTR;
 
-#include <OpenGLES/ES1/gl.h>
-//#include <OpenGLES/eagl.h>
-#include <OpenGLES/ES1/glext.h>
+#ifdef RT_SHADER_PIPELINE_ONLY
+	//the ES2/shader build: pure GLES2 headers, no fixed-function GL at all
+	#include <OpenGLES/ES2/gl.h>
+	#include <OpenGLES/ES2/glext.h>
+	#include "Renderer/GLES2TokenCompat.h"
+	#include "Renderer/GLCompatGLES.h" //GLdouble typedef etc for app code
+	#define glTexParameterx glTexParameteri
+#else
+	#include <OpenGLES/ES1/gl.h>
+	//#include <OpenGLES/eagl.h>
+	#include <OpenGLES/ES1/glext.h>
 
-#include "Renderer/GLCompatGLES.h"
+	#include "Renderer/GLCompatGLES.h"
+#endif
 
 #define stricmp strcasecmp
 

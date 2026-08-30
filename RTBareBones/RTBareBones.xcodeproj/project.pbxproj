@@ -62,6 +62,7 @@
 		5DA1FD030F01EF07001E9C1B /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DA1FD020F01EF07001E9C1B /* CoreAudio.framework */; };
 		5DADFF4C0EA2F561007ADD60 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DADFF4B0EA2F561007ADD60 /* CoreGraphics.framework */; };
 		5DB488DB10B1313300B84589 /* RenderBatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5DB488D910B1313300B84589 /* RenderBatcher.cpp */; };
+		B1B2C3D40000000000000C01 /* ShaderPipeline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B1B2C3D40000000000000C02 /* ShaderPipeline.cpp */; };
 		5DC692B20E94852F00E5AC44 /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5DC692B10E94852F00E5AC44 /* App.cpp */; };
 		5DC6D63F0EA47C0E001482E0 /* interface in Resources */ = {isa = PBXBuildFile; fileRef = 5DC6D63B0EA47C0E001482E0 /* interface */; };
 		5DC6D77D0EA4B397001482E0 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 5DC6D77B0EA4B397001482E0 /* Default.png */; };
@@ -193,6 +194,8 @@
 		5DADFF4B0EA2F561007ADD60 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		5DB488D910B1313300B84589 /* RenderBatcher.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenderBatcher.cpp; path = ../shared/Renderer/RenderBatcher.cpp; sourceTree = SOURCE_ROOT; };
 		5DB488DA10B1313300B84589 /* RenderBatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RenderBatcher.h; path = ../shared/Renderer/RenderBatcher.h; sourceTree = SOURCE_ROOT; };
+		B1B2C3D40000000000000C02 /* ShaderPipeline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ShaderPipeline.cpp; path = ../shared/Renderer/ShaderPipeline.cpp; sourceTree = SOURCE_ROOT; };
+		B1B2C3D40000000000000C03 /* ShaderPipeline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ShaderPipeline.h; path = ../shared/Renderer/ShaderPipeline.h; sourceTree = SOURCE_ROOT; };
 		5DC692B00E94852F00E5AC44 /* App.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = App.h; path = source/App.h; sourceTree = "<group>"; };
 		5DC692B10E94852F00E5AC44 /* App.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = App.cpp; path = source/App.cpp; sourceTree = "<group>"; };
 		5DC6D63B0EA47C0E001482E0 /* interface */ = {isa = PBXFileReference; lastKnownFileType = folder; name = interface; path = bin/interface; sourceTree = "<group>"; };
@@ -314,6 +317,8 @@
 				5D7B4CF610CCEE030073DDA8 /* SoftSurface.h */,
 				5DB488D910B1313300B84589 /* RenderBatcher.cpp */,
 				5DB488DA10B1313300B84589 /* RenderBatcher.h */,
+				B1B2C3D40000000000000C02 /* ShaderPipeline.cpp */,
+				B1B2C3D40000000000000C03 /* ShaderPipeline.h */,
 				5D7BBD081014530B0015A90E /* SurfaceAnim.cpp */,
 				5D7BBD091014530B0015A90E /* SurfaceAnim.h */,
 				5D0CC94B0F79E181004D9AE9 /* bitmap.h */,
@@ -634,6 +639,7 @@
 				5D7BBD0110144FF50015A90E /* ResourceManager.cpp in Sources */,
 				5D7BBD0A1014530B0015A90E /* SurfaceAnim.cpp in Sources */,
 				5DB488DB10B1313300B84589 /* RenderBatcher.cpp in Sources */,
+				B1B2C3D40000000000000C01 /* ShaderPipeline.cpp in Sources */,
 				5D7B4CF710CCEE030073DDA8 /* SoftSurface.cpp in Sources */,
 				5D7C7662118FF94D007F9604 /* PlatformSetup.cpp in Sources */,
 				5D7C7663118FF94D007F9604 /* PlatformPrecomp.cpp in Sources */,
@@ -716,6 +722,8 @@
 					RT_USE_LIBCURL,
 					GLES_SILENCE_DEPRECATION,
 					RT_CONTROLLER_SUPPORT,
+					RT_SHADER_PIPELINE_AVAILABLE,
+					RT_SHADER_PIPELINE_ONLY,
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -796,6 +804,8 @@
 					RT_USE_LIBCURL,
 					GLES_SILENCE_DEPRECATION,
 					RT_CONTROLLER_SUPPORT,
+					RT_SHADER_PIPELINE_AVAILABLE,
+					RT_SHADER_PIPELINE_ONLY,
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;

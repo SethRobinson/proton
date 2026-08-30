@@ -107,8 +107,18 @@ and the existing compatibility/legacy contexts on Windows/Linux/macOS (GLSL
   Proton.cmake compiles ShaderPipeline.cpp and defines
   RT_SHADER_PIPELINE_AVAILABLE in the desktop-GL branch; GL2 functions
   load via SDL_GL_GetProcAddress (SDL is mandatory there); syntax-checked
-  under WSL, not yet run. Still to do: iOS/Android ES2 context creation
-  as default, store-build flips.
+  under WSL, not yet run. iOS ES2 flip (Aug 2026): like html5/Android,
+  iOS can't switch pipelines at runtime (the EAGL context is ES1 or ES2,
+  period), so it's an RT_SHADER_PIPELINE_ONLY build: PlatformSetupIOS.h
+  and EAGLView.h grew ES2 header branches, EAGLView.mm creates a
+  kEAGLRenderingAPIOpenGLES2 context and maps its OES-suffixed
+  framebuffer calls to the ES2 core names (one code path, macros at the
+  top of the file), and the RTBareBones iOS xcodeproj compiles
+  ShaderPipeline.cpp with both defines. Verified against the goldens
+  recorded under GLES1: simulator 0.012%, real M4 iPad 0.009% (both at
+  the pre-existing jitter floor), with engine ms/frame on the iPad down
+  38% (0.612 -> 0.377). Still to do: Android as default (opt-in exists),
+  store-build flips (RTDink iOS etc. live in their own repos).
 - **Phase 4**: public shader + render-to-texture APIs.
 - **Phase 5**: delete the legacy path (tag first).
 

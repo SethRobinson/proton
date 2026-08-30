@@ -15,6 +15,33 @@ CGRect iOS7StyleScreenBounds();
 
 #define USE_DEPTH_BUFFER 1
 
+#ifdef RT_SHADER_PIPELINE_ONLY
+//ES2 context: the framebuffer API that was the OES extension under ES1 is
+//core (unsuffixed) in ES2, so remap the names this file uses and keep one
+//code path below
+#define glGenFramebuffersOES glGenFramebuffers
+#define glBindFramebufferOES glBindFramebuffer
+#define glDeleteFramebuffersOES glDeleteFramebuffers
+#define glGenRenderbuffersOES glGenRenderbuffers
+#define glBindRenderbufferOES glBindRenderbuffer
+#define glDeleteRenderbuffersOES glDeleteRenderbuffers
+#define glRenderbufferStorageOES glRenderbufferStorage
+#define glFramebufferRenderbufferOES glFramebufferRenderbuffer
+#define glGetRenderbufferParameterivOES glGetRenderbufferParameteriv
+#define glCheckFramebufferStatusOES glCheckFramebufferStatus
+#define GL_FRAMEBUFFER_OES GL_FRAMEBUFFER
+#define GL_RENDERBUFFER_OES GL_RENDERBUFFER
+#define GL_COLOR_ATTACHMENT0_OES GL_COLOR_ATTACHMENT0
+#define GL_DEPTH_ATTACHMENT_OES GL_DEPTH_ATTACHMENT
+#define GL_DEPTH_COMPONENT16_OES GL_DEPTH_COMPONENT16
+#define GL_RENDERBUFFER_WIDTH_OES GL_RENDERBUFFER_WIDTH
+#define GL_RENDERBUFFER_HEIGHT_OES GL_RENDERBUFFER_HEIGHT
+#define GL_FRAMEBUFFER_COMPLETE_OES GL_FRAMEBUFFER_COMPLETE
+#define RT_EAGL_API kEAGLRenderingAPIOpenGLES2
+#else
+#define RT_EAGL_API kEAGLRenderingAPIOpenGLES1
+#endif
+
 // A class extension to declare private methods
 @interface EAGLView ()
 
@@ -54,7 +81,7 @@ CGRect iOS7StyleScreenBounds();
 		eaglLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:
 		   [NSNumber numberWithBool:NO], kEAGLDrawablePropertyRetainedBacking, kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];
 		
-		context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
+		context = [[EAGLContext alloc] initWithAPI:RT_EAGL_API];
 		
 		if (!context || ![EAGLContext setCurrentContext:context])
 		{
