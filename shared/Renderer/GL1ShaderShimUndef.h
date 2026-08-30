@@ -5,9 +5,10 @@
 //  ***************************************************************
 
 //Undoes GL1ShaderShim.h's remapping for translation units that implement the
-//pipeline and must call the REAL gl functions (ShaderPipeline.cpp).  Needed
-//because MSVC precompiled headers bake the shim macros in before a .cpp's own
-//defines are seen, so RT_RENDERER_INTERNAL alone can't opt out under /Yu.
+//pipeline and must call the REAL gl functions (ShaderPipeline.cpp).  This is
+//the only opt-out mechanism: under MSVC /Yu the precompiled header replaces
+//everything up to the PlatformPrecomp.h include, so a .cpp cannot prevent the
+//shim macros from existing - it can only remove them again afterwards.
 //Include immediately after PlatformPrecomp.h.  No include guard on purpose.
 
 #ifdef glMatrixMode

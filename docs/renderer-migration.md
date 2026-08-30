@@ -42,7 +42,8 @@ and the existing compatibility/legacy contexts on Windows/Linux/macOS (GLSL
   0.000% vs their fixed-function goldens under -shaderpipeline. Gotchas
   baked into the code: ShaderPipeline.cpp must see real GL, and MSVC PCHs
   bake the shim macros in, so it includes GL1ShaderShimUndef.h right after
-  the precomp (RT_RENDERER_INTERNAL alone is not enough under /Yu);
+  the precomp (the only mechanism; under /Yu nothing before the precomp
+  include compiles, so a pre-precomp opt-out define is impossible);
   RenderBatcher has a *method* named glDrawArrays, so its internal calls to
   the free function are ::-qualified; GL_LINE_SMOOTH is rasterizer state
   that still works with shaders on desktop, and DrawLine's look depends on

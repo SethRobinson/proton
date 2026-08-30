@@ -5,10 +5,11 @@
 //  ***************************************************************
 
 //this file implements the backend, so it must see the REAL gl functions, not
-//the app-compatibility macros from GL1ShaderShim.h.  RT_RENDERER_INTERNAL
-//skips the shim where possible, and GL1ShaderShimUndef.h handles the MSVC
-//precompiled-header case where the macros are baked in before we get a say.
-#define RT_RENDERER_INTERNAL
+//the app-compatibility macros from GL1ShaderShim.h.  GL1ShaderShimUndef.h
+//removes those macros again right after the precomp; that works identically
+//whether they came from a real include or were baked into an MSVC
+//precompiled header (where nothing before the PlatformPrecomp.h line even
+//compiles, so an opt-out define here would be silently ignored - see C4603).
 #include "PlatformPrecomp.h"
 #include "GL1ShaderShimUndef.h"
 

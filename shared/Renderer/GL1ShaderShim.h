@@ -14,17 +14,17 @@
 //
 //Included automatically at the end of PlatformSetup.h when
 //RT_SHADER_PIPELINE_AVAILABLE is defined.  A translation unit that implements
-//the pipeline itself opts out by defining RT_RENDERER_INTERNAL before
-//PlatformPrecomp.h.
+//the pipeline itself (ShaderPipeline.cpp) removes the macros again by
+//including GL1ShaderShimUndef.h right after PlatformPrecomp.h.
 //
 //Deliberately NOT remapped (still real GL, fine in ES2): glClear/glClearColor,
 //glScissor, glViewport, glReadPixels, glBlendFunc, glBindTexture and all
 //texture calls, glGetError/glGetString, glGetBooleanv/glGetIntegerv.
 //Deliberately unsupported (no Proton app uses them): immediate mode, display
 //lists, glTexEnv*, fog, multitexture, glAlphaFunc with a real reference.
-//glLight*/glShadeModel are accepted but ignored until the single-light
-//ubershader variant lands, so lit 3D apps (RTMindWall) stay on the legacy
-//path for now.
+//glLightfv feeds the single-light ubershader variant (GL_LIGHT0 +
+//COLOR_MATERIAL, see SP_Lightfv); glLightf/glShadeModel pass through to the
+//legacy path and are ignored by the shader path.
 
 #ifndef GL1ShaderShim_h__
 #define GL1ShaderShim_h__
