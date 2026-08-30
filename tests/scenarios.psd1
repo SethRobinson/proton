@@ -63,6 +63,22 @@ Apps = @(
         )
     }
     @{
+        # RTShader's 3D mode: a textured spinning cube drawn with classic
+        # fixed-function-style GL (perspective + depth + client arrays) via
+        # the compatibility shim - the only suite coverage of that 3D path
+        # beyond RTBareBones' flat triangle.
+        Name = 'RTShaderCube'
+        Exe = 'RTShader\bin\RTShader_Debug GL_Win32.exe'
+        Html5Page = 'RTShader\html5\RTShader.html'
+        ShaderReady = $true
+        RequiresShaderPipe = $true
+        ExtraParms = '-effect 5'
+        SettleMs = 6000
+        Steps = @(
+            @{ Action = 'capture'; Name = 'cube' }
+        )
+    }
+    @{
         Name = 'RTSimpleApp'
         Exe = 'RTSimpleApp\bin\RTSimpleApp_Debug_GL.exe'
         Html5Page = 'RTSimpleApp\html5\RTSimpleApp.html'

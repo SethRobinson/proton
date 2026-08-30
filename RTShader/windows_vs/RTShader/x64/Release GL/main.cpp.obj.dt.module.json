@@ -1,0 +1,15 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "RTShader\\x64\\Release GL\\main.obj",
+            "outputs": [
+                "RTShader\\x64\\Release GL\\main.cpp.obj.dt.module.json",
+                "RTShader\\x64\\Release GL\\main.cpp.obj.dt.d.json",
+                "RTShader\\x64\\Release GL\\RTShader_Release GL_x64.pch"
+            ],
+            "requires": []
+        }
+    ]
+}

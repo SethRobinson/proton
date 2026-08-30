@@ -71,6 +71,9 @@ void SP_UnbindFrameBuffer(); //restores what SP_BindFrameBuffer saved
 // (vec4) and sets uniforms uProj, uMV (mat4), uColor (vec4) and uTex
 // (sampler2D, unit 0) if declared.  Write GLSL ES 1.00 style; on ES2 builds
 // "precision mediump float;" is prepended to the fragment shader if missing.
+// Because of that mediump default, keep time-like uniforms SMALL (wrap them
+// on the CPU): a seconds-since-launch value stutters visibly once it grows
+// past a few hundred (see the uTime handling in RTShader's App.cpp).
 // While a shader is active (SetActiveShader), every engine draw (Surface
 // blits, RenderBatcher, DrawFilledRect...) renders through it.
 //---------------------------------------------------------------------------

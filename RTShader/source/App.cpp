@@ -113,6 +113,7 @@ static const char *g_fragGrayscale =
 	"}\n";
 
 //effect 3: color cycle.  Rotates the color channels around over time.
+//(note the whole-number time multiplier - see the uTime comment in Draw)
 static const char *g_fragColorCycle =
 	"uniform sampler2D uTex;\n"
 	"uniform vec4 uColor;\n"
@@ -121,7 +122,7 @@ static const char *g_fragColorCycle =
 	"void main()\n"
 	"{\n"
 	"	vec4 c = texture2D(uTex, v_uv);\n"
-	"	float t = uTime * 0.7;\n"
+	"	float t = uTime * 1.0;\n"
 	"	vec3 cycled = c.rgb * (0.5 + 0.5 * cos(t + vec3(0.0, 2.1, 4.2)))\n"
 	"	            + c.gbr * (0.5 - 0.5 * cos(t + vec3(0.0, 2.1, 4.2)));\n"
 	"	gl_FragColor = vec4(cycled, c.a) * uColor;\n"
@@ -142,7 +143,7 @@ static const char *g_fragScanlines =
 	"	gl_FragColor = vec4(outColor, c.a) * uColor;\n"
 	"}\n";
 
-static const char *g_effectNames[EFFECT_COUNT] = { "No shader", "Wavy", "Grayscale", "Color cycle", "Scanlines" };
+static const char *g_effectNames[EFFECT_COUNT] = { "No shader", "Wavy", "Grayscale", "Color cycle", "Scanlines", "3D cube" };
 
 //---------------------------------------------------------------------------
 
@@ -307,6 +308,69 @@ void App::DrawSceneIntoTexture()
 	glClearColor(0, 0, 0, 1); //back to the engine default
 }
 
+//effect 5: a spinning textured 3D cube, written exactly like fixed-function
+//GL code has always looked in Proton apps: matrix stack, client-side vertex
+//arrays, glDrawArrays.  The compatibility shim routes these gl* calls onto
+//the shader pipeline, so the identical code runs on GLES1 and on shaders.
+void App::DrawSpinningCube()
+{
+	//leave 2D ortho mode: this restores the engine's perspective projection
+	//and turns depth testing back on
+	PrepareForGL();
+
+	//build the cube once: 6 quads expanded to 12 triangles (CCW winding so
+	//backface culling works), each face showing the full texture
+	static vector<GLfloat> verts;
+	static vector<GLfloat> uvs;
+	if (verts.empty())
+	{
+		const float s = 0.5f;
+		const GLfloat quad[6][4][3] =
+		{
+			{ {-s,-s, s}, { s,-s, s}, { s, s, s}, {-s, s, s} }, //front  (+z)
+			{ { s,-s,-s}, {-s,-s,-s}, {-s, s,-s}, { s, s,-s} }, //back   (-z)
+			{ { s,-s, s}, { s,-s,-s}, { s, s,-s}, { s, s, s} }, //right  (+x)
+			{ {-s,-s,-s}, {-s,-s, s}, {-s, s, s}, {-s, s,-s} }, //left   (-x)
+			{ {-s, s, s}, { s, s, s}, { s, s,-s}, {-s, s,-s} }, //top    (+y)
+			{ {-s,-s,-s}, { s,-s,-s}, { s,-s, s}, {-s,-s, s} }, //bottom (-y)
+		};
+		//note the V flip: Proton textures keep row 0 at the top (the engine's
+		//2D blits compensate internally), so raw UV mapping flips V
+		const GLfloat quadUV[4][2] = { {0,0}, {1,0}, {1,1}, {0,1} };
+		const int tri[6] = { 0,1,2, 0,2,3 }; //two triangles per quad
+		for (int f = 0; f < 6; f++)
+		{
+			for (int i = 0; i < 6; i++)
+			{
+				int c = tri[i];
+				verts.push_back(quad[f][c][0]); verts.push_back(quad[f][c][1]); verts.push_back(quad[f][c][2]);
+				uvs.push_back(quadUV[c][0]); uvs.push_back(quadUV[c][1]);
+			}
+		}
+	}
+
+	m_logoSurf.Bind(); //any Proton Surface works as a 3D texture
+
+	glPushMatrix();
+	glLoadIdentity();
+	glTranslatef(0, 0, -3.2f);
+	//tick-driven angles so harness captures stay deterministic
+	glRotatef(float((GetGameTick() / 10) % 360), 0, 1, 0);
+	glRotatef(float((GetGameTick() / 14) % 360), 1, 0, 0);
+
+	glVertexPointer(3, GL_FLOAT, 0, &verts[0]);
+	glTexCoordPointer(2, GL_FLOAT, 0, &uvs[0]);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	glDisable(GL_BLEND); //opaque cube: no draw-order sorting worries
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glEnable(GL_BLEND);
+
+	glPopMatrix();
+	CHECK_GL_ERROR();
+}
+
 void App::Draw()
 {
 	PrepareForGL();
@@ -361,13 +425,27 @@ void App::Draw()
 	if (pEffect)
 	{
 		SetActiveShader(pEffect);
-		//feed the shaders their time uniform, tick-driven for determinism
-		pEffect->SetUniform1f("uTime", float(GetGameTick()) / 1000.0f);
+
+		//feed the shaders their time uniform, tick-driven for determinism.
+		//MOBILE GOTCHA: ES2 fragment shaders run mediump (half) floats, so a
+		//"seconds since launch" value loses precision as it grows - after a
+		//few minutes sin(uTime * 3.0) visibly stutters.  So wrap it at 2*PI
+		//seconds, which is invisible as long as shaders only multiply uTime
+		//by whole numbers (sin(x + uTime*3.0) is continuous across the wrap;
+		//uTime*2.5 would pop every 6.28 seconds).
+		pEffect->SetUniform1f("uTime", float(GetGameTick() % 6283) / 1000.0f);
 	}
 
 	m_sceneSurf.Blit(0, 0);
 
-	SetActiveShader(NULL); //back to normal rendering for the UI text below
+	SetActiveShader(NULL); //back to normal rendering for everything below
+
+	//the last "effect" isn't a shader at all: it shows classic 3D running on
+	//the same pipeline
+	if (m_curEffect == 5)
+	{
+		DrawSpinningCube();
+	}
 
 	char msg[128];
 	sprintf(msg, "Effect %d of %d: %s  (click, tap or space to change)", m_curEffect + 1,

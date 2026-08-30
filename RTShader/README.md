@@ -10,7 +10,9 @@ The smallest possible demonstration of Proton's shader pipeline features:
    full-screen post-processing effect in a few lines of shader code.
 
 Click, tap, or press space to cycle the effects: no shader, wavy, grayscale,
-color cycle, and scanlines+vignette. The whole tour is in
+color cycle, scanlines+vignette, and a spinning textured 3D cube (that last
+one is not a shader at all: it's classic fixed-function-style GL running on
+the shader pipeline through the compatibility shim). The whole tour is in
 [source/App.cpp](source/App.cpp), written to be read top to bottom; the
 engine's shader contract (which attributes and uniforms are bound for you) is
 documented in the comment block at the top and in

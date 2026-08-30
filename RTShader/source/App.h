@@ -12,7 +12,7 @@
 #include "BaseApp.h"
 #include "Renderer/ShaderPipeline.h" //RTShader, SetActiveShader
 
-const int EFFECT_COUNT = 5; //effect 0 is "no shader", the rest are in App.cpp
+const int EFFECT_COUNT = 6; //effect 0 is "no shader", the rest are in App.cpp
 
 class App: public BaseApp
 {
@@ -35,6 +35,7 @@ public:
 private:
 
 	void DrawSceneIntoTexture();
+	void DrawSpinningCube();
 	bool InitEffectsIfNeeded();
 
 	bool m_bDidPostInit;
