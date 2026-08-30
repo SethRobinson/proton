@@ -512,10 +512,20 @@ void App::Draw()
 		DrawSpinningCube(m_curEffect == 6);
 	}
 
+	//the status bar: scale the text with the screen so it's readable on
+	//high-res tablets, and back it with a translucent strip so it stays
+	//legible over whatever the effect is doing behind it
 	char msg[128];
 	sprintf(msg, "Effect %d of %d: %s  (click, tap or space to change)", m_curEffect + 1,
 		EFFECT_COUNT, g_effectNames[m_curEffect]);
-	GetFont(FONT_SMALL)->Draw(20.0f, GetScreenSizeYf() - 40.0f, msg);
+
+	float txtScale = rt_max(1.0f, rt_min(GetScreenSizeXf(), GetScreenSizeYf()) / 768.0f);
+	CL_Vec2f txtSize = GetFont(FONT_SMALL)->MeasureText(msg, txtScale);
+	float pad = 10.0f * txtScale;
+	float barH = txtSize.y + pad * 2.0f;
+	float barY = GetScreenSizeYf() - barH;
+	DrawFilledRect(0.0f, barY, GetScreenSizeXf(), barH, MAKE_RGBA(0, 0, 0, 150));
+	GetFont(FONT_SMALL)->DrawScaled((GetScreenSizeXf() - txtSize.x) * 0.5f, barY + pad, msg, txtScale);
 
 	BaseApp::Draw();
 }
