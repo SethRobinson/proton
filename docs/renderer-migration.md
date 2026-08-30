@@ -46,10 +46,14 @@ and the existing compatibility/legacy contexts on Windows/Linux/macOS (GLSL
   RenderBatcher has a *method* named glDrawArrays, so its internal calls to
   the free function are ::-qualified; GL_LINE_SMOOTH is rasterizer state
   that still works with shaders on desktop, and DrawLine's look depends on
-  it, so SP_Enable passes it through under C_GL_MODE. RTMindWall stays on
-  legacy until the single-light ubershader variant lands (its glLightfv/
-  glShadeModel are shimmed as legacy-passthrough/shader-ignored). Still to
-  do: that lighting variant, ES2 context creation per platform, the WebGL
+  it, so SP_Enable passes it through under C_GL_MODE. Milestone 3 (Aug
+  2026): the single-light ubershader variant (SP_VARIANT_LIGHT): GL-spec
+  fixed-function lighting for GL_LIGHT0 with COLOR_MATERIAL, eye-space light
+  position captured at glLightfv time, transpose(inverse(MV)) normal matrix,
+  normals deliberately NOT normalized (GL_NORMALIZE was never enabled).
+  RTMindWall renders 0.000% vs its fixed-function golden, which makes ALL
+  SIX suite apps pixel-exact on both pipelines on Windows. Still to
+  do: ES2 context creation per platform, the WebGL
   flip (streaming VBO + dropping LEGACY_GL_EMULATION), FBO render targets,
   and the public shader API. Notable finding recorded in ShaderPipeline.cpp:
   GL_ALPHA_TEST was always a no-op in Proton (glAlphaFunc never called, GL

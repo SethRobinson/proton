@@ -60,22 +60,17 @@ inline void rtShim_glClipPlane(GLenum plane, const void *pEq)
 	rtClipPlane(plane, (const float*)pEq);
 }
 
-//lighting: passes through untouched on the legacy pipeline; accepted but
-//ignored on the shader pipeline until the single-light ubershader variant
-//exists (which is why lit apps like RTMindWall aren't marked ShaderReady yet)
+//lighting: glLightfv routes into the single-light (GL_LIGHT0) ubershader
+//emulation on the shader pipeline, and through to real GL on the legacy one.
+//glLightf and glShadeModel pass through on legacy and are ignored on the
+//shader path (Gouraud/GL_SMOOTH is the only shading model implemented, and
+//no Proton app uses the scalar light params).
 inline void rtShim_glLightf(GLenum light, GLenum pname, float param)
 {
 #ifdef RT_SHADER_PIPELINE_AVAILABLE
 	if (g_bShaderPipelineActive) return;
 #endif
 	glLightf(light, pname, param);
-}
-inline void rtShim_glLightfv(GLenum light, GLenum pname, const float *params)
-{
-#ifdef RT_SHADER_PIPELINE_AVAILABLE
-	if (g_bShaderPipelineActive) return;
-#endif
-	glLightfv(light, pname, params);
 }
 inline void rtShim_glShadeModel(GLenum mode)
 {
@@ -128,7 +123,7 @@ inline void rtShim_glShadeModel(GLenum mode)
 #define glClipPlanef rtShim_glClipPlane
 
 #define glLightf rtShim_glLightf
-#define glLightfv rtShim_glLightfv
+#define glLightfv rtLightfv
 #define glShadeModel rtShim_glShadeModel
 
 #endif // GL1ShaderShim_h__

@@ -84,6 +84,7 @@ inline void rtDrawElements(GLenum mode, GLsizei count, GLenum type, const void *
 
 inline void rtEnable(GLenum cap) RT_PIPE(SP_Enable(cap), glEnable(cap))
 inline void rtDisable(GLenum cap) RT_PIPE(SP_Disable(cap), glDisable(cap))
+inline void rtLightfv(GLenum light, GLenum pname, const float *params) RT_PIPE(SP_Lightfv(light, pname, params), glLightfv(light, pname, params))
 inline void rtHint(GLenum target, GLenum mode) RT_PIPE(SP_Hint(target, mode), glHint(target, mode)) //GL_LINE_SMOOTH_HINT is the only engine use
 
 //pEq4 points at 4 floats.  Note: the legacy path preserves the engine's

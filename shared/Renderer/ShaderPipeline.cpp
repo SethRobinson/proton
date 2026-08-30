@@ -57,6 +57,7 @@ typedef GLint (APIENTRY *PFNSPGETUNIFORMLOCATION)(GLuint program, const SPGLchar
 typedef void (APIENTRY *PFNSPUNIFORMMATRIX4FV)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
 typedef void (APIENTRY *PFNSPUNIFORM4FV)(GLint location, GLsizei count, const GLfloat *value);
 typedef void (APIENTRY *PFNSPUNIFORM1I)(GLint location, GLint v0);
+typedef void (APIENTRY *PFNSPUNIFORM1F)(GLint location, GLfloat v0);
 typedef void (APIENTRY *PFNSPENABLEVERTEXATTRIBARRAY)(GLuint index);
 typedef void (APIENTRY *PFNSPDISABLEVERTEXATTRIBARRAY)(GLuint index);
 typedef void (APIENTRY *PFNSPVERTEXATTRIBPOINTER)(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer);
@@ -79,6 +80,7 @@ static PFNSPGETUNIFORMLOCATION spGetUniformLocation = NULL;
 static PFNSPUNIFORMMATRIX4FV spUniformMatrix4fv = NULL;
 static PFNSPUNIFORM4FV spUniform4fv = NULL;
 static PFNSPUNIFORM1I spUniform1i = NULL;
+static PFNSPUNIFORM1F spUniform1f = NULL;
 static PFNSPENABLEVERTEXATTRIBARRAY spEnableVertexAttribArray = NULL;
 static PFNSPDISABLEVERTEXATTRIBARRAY spDisableVertexAttribArray = NULL;
 static PFNSPVERTEXATTRIBPOINTER spVertexAttribPointer = NULL;
@@ -104,6 +106,7 @@ static bool LoadGL2FunctionPointers()
 	SP_LOAD(spUniformMatrix4fv, "glUniformMatrix4fv");
 	SP_LOAD(spUniform4fv, "glUniform4fv");
 	SP_LOAD(spUniform1i, "glUniform1i");
+	SP_LOAD(spUniform1f, "glUniform1f");
 	SP_LOAD(spEnableVertexAttribArray, "glEnableVertexAttribArray");
 	SP_LOAD(spDisableVertexAttribArray, "glDisableVertexAttribArray");
 	SP_LOAD(spVertexAttribPointer, "glVertexAttribPointer");
@@ -132,6 +135,7 @@ static bool LoadGL2FunctionPointers() { return true; }
 #define spUniformMatrix4fv glUniformMatrix4fv
 #define spUniform4fv glUniform4fv
 #define spUniform1i glUniform1i
+#define spUniform1f glUniform1f
 #define spEnableVertexAttribArray glEnableVertexAttribArray
 #define spDisableVertexAttribArray glDisableVertexAttribArray
 #define spVertexAttribPointer glVertexAttribPointer
@@ -195,12 +199,13 @@ struct SPClientArray
 enum { SP_ARRAY_VERTEX = 0, SP_ARRAY_TEXCOORD, SP_ARRAY_COLOR, SP_ARRAY_NORMAL, SP_ARRAY_COUNT };
 
 //program variant bits
-enum { SP_VARIANT_TEXTURE = 1, SP_VARIANT_VCOLOR = 2, SP_VARIANT_CLIP = 4, SP_VARIANT_COUNT = 8 };
+enum { SP_VARIANT_TEXTURE = 1, SP_VARIANT_VCOLOR = 2, SP_VARIANT_CLIP = 4, SP_VARIANT_LIGHT = 8, SP_VARIANT_COUNT = 16 };
 
 struct SPProgram
 {
 	GLuint program;
 	GLint locProj, locMV, locColor, locClipPlane;
+	GLint locNormalMat, locLightPosEye, locLightAmbient, locLightDiffuse, locColorMaterial;
 };
 
 struct SPState
@@ -216,6 +221,15 @@ struct SPState
 	bool bTexture2D;
 	bool bClipPlane;
 	float clipPlaneEye[4]; //already transformed to eye space, per the GL spec
+
+	//single-light fixed-function emulation (GL_LIGHT0 only, which is all any
+	//Proton app has ever used)
+	bool bLighting;
+	bool bLight0;
+	bool bColorMaterial;
+	float lightPosEye[4];   //transformed to eye space at glLightfv time, per the GL spec
+	float lightAmbient[4];
+	float lightDiffuse[4];
 
 	SPProgram programs[SP_VARIANT_COUNT];
 	GLuint boundProgram;
@@ -248,11 +262,40 @@ static const char *GetVertexShaderSource(int variant)
 	if (variant & SP_VARIANT_TEXTURE) s += "attribute vec2 a_uv;\nvarying vec2 v_uv;\n";
 	if (variant & SP_VARIANT_VCOLOR) s += "attribute vec4 a_color;\n";
 	if (variant & SP_VARIANT_CLIP) s += "uniform vec4 uClipPlane;\nvarying float v_clipDist;\n";
+	if (variant & SP_VARIANT_LIGHT)
+	{
+		s += "attribute vec4 a_normal;\n"
+			"uniform mat4 uNormalMat;\n"     //transpose(inverse(uMV)); upper 3x3 is what matters
+			"uniform vec4 uLightPosEye;\n"   //already in eye space, w=0 means directional
+			"uniform vec4 uLightAmbient;\n"
+			"uniform vec4 uLightDiffuse;\n"
+			"uniform float uColorMaterial;\n"; //1 = material ambient+diffuse track the color (GL_COLOR_MATERIAL)
+	}
 	s += "void main() {\n"
 		"	vec4 eyePos = uMV * vec4(a_pos.xyz, 1.0);\n"
 		"	gl_Position = uProj * eyePos;\n";
 	if (variant & SP_VARIANT_TEXTURE) s += "	v_uv = a_uv;\n";
-	s += (variant & SP_VARIANT_VCOLOR) ? "	v_color = a_color;\n" : "	v_color = uColor;\n";
+	s += (variant & SP_VARIANT_VCOLOR) ? "	vec4 baseColor = a_color;\n" : "	vec4 baseColor = uColor;\n";
+	if (variant & SP_VARIANT_LIGHT)
+	{
+		//fixed-function equation with Proton's defaults: emission 0, specular 0,
+		//attenuation 1, global ambient 0.2, materials 0.2/0.8 unless
+		//GL_COLOR_MATERIAL tracks the color.  Normals deliberately NOT
+		//normalized (GL_NORMALIZE was never enabled on the fixed pipeline).
+		s += "	vec3 n = (uNormalMat * vec4(a_normal.xyz, 0.0)).xyz;\n"
+			"	vec3 L;\n"
+			"	if (uLightPosEye.w == 0.0) L = normalize(uLightPosEye.xyz);\n"
+			"	else L = normalize(uLightPosEye.xyz - eyePos.xyz);\n"
+			"	vec3 matAmb = mix(vec3(0.2), baseColor.rgb, uColorMaterial);\n"
+			"	vec3 matDif = mix(vec3(0.8), baseColor.rgb, uColorMaterial);\n"
+			"	float litAlpha = mix(1.0, baseColor.a, uColorMaterial);\n"
+			"	vec3 lit = matAmb * (vec3(0.2) + uLightAmbient.rgb) + matDif * uLightDiffuse.rgb * max(0.0, dot(n, L));\n"
+			"	v_color = vec4(clamp(lit, 0.0, 1.0), litAlpha);\n";
+	}
+	else
+	{
+		s += "	v_color = baseColor;\n";
+	}
 	if (variant & SP_VARIANT_CLIP) s += "	v_clipDist = dot(uClipPlane, eyePos);\n";
 	s += "}\n";
 	return s.c_str();
@@ -308,6 +351,7 @@ static bool BuildProgram(int variant)
 	spBindAttribLocation(prog, SP_ARRAY_VERTEX, "a_pos");
 	if (variant & SP_VARIANT_TEXTURE) spBindAttribLocation(prog, SP_ARRAY_TEXCOORD, "a_uv");
 	if (variant & SP_VARIANT_VCOLOR) spBindAttribLocation(prog, SP_ARRAY_COLOR, "a_color");
+	if (variant & SP_VARIANT_LIGHT) spBindAttribLocation(prog, SP_ARRAY_NORMAL, "a_normal");
 	spLinkProgram(prog);
 	spDeleteShader(vs);
 	spDeleteShader(fs);
@@ -328,6 +372,11 @@ static bool BuildProgram(int variant)
 	p.locMV = spGetUniformLocation(prog, "uMV");
 	p.locColor = spGetUniformLocation(prog, "uColor");
 	p.locClipPlane = spGetUniformLocation(prog, "uClipPlane");
+	p.locNormalMat = spGetUniformLocation(prog, "uNormalMat");
+	p.locLightPosEye = spGetUniformLocation(prog, "uLightPosEye");
+	p.locLightAmbient = spGetUniformLocation(prog, "uLightAmbient");
+	p.locLightDiffuse = spGetUniformLocation(prog, "uLightDiffuse");
+	p.locColorMaterial = spGetUniformLocation(prog, "uColorMaterial");
 	if (variant & SP_VARIANT_TEXTURE)
 	{
 		spUseProgram(prog);
@@ -370,6 +419,11 @@ void SP_ResetState()
 	}
 	g_sp.curMatrix = 0;
 	g_sp.color[0] = g_sp.color[1] = g_sp.color[2] = g_sp.color[3] = 1.0f;
+
+	//GL_LIGHT0 defaults per the GL spec
+	g_sp.lightPosEye[0] = 0; g_sp.lightPosEye[1] = 0; g_sp.lightPosEye[2] = 1.0f; g_sp.lightPosEye[3] = 0;
+	g_sp.lightAmbient[3] = 1.0f; //(0,0,0,1)
+	g_sp.lightDiffuse[0] = g_sp.lightDiffuse[1] = g_sp.lightDiffuse[2] = g_sp.lightDiffuse[3] = 1.0f;
 }
 
 //---------------------------------------------------------------------------
@@ -523,6 +577,9 @@ void SP_Enable(GLenum cap)
 {
 	if (cap == GL_TEXTURE_2D) { g_sp.bTexture2D = true; return; }
 	if (cap == GL_CLIP_PLANE0) { g_sp.bClipPlane = true; return; }
+	if (cap == GL_LIGHTING) { g_sp.bLighting = true; return; }
+	if (cap == GL_LIGHT0) { g_sp.bLight0 = true; return; }
+	if (cap == GL_COLOR_MATERIAL) { g_sp.bColorMaterial = true; return; }
 #ifdef C_GL_MODE
 	//line smoothing is rasterizer state, not fixed-function shading: on desktop
 	//GL it works fine alongside shaders, and DrawLine's visuals depend on it
@@ -542,6 +599,9 @@ void SP_Disable(GLenum cap)
 {
 	if (cap == GL_TEXTURE_2D) { g_sp.bTexture2D = false; return; }
 	if (cap == GL_CLIP_PLANE0) { g_sp.bClipPlane = false; return; }
+	if (cap == GL_LIGHTING) { g_sp.bLighting = false; return; }
+	if (cap == GL_LIGHT0) { g_sp.bLight0 = false; return; }
+	if (cap == GL_COLOR_MATERIAL) { g_sp.bColorMaterial = false; return; }
 #ifdef C_GL_MODE
 	if (cap == GL_LINE_SMOOTH) { glDisable(cap); return; }
 #endif
@@ -550,6 +610,35 @@ void SP_Disable(GLenum cap)
 }
 
 void SP_Hint(GLenum target, GLenum mode) {}
+
+void SP_Lightfv(GLenum light, GLenum pname, const float *params)
+{
+	if (light != GL_LIGHT0) return; //only light 0 is emulated; no Proton app has ever used another
+
+	if (pname == GL_POSITION)
+	{
+		//per the GL spec the position is transformed by the modelview at call
+		//time and stored in eye space (w == 0 means directional)
+		const float *mv = g_sp.matrix[0].stack[g_sp.matrix[0].depth].m;
+		for (int r = 0; r < 4; r++)
+		{
+			g_sp.lightPosEye[r] =
+				mv[0 * 4 + r] * params[0] +
+				mv[1 * 4 + r] * params[1] +
+				mv[2 * 4 + r] * params[2] +
+				mv[3 * 4 + r] * params[3];
+		}
+	}
+	else if (pname == GL_AMBIENT)
+	{
+		memcpy(g_sp.lightAmbient, params, sizeof(float) * 4);
+	}
+	else if (pname == GL_DIFFUSE)
+	{
+		memcpy(g_sp.lightDiffuse, params, sizeof(float) * 4);
+	}
+	//other pnames (specular, attenuation, spot) keep their defaults; nothing uses them
+}
 
 void SP_ClipPlane(GLenum plane, const float *pEq4)
 {
@@ -581,6 +670,7 @@ static bool PrepareToDraw()
 	if (g_sp.bTexture2D && g_sp.arrays[SP_ARRAY_TEXCOORD].bEnabled) variant |= SP_VARIANT_TEXTURE;
 	if (g_sp.arrays[SP_ARRAY_COLOR].bEnabled) variant |= SP_VARIANT_VCOLOR;
 	if (g_sp.bClipPlane) variant |= SP_VARIANT_CLIP;
+	if (g_sp.bLighting && g_sp.bLight0) variant |= SP_VARIANT_LIGHT;
 
 	SPProgram &p = g_sp.programs[variant];
 	if (!p.program)
@@ -627,6 +717,41 @@ static bool PrepareToDraw()
 	else
 	{
 		spDisableVertexAttribArray(SP_ARRAY_COLOR);
+	}
+
+	if (variant & SP_VARIANT_LIGHT)
+	{
+		//normal matrix: transpose(inverse(modelview)), computed per lit draw
+		//(lit draws are rare enough that caching can wait)
+		CL_Mat4f mv;
+		memcpy(mv.matrix, g_sp.matrix[0].stack[g_sp.matrix[0].depth].m, sizeof(float) * 16);
+		CL_Mat4f inv = mv.inverse();
+		SPMat16 normalMat;
+		for (int c = 0; c < 4; c++)
+		{
+			for (int r = 0; r < 4; r++) normalMat.m[c * 4 + r] = inv.matrix[r * 4 + c];
+		}
+		spUniformMatrix4fv(p.locNormalMat, 1, GL_FALSE, normalMat.m);
+		spUniform4fv(p.locLightPosEye, 1, g_sp.lightPosEye);
+		spUniform4fv(p.locLightAmbient, 1, g_sp.lightAmbient);
+		spUniform4fv(p.locLightDiffuse, 1, g_sp.lightDiffuse);
+		spUniform1f(p.locColorMaterial, g_sp.bColorMaterial ? 1.0f : 0.0f);
+
+		const SPClientArray &nrm = g_sp.arrays[SP_ARRAY_NORMAL];
+		if (nrm.bEnabled)
+		{
+			spEnableVertexAttribArray(SP_ARRAY_NORMAL);
+			spVertexAttribPointer(SP_ARRAY_NORMAL, 3, nrm.type, GL_FALSE, nrm.stride, nrm.pData);
+		}
+		else
+		{
+			spDisableVertexAttribArray(SP_ARRAY_NORMAL);
+			spVertexAttrib4f(SP_ARRAY_NORMAL, 0, 0, 1.0f, 0); //GL's default current normal
+		}
+	}
+	else
+	{
+		spDisableVertexAttribArray(SP_ARRAY_NORMAL);
 	}
 
 	return true;

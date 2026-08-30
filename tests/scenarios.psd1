@@ -72,6 +72,7 @@ Apps = @(
     @{
         Name = 'RTMindWall'
         Exe = 'RTMindWall\bin\winRTMindWall_Debug GL.exe'
+        ShaderReady = $true
         SettleMs = 8000
         Steps = @(
             @{ Action = 'capture'; Name = 'main' }

@@ -48,6 +48,7 @@ void SP_DrawArrays(GLenum mode, GLint first, GLsizei count);
 void SP_DrawElements(GLenum mode, GLsizei count, GLenum type, const void *pIndices);
 void SP_Enable(GLenum cap);
 void SP_Disable(GLenum cap);
+void SP_Lightfv(GLenum light, GLenum pname, const float *params);
 void SP_Hint(GLenum target, GLenum mode);
 void SP_ClipPlane(GLenum plane, const float *pEq4);
 
