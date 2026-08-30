@@ -211,6 +211,9 @@
     <ClCompile Include="..\..\shared\Renderer\RenderBatcher.cpp">
       <Filter>shared\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\shared\Renderer\ShaderPipeline.cpp">
+      <Filter>shared\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\shared\Renderer\RTGLESExt.cpp">
       <Filter>shared\Renderer</Filter>
     </ClCompile>

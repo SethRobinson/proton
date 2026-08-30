@@ -107,8 +107,12 @@ and the existing compatibility/legacy contexts on Windows/Linux/macOS (GLSL
   (0.082%, driver-precision drift; Windows is byte-identical). Linux:
   Proton.cmake compiles ShaderPipeline.cpp and defines
   RT_SHADER_PIPELINE_AVAILABLE in the desktop-GL branch; GL2 functions
-  load via SDL_GL_GetProcAddress (SDL is mandatory there); syntax-checked
-  under WSL, not yet run. iOS ES2 flip (Aug 2026): like html5/Android,
+  load via SDL_GL_GetProcAddress (SDL is mandatory there); verified on real
+  hardware (Aug 2026): RTShader builds inside the freedesktop 24.08 Sdk
+  flatpak sandbox on the glados Ubuntu box (system libsdl2-dev isn't
+  installed there; the Sdk ships SDL2) and renders the wavy postprocess and
+  the 3D cube correctly at 1080p, ~715 fps uncapped - see agents_local.md
+  for the build/run recipe. iOS ES2 flip (Aug 2026): like html5/Android,
   iOS can't switch pipelines at runtime (the EAGL context is ES1 or ES2,
   period), so it's an RT_SHADER_PIPELINE_ONLY build: PlatformSetupIOS.h
   and EAGLView.h grew ES2 header branches, EAGLView.mm creates a
