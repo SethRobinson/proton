@@ -160,12 +160,24 @@ static const char *g_fragScanlines =
 //  shader mixes rainbow bands into the texture: things the fixed-function
 //  menu simply doesn't have on it.
 
+//REAL-WORLD GOTCHA: a uniform used by BOTH stages must have the SAME
+//precision in both, or strict GLES2 linkers (Apple!) refuse the program
+//with "Uniform precision mismatch".  Vertex shaders default float to highp
+//and our fragment shaders default to mediump, so declare it explicitly on
+//ES (GL_ES is predefined there; desktop GL has no precision keywords).
+#define SHARED_UNIFORM_TIME \
+	"#ifdef GL_ES\n" \
+	"uniform mediump float uTime;\n" \
+	"#else\n" \
+	"uniform float uTime;\n" \
+	"#endif\n"
+
 static const char *g_cubeVertexShader =
 	"attribute vec4 a_pos;\n"
 	"attribute vec2 a_uv;\n"
 	"uniform mat4 uProj;\n"
 	"uniform mat4 uMV;\n"
-	"uniform float uTime;\n"
+	SHARED_UNIFORM_TIME
 	"varying vec2 v_uv;\n"
 	"varying vec3 v_localPos;\n"
 	"void main()\n"
@@ -182,7 +194,7 @@ static const char *g_cubeVertexShader =
 static const char *g_cubeFragmentShader =
 	"uniform sampler2D uTex;\n"
 	"uniform vec4 uColor;\n"
-	"uniform float uTime;\n"
+	SHARED_UNIFORM_TIME
 	"varying vec2 v_uv;\n"
 	"varying vec3 v_localPos;\n"
 	"void main()\n"
@@ -304,19 +316,31 @@ void App::Update()
 //RTShader::Load your vertex and fragment source and it compiles+links.
 bool App::InitEffectsIfNeeded()
 {
-	if (m_effect[1].IsLoaded()) return true;
+	//only try once, and remember failure honestly - an early version keyed
+	//this off "is effect 1 loaded", so if a LATER shader failed to compile
+	//the error text showed for one frame and then everything looked normal
+	//except that effect silently doing nothing (which is how an Apple-only
+	//link error went unnoticed... briefly)
+	static bool bTried = false;
+	static bool bAllLoaded = false;
+	if (bTried) return bAllLoaded;
+	bTried = true;
 
-	//m_effect[0] deliberately stays unloaded: it means "draw normally"
-	if (!m_effect[1].Load(g_vertexShader, g_fragWave)) return false;
-	if (!m_effect[2].Load(g_vertexShader, g_fragGrayscale)) return false;
-	if (!m_effect[3].Load(g_vertexShader, g_fragColorCycle)) return false;
-	if (!m_effect[4].Load(g_vertexShader, g_fragScanlines)) return false;
-	//[5] stays unloaded too (the fixed-function cube); [6] is the jelly cube
-	if (!m_effect[6].Load(g_cubeVertexShader, g_cubeFragmentShader)) return false;
+	//m_effect[0] deliberately stays unloaded: it means "draw normally";
+	//[5] too (the fixed-function cube); [6] is the jelly cube
+	bAllLoaded =
+		m_effect[1].Load(g_vertexShader, g_fragWave) &&
+		m_effect[2].Load(g_vertexShader, g_fragGrayscale) &&
+		m_effect[3].Load(g_vertexShader, g_fragColorCycle) &&
+		m_effect[4].Load(g_vertexShader, g_fragScanlines) &&
+		m_effect[6].Load(g_cubeVertexShader, g_cubeFragmentShader);
 
-	//uniforms can be set any time; they're applied whenever the shader is active
-	m_effect[4].SetUniform4f("uEdgeColor", 0.1f, 0.05f, 0.3f, 1.5f); //vignette tint (a is strength)
-	return true;
+	if (bAllLoaded)
+	{
+		//uniforms can be set any time; they're applied whenever the shader is active
+		m_effect[4].SetUniform4f("uEdgeColor", 0.1f, 0.05f, 0.3f, 1.5f); //vignette tint (a is strength)
+	}
+	return bAllLoaded;
 }
 
 //step 1: draw an ordinary animated 2D scene, but into a texture instead of
