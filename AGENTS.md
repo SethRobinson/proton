@@ -98,6 +98,16 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   A crash shows up as the process going not-responding with a WER dialog; the
   Application event log (Id 1000) has the exception code.
 
+## Versioning
+
+- The engine version lives in `shared/ProtonVersion.h`: `PROTON_VERSION_MAJOR/MINOR/PATCH`,
+  a numeric `PROTON_VERSION` for compile-time checks (v1.2.3 = 10203), and
+  `PROTON_VERSION_STRING`. `BaseApp::Init()` logs it at startup.
+- When cutting a notable engine milestone, bump the header and create a matching
+  annotated git tag (e.g. `v1.0.0`) in the same commit/tag pair.
+- `BaseApp::GetAppVersion()` is the *app's* version (filled in via OS messages on
+  iOS/Android), unrelated to the engine version.
+
 ## Git
 
 - `.gitignore` uses a whitelist: `/*` ignores everything at the repo root, and

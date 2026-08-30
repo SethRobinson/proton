@@ -115,6 +115,8 @@ bool BaseApp::Init()
 
 	m_bInitted = true;
 
+	LogMsg("Proton SDK v%s", PROTON_VERSION_STRING);
+
 	CHECK_GL_ERROR();
 
 	PrintGLString("Version", GL_VERSION);

@@ -2,6 +2,7 @@
 #define PlatformSetup_h__
 
 #include "PlatformEnums.h"
+#include "ProtonVersion.h"
 
 #ifdef WIN32
 #include "win/PlatformSetupWin.h"
