@@ -315,6 +315,16 @@ void BaseApp::ProcessAutoScreenshot()
 		OSMessage o;
 		o.m_type = OSMessage::MESSAGE_FINISH_APP;
 		AddOSMessage(o);
+
+#ifdef PLATFORM_IOS
+		//iOS ignores MESSAGE_FINISH_APP (apps aren't supposed to quit
+		//themselves), which left every harness capture running on the device
+		//forever - sitting on screen in locked-timestep mode with the FPS
+		//display pinned at 62, repeatedly mistaken for a real fps problem.
+		//The capture is written and the harness is done with us: exit.
+		LogMsg("autoscreenshot: capture done, exiting (iOS has no app-quit message)");
+		exit(0);
+#endif
 	}
 }
 
