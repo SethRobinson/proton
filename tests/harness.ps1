@@ -22,6 +22,10 @@ param(
     [switch]$ShowBrowser,  # html5 only: run the browser headed, for debugging
     [switch]$PrepareMac,   # ios only: rsync the tracked tree to the Mac and xcodebuild the sim apps first
     [string]$MacHost = 'seth@studiomac.local', # ios only
+    [string]$IosSimDevice = 'iPad Pro (12.9-inch)', # ios only: simulator model to boot/use; goldens are per-model so keep it pinned
+    [switch]$IosDevice,    # ios only: run on a real USB/network-paired device instead of the simulator (goldens prefixed iosdev_)
+    [string]$IosDeviceId = '', # ios only: devicectl UDID; empty = first paired device
+    [string]$MacKeychainPassword = '', # ios only: needed by -PrepareMac -IosDevice to unlock the keychain for codesigning (see agents_secret.md)
     [string]$RepoRoot = (Split-Path $PSScriptRoot)
 )
 
@@ -226,30 +230,69 @@ function Invoke-IosCapture([string]$projectPath, [string]$appName, [int]$settleM
     # generate a capture script, scp it over, run it - avoids ssh quoting traps
     $lines = @(
         'set -e'
-        'APPNAME=$1; REMOTEBMP=$2; SETTLEMS=$3; TIMEOUTSEC=$4'
-        'if ! xcrun simctl list devices booted | grep -q "(Booted)"; then'
-        '  DEV=$(xcrun simctl list devices available | grep -m1 -oE "[A-F0-9-]{36}")'
-        '  echo "booting simulator $DEV"; xcrun simctl boot "$DEV"; xcrun simctl bootstatus "$DEV"'
-        'fi'
+        'APPNAME=$1; REMOTEBMP=$2; SETTLEMS=$3; TIMEOUTSEC=$4; SIMNAME=$5'
+        '#pin the simulator model: goldens are per-model, first-available is a lottery'
+        'DEV=$(xcrun simctl list devices available | grep -m1 "$SIMNAME (" | grep -oE "[A-F0-9-]{36}")'
+        'if [ -z "$DEV" ]; then echo "no available simulator named $SIMNAME"; exit 1; fi'
+        'xcrun simctl bootstatus "$DEV" -b >/dev/null' # boots it if needed and waits
         'APP=$(find ~/proton_warncheck/$APPNAME -name "$APPNAME.app" -path "*iphonesimulator*" | head -1)'
         'if [ -z "$APP" ]; then echo "no built .app found - run the harness with -PrepareMac"; exit 1; fi'
         'BUNDLE=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$APP/Info.plist")'
-        'xcrun simctl install booted "$APP"'
+        'xcrun simctl install "$DEV" "$APP"'
         'rm -f "$REMOTEBMP"'
-        'xcrun simctl launch --terminate-running-process booted "$BUNDLE" -autoscreenshot "$REMOTEBMP" "$SETTLEMS" -autoquit'
+        'xcrun simctl launch --terminate-running-process "$DEV" "$BUNDLE" -autoscreenshot "$REMOTEBMP" "$SETTLEMS" -autoquit'
         'i=0; while [ $i -lt $TIMEOUTSEC ]; do if [ -f "$REMOTEBMP" ]; then break; fi; sleep 1; i=$((i+1)); done'
-        'xcrun simctl terminate booted "$BUNDLE" 2>/dev/null || true'
+        'xcrun simctl terminate "$DEV" "$BUNDLE" 2>/dev/null || true'
         'if [ ! -f "$REMOTEBMP" ]; then echo "app never wrote $REMOTEBMP"; exit 1; fi'
     )
     $scriptPath = Join-Path $outputDir 'ios_capture.sh'
     [IO.File]::WriteAllText($scriptPath, ($lines -join "`n") + "`n")
     & scp -q $scriptPath "$MacHost`:/tmp/proton_harness_capture.sh"
     if ($LASTEXITCODE -ne 0) { throw 'scp of capture script failed' }
-    & ssh $MacHost "bash /tmp/proton_harness_capture.sh $appName $remoteBmp $settleMs $timeoutSec"
+    & ssh $MacHost "bash /tmp/proton_harness_capture.sh $appName $remoteBmp $settleMs $timeoutSec '$IosSimDevice'"
     if ($LASTEXITCODE -ne 0) { throw 'remote iOS capture failed (see output above)' }
     & scp -q "$MacHost`:$remoteBmp" $bmpOutPath
     if ($LASTEXITCODE -ne 0 -or -not (Test-Path $bmpOutPath)) { throw "scp of $remoteBmp failed" }
     & scp -q "$MacHost`:$remoteBmp.perf.txt" "$bmpOutPath.perf.txt" 2>$null # best effort
+}
+
+# ios -IosDevice: runs on a real paired device via devicectl. The app writes
+# to its sandbox Documents (unique name per run, since old files persist
+# there) and devicectl copies it out.
+
+function Invoke-IosDeviceCapture([string]$appName, [int]$settleMs, [string]$bmpOutPath)
+{
+    $timeoutSec = [int](($settleMs + 60000) / 1000)
+    $lines = @(
+        'set -e'
+        'APPNAME=$1; SETTLEMS=$2; TIMEOUTSEC=$3; DEVID=$4'
+        'if [ -z "$DEVID" ]; then DEVID=$(xcrun devicectl list devices | grep -m1 "available (paired)" | grep -oE "[A-F0-9-]{36}"); fi'
+        'if [ -z "$DEVID" ]; then echo "no paired iOS device visible to devicectl"; exit 1; fi'
+        'APP=$(find ~/proton_warncheck/$APPNAME -path "*Debug-iphoneos*" -name "$APPNAME.app" | head -1)'
+        'if [ -z "$APP" ]; then echo "no device .app built - run the harness with -PrepareMac -IosDevice"; exit 1; fi'
+        'BUNDLE=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$APP/Info.plist")'
+        'SHOT=shot_$(date +%s).bmp' # unique per run: old files persist in the sandbox
+        'xcrun devicectl device install app --device $DEVID "$APP" >/dev/null'
+        'xcrun devicectl device process launch --terminate-existing --device $DEVID "$BUNDLE" -- -autoscreenshot "$SHOT" "$SETTLEMS" -autoquit >/dev/null'
+        'rm -f /tmp/proton_device_shot.bmp /tmp/proton_device_shot.bmp.perf.txt'
+        'i=0'
+        'while [ $i -lt $TIMEOUTSEC ]; do'
+        '  sleep 2'
+        '  if xcrun devicectl device copy from --device $DEVID --domain-type appDataContainer --domain-identifier "$BUNDLE" --source "Documents/$SHOT" --destination /tmp/proton_device_shot.bmp >/dev/null 2>&1; then break; fi'
+        '  i=$((i+2))'
+        'done'
+        'if [ ! -f /tmp/proton_device_shot.bmp ]; then echo "never received $SHOT from the device (is it unlocked?)"; exit 1; fi'
+        'xcrun devicectl device copy from --device $DEVID --domain-type appDataContainer --domain-identifier "$BUNDLE" --source "Documents/$SHOT.perf.txt" --destination /tmp/proton_device_shot.bmp.perf.txt >/dev/null 2>&1 || true'
+    )
+    $scriptPath = Join-Path $outputDir 'ios_device_capture.sh'
+    [IO.File]::WriteAllText($scriptPath, ($lines -join "`n") + "`n")
+    & scp -q $scriptPath "$MacHost`:/tmp/proton_harness_devcapture.sh"
+    if ($LASTEXITCODE -ne 0) { throw 'scp of device capture script failed' }
+    & ssh $MacHost "bash /tmp/proton_harness_devcapture.sh $appName $settleMs $timeoutSec '$IosDeviceId'"
+    if ($LASTEXITCODE -ne 0) { throw 'remote iOS device capture failed (see output above)' }
+    & scp -q "$MacHost`:/tmp/proton_device_shot.bmp" $bmpOutPath
+    if ($LASTEXITCODE -ne 0 -or -not (Test-Path $bmpOutPath)) { throw 'scp of device screenshot failed' }
+    & scp -q "$MacHost`:/tmp/proton_device_shot.bmp.perf.txt" "$bmpOutPath.perf.txt" 2>$null # best effort
 }
 
 # ---------------------------------------------------------------------------
@@ -318,9 +361,19 @@ if ($Target -eq 'ios' -and $PrepareMac)
         {
             if ($entry.Name -notlike $App -or -not $entry.ContainsKey('IosProject')) { continue }
             $proj = $entry.IosProject -replace '\\', '/'
-            Write-Host "  xcodebuild $($entry.Name) (iphonesimulator)..."
-            & ssh $MacHost "cd ~/proton_warncheck && xcodebuild -project $proj -target $($entry.Name) -configuration Debug -sdk iphonesimulator CODE_SIGNING_ALLOWED=NO build 2>&1 | grep -E 'error|BUILD' | tail -3"
-            if ($LASTEXITCODE -ne 0) { throw "iOS build of $($entry.Name) failed" }
+            if ($IosDevice)
+            {
+                Write-Host "  xcodebuild $($entry.Name) (iphoneos, signed)..."
+                $unlock = if ($MacKeychainPassword) { "security unlock-keychain -p '$MacKeychainPassword' ~/Library/Keychains/login.keychain-db && " } else { '' }
+                & ssh $MacHost "$unlock cd ~/proton_warncheck && xcodebuild -project $proj -target $($entry.Name) -configuration Debug -sdk iphoneos CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM=7DA5SJEYK8 -allowProvisioningUpdates build 2>&1 | grep -E 'error|BUILD' | tail -3"
+                if ($LASTEXITCODE -ne 0) { throw "iOS device build of $($entry.Name) failed (keychain locked? pass -MacKeychainPassword, see agents_secret.md)" }
+            }
+            else
+            {
+                Write-Host "  xcodebuild $($entry.Name) (iphonesimulator)..."
+                & ssh $MacHost "cd ~/proton_warncheck && xcodebuild -project $proj -target $($entry.Name) -configuration Debug -sdk iphonesimulator CODE_SIGNING_ALLOWED=NO build 2>&1 | grep -E 'error|BUILD' | tail -3"
+                if ($LASTEXITCODE -ne 0) { throw "iOS build of $($entry.Name) failed" }
+            }
         }
     }
     finally { Pop-Location }
@@ -395,7 +448,7 @@ foreach ($entry in $scenarios.Apps)
     Write-Host "RUN   $($entry.Name)" -ForegroundColor Cyan
     try
     {
-        $prefix = if ($Target -eq 'win') { '' } else { "$($Target)_" }
+        $prefix = if ($Target -eq 'win') { '' } elseif ($Target -eq 'ios' -and $IosDevice) { 'iosdev_' } else { "$($Target)_" }
         $shotName = "$prefix$($entry.Name)_$($step.Name).png"
         $bmpPath = Join-Path $outputDir "$prefix$($entry.Name)_$($step.Name).bmp"
         if ($bmpPath -match ' ') { throw "path contains spaces; Proton's Windows parm tokenizer splits on them: $bmpPath" }
@@ -409,7 +462,8 @@ foreach ($entry in $scenarios.Apps)
         }
         elseif ($Target -eq 'ios')
         {
-            Invoke-IosCapture $entry.IosProject $entry.Name $entry.SettleMs $bmpPath
+            if ($IosDevice) { Invoke-IosDeviceCapture $entry.Name $entry.SettleMs $bmpPath }
+            else { Invoke-IosCapture $entry.IosProject $entry.Name $entry.SettleMs $bmpPath }
         }
         elseif ($Target -eq 'android')
         {

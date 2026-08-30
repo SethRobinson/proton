@@ -61,9 +61,19 @@ Per-target notes:
   against the `~/proton_warncheck` tree. Pass `-PrepareMac` to re-sync the
   tracked tree and xcodebuild the simulator apps (scenario key `IosProject`).
   Launch args flow through main.mm into command line parms; the BMP lands in
-  /tmp on the Mac and is scp'd back. Boots the first available simulator if
-  none is running. Expect a few hundred pixels of rasterization jitter
-  between runs (0.004-0.011% observed), comfortably inside the 0.5% limit.
+  /tmp on the Mac and is scp'd back. The simulator model is pinned via
+  `-IosSimDevice` (default iPad Pro 12.9) and is booted if needed; goldens
+  are per-model and captured in the fresh-boot portrait orientation. Expect
+  a few hundred pixels of rasterization jitter between runs (~0.01%),
+  comfortably inside the 0.5% limit.
+- **ios real device**: add `-IosDevice` (goldens prefixed `iosdev_`). Uses
+  devicectl against the first paired device (`-IosDeviceId` to pick one);
+  the app writes to its sandbox Documents under a unique name and devicectl
+  copies it out. Requirements: the device must be PAIRED, ON USB or the same
+  network, and UNLOCKED (set Auto-Lock to Never on a test device: a locked
+  screen fails with kAMDMobileImageMounterDeviceLocked). Device builds need
+  signing: run `-PrepareMac -IosDevice -MacKeychainPassword <pw>` (the
+  password lives in agents_secret.md, never in tracked files).
 - **android**: the app must be installed (debuggable) on the first adb
   device/emulator; scenario key `AndroidPackage`. Parms are passed as the
   "parms" intent extra (see SharedActivity.onCreate +
