@@ -4,7 +4,13 @@
 //  Robinson Technologies - Check license.txt for license info.
 //  ***************************************************************
 
+//this file implements the backend, so it must see the REAL gl functions, not
+//the app-compatibility macros from GL1ShaderShim.h.  RT_RENDERER_INTERNAL
+//skips the shim where possible, and GL1ShaderShimUndef.h handles the MSVC
+//precompiled-header case where the macros are baked in before we get a say.
+#define RT_RENDERER_INTERNAL
 #include "PlatformPrecomp.h"
+#include "GL1ShaderShimUndef.h"
 
 #ifdef RT_SHADER_PIPELINE_AVAILABLE
 
@@ -493,19 +499,54 @@ void SP_TexCoordPointer(GLint size, GLenum type, GLsizei stride, const void *pDa
 void SP_ColorPointer(GLint size, GLenum type, GLsizei stride, const void *pData) { SetArray(SP_ARRAY_COLOR, size, type, stride, pData); }
 void SP_NormalPointer(GLenum type, GLsizei stride, const void *pData) { SetArray(SP_ARRAY_NORMAL, 3, type, stride, pData); }
 
+//true for caps that no longer exist as GL state in the shader pipeline; these
+//are tracked (or deliberately ignored) instead of being passed to glEnable
+static bool IsFixedFunctionOnlyCap(GLenum cap)
+{
+	switch (cap)
+	{
+		case GL_TEXTURE_2D:
+		case GL_CLIP_PLANE0:
+		case GL_ALPHA_TEST:
+		case GL_LIGHTING:
+		case GL_LIGHT0:
+		case GL_LINE_SMOOTH:
+		case GL_COLOR_MATERIAL:
+		case GL_NORMALIZE:
+		case GL_FOG:
+			return true;
+	}
+	return false;
+}
+
 void SP_Enable(GLenum cap)
 {
-	if (cap == GL_TEXTURE_2D) g_sp.bTexture2D = true;
-	else if (cap == GL_CLIP_PLANE0) g_sp.bClipPlane = true;
-	//GL_ALPHA_TEST / GL_LIGHTING / GL_LINE_SMOOTH / GL_COLOR_MATERIAL: no-ops here
-	//(alpha test: the engine never sets glAlphaFunc, so GL's default GL_ALWAYS
-	//made it a no-op on the fixed pipeline too)
+	if (cap == GL_TEXTURE_2D) { g_sp.bTexture2D = true; return; }
+	if (cap == GL_CLIP_PLANE0) { g_sp.bClipPlane = true; return; }
+#ifdef C_GL_MODE
+	//line smoothing is rasterizer state, not fixed-function shading: on desktop
+	//GL it works fine alongside shaders, and DrawLine's visuals depend on it
+	//(GLES2 targets use DrawLine's quad-based variant instead)
+	if (cap == GL_LINE_SMOOTH) { glEnable(cap); return; }
+#endif
+	if (IsFixedFunctionOnlyCap(cap)) return;
+	//GL_ALPHA_TEST etc are no-ops here (alpha test: the engine never sets
+	//glAlphaFunc, so GL's default GL_ALWAYS made it a no-op before too).
+	//Anything else (GL_BLEND, GL_SCISSOR_TEST, GL_DEPTH_TEST, GL_CULL_FACE...)
+	//is still real GL state in ES2 and passes straight through - app code
+	//reaches here via the compatibility shim's glEnable remap.
+	glEnable(cap);
 }
 
 void SP_Disable(GLenum cap)
 {
-	if (cap == GL_TEXTURE_2D) g_sp.bTexture2D = false;
-	else if (cap == GL_CLIP_PLANE0) g_sp.bClipPlane = false;
+	if (cap == GL_TEXTURE_2D) { g_sp.bTexture2D = false; return; }
+	if (cap == GL_CLIP_PLANE0) { g_sp.bClipPlane = false; return; }
+#ifdef C_GL_MODE
+	if (cap == GL_LINE_SMOOTH) { glDisable(cap); return; }
+#endif
+	if (IsFixedFunctionOnlyCap(cap)) return;
+	glDisable(cap);
 }
 
 void SP_Hint(GLenum target, GLenum mode) {}

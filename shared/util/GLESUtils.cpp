@@ -307,7 +307,7 @@ void DrawEllipse (const int segments, CL_Vec2f vPos, float radianWidth, float ra
 	rtTranslatef(vPos.x, vPos.y, 0.0);
 	vector<float> vertices;
 	vertices.resize(segments*2);
-	glEnable (GL_LINE_SMOOTH);
+	rtEnable (GL_LINE_SMOOTH);
 	int count=0;
 	for (GLfloat i = 0; i < 360.0f; i+=(360.0f/segments))
 	{
@@ -362,8 +362,8 @@ void  DrawLine( GLuint rgba,   float ax, float ay, float bx, float by, float lin
 		bx, by, 0 
 	};
 	
-		glLineWidth(lineWidth); 
-		glEnable (GL_LINE_SMOOTH);
+		glLineWidth(lineWidth);
+		rtEnable (GL_LINE_SMOOTH);
 		//rtDisable(GL_LINE_SMOOTH);
 		rtHint (GL_LINE_SMOOTH_HINT, GL_NICEST);
 

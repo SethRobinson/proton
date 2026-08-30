@@ -45,6 +45,7 @@ Apps = @(
     @{
         Name = 'RTLooneyLadders'
         Exe = 'RTLooneyLadders\bin\RTLooneyLadders_Debug GL_x64.exe'
+        ShaderReady = $true
         SettleMs = 8000
         Steps = @(
             @{ Action = 'capture'; Name = 'mainmenu' }
@@ -53,6 +54,7 @@ Apps = @(
     @{
         Name = 'RTDink'
         Exe = 'RTDink\bin\winRTDink_Debug GL.exe'
+        ShaderReady = $true
         SettleMs = 12000
         Steps = @(
             @{ Action = 'capture'; Name = 'mainmenu' }
@@ -61,6 +63,7 @@ Apps = @(
     @{
         Name = 'BlipArcade'
         Exe = 'BlipArcade\bin\BlipArcade_debug.exe'
+        ShaderReady = $true
         SettleMs = 8000
         Steps = @(
             @{ Action = 'capture'; Name = 'main' }

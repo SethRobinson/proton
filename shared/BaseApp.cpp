@@ -196,6 +196,16 @@ void BaseApp::CheckAutoScreenshotParms()
 		{
 			m_autoScreenshotFile = m_commandLineParms[i + 1];
 			m_autoScreenshotAtMS = atoi(m_commandLineParms[i + 2].c_str());
+
+#ifdef PLATFORM_IOS
+			//on a real device the sandbox means a relative path is the only sane
+			//input, so resolve it against the app's Documents dir (the simulator
+			//harness passes absolute /tmp paths, which still work there)
+			if (!m_autoScreenshotFile.empty() && m_autoScreenshotFile[0] != '/')
+			{
+				m_autoScreenshotFile = GetSavePath() + m_autoScreenshotFile;
+			}
+#endif
 		}
 		if (parm == "-autoquit")
 		{

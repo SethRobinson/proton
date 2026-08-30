@@ -160,6 +160,13 @@ std::string PlatformIDAsStringDisplay(ePlatformID platformID);
 
 ePlatformID PlatformStringAsID(std::string platform);
 
+//projects with the runtime-selectable shader backend get the app-compatibility
+//shim: fixed-function gl* names remap onto the rt* dispatch layer so app code
+//runs unchanged on either pipeline.  See Renderer/GL1ShaderShim.h.
+#if defined(RT_SHADER_PIPELINE_AVAILABLE) && !defined(RT_RENDERER_INTERNAL) && !defined(_CONSOLE)
+	#include "Renderer/GL1ShaderShim.h"
+#endif
+
 
 /**
  * Returns a string representation of an orientation mode for display purposes.

@@ -192,7 +192,7 @@ void RenderBatcher::Flush(eFlushMode mode)
 				//glBlendFunc( GL_ONE, GL_ONE_MINUS_SRC_ALPHA );
 				//glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 			}
-			rtDrawArrays(GL_TRIANGLES,curPrim,event.m_vertCount);
+			::rtDrawArrays(GL_TRIANGLES,curPrim,event.m_vertCount);
 			if (event.m_pSurf)
 			{
 				event.m_pSurf->RemoveBlendingMode(color);
@@ -268,7 +268,7 @@ void RenderBatcher::BlitRawImage(int dstX, int dstY,  uint8 *pRaw, int width, in
 	rtVertexPointer(3, GL_SHORT, 0, &vertBuff[0]);
 	rtPushMatrix();
 	//rtTranslatef(-0.5f, 0.5f, 0);
-	rtDrawArrays(GL_POINTS, 0, dataSize);
+	::rtDrawArrays(GL_POINTS, 0, dataSize);
 	rtPopMatrix();
 
 	rtDisableClientState(GL_COLOR_ARRAY);
@@ -368,7 +368,7 @@ void RenderBatcher::Flush3D( bool bUseNormals, bool bUseTextures, bool bUseColor
 	
 	CHECK_GL_ERROR();
 
-	rtDrawArrays(GL_TRIANGLES, 0, (GLsizei) m_verts.size());
+	::rtDrawArrays(GL_TRIANGLES, 0, (GLsizei) m_verts.size());
 	CHECK_GL_ERROR();
 	glDisable( GL_BLEND );
 

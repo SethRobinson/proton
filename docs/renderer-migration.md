@@ -34,13 +34,26 @@ and the existing compatibility/legacy contexts on Windows/Linux/macOS (GLSL
   RTSimpleApp Debug GL configs) accept a `-shaderpipeline` launch parm;
   without it the legacy path runs untouched. Milestone 1 (Aug 2026): both
   apps render pixel-identical (0.000%) to the fixed-function goldens on
-  Windows via `harness.ps1 -Mode test -ShaderPipe`. Still to do: the gl-name
-  compatibility shim so apps with raw GL (RTDink/BlipArcade/RTMindWall) can
-  run on it, ES2 context creation per platform, the WebGL flip (streaming
-  VBO + dropping LEGACY_GL_EMULATION), FBO render targets, and the public
-  shader API. Notable finding recorded in ShaderPipeline.cpp: GL_ALPHA_TEST
-  was always a no-op in Proton (glAlphaFunc never called, GL default is
-  GL_ALWAYS), so the shader path needs no alpha discard.
+  Windows via `harness.ps1 -Mode test -ShaderPipe`. Milestone 2 (Aug 2026):
+  the app compatibility shim, `Renderer/GL1ShaderShim.h`, included from
+  PlatformSetup.h in shader-enabled projects: remaps the fixed-function gl*
+  names apps call onto the rt* dispatch layer, so app source runs unchanged
+  on either pipeline. RTDink, BlipArcade, and RTLooneyLadders all render at
+  0.000% vs their fixed-function goldens under -shaderpipeline. Gotchas
+  baked into the code: ShaderPipeline.cpp must see real GL, and MSVC PCHs
+  bake the shim macros in, so it includes GL1ShaderShimUndef.h right after
+  the precomp (RT_RENDERER_INTERNAL alone is not enough under /Yu);
+  RenderBatcher has a *method* named glDrawArrays, so its internal calls to
+  the free function are ::-qualified; GL_LINE_SMOOTH is rasterizer state
+  that still works with shaders on desktop, and DrawLine's look depends on
+  it, so SP_Enable passes it through under C_GL_MODE. RTMindWall stays on
+  legacy until the single-light ubershader variant lands (its glLightfv/
+  glShadeModel are shimmed as legacy-passthrough/shader-ignored). Still to
+  do: that lighting variant, ES2 context creation per platform, the WebGL
+  flip (streaming VBO + dropping LEGACY_GL_EMULATION), FBO render targets,
+  and the public shader API. Notable finding recorded in ShaderPipeline.cpp:
+  GL_ALPHA_TEST was always a no-op in Proton (glAlphaFunc never called, GL
+  default is GL_ALWAYS), so the shader path needs no alpha discard.
 - **Phase 3**: flip defaults per platform (HTML5 first).
 - **Phase 4**: public shader + render-to-texture APIs.
 - **Phase 5**: delete the legacy path (tag first).
