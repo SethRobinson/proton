@@ -1,4 +1,9 @@
-# Proton SDK
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/readme_media/proton_logo_dark.png">
+    <img src="docs/readme_media/proton_logo.png" alt="Proton SDK" width="458">
+  </picture>
+</p>
 
 ## For tutorials and more info, visit [The Proton SDK wiki](https://www.protonsdk.com)
 
@@ -6,18 +11,41 @@ License: [BSD style with attribution required](https://github.com/SethRobinson/p
 
 Seth's GL/GLES messy multi-platform C++ game SDK.  Can output to **Windows**, **Linux** (including the **Raspberry Pi**), **HTML5**, **OS X**,  **iOS**, **Android**
 
-A component based toolbox of useful things built up over the last ten years.  Instead of a giant .lib you link only the .cpp files used when possible to simplify multiplatform support as well as keep code size down.
+A component based toolbox of useful things built up over the last SEVENTEEN years.  Instead of a giant .lib you link only the .cpp files used when possible to simplify multiplatform support as well as keep code size down.
 
-It's kind of an SDL-like on steroids (while also being able to target SDL2 for setup/input/audio itself when needed) but generally gets the best results with its own native implementations of things. For example, it can target the following audio subsystems: SDL2_mixer, Audiere, FMOD, FMODStudio, Native iOS, Native Android, Denshion, Native Flash
+It's kind of an SDL-like on steroids (while also being able to target SDL2 for setup/input/audio itself when needed) but generally gets the best results with its own native implementations of things. For example, it can target the following audio subsystems: SDL2_mixer, Audiere, FMOD, FMODStudio, Native iOS, Native Android, Denshion.
 
-It's designed with a "Write stuff in Windows with Visual Studio 2017, then compile/export to other platforms as needed" mentality.
+It's designed with a "Write stuff in Windows, then compile/export to other platforms as needed" mentality.
+
+<p align="center">
+  <a href="https://www.rtsoft.com/pages/tanked.php"><img src="docs/readme_media/shot_tanked.jpg" height="170" alt="Tanked"></a>
+  <a href="https://www.rtsoft.com/pages/dink.php"><img src="docs/readme_media/shot_dink.jpg" height="170" alt="Dink Smallwood HD"></a>
+  <a href="https://www.rtsoft.com/pages/dscroll_mobile.php"><img src="docs/readme_media/shot_dscroll.jpg" height="170" alt="Dungeon Scroll"></a>
+  <a href="https://www.codedojo.com/?p=138"><img src="docs/readme_media/shot_mindwall.jpg" height="170" alt="Mind Wall"></a>
+</p>
+<p align="center"><sub>Some things written with Proton: <a href="https://www.rtsoft.com/pages/tanked.php">Tanked</a>, <a href="https://www.rtsoft.com/pages/dink.php">Dink Smallwood HD</a>, <a href="https://www.rtsoft.com/pages/dscroll_mobile.php">Dungeon Scroll</a>, <a href="https://www.codedojo.com/?p=138">Mind Wall</a></sub></p>
 
 Deprecated platforms no longer actively supported:  Flash, BBX, WebOS
+
+### 8/30/2026 Note - the renderer got modernized
+
+Proton SDK has been GL 1.x/GLES1 until now because when I wrote it (2009?), that was what was needed to be compatible with everything.  But... now we're hitting the point where fixed-function rendering is so old... well, it's time to update it.
+
+I need a fancy shader for something and I want to use this, so it's been modified to support a GLES2-class render pipeline alongside the old fixed-function GL 1.x/GLES1 path.
+
+The important part: **existing app code needs no changes**, a compatibility shim remaps the fixed-function gl* calls apps make onto the new pipeline, and the regression suite verifies both paths render pixel-identical. 
+
+What this gets you:
+
+* **Custom GLSL shaders** in your app via the new `RTShader` class + `SetActiveShader()`, and **render-to-texture** via `Surface::InitRenderTarget()`.  See the new **RTShader** example app for a short, heavily commented tour that runs on every supported platform: full-screen post-process effects, plus the same 3D cube drawn twice - once with classic fixed-function-style GL calls (no GPU code, the built-in math) and once through a custom vertex+fragment shader that bends it like jelly, so you can flip between them and SEE the difference.
+* The shader pipeline is the **default** in projects that compile it in (all the included demo apps).  On desktop builds you can launch with `-fixedpipeline` to compare against the legacy path, which is still fully intact.  If for some reason you REALLY want to use the old path, you can define `PROTON_USE_FIXED_PIPELINE` in your project to force it.
+* iOS and Android now build as pure GLES2, and **HTML5 targets WebGL directly instead of LEGACY_GL_EMULATION**, speed gains across the board.
+
+The pre-shader engine is tagged `v1.0.0` if you need the old baseline.  Full details and phase history: `docs/renderer-migration.md`.
 
 ### 8/29/2023 Note
 
 I had to make a breaking change - I updated the Boost library to the latest for proper C++20 support and it doesn't support signal anymore, just signals2.
-
 
 If you're updating an old project, When you get this error:
 
@@ -43,7 +71,6 @@ To this:
 
 	boost::signals2::signal<void(void)> m_sig_target_language_changed;
 
-
 Some things written with Proton:
 
 * [Growtopia](https://www.growtopiagame.com) - 2D MMO, a good example of using Proton's GUI for many screen sizes.
@@ -54,6 +81,7 @@ Some things written with Proton:
 * Arduboy Simulator - Allows you to write and debug [Arduboy](arduboy.com) apps with MSVC as well as output HTML5 playable versions (included with [Proton SDK](https://www.arduboy.com)) [HTML5 Example game](http://www.rtsoft.com/arduman.html)
 
 Credits and links
+
 - [Proton SDK wiki/tutorial site](https://www.protonsdk.com)
 - Seth A. Robinson (seth@rtsoft.com) (Wrote most of Proton SDK) ([Codedojo](https://www.codedojo.com), Seth's blog)
 - Aki Koskinen (Contibutions to Linux support, SpriteAnim, documentation)
@@ -63,89 +91,10 @@ Credits and links
 - Vita platform support by @NabsiYa
 - Mateus Sales Bentes (@mateusbentes) (Mac support improvements)
 
-# Building the Demo Apps on macOS
+#### AI Disclosure
 
-The following demo apps have Xcode projects under their `OSX/` folder:
+This project was developed with assistance from AI tools. (well, starting in August 2026) I mean, you can still blame me (Seth) for bugs, but I just wanted to mention it.
 
-| App | Xcode Project | Audio | Notes |
-|-----|--------------|-------|-------|
-| **RTBareBones** | `RTBareBones/OSX/RTBareBones.xcodeproj` | Dummy (no audio) | Simplest starting point |
-| **RTSimpleApp** | `RTSimpleApp/OSX/RTSimpleApp.xcodeproj` | SDL2_mixer | Basic app with SDL audio |
-| **RTLooneyLadders** | `RTLooneyLadders/OSX/RTLooneyLadders.xcodeproj` | SDL2_mixer | Full game with gamepad support |
+#### Want to contribute?
 
-All projects target **macOS 11.0+** and build as **universal binaries** (arm64 + x86_64).
-
-## Prerequisites
-
-### 1. Install SDL2 frameworks
-
-RTSimpleApp and RTLooneyLadders require SDL2 and SDL2_mixer. RTBareBones only requires SDL2 headers (no audio).
-
-The Xcode projects look for both frameworks in `~/Library/Frameworks/` automatically.
-
-**Option A — Universal DMG** (arm64 + x86_64, recommended):
-
-```bash
-# SDL2
-curl -L -o /tmp/SDL2.dmg https://github.com/libsdl-org/SDL/releases/download/release-2.30.9/SDL2-2.30.9.dmg
-hdiutil attach /tmp/SDL2.dmg
-cp -r "/Volumes/SDL2/SDL2.framework" ~/Library/Frameworks/
-hdiutil detach "/Volumes/SDL2"
-
-# SDL2_mixer (needed by RTSimpleApp and RTLooneyLadders)
-curl -L -o /tmp/SDL2_mixer.dmg https://github.com/libsdl-org/SDL_mixer/releases/download/release-2.8.0/SDL2_mixer-2.8.0.dmg
-hdiutil attach /tmp/SDL2_mixer.dmg
-cp -r "/Volumes/SDL2_mixer/SDL2_mixer.framework" ~/Library/Frameworks/
-hdiutil detach "/Volumes/SDL2_mixer"
-```
-
-> These are universal frameworks (arm64 + x86_64) so the resulting `.app` runs on both Intel and Apple Silicon Macs.
-
-**Option B — Homebrew** (native arch only, not suitable for universal binary):
-
-```bash
-brew install sdl2 sdl2_mixer
-```
-
-> **Note:** Homebrew on Apple Silicon only provides arm64 libraries. Use Option A if you need a universal binary.
-
-### 2. Generate fonts and textures
-
-RTSimpleApp and RTLooneyLadders require `.rtfont` files generated from source assets. Run `update_media.sh` from each app's `media/` folder (requires RTPack — build it first from `RTPack/linux/` on Linux or use the Windows version):
-
-```bash
-cd RTSimpleApp/media && sh update_media.sh
-cd RTLooneyLadders/media && sh update_media.sh
-```
-
-> **Note:** Without this step the apps will still open but text/fonts will not render.
-
-### 3. Generate the required libpng config header
-
-```bash
-LIBPNG=shared/Irrlicht/source/Irrlicht/libpng
-cp "$LIBPNG/pnglibconf.h.prebuilt" "$LIBPNG/pnglibconf.h"
-```
-
-## Build
-
-Open the desired Xcode project and build (`⌘B`):
-
-```bash
-# RTBareBones
-open RTBareBones/OSX/RTBareBones.xcodeproj
-
-# RTSimpleApp
-open RTSimpleApp/OSX/RTSimpleApp.xcodeproj
-
-# RTLooneyLadders
-open RTLooneyLadders/OSX/RTLooneyLadders.xcodeproj
-```
-
-> **Note:** The SDL2 frameworks are automatically embedded into the `.app` bundle at build time via `@executable_path/../Frameworks`, so the final app is self-contained and does not require SDL2 to be installed on the target machine.
-
----
-
-# Want to contribute?
-
-Feel free to submit a pull request! At this point the goal is that all changes be *non-breaking* to existing projects.
+Well, these days it's generally easier for me to get a bug report and fix it myself as I can test on six platforms automatically, rather than a PR.  But as with any of my stuff, fork away!
