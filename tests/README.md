@@ -15,18 +15,22 @@ and is compiled into every Proton app, completely inert unless the parm is
 passed: once the app's own timer passes `delayMS` it writes its framebuffer
 (`glReadPixels` via `SoftSurface::BlitFromScreenFixed`) to the BMP and quits.
 
-Because the capture is scheduled on the app clock, tick-driven animations land
-in the same pose every run: four of the six apps reproduce with **zero**
-differing pixels. No desktop pixels are captured, and the app window does not
-need to be in the foreground (`-autoscreenshot` implies run-in-background on
-Windows; see the parm handling in shared/win/app/main.cpp).
+`-autoscreenshot` also switches the engine to a deterministic mode: the game
+timer runs on a locked 16ms timestep with its timeline zeroed at Init (see
+`GameTimer::SetLockedTimestepMS`), and the random seed is fixed. Time becomes
+a pure function of the frame count, so animations, particles, and even the FPS
+counter are identical every run: **all six apps reproduce with zero differing
+pixels**, no masks needed. No desktop pixels are captured, and the app window
+does not need to be in the foreground (`-autoscreenshot` implies
+run-in-background on Windows; see the parm handling in
+shared/win/app/main.cpp).
 
-The harness converts each BMP to a 24bpp PNG, paints the scenario's
-`IgnoreRects` magenta (FPS counters and the like), and either records it as a
-golden or compares against the golden. A compare fails when more than
-`MaxDiffPct` percent of pixels differ by more than `ChannelTol` per channel;
-failures write a `*_DIFF.png` (golden dimmed, differing pixels red) into
-`output/`.
+The harness converts each BMP to a 24bpp PNG, paints any `IgnoreRects` magenta
+(none are currently needed; the mechanism remains for future
+wall-clock-dependent content), and either records it as a golden or compares
+against the golden. A compare fails when more than `MaxDiffPct` percent of
+pixels (default 0.5) differ by more than `ChannelTol` per channel; failures
+write a `*_DIFF.png` (golden dimmed, differing pixels red) into `output/`.
 
 ## Usage (Windows)
 
@@ -55,10 +59,9 @@ with `-Mode golden` before starting renderer work.
   DLLs sitting in `bin/`).
 - RTDink's scenario expects a previous save to exist (it captures the
   "Continue your last session?" prompt).
-- The two apps with tolerance above ~zero (RTBareBones 3%, RTMindWall 4%) have
-  continuously-animating content that can land one frame apart between runs;
-  the tolerance absorbs the resulting edge drift while still catching any real
-  rendering change (wrong colors, missing textures, broken batching all show
-  up as double-digit percentages).
 - Paths passed to `-autoscreenshot` must not contain spaces (the Windows parm
   tokenizer splits on them).
+- The deterministic mode belongs to the engine, not the harness: launching any
+  app with `-autoscreenshot` gives locked-timestep fixed-seed behavior on
+  every platform, so the same approach can drive Mac/Linux/HTML5 harnesses
+  later.

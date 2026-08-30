@@ -91,9 +91,12 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   renderer code. Run `.\harness.ps1 -Mode test` from `tests/` after any change
   that could affect rendering.
 - Any Proton app supports `-autoscreenshot <file.bmp> <delayMS>` (+`-autoquit`)
-  to write its framebuffer to a BMP at a fixed app-clock time and exit; the
-  code is `BaseApp::ProcessAutoScreenshot()`. On Windows the parm implies
-  run-in-background so it works without focus. Paths must not contain spaces.
+  to write its framebuffer to a BMP and exit; the code is
+  `BaseApp::ProcessAutoScreenshot()`. The parm also enables deterministic mode
+  (locked 16ms timestep via `GameTimer::SetLockedTimestepMS`, timeline zeroed,
+  fixed rand seed), making captures pixel-exact across runs. On Windows the
+  parm implies run-in-background so it works without focus. Paths must not
+  contain spaces.
 - Goldens are GPU/driver specific and NOT tracked in git (tests/goldens/ is
   ignored); record a fresh set with `-Mode golden` on the current renderer
   before starting renderer work on any machine.

@@ -32,6 +32,8 @@ public:
 	bool GetGameTickPause() {return m_bGameTimerPaused;}
 	void Reset();
 	bool IsKosher(); //false if timer issues noticed
+	void SetLockedTimestepMS(int ms); //nonzero = deterministic mode for automated tests: every Update advances time by exactly ms and the timeline restarts at 0, so tick values are a pure function of the frame count
+	int GetLockedTimestepMS() {return m_lockedTimestepMS;}
 
 private:
 
@@ -47,6 +49,7 @@ private:
 	float m_deltaFloat;
 	std::deque <float> m_tickHistory;
 	unsigned int m_shadowGameTick;
+	int m_lockedTimestepMS;
 
 
 };

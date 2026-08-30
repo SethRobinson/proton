@@ -65,6 +65,22 @@ GameTimer::GameTimer()
 	m_fpsTimer = 0;
 	m_deltaFloat = 1;
 	m_gameTimer = 0;
+	m_lockedTimestepMS = 0;
+}
+
+void GameTimer::SetLockedTimestepMS(int ms)
+{
+	m_lockedTimestepMS = ms;
+
+	//restart the timeline at zero so tick values are identical every run, no
+	//matter how long app startup took in real time
+	m_lastTimeMS = m_timeMS = g_lastGameTime = 0;
+	m_gameTimer = 0;
+	m_shadowGameTick = 0;
+	m_shadowOffset = 0;
+	m_fps = m_fpsTemp = 0;
+	m_fpsTimer = 0;
+	m_tickHistory.clear();
 }
 
 GameTimer::~GameTimer()
@@ -73,6 +89,25 @@ GameTimer::~GameTimer()
 
 void GameTimer::Update()
 {
+	if (m_lockedTimestepMS != 0)
+	{
+		//deterministic mode: time is a pure function of the frame count, so
+		//automated screenshot tests see identical animation poses every run
+		m_deltaMS = m_lockedTimestepMS;
+		m_timeMS = g_lastGameTime = m_lastTimeMS + m_deltaMS;
+		m_lastTimeMS = m_timeMS;
+
+		if (!m_bGameTimerPaused)
+		{
+			m_gameTimer += m_deltaMS;
+			m_shadowGameTick += (m_deltaMS+C_SHADOW_OFFSET);
+			m_shadowOffset += C_SHADOW_OFFSET;
+		}
+
+		m_deltaFloat = float(m_deltaMS)/ (1000.0f/50.0f);
+		m_fps = 1000/m_lockedTimestepMS;
+		return;
+	}
 
 	m_timeMS = g_lastGameTime = uint32(GetSystemTimeAccurateRangeChecked());
 	
@@ -137,6 +172,15 @@ void GameTimer::Update()
 
 void GameTimer::Reset()
 {
+	if (m_lockedTimestepMS != 0)
+	{
+		//stay deterministic: restart the locked timeline instead of syncing to real time
+		SetLockedTimestepMS(m_lockedTimestepMS);
+		m_bGameTimerPaused = false;
+		m_deltaFloat = 1;
+		return;
+	}
+
 	m_lastTimeMS = m_timeMS = g_lastGameTime = uint32(GetSystemTimeAccurateRangeChecked()); //make sure this is valid now
 	m_bGameTimerPaused = false;
 	m_fps = m_fpsTemp = 0;

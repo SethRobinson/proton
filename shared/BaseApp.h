@@ -406,6 +406,7 @@ public:
 protected:
 
     void ProcessAutoScreenshot(); //handles the -autoscreenshot/-autoquit command line parms, called from Draw()
+    void CheckAutoScreenshotParms(); //parses those parms and enables deterministic mode (locked timestep + fixed rand seed), called from Init()
 
     bool m_bConsoleVisible;
     bool m_bFPSVisible;

@@ -109,6 +109,7 @@ bool BaseApp::Init()
 {
 	
 	m_gameTimer.Reset();
+	CheckAutoScreenshotParms(); //after the timer reset so deterministic mode's zeroed timeline sticks
 	GetEntityRoot()->SetName("root");
 
 	if (m_bInitted)	
@@ -169,29 +170,41 @@ void DrawConsole()
 
 //Automation helper for the screenshot-based render regression tests (see tests/ in
 //the repo root).  Launch any Proton app with "-autoscreenshot <file.bmp> <delayMS>"
-//and it will write a BMP of its framebuffer once its app timer passes delayMS (app
-//time rather than wall clock, so animations line up between runs).  Add "-autoquit"
-//to have the app close itself right after.  Completely inert without the parms.
-void BaseApp::ProcessAutoScreenshot()
+//and it will write a BMP of its framebuffer once its app timer passes delayMS.  Add
+//"-autoquit" to have the app close itself right after.  The parm also switches the
+//engine to a deterministic mode (a locked 16ms timestep and a fixed random seed) so
+//animations and particles are in identical poses every run and shots can be compared
+//pixel for pixel.  Completely inert without the parms.
+void BaseApp::CheckAutoScreenshotParms()
 {
-	if (!m_autoScreenshotParmsChecked)
-	{
-		m_autoScreenshotParmsChecked = true;
+	if (m_autoScreenshotParmsChecked) return;
+	m_autoScreenshotParmsChecked = true;
 
-		for (unsigned int i = 0; i < m_commandLineParms.size(); i++)
+	for (unsigned int i = 0; i < m_commandLineParms.size(); i++)
+	{
+		string parm = ToLowerCaseString(m_commandLineParms[i]);
+		if (parm == "-autoscreenshot" && i + 2 < m_commandLineParms.size())
 		{
-			string parm = ToLowerCaseString(m_commandLineParms[i]);
-			if (parm == "-autoscreenshot" && i + 2 < m_commandLineParms.size())
-			{
-				m_autoScreenshotFile = m_commandLineParms[i + 1];
-				m_autoScreenshotAtMS = atoi(m_commandLineParms[i + 2].c_str());
-			}
-			if (parm == "-autoquit")
-			{
-				m_autoScreenshotQuit = true;
-			}
+			m_autoScreenshotFile = m_commandLineParms[i + 1];
+			m_autoScreenshotAtMS = atoi(m_commandLineParms[i + 2].c_str());
+		}
+		if (parm == "-autoquit")
+		{
+			m_autoScreenshotQuit = true;
 		}
 	}
+
+	if (!m_autoScreenshotFile.empty())
+	{
+		m_gameTimer.SetLockedTimestepMS(16);
+		srand(31337);
+		LogMsg("autoscreenshot: locked 16ms timestep and fixed rand seed for deterministic capture");
+	}
+}
+
+void BaseApp::ProcessAutoScreenshot()
+{
+	CheckAutoScreenshotParms(); //normally already done in Init(), but some platforms deliver parms late
 
 	if (m_autoScreenshotFile.empty() || m_gameTimer.GetTick() < m_autoScreenshotAtMS) return;
 
