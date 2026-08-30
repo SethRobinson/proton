@@ -16,7 +16,11 @@
 
 param(
     [ValidateSet('golden', 'test')] [string]$Mode = 'test',
+    [ValidateSet('win', 'html5', 'ios', 'android')] [string]$Target = 'win',
     [string]$App = '*',
+    [switch]$ShowBrowser,  # html5 only: run the browser headed, for debugging
+    [switch]$PrepareMac,   # ios only: rsync the tracked tree to the Mac and xcodebuild the sim apps first
+    [string]$MacHost = 'seth@studiomac.local', # ios only
     [string]$RepoRoot = (Split-Path $PSScriptRoot)
 )
 
@@ -121,6 +125,146 @@ function Compare-Shots([string]$goldenPath, [string]$capturePath, [int]$channelT
 }
 
 # ---------------------------------------------------------------------------
+# html5 target: serve the app's built html5 dir over a local HTTP server,
+# launch a (headless) Edge at it with the -autoscreenshot parms in the URL, and
+# wait for the app to POST its framebuffer BMP back to us.
+
+function Get-EdgePath
+{
+    foreach ($p in "${env:ProgramFiles(x86)}\Microsoft\Edge\Application\msedge.exe",
+                   "$env:ProgramFiles\Microsoft\Edge\Application\msedge.exe")
+    { if (Test-Path $p) { return $p } }
+    throw 'msedge.exe not found; the html5 target needs Edge (or adapt Get-EdgePath for Chrome)'
+}
+
+$script:MimeTypes = @{ '.html' = 'text/html'; '.js' = 'text/javascript'; '.wasm' = 'application/wasm'
+                       '.data' = 'application/octet-stream'; '.png' = 'image/png'; '.txt' = 'text/plain' }
+
+function Invoke-Html5Capture([string]$pageDir, [string]$pageName, [int]$settleMs, [string]$bmpOutPath)
+{
+    $port = Get-Random -Minimum 40000 -Maximum 59999
+    $listener = New-Object System.Net.HttpListener
+    $listener.Prefixes.Add("http://127.0.0.1:$port/")
+    $listener.Start()
+    $edgeProfile = Join-Path ([IO.Path]::GetTempPath()) "proton_harness_edge"
+    $parms = [Uri]::EscapeDataString("-autoscreenshot shot.bmp $settleMs")
+    $url = "http://127.0.0.1:$port/$pageName`?parms=$parms"
+    $edgeArgs = @("--user-data-dir=$edgeProfile", '--no-first-run', '--disable-extensions', '--window-size=1280,960', $url)
+    if (-not $ShowBrowser) { $edgeArgs = @('--headless=new') + $edgeArgs }
+    $browser = Start-Process -FilePath (Get-EdgePath) -ArgumentList $edgeArgs -PassThru
+    $gotShot = $false
+    try
+    {
+        $deadline = (Get-Date).AddMilliseconds($settleMs + 90000)
+        while ((Get-Date) -lt $deadline -and -not $gotShot)
+        {
+            $ctxTask = $listener.GetContextAsync()
+            while (-not $ctxTask.Wait(500)) { if ((Get-Date) -ge $deadline) { break } }
+            if (-not $ctxTask.IsCompletedSuccessfully) { break }
+            $ctx = $ctxTask.Result
+            $req = $ctx.Request; $resp = $ctx.Response
+            try
+            {
+                if ($req.HttpMethod -eq 'POST' -and $req.Url.AbsolutePath -like '*autoscreenshot_upload*')
+                {
+                    $ms = New-Object System.IO.MemoryStream
+                    $req.InputStream.CopyTo($ms)
+                    [IO.File]::WriteAllBytes($bmpOutPath, $ms.ToArray())
+                    $resp.StatusCode = 200
+                    $gotShot = $true
+                }
+                else
+                {
+                    # static file serving, restricted to the page dir
+                    $rel = $req.Url.AbsolutePath.TrimStart('/').Replace('/', '\')
+                    $file = [IO.Path]::GetFullPath((Join-Path $pageDir $rel))
+                    if ($rel -and -not $file.StartsWith([IO.Path]::GetFullPath($pageDir)) ) { $resp.StatusCode = 403 }
+                    elseif ($rel -and (Test-Path $file -PathType Leaf))
+                    {
+                        $ext = [IO.Path]::GetExtension($file).ToLower()
+                        $resp.ContentType = if ($script:MimeTypes.ContainsKey($ext)) { $script:MimeTypes[$ext] } else { 'application/octet-stream' }
+                        $bytes = [IO.File]::ReadAllBytes($file)
+                        $resp.ContentLength64 = $bytes.Length
+                        $resp.OutputStream.Write($bytes, 0, $bytes.Length)
+                    }
+                    else { $resp.StatusCode = 404 }
+                }
+            }
+            finally { $resp.Close() }
+        }
+    }
+    finally
+    {
+        $listener.Stop(); $listener.Close()
+        # kill the whole browser tree; the profile dir keeps it isolated from the user's own Edge
+        & taskkill /PID $browser.Id /T /F 2>$null | Out-Null
+    }
+    if (-not $gotShot) { throw "no screenshot uploaded within $([int](($settleMs + 90000)/1000))s (try -ShowBrowser to debug; is the html5 build current?)" }
+}
+
+# ---------------------------------------------------------------------------
+# ios target: builds/runs on the Mac's iOS simulator over ssh. The app is
+# launched with the -autoscreenshot parms as launch arguments (see
+# shared/iOS/app/main.mm); it writes the BMP to /tmp on the Mac and we scp it
+# back. Run with -PrepareMac once after changing engine/app code.
+
+function Invoke-IosCapture([string]$projectPath, [string]$appName, [int]$settleMs, [string]$bmpOutPath)
+{
+    $remoteBmp = "/tmp/proton_harness_$appName.bmp"
+    $timeoutSec = [int](($settleMs + 60000) / 1000)
+    # generate a capture script, scp it over, run it - avoids ssh quoting traps
+    $lines = @(
+        'set -e'
+        'APPNAME=$1; REMOTEBMP=$2; SETTLEMS=$3; TIMEOUTSEC=$4'
+        'if ! xcrun simctl list devices booted | grep -q "(Booted)"; then'
+        '  DEV=$(xcrun simctl list devices available | grep -m1 -oE "[A-F0-9-]{36}")'
+        '  echo "booting simulator $DEV"; xcrun simctl boot "$DEV"; xcrun simctl bootstatus "$DEV"'
+        'fi'
+        'APP=$(find ~/proton_warncheck/$APPNAME -name "$APPNAME.app" -path "*iphonesimulator*" | head -1)'
+        'if [ -z "$APP" ]; then echo "no built .app found - run the harness with -PrepareMac"; exit 1; fi'
+        'BUNDLE=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$APP/Info.plist")'
+        'xcrun simctl install booted "$APP"'
+        'rm -f "$REMOTEBMP"'
+        'xcrun simctl launch --terminate-running-process booted "$BUNDLE" -autoscreenshot "$REMOTEBMP" "$SETTLEMS" -autoquit'
+        'i=0; while [ $i -lt $TIMEOUTSEC ]; do if [ -f "$REMOTEBMP" ]; then break; fi; sleep 1; i=$((i+1)); done'
+        'xcrun simctl terminate booted "$BUNDLE" 2>/dev/null || true'
+        'if [ ! -f "$REMOTEBMP" ]; then echo "app never wrote $REMOTEBMP"; exit 1; fi'
+    )
+    $scriptPath = Join-Path $outputDir 'ios_capture.sh'
+    [IO.File]::WriteAllText($scriptPath, ($lines -join "`n") + "`n")
+    & scp -q $scriptPath "$MacHost`:/tmp/proton_harness_capture.sh"
+    if ($LASTEXITCODE -ne 0) { throw 'scp of capture script failed' }
+    & ssh $MacHost "bash /tmp/proton_harness_capture.sh $appName $remoteBmp $settleMs $timeoutSec"
+    if ($LASTEXITCODE -ne 0) { throw 'remote iOS capture failed (see output above)' }
+    & scp -q "$MacHost`:$remoteBmp" $bmpOutPath
+    if ($LASTEXITCODE -ne 0 -or -not (Test-Path $bmpOutPath)) { throw "scp of $remoteBmp failed" }
+}
+
+# ---------------------------------------------------------------------------
+# android target: runs on the first device/emulator adb reports. The app must
+# already be installed (gradle installDebug); we pass the parms as an intent
+# extra (see SharedActivity.onCreate), the app writes the BMP to its internal
+# files dir, and we pull it out with run-as (works for debuggable builds).
+
+function Invoke-AndroidCapture([string]$package, [string]$activity, [int]$settleMs, [string]$bmpOutPath)
+{
+    $remoteBmp = "/data/data/$package/files/proton_harness.bmp"
+    & adb shell am force-stop $package 2>$null | Out-Null
+    & adb shell run-as $package rm -f files/proton_harness.bmp 2>$null | Out-Null
+    & adb shell am start -n "$package/$activity" --es parms "'-autoscreenshot $remoteBmp $settleMs -autoquit'" | Out-Null
+    $deadline = (Get-Date).AddMilliseconds($settleMs + 60000)
+    $found = $false
+    while ((Get-Date) -lt $deadline)
+    {
+        Start-Sleep -Seconds 1
+        $probe = & adb shell run-as $package ls files/proton_harness.bmp 2>$null
+        if ($probe -match 'proton_harness.bmp') { $found = $true; break }
+    }
+    & adb shell am force-stop $package 2>$null | Out-Null
+    if (-not $found) { throw "app never wrote $remoteBmp (check adb logcat)" }
+    & adb exec-out run-as $package cat files/proton_harness.bmp > $bmpOutPath
+    if (-not (Test-Path $bmpOutPath) -or (Get-Item $bmpOutPath).Length -lt 1000) { throw "adb pull of screenshot failed" }
+}
 
 $scenarios = Import-PowerShellDataFile (Join-Path $PSScriptRoot 'scenarios.psd1')
 $goldenDir = Join-Path $PSScriptRoot 'goldens'
@@ -140,15 +284,82 @@ Get-Process -ErrorAction SilentlyContinue | Where-Object {
     Stop-Process -Id $_.Id -Force -Confirm:$false
 }
 
+if ($Target -eq 'android')
+{
+    $devices = (& adb devices) -match "`tdevice$"
+    if (-not $devices) { throw 'android target: no device/emulator visible to adb (plug one in or start an emulator, and gradle installDebug the app first)' }
+}
+
+if ($Target -eq 'ios' -and $PrepareMac)
+{
+    Write-Host "Syncing tracked tree to $MacHost and building simulator apps..." -ForegroundColor Cyan
+    Push-Location $RepoRoot
+    try
+    {
+        cmd /c "git ls-files -z | tar czf `"%TEMP%\proton_harness_mac.tgz`" --null -T -"
+        if ($LASTEXITCODE -ne 0) { throw 'tar of tracked files failed' }
+        & scp -q "$env:TEMP\proton_harness_mac.tgz" "$MacHost`:/tmp/"
+        & ssh $MacHost 'rm -rf ~/proton_warncheck && mkdir -p ~/proton_warncheck && tar xzf /tmp/proton_harness_mac.tgz -C ~/proton_warncheck'
+        if ($LASTEXITCODE -ne 0) { throw 'remote extract failed' }
+        foreach ($entry in $scenarios.Apps)
+        {
+            if ($entry.Name -notlike $App -or -not $entry.ContainsKey('IosProject')) { continue }
+            $proj = $entry.IosProject -replace '\\', '/'
+            Write-Host "  xcodebuild $($entry.Name) (iphonesimulator)..."
+            & ssh $MacHost "cd ~/proton_warncheck && xcodebuild -project $proj -target $($entry.Name) -configuration Debug -sdk iphonesimulator CODE_SIGNING_ALLOWED=NO build 2>&1 | grep -E 'error|BUILD' | tail -3"
+            if ($LASTEXITCODE -ne 0) { throw "iOS build of $($entry.Name) failed" }
+        }
+    }
+    finally { Pop-Location }
+}
+
 foreach ($entry in $scenarios.Apps)
 {
     if ($entry.Name -notlike $App) { continue }
-    $exe = Join-Path $RepoRoot $entry.Exe
-    if (-not (Test-Path $exe))
+
+    if ($Target -eq 'html5')
     {
-        Write-Host "SKIP  $($entry.Name): $exe not found (separate repo not checked out, or not built)" -ForegroundColor Yellow
-        $results += @{ App = $entry.Name; Step = '-'; Status = 'SKIP'; Note = 'exe missing' }
-        continue
+        if (-not $entry.ContainsKey('Html5Page'))
+        {
+            Write-Host "SKIP  $($entry.Name): no Html5Page defined in scenarios.psd1" -ForegroundColor Yellow
+            $results += @{ App = $entry.Name; Step = '-'; Status = 'SKIP'; Note = 'no Html5Page' }
+            continue
+        }
+        $page = Join-Path $RepoRoot $entry.Html5Page
+        if (-not (Test-Path $page))
+        {
+            Write-Host "SKIP  $($entry.Name): $page not found (run the app's html5 build_release.bat first)" -ForegroundColor Yellow
+            $results += @{ App = $entry.Name; Step = '-'; Status = 'SKIP'; Note = 'html5 page not built' }
+            continue
+        }
+    }
+    elseif ($Target -eq 'ios')
+    {
+        if (-not $entry.ContainsKey('IosProject'))
+        {
+            Write-Host "SKIP  $($entry.Name): no IosProject defined in scenarios.psd1" -ForegroundColor Yellow
+            $results += @{ App = $entry.Name; Step = '-'; Status = 'SKIP'; Note = 'no IosProject' }
+            continue
+        }
+    }
+    elseif ($Target -eq 'android')
+    {
+        if (-not $entry.ContainsKey('AndroidPackage'))
+        {
+            Write-Host "SKIP  $($entry.Name): no AndroidPackage defined in scenarios.psd1" -ForegroundColor Yellow
+            $results += @{ App = $entry.Name; Step = '-'; Status = 'SKIP'; Note = 'no AndroidPackage' }
+            continue
+        }
+    }
+    else
+    {
+        $exe = Join-Path $RepoRoot $entry.Exe
+        if (-not (Test-Path $exe))
+        {
+            Write-Host "SKIP  $($entry.Name): $exe not found (separate repo not checked out, or not built)" -ForegroundColor Yellow
+            $results += @{ App = $entry.Name; Step = '-'; Status = 'SKIP'; Note = 'exe missing' }
+            continue
+        }
     }
 
     # v1 supports exactly one capture step per app, driven by -autoscreenshot
@@ -159,22 +370,40 @@ foreach ($entry in $scenarios.Apps)
     Write-Host "RUN   $($entry.Name)" -ForegroundColor Cyan
     try
     {
-        $shotName = "$($entry.Name)_$($step.Name).png"
-        $bmpPath = Join-Path $outputDir "$($entry.Name)_$($step.Name).bmp"
+        $prefix = if ($Target -eq 'win') { '' } else { "$($Target)_" }
+        $shotName = "$prefix$($entry.Name)_$($step.Name).png"
+        $bmpPath = Join-Path $outputDir "$prefix$($entry.Name)_$($step.Name).bmp"
         if ($bmpPath -match ' ') { throw "path contains spaces; Proton's Windows parm tokenizer splits on them: $bmpPath" }
         Remove-Item $bmpPath -Force -ErrorAction SilentlyContinue
 
-        $proc = Start-Process -FilePath $exe -WorkingDirectory (Split-Path $exe) -PassThru `
-            -ArgumentList @('-autoscreenshot', $bmpPath, [string]$entry.SettleMs, '-autoquit')
-
-        $deadline = (Get-Date).AddMilliseconds($entry.SettleMs + 60000)
-        while ((Get-Date) -lt $deadline -and -not $proc.HasExited) { Start-Sleep -Milliseconds 250; $proc.Refresh() }
-        if (-not $proc.HasExited)
+        if ($Target -eq 'html5')
         {
-            Stop-Process -Id $proc.Id -Force -Confirm:$false
-            Write-Host "  WARN  $($entry.Name) didn't quit on its own, killed" -ForegroundColor Yellow
+            $pageFull = Join-Path $RepoRoot $entry.Html5Page
+            Invoke-Html5Capture (Split-Path $pageFull) (Split-Path $pageFull -Leaf) $entry.SettleMs $bmpPath
         }
-        if (-not (Test-Path $bmpPath)) { throw "app never wrote $bmpPath (check $((Split-Path $exe))\log.txt)" }
+        elseif ($Target -eq 'ios')
+        {
+            Invoke-IosCapture $entry.IosProject $entry.Name $entry.SettleMs $bmpPath
+        }
+        elseif ($Target -eq 'android')
+        {
+            $activity = if ($entry.ContainsKey('AndroidActivity')) { $entry.AndroidActivity } else { '.Main' }
+            Invoke-AndroidCapture $entry.AndroidPackage $activity $entry.SettleMs $bmpPath
+        }
+        else
+        {
+            $proc = Start-Process -FilePath $exe -WorkingDirectory (Split-Path $exe) -PassThru `
+                -ArgumentList @('-autoscreenshot', $bmpPath, [string]$entry.SettleMs, '-autoquit')
+
+            $deadline = (Get-Date).AddMilliseconds($entry.SettleMs + 60000)
+            while ((Get-Date) -lt $deadline -and -not $proc.HasExited) { Start-Sleep -Milliseconds 250; $proc.Refresh() }
+            if (-not $proc.HasExited)
+            {
+                Stop-Process -Id $proc.Id -Force -Confirm:$false
+                Write-Host "  WARN  $($entry.Name) didn't quit on its own, killed" -ForegroundColor Yellow
+            }
+            if (-not (Test-Path $bmpPath)) { throw "app never wrote $bmpPath (check $((Split-Path $exe))\log.txt)" }
+        }
 
         $ignore = if ($step.ContainsKey('IgnoreRects')) { $step.IgnoreRects } elseif ($entry.ContainsKey('IgnoreRects')) { $entry.IgnoreRects } else { $null }
         $capturePath = Join-Path $outputDir $shotName

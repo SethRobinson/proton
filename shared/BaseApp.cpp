@@ -3,6 +3,10 @@
 #include "Renderer/RTGLESExt.h"
 #include "Renderer/SoftSurface.h"
 
+#ifdef PLATFORM_HTML5
+#include <emscripten/emscripten.h>
+#endif
+
 #ifdef PLATFORM_OSX
 #include "OSX/OSXUtils.h"
 #endif
@@ -216,6 +220,18 @@ void BaseApp::ProcessAutoScreenshot()
 		s.BlitFromScreenFixed(0, 0, 0, 0, GetScreenSizeX(), GetScreenSizeY());
 		s.WriteBMPOut(m_autoScreenshotFile);
 		LogMsg("Wrote autoscreenshot to %s at tick %u", m_autoScreenshotFile.c_str(), m_gameTimer.GetTick());
+
+#ifdef PLATFORM_HTML5
+		//on the web the "file" only exists in MEMFS, so hand it to whoever served
+		//the page (the test harness runs a tiny local server that accepts this)
+		EM_ASM({
+			try {
+				var name = UTF8ToString($0);
+				var data = FS.readFile(name);
+				fetch('autoscreenshot_upload?name=' + encodeURIComponent(name), { method: 'POST', body: data });
+			} catch(e) { console.log('autoscreenshot upload failed: ' + e); }
+		}, m_autoScreenshotFile.c_str());
+#endif
 	}
 #endif
 	m_autoScreenshotFile.clear(); //only fire once

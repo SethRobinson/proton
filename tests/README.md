@@ -32,18 +32,44 @@ against the golden. A compare fails when more than `MaxDiffPct` percent of
 pixels (default 0.5) differ by more than `ChannelTol` per channel; failures
 write a `*_DIFF.png` (golden dimmed, differing pixels red) into `output/`.
 
-## Usage (Windows)
+## Usage
 
 ```powershell
 cd tests
-.\harness.ps1 -Mode test              # run the suite against the goldens
-.\harness.ps1 -Mode test -App RTDink  # one app
-.\harness.ps1 -Mode golden            # re-record all goldens
+.\harness.ps1 -Mode test                    # Windows apps against win goldens
+.\harness.ps1 -Mode test -App RTDink        # one app
+.\harness.ps1 -Mode golden                  # re-record win goldens
+.\harness.ps1 -Mode test -Target html5      # wasm/WebGL in headless Edge
+.\harness.ps1 -Mode test -Target ios        # iOS simulator on the Mac (ssh)
+.\harness.ps1 -Mode test -Target android    # device/emulator via adb
 ```
 
 Exit code 0 = all pass. Both `output/` (scratch) and `goldens/` are
 git-ignored: goldens are GPU/driver specific, so each machine records its own
-with `-Mode golden` before starting renderer work.
+per target with `-Mode golden` before starting renderer work. Golden files are
+prefixed by target (`html5_`, `ios_`, `android_`; win has no prefix).
+
+Per-target notes:
+
+- **html5**: needs the app's `html5/build_release.bat` run first (scenario key
+  `Html5Page` points at the built page). The harness serves the page dir over
+  a local HTTP server, launches headless Edge with the parms in the URL
+  (`?parms=...`, see `AddCommandLineParmsFromURL` in HTML5Main.cpp), and the
+  app POSTs its BMP back (`autoscreenshot_upload`). `-ShowBrowser` runs headed
+  for debugging.
+- **ios**: runs over ssh on the Mac (`-MacHost`, default seth@studiomac.local)
+  against the `~/proton_warncheck` tree. Pass `-PrepareMac` to re-sync the
+  tracked tree and xcodebuild the simulator apps (scenario key `IosProject`).
+  Launch args flow through main.mm into command line parms; the BMP lands in
+  /tmp on the Mac and is scp'd back. Boots the first available simulator if
+  none is running. Expect a few hundred pixels of rasterization jitter
+  between runs (0.004-0.011% observed), comfortably inside the 0.5% limit.
+- **android**: the app must be installed (debuggable) on the first adb
+  device/emulator; scenario key `AndroidPackage`. Parms are passed as the
+  "parms" intent extra (see SharedActivity.onCreate +
+  nativeAddCommandLineParm), the BMP is written to the app's internal files
+  dir and pulled with `adb exec-out run-as`. NOTE: wired but not yet verified
+  end to end (no device/emulator was available when this was written).
 
 ## Things to know
 

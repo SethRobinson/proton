@@ -254,6 +254,23 @@ import android.view.ViewTreeObserver;
 		Log.d(PackageName, "API Level: " + apiVersion);
 	
 		super.onCreate(savedInstanceState);
+
+		//pass the "parms" intent extra through as Proton command line parms, e.g.
+		//adb shell am start -n com.rtsoft.RTAndroidApp/.Main --es parms "-autoscreenshot <path> 8000"
+		//(used by the render regression harness in the proton repo's tests/ folder)
+		try
+		{
+			String launchParms = getIntent().getStringExtra("parms");
+			if (launchParms != null && launchParms.length() > 0)
+			{
+				for (String p : launchParms.split(" "))
+				{
+					if (p.length() > 0) nativeAddCommandLineParm(p);
+				}
+				Log.d(PackageName, "Added command line parms from intent extra: " + launchParms);
+			}
+		} catch (Exception e) { Log.d(PackageName, "parms extra check failed: " + e); }
+
         mGLView = new AppGLSurfaceView(this, this);
     	
 		setContentView(mGLView);
@@ -1824,6 +1841,7 @@ public static String get_getNetworkType()
 
 	public GLSurfaceView mGLView;
 	public static native void nativeOnKey(int type, int keycode, int c);
+	public static native void nativeAddCommandLineParm(String parm);
 	public static native void nativeOnTrackball(float x, float y);
 	public static native void nativeOnAccelerometerUpdate(float x, float y, float z);
 	public static native void nativeSendGUIEx(int messageType, int parm1, int parm2, int finger);

@@ -90,6 +90,17 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   diffs them after renderer changes; read `tests/README.md` before touching
   renderer code. Run `.\harness.ps1 -Mode test` from `tests/` after any change
   that could affect rendering.
+- Besides the default Windows target, `-Target html5` runs the wasm build in
+  headless Edge (pixel-exact, needs the app's html5 build_release.bat run
+  first), `-Target ios` runs on the Mac's iOS simulator over ssh (use
+  `-PrepareMac` after code changes; ~0.01% rasterization jitter), and
+  `-Target android` runs on an adb device/emulator (wired but unverified,
+  none was available). Parms reach the app via URL query (?parms=...) on
+  html5, launch args on iOS, and the "parms" intent extra on Android.
+- Android note: the gradle build's PrepareResources.bat overwrites the app's
+  java copies from `shared/android/v3_src/`, so edit the v3_src templates,
+  never the per-app copies. Gradle needs JAVA_HOME set to a JDK 17 (the local
+  path is machine-specific, see agents_local.md).
 - Any Proton app supports `-autoscreenshot <file.bmp> <delayMS>` (+`-autoquit`)
   to write its framebuffer to a BMP and exit; the code is
   `BaseApp::ProcessAutoScreenshot()`. The parm also enables deterministic mode

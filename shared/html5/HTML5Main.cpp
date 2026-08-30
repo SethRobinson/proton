@@ -1185,14 +1185,31 @@ void AddPersistentFileFolder(string folderName) //should start with a slash
 #endif
 }
 
+//lets Proton command line parms be passed in the URL, e.g.
+//page.html?parms=-autoscreenshot%20shot.bmp%206000 - used by the render
+//regression harness (tests/ in the repo root), but works for anything
+static void AddCommandLineParmsFromURL()
+{
+	char *pParms = emscripten_run_script_string("(function(){ try { var p = new URLSearchParams(window.location.search).get('parms'); return p ? p : ''; } catch(e) { return ''; } })()");
+	if (!pParms || !pParms[0]) return;
+
+	vector<string> parms = StringTokenize(pParms, " ");
+	for (unsigned int i = 0; i < parms.size(); i++)
+	{
+		GetBaseApp()->AddCommandLineParm(parms[i]);
+	}
+	LogMsg("Added %d command line parm(s) from the URL", (int)parms.size());
+}
+
 void mainHTML()
 {
-	
+
 	string webIDTarget = "canvas"; //we're assuming the webgl canvas is named "canvas", but if wanted multiple apps in one page I guess we'd want to use different ones?
 
 	int w, h, fs;
 	srand( (unsigned)time(NULL) );
 	RemoveFile("log.txt", false);
+	AddCommandLineParmsFromURL();
 	double cssW, cssH;
 	EMSCRIPTEN_RESULT r;
 

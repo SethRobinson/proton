@@ -26,6 +26,18 @@ extern "C"
 	{
 		AppOnTrackball(env, thiz, x, y);
 	}
+	//lets java pass launch parms (from the "parms" intent extra) through as Proton
+	//command line parms - used by the render regression harness (tests/ in repo root)
+	JNIEXPORT void JNICALL Java_com_rtsoft_RTAndroidApp_SharedActivity_nativeAddCommandLineParm(JNIEnv* env, jobject thiz, jstring parm)
+	{
+		const char *pStr = env->GetStringUTFChars(parm, NULL);
+		if (pStr)
+		{
+			GetBaseApp()->AddCommandLineParm(pStr);
+			env->ReleaseStringUTFChars(parm, pStr);
+		}
+	}
+
 	// JAKE ADDED - DO NOT REMOVE - Machineworks requires this
 	JNIEXPORT void JNICALL Java_com_rtsoft_RTAndroidApp_Main_nativeOnJoyPadButtons(JNIEnv* env, jobject thiz, jint key, jint value)
 	{
