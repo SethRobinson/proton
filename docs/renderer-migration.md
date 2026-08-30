@@ -85,7 +85,30 @@ and the existing compatibility/legacy contexts on Windows/Linux/macOS (GLSL
   recorded in ShaderPipeline.cpp:
   GL_ALPHA_TEST was always a no-op in Proton (glAlphaFunc never called, GL
   default is GL_ALWAYS), so the shader path needs no alpha discard.
-- **Phase 3**: flip defaults per platform (HTML5 first).
+- **Phase 3 (in progress)**: flip defaults per platform. Rollout wave 1
+  (Aug 2026): all sanctioned html5 apps (RTBareBones, RTSimpleApp, RTDink,
+  RTDScroll, RTMindWall, ArduboySim) build shader-pipeline-only, and
+  RTBareBones AndroidGradle builds ES2 (per-app opt-in via
+  SharedActivity.useGLES2; legacy apps' Android builds untouched). Desktop
+  default flip (Aug 2026): wherever RT_SHADER_PIPELINE_AVAILABLE is
+  compiled in, g_bShaderPipelineActive now defaults TRUE; the
+  -fixedpipeline launch parm is the escape hatch back to fixed function
+  (-shaderpipeline stays as a redundant opt-in). SPState gained a
+  constructor so backend state is sane before parm parsing. Coverage:
+  Windows: all Debug/Release GL configs (plus FMOD/Beta variants) of the
+  five suite apps carry the define; both pipelines still 0.000% on all
+  goldens (harness: plain run = shader, -LegacyPipe = legacy). Mac: the
+  RTBareBones OSX xcodeproj compiles ShaderPipeline.cpp + define; Apple's
+  GL headers already declare GL2.1 so no loader is needed; MyOpenGLView's
+  awakeFromNib now forwards launch args to AddCommandLineParm (it never
+  did), so -autoscreenshot/-fixedpipeline work; verified on studiomac
+  ("2.1 Metal - 90.5"): shader vs fixed captures differ by 642 edge pixels
+  (0.082%, driver-precision drift; Windows is byte-identical). Linux:
+  Proton.cmake compiles ShaderPipeline.cpp and defines
+  RT_SHADER_PIPELINE_AVAILABLE in the desktop-GL branch; GL2 functions
+  load via SDL_GL_GetProcAddress (SDL is mandatory there); syntax-checked
+  under WSL, not yet run. Still to do: iOS/Android ES2 context creation
+  as default, store-build flips.
 - **Phase 4**: public shader + render-to-texture APIs.
 - **Phase 5**: delete the legacy path (tag first).
 

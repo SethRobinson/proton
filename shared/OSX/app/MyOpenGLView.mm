@@ -197,6 +197,14 @@ static BOOL g_drawInitiatedByTimer = NO;
     CFRelease(resourcesURL);
     chdir(path);
 
+    //forward launch arguments (e.g. -autoscreenshot, -fixedpipeline) to the
+    //engine like the other desktop platforms do; index 0 is the binary path
+    NSArray *launchArgs = [[NSProcessInfo processInfo] arguments];
+    for (NSUInteger i = 1; i < [launchArgs count]; i++)
+    {
+        GetBaseApp()->AddCommandLineParm([[launchArgs objectAtIndex:i] UTF8String]);
+    }
+
     // Start animation timer - prepareOpenGL will be called by the system
     // on the first real draw when the window has valid bounds
     timer = [NSTimer timerWithTimeInterval:(1.0f/60.0f) target:self selector:@selector(animationTimer:) userInfo:nil repeats:YES];

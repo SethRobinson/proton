@@ -90,6 +90,10 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   Non-obvious constraint: engine rendering code must use the rt* functions from
   `shared/Renderer/RenderPipeline.h` for fixed-function GL, never the raw gl*
   names; ES2-portable GL (textures/blend/depth/scissor/etc) stays raw.
+  The shader pipeline is the DEFAULT in any build that defines
+  `RT_SHADER_PIPELINE_AVAILABLE` (all desktop GL configs of the suite apps,
+  Mac RTBareBones, Linux via Proton.cmake); launch with `-fixedpipeline` to
+  get the legacy fixed-function path for comparison.
 
 ## Renderer regression tests (tests/)
 
@@ -105,7 +109,9 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
 - `tests/harness.ps1` captures golden screenshots of the example apps and
   diffs them after renderer changes; read `tests/README.md` before touching
   renderer code. Run `.\harness.ps1 -Mode test` from `tests/` after any change
-  that could affect rendering.
+  that could affect rendering (that tests the shader pipeline, the default);
+  add `-LegacyPipe` to regress the legacy fixed-function path against the
+  same goldens.
 - Besides the default Windows target, `-Target html5` runs the wasm build in
   headless Edge (pixel-exact, needs the app's html5 build_release.bat run
   first), `-Target ios` runs on the Mac's iOS simulator over ssh (use

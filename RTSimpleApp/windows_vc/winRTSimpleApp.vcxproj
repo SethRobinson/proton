@@ -243,7 +243,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\source;..\..\shared;..\..\shared\win\;..\..\shared\util\boost;..\..\shared\ClanLib-2.0\Sources;..\..\shared\win\include;..\..\shared\FliteTTS\include;..\..\shared\Irrlicht\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;_USE_32BIT_TIME_T;C_GL_MODE;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;_NO_DEBUG_HEAP=1;RT_JPG_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;_USE_32BIT_TIME_T;C_GL_MODE;RT_SHADER_PIPELINE_AVAILABLE;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;_NO_DEBUG_HEAP=1;RT_JPG_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -266,7 +266,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\source;..\..\shared;..\..\shared\win\;..\..\shared\util\boost;..\..\shared\ClanLib-2.0\Sources;..\..\shared\win\include;..\..\shared\FliteTTS\include;..\..\shared\Irrlicht\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;_USE_32BIT_TIME_T;C_GL_MODE;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;_NO_DEBUG_HEAP=1;RT_JPG_SUPPORT;RT_ENABLE_FMOD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;_USE_32BIT_TIME_T;C_GL_MODE;RT_SHADER_PIPELINE_AVAILABLE;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;_NO_DEBUG_HEAP=1;RT_JPG_SUPPORT;RT_ENABLE_FMOD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -312,7 +312,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\source;..\..\shared;..\..\shared\win\;..\..\shared\util\boost;..\..\shared\ClanLib-2.0\Sources;..\..\shared\win\include;..\..\shared\FliteTTS\include;..\..\shared\Irrlicht\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;C_GL_MODE;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;_NO_DEBUG_HEAP=1;RT_JPG_SUPPORT;RT_ENABLE_FMOD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;C_GL_MODE;RT_SHADER_PIPELINE_AVAILABLE;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;_NO_DEBUG_HEAP=1;RT_JPG_SUPPORT;RT_ENABLE_FMOD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -333,7 +333,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_GL|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\source;..\..\shared;..\..\shared\win\;..\..\shared\util\boost;..\..\shared\ClanLib-2.0\Sources;..\..\shared\win\include;..\..\shared\FliteTTS\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;_USE_32BIT_TIME_T;C_GL_MODE;RT_JPG_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;_USE_32BIT_TIME_T;C_GL_MODE;RT_SHADER_PIPELINE_AVAILABLE;RT_JPG_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PlatformPrecomp.h</PrecompiledHeaderFile>
@@ -355,7 +355,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_FMOD_GL|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\source;..\..\shared;..\..\shared\win\;..\..\shared\util\boost;..\..\shared\ClanLib-2.0\Sources;..\..\shared\win\include;..\..\shared\FliteTTS\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;_USE_32BIT_TIME_T;C_GL_MODE;RT_JPG_SUPPORT;RT_ENABLE_FMOD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;_USE_32BIT_TIME_T;C_GL_MODE;RT_SHADER_PIPELINE_AVAILABLE;RT_JPG_SUPPORT;RT_ENABLE_FMOD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PlatformPrecomp.h</PrecompiledHeaderFile>
@@ -377,7 +377,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_GL|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\source;..\..\shared;..\..\shared\win\;..\..\shared\util\boost;..\..\shared\ClanLib-2.0\Sources;..\..\shared\win\include;..\..\shared\FliteTTS\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;C_GL_MODE;RT_JPG_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;C_GL_MODE;RT_SHADER_PIPELINE_AVAILABLE;RT_JPG_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PlatformPrecomp.h</PrecompiledHeaderFile>
@@ -398,7 +398,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_FMOD_GL|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\source;..\..\shared;..\..\shared\win\;..\..\shared\util\boost;..\..\shared\ClanLib-2.0\Sources;..\..\shared\win\include;..\..\shared\FliteTTS\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;C_GL_MODE;RT_JPG_SUPPORT;RT_ENABLE_FMOD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;C_GL_MODE;RT_SHADER_PIPELINE_AVAILABLE;RT_JPG_SUPPORT;RT_ENABLE_FMOD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PlatformPrecomp.h</PrecompiledHeaderFile>

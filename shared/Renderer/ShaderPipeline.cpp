@@ -17,16 +17,15 @@
 #include "ShaderPipeline.h"
 #include "util/MathUtils.h" //for CL_Mat4f (used for the clip plane inverse only)
 
-#ifdef RT_SHADER_PIPELINE_ONLY
-bool g_bShaderPipelineActive = true; //pure-GLES2 build: there is no legacy path to fall back to
-#else
-bool g_bShaderPipelineActive = false;
-#endif
+//the shader pipeline is the default wherever it's compiled in; the
+//-fixedpipeline launch parm switches back to fixed function for comparison
+//(except in RT_SHADER_PIPELINE_ONLY builds, which have no legacy path)
+bool g_bShaderPipelineActive = true;
 
 //---------------------------------------------------------------------------
-// GL2 entry points + constants.  The vendored desktop gl.h is 1.1-only, so on
-// Windows we declare and load what we need ourselves; GLES2 targets get the
-// functions from their platform headers directly.
+// GL2 entry points + constants.  The vendored desktop gl.h is 1.1-only, so
+// Windows and Linux declare and load what we need at runtime; GLES2 targets
+// (and Mac, whose OpenGL framework headers cover 2.1) get them directly.
 //---------------------------------------------------------------------------
 
 #ifndef GL_FRAGMENT_SHADER
@@ -48,7 +47,19 @@ bool g_bShaderPipelineActive = false;
 	#define GL_FRAMEBUFFER_BINDING 0x8CA6
 #endif
 
-#if defined(_WIN32) && defined(C_GL_MODE)
+#if (defined(_WIN32) || defined(PLATFORM_LINUX)) && defined(C_GL_MODE)
+
+//desktop GL on Windows and Linux ships a GL 1.1 header, so everything GL2+
+//must be fetched at runtime.  Windows uses wglGetProcAddress; Linux goes
+//through SDL (mandatory in Proton's Linux builds, and works on X11 and
+//Wayland alike).  SDL's own declaration is plain cdecl on Linux, so declare
+//it here rather than dragging SDL.h into the renderer.
+#ifdef PLATFORM_LINUX
+extern "C" void * SDL_GL_GetProcAddress(const char *proc);
+#define SP_GETPROC(name) SDL_GL_GetProcAddress(name)
+#else
+#define SP_GETPROC(name) wglGetProcAddress(name)
+#endif
 
 typedef char SPGLchar;
 typedef GLuint (APIENTRY *PFNSPCREATESHADER)(GLenum type);
@@ -109,7 +120,7 @@ static PFNSPCHECKFRAMEBUFFERSTATUS spCheckFramebufferStatus = NULL;
 
 static bool LoadGL2FunctionPointers()
 {
-	#define SP_LOAD(var, name) var = (decltype(var)) wglGetProcAddress(name); if (!var) { LogError("ShaderPipeline: missing GL function %s", name); return false; }
+	#define SP_LOAD(var, name) var = (decltype(var)) SP_GETPROC(name); if (!var) { LogError("ShaderPipeline: missing GL function %s", name); return false; }
 	SP_LOAD(spCreateShader, "glCreateShader");
 	SP_LOAD(spShaderSource, "glShaderSource");
 	SP_LOAD(spCompileShader, "glCompileShader");
@@ -243,6 +254,9 @@ enum { SP_STDLOC_PROJ = 0, SP_STDLOC_MV, SP_STDLOC_COLOR };
 
 struct SPState
 {
+	SPState() { Reset(); } //the pipeline is on by default, so state must be sane before any parm parsing
+	void Reset();
+
 	bool bInitted;
 	bool bInitFailed;
 
@@ -452,22 +466,26 @@ static bool SPInit()
 	return true;
 }
 
-//called once from BaseApp when the parm is seen, before any GL state exists
-void SP_ResetState()
+void SPState::Reset()
 {
-	memset(&g_sp, 0, sizeof(g_sp));
+	memset(this, 0, sizeof(SPState));
 	for (int i = 0; i < 2; i++)
 	{
-		g_sp.matrix[i].depth = 0;
-		MatIdentity(g_sp.matrix[i].stack[0]);
+		matrix[i].depth = 0;
+		MatIdentity(matrix[i].stack[0]);
 	}
-	g_sp.curMatrix = 0;
-	g_sp.color[0] = g_sp.color[1] = g_sp.color[2] = g_sp.color[3] = 1.0f;
+	curMatrix = 0;
+	color[0] = color[1] = color[2] = color[3] = 1.0f;
 
 	//GL_LIGHT0 defaults per the GL spec
-	g_sp.lightPosEye[0] = 0; g_sp.lightPosEye[1] = 0; g_sp.lightPosEye[2] = 1.0f; g_sp.lightPosEye[3] = 0;
-	g_sp.lightAmbient[3] = 1.0f; //(0,0,0,1)
-	g_sp.lightDiffuse[0] = g_sp.lightDiffuse[1] = g_sp.lightDiffuse[2] = g_sp.lightDiffuse[3] = 1.0f;
+	lightPosEye[0] = 0; lightPosEye[1] = 0; lightPosEye[2] = 1.0f; lightPosEye[3] = 0;
+	lightAmbient[3] = 1.0f; //(0,0,0,1)
+	lightDiffuse[0] = lightDiffuse[1] = lightDiffuse[2] = lightDiffuse[3] = 1.0f;
+}
+
+void SP_ResetState()
+{
+	g_sp.Reset();
 }
 
 //---------------------------------------------------------------------------

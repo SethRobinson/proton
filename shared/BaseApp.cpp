@@ -798,13 +798,25 @@ void BaseApp::AddCommandLineParm( string parm )
 	m_commandLineParms.push_back(parm);
 
 #ifdef RT_SHADER_PIPELINE_AVAILABLE
-	//flip this as early as possible so the very first GL default setup already
-	//routes through the shader backend's state tracking
+	//the shader pipeline is the default in builds that compile it; -shaderpipeline
+	//is kept as an explicit (now redundant) opt-in so old launch scripts still work
 	if (ToLowerCaseString(parm) == "-shaderpipeline")
 	{
 		SP_ResetState();
 		g_bShaderPipelineActive = true;
 		LogMsg("Shader pipeline requested via command line parm");
+	}
+
+	//escape hatch for A/B comparison against the legacy fixed-function path.
+	//Flip as early as possible so the very first GL default setup routes correctly.
+	if (ToLowerCaseString(parm) == "-fixedpipeline")
+	{
+#ifdef RT_SHADER_PIPELINE_ONLY
+		LogMsg("-fixedpipeline ignored: this build compiled out the fixed-function path");
+#else
+		g_bShaderPipelineActive = false;
+		LogMsg("Fixed-function pipeline requested via command line parm");
+#endif
 	}
 #endif
 }

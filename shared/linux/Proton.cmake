@@ -23,6 +23,9 @@ else(RASPBERRYPI_GLES11)
 #not gles1, so let's do full on GL
 
 add_definitions(-DC_GL_MODE)
+#the GL2 shader backend (see docs/renderer-migration.md); it's the default
+#renderer, launch with -fixedpipeline to compare against fixed function
+add_definitions(-DRT_SHADER_PIPELINE_AVAILABLE)
 
 	if(RASPBERRYPI_OPENGL)
 	link_directories("/usr/local/lib")
@@ -83,7 +86,7 @@ set(PROTON_SOURCES_BASIC "${PROTON_SHARED}/BaseApp.cpp" "${PROTON_SHARED}/Platfo
 	"${PROTON_GUI}/RTFont.cpp"
 	"${PROTON_MANAGER}/Console.cpp" "${PROTON_MANAGER}/GameTimer.cpp" "${PROTON_MANAGER}/MessageManager.cpp" "${PROTON_MANAGER}/ResourceManager.cpp"
 	"${PROTON_MATH}/rtRect.cpp" 
-	"${PROTON_RENDERER}/Surface.cpp" "${PROTON_RENDERER}/SoftSurface.cpp" "${PROTON_RENDERER}/SurfaceAnim.cpp" "${PROTON_RENDERER}/RenderBatcher.cpp"
+	"${PROTON_RENDERER}/Surface.cpp" "${PROTON_RENDERER}/SoftSurface.cpp" "${PROTON_RENDERER}/SurfaceAnim.cpp" "${PROTON_RENDERER}/RenderBatcher.cpp" "${PROTON_RENDERER}/ShaderPipeline.cpp"
 	"${PROTON_UTIL}/MathUtils.cpp" "${PROTON_UTIL}/CRandom.cpp" "${PROTON_UTIL}/MiscUtils.cpp" "${PROTON_UTIL}/ResourceUtils.cpp" "${PROTON_UTIL}/RenderUtils.cpp" "${PROTON_UTIL}/GLESUtils.cpp"
 	"${PROTON_ENTITY}/Entity.cpp" "${PROTON_ENTITY}/Component.cpp"
 	"${PROTON_CLANMATH}/angle.cpp" "${PROTON_CLANMATH}/mat3.cpp" "${PROTON_CLANMATH}/mat4.cpp" "${PROTON_CLANMATH}/rect.cpp" "${PROTON_CLANMATH}/vec2.cpp" "${PROTON_CLANMATH}/vec3.cpp" "${PROTON_CLANMATH}/vec4.cpp"

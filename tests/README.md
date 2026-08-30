@@ -39,10 +39,17 @@ cd tests
 .\harness.ps1 -Mode test                    # Windows apps against win goldens
 .\harness.ps1 -Mode test -App RTDink        # one app
 .\harness.ps1 -Mode golden                  # re-record win goldens
+.\harness.ps1 -Mode test -LegacyPipe        # win: force the legacy fixed-function path
 .\harness.ps1 -Mode test -Target html5      # wasm/WebGL in headless Edge
 .\harness.ps1 -Mode test -Target ios        # iOS simulator on the Mac (ssh)
 .\harness.ps1 -Mode test -Target android    # device/emulator via adb
 ```
+
+The shader pipeline is the engine default wherever it's compiled in
+(`RT_SHADER_PIPELINE_AVAILABLE`), so a plain run tests it. `-LegacyPipe`
+launches the apps with `-fixedpipeline` to regress the legacy path, which
+must stay pixel-identical to the same goldens until it's retired.
+(`-ShaderPipe` is a deprecated no-op from when the shader path was opt-in.)
 
 Exit code 0 = all pass. Both `output/` (scratch) and `goldens/` are
 git-ignored: goldens are GPU/driver specific, so each machine records its own
@@ -86,10 +93,10 @@ Per-target notes:
 - **Goldens are GPU/driver specific.** Only compare against goldens recorded
   on the same machine. After a driver update or on a new machine, re-record
   (`-Mode golden`) and eyeball the images before trusting them.
-- RTDink, BlipArcade, and RTMindWall are separate repos/folders that happen to
-  live inside the proton checkout; the harness skips apps whose exe is
-  missing. Their goldens are still tracked here since the renderer under test
-  is proton's.
+- Per Seth, only apps tracked in the proton repo plus RTDink, RTDScroll, and
+  RTMindWall may be used for testing. RTDink and RTMindWall are separate
+  repos/folders that happen to live inside the proton checkout; the harness
+  skips apps whose exe is missing.
 - Build the `Debug GL` configs first (x64 for everything except RTBareBones;
   several Win32 configs are stale and fail with 0xc000007b loading the 64-bit
   DLLs sitting in `bin/`).
@@ -116,10 +123,12 @@ later run when:
 - engine ms/frame exceeds 2x baseline AND baseline+0.5ms AND 1.0ms absolute
   (the guards keep sub-millisecond cache noise from flaking).
 
-Scenario keys beyond the basics: `ShaderReady` (app may run under
-`-ShaderPipe`), `RequiresShaderPipe` (scenario only runs under `-ShaderPipe`
-or on html5, e.g. the RTBareBonesRTT render-to-texture demo), and
-`ExtraParms` (extra command line parms, passed via URL on html5).
+Scenario keys beyond the basics: `ShaderReady` (app's own raw GL is shimmed,
+so it works on the shader pipeline; apps without it are skipped except under
+`-LegacyPipe`), `RequiresShaderPipe` (scenario has no fixed-function
+equivalent and is skipped under `-LegacyPipe`, e.g. the RTBareBonesRTT
+render-to-texture demo), and `ExtraParms` (extra command line parms, passed
+via URL on html5).
 
 This is a tripwire for "everything got horribly slower" bugs, not a profiler.
 Notes: on Windows, `-autoscreenshot` disables vsync and bypasses the app's

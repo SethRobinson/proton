@@ -10,6 +10,11 @@
 #   .\harness.ps1 -Mode golden            # (re)record golden screenshots
 #   .\harness.ps1 -Mode test              # capture + compare against goldens
 #   .\harness.ps1 -Mode test -App RTDink  # single app
+#   .\harness.ps1 -Mode test -LegacyPipe  # win: force the old fixed-function path
+#
+# The shader pipeline is the engine default wherever it's compiled in, so a
+# plain run exercises it; -LegacyPipe launches with -fixedpipeline to regress
+# the legacy path (which must stay pixel-identical until it's retired).
 #
 # Goldens are GPU/driver specific: only compare on the machine that recorded
 # them. Exit code 0 = all pass, 1 = something failed. See tests/README.md.
@@ -18,7 +23,8 @@ param(
     [ValidateSet('golden', 'test')] [string]$Mode = 'test',
     [ValidateSet('win', 'html5', 'ios', 'android')] [string]$Target = 'win',
     [string]$App = '*',
-    [switch]$ShaderPipe,   # win only: launch apps with -shaderpipeline and diff the shader backend against the same goldens (apps opt in via ShaderReady)
+    [switch]$LegacyPipe,   # win only: launch apps with -fixedpipeline to regress the legacy fixed-function path against the same goldens
+    [switch]$ShaderPipe,   # deprecated: the shader pipeline is the default now, so this is a no-op kept for muscle memory
     [switch]$ShowBrowser,  # html5 only: run the browser headed, for debugging
     [switch]$PrepareMac,   # ios only: rsync the tracked tree to the Mac and xcodebuild the sim apps first
     [string]$MacHost = 'seth@studiomac.local', # ios only
@@ -31,6 +37,11 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
+
+if ($ShaderPipe)
+{
+    Write-Host 'NOTE: -ShaderPipe is deprecated; the shader pipeline is the engine default now, so a plain run already tests it (-LegacyPipe forces the old path).' -ForegroundColor Yellow
+}
 
 Add-Type -TypeDefinition @'
 using System;
@@ -422,16 +433,16 @@ foreach ($entry in $scenarios.Apps)
     }
     else
     {
-        if ($ShaderPipe -and -not ($entry.ContainsKey('ShaderReady') -and $entry.ShaderReady))
+        if (-not $LegacyPipe -and -not ($entry.ContainsKey('ShaderReady') -and $entry.ShaderReady))
         {
-            Write-Host "SKIP  $($entry.Name): not marked ShaderReady in scenarios.psd1 (its app-level raw GL needs the compatibility shim first)" -ForegroundColor Yellow
+            Write-Host "SKIP  $($entry.Name): not marked ShaderReady in scenarios.psd1 (its app-level raw GL needs the compatibility shim first; test it with -LegacyPipe)" -ForegroundColor Yellow
             $results += @{ App = $entry.Name; Step = '-'; Status = 'SKIP'; Note = 'not ShaderReady' }
             continue
         }
-        if (-not $ShaderPipe -and $entry.ContainsKey('RequiresShaderPipe') -and $entry.RequiresShaderPipe)
+        if ($LegacyPipe -and $entry.ContainsKey('RequiresShaderPipe') -and $entry.RequiresShaderPipe)
         {
-            Write-Host "SKIP  $($entry.Name): shader-pipeline-only scenario (run with -ShaderPipe)" -ForegroundColor Yellow
-            $results += @{ App = $entry.Name; Step = '-'; Status = 'SKIP'; Note = 'needs -ShaderPipe' }
+            Write-Host "SKIP  $($entry.Name): shader-pipeline-only scenario (no fixed-function equivalent)" -ForegroundColor Yellow
+            $results += @{ App = $entry.Name; Step = '-'; Status = 'SKIP'; Note = 'needs shader pipe' }
             continue
         }
         $exe = Join-Path $RepoRoot $entry.Exe
@@ -476,7 +487,7 @@ foreach ($entry in $scenarios.Apps)
         else
         {
             $appArgs = @('-autoscreenshot', $bmpPath, [string]$entry.SettleMs, '-autoquit')
-            if ($ShaderPipe) { $appArgs = @('-shaderpipeline') + $appArgs }
+            if ($LegacyPipe) { $appArgs = @('-fixedpipeline') + $appArgs }
             if ($entry.ContainsKey('ExtraParms')) { $appArgs = ($entry.ExtraParms -split ' ') + $appArgs }
             $proc = Start-Process -FilePath $exe -WorkingDirectory (Split-Path $exe) -PassThru -ArgumentList $appArgs
 
@@ -512,7 +523,6 @@ foreach ($entry in $scenarios.Apps)
             }
             $tol = if ($step.ContainsKey('ChannelTol')) { $step.ChannelTol } elseif ($entry.ContainsKey('ChannelTol')) { $entry.ChannelTol } else { 12 }
             $maxPct = if ($step.ContainsKey('MaxDiffPct')) { $step.MaxDiffPct } elseif ($entry.ContainsKey('MaxDiffPct')) { $entry.MaxDiffPct } else { 0.5 }
-            if ($ShaderPipe) { $maxPct = if ($entry.ContainsKey('ShaderMaxDiffPct')) { $entry.ShaderMaxDiffPct } else { 3.0 } } # different rasterization path; small edge drift expected
             $cmp = Compare-Shots $goldenPath $capturePath $tol (Join-Path $outputDir "$($entry.Name)_$($step.Name)_DIFF.png")
             $pass = $cmp.DiffPct -le $maxPct
             if (-not $pass) { $anyFailed = $true }
@@ -531,13 +541,13 @@ foreach ($entry in $scenarios.Apps)
         # vsync is uncapped on win, but html5/ios are capped near 60 by the
         # browser/display, so those only catch drops below the cap.
         $perfPath = "$bmpPath.perf.txt"
-        if ($ShaderPipe -and (Test-Path $perfPath))
+        if ($LegacyPipe -and (Test-Path $perfPath))
         {
-            # informational only: shader-path perf isn't compared against the legacy baselines
+            # informational only: legacy-path perf isn't compared against the (default, shader-path) baselines
             $perfRaw = Get-Content $perfPath -Raw
             if ($perfRaw -match 'fps=([0-9.]+)') { $fps = $Matches[1] } else { $fps = '?' }
             if ($perfRaw -match 'engineMS=([0-9.]+)') { $engMS = $Matches[1] } else { $engMS = '?' }
-            Write-Host "  PERF    info  $fps fps, $engMS engine ms/frame (shader path, not gated)"
+            Write-Host "  PERF    info  $fps fps, $engMS engine ms/frame (legacy path, not gated)"
         }
         elseif (Test-Path $perfPath)
         {

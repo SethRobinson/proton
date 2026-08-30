@@ -487,7 +487,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release GL|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\source;..\..\shared;..\..\shared\win\;..\..\shared\util\boost;..\..\shared\ClanLib-2.0\Sources;..\..\shared\win\include;..\..\shared\FliteTTS\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;_USE_32BIT_TIME_T;C_GL_MODE;C_NO_NETWORK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;_USE_32BIT_TIME_T;C_GL_MODE;RT_SHADER_PIPELINE_AVAILABLE;C_NO_NETWORK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PlatformPrecomp.h</PrecompiledHeaderFile>
@@ -509,7 +509,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release GL|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\source;..\..\shared;..\..\shared\win\;..\..\shared\util\boost;..\..\shared\ClanLib-2.0\Sources;..\..\shared\win\include;..\..\shared\FliteTTS\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;C_GL_MODE;C_NO_NETWORK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;C_GL_MODE;RT_SHADER_PIPELINE_AVAILABLE;C_NO_NETWORK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PlatformPrecomp.h</PrecompiledHeaderFile>

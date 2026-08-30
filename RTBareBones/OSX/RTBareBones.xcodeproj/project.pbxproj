@@ -38,6 +38,7 @@
 		5DDE019912B4D4F2000C5CC0 /* rtRect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5DDE015912B4D4F2000C5CC0 /* rtRect.cpp */; };
 		5DDE019A12B4D4F2000C5CC0 /* SoftSurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5DDE015C12B4D4F2000C5CC0 /* SoftSurface.cpp */; };
 		5DDE019B12B4D4F2000C5CC0 /* RenderBatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5DDE015E12B4D4F2000C5CC0 /* RenderBatcher.cpp */; };
+		A1B2C3D40000000000000C01 /* ShaderPipeline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D40000000000000C02 /* ShaderPipeline.cpp */; };
 		5DDE019C12B4D4F2000C5CC0 /* SurfaceAnim.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5DDE016012B4D4F2000C5CC0 /* SurfaceAnim.cpp */; };
 		5DDE019D12B4D4F2000C5CC0 /* Surface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5DDE016312B4D4F2000C5CC0 /* Surface.cpp */; };
 		5DDE019E12B4D4F2000C5CC0 /* CRandom.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5DDE016612B4D4F2000C5CC0 /* CRandom.cpp */; };
@@ -124,6 +125,8 @@
 		5DDE015D12B4D4F2000C5CC0 /* SoftSurface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SoftSurface.h; path = ../../shared/Renderer/SoftSurface.h; sourceTree = SOURCE_ROOT; };
 		5DDE015E12B4D4F2000C5CC0 /* RenderBatcher.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenderBatcher.cpp; path = ../../shared/Renderer/RenderBatcher.cpp; sourceTree = SOURCE_ROOT; };
 		5DDE015F12B4D4F2000C5CC0 /* RenderBatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RenderBatcher.h; path = ../../shared/Renderer/RenderBatcher.h; sourceTree = SOURCE_ROOT; };
+		A1B2C3D40000000000000C02 /* ShaderPipeline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ShaderPipeline.cpp; path = ../../shared/Renderer/ShaderPipeline.cpp; sourceTree = SOURCE_ROOT; };
+		A1B2C3D40000000000000C03 /* ShaderPipeline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ShaderPipeline.h; path = ../../shared/Renderer/ShaderPipeline.h; sourceTree = SOURCE_ROOT; };
 		5DDE016012B4D4F2000C5CC0 /* SurfaceAnim.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SurfaceAnim.cpp; path = ../../shared/Renderer/SurfaceAnim.cpp; sourceTree = SOURCE_ROOT; };
 		5DDE016112B4D4F2000C5CC0 /* SurfaceAnim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SurfaceAnim.h; path = ../../shared/Renderer/SurfaceAnim.h; sourceTree = SOURCE_ROOT; };
 		5DDE016212B4D4F2000C5CC0 /* bitmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bitmap.h; path = ../../shared/Renderer/bitmap.h; sourceTree = SOURCE_ROOT; };
@@ -432,6 +435,8 @@
 				5DDE015D12B4D4F2000C5CC0 /* SoftSurface.h */,
 				5DDE015E12B4D4F2000C5CC0 /* RenderBatcher.cpp */,
 				5DDE015F12B4D4F2000C5CC0 /* RenderBatcher.h */,
+				A1B2C3D40000000000000C02 /* ShaderPipeline.cpp */,
+				A1B2C3D40000000000000C03 /* ShaderPipeline.h */,
 				5DDE016012B4D4F2000C5CC0 /* SurfaceAnim.cpp */,
 				5DDE016112B4D4F2000C5CC0 /* SurfaceAnim.h */,
 				5DDE016212B4D4F2000C5CC0 /* bitmap.h */,
@@ -564,6 +569,7 @@
 				5DDE019912B4D4F2000C5CC0 /* rtRect.cpp in Sources */,
 				5DDE019A12B4D4F2000C5CC0 /* SoftSurface.cpp in Sources */,
 				5DDE019B12B4D4F2000C5CC0 /* RenderBatcher.cpp in Sources */,
+				A1B2C3D40000000000000C01 /* ShaderPipeline.cpp in Sources */,
 				5DDE019C12B4D4F2000C5CC0 /* SurfaceAnim.cpp in Sources */,
 				5DDE019D12B4D4F2000C5CC0 /* Surface.cpp in Sources */,
 				5DDE019E12B4D4F2000C5CC0 /* CRandom.cpp in Sources */,
@@ -620,6 +626,7 @@ GCC_PREPROCESSOR_DEFINITIONS = (
 				_DEBUG,
 				BOOST_ALL_NO_LIB,
 				C_GL_MODE,
+				RT_SHADER_PIPELINE_AVAILABLE,
 				GL_SILENCE_DEPRECATION,
 								RT_IPV6,
 			);
@@ -638,6 +645,7 @@ GCC_PREPROCESSOR_DEFINITIONS = (
 				BOOST_ALL_NO_LIB,
 				NDEBUG,
 				C_GL_MODE,
+				RT_SHADER_PIPELINE_AVAILABLE,
 				GL_SILENCE_DEPRECATION,
 								RT_IPV6,
 			);
@@ -663,6 +671,7 @@ GCC_PREPROCESSOR_DEFINITIONS = (
 				_DEBUG,
 				BOOST_ALL_NO_LIB,
 				C_GL_MODE,
+				RT_SHADER_PIPELINE_AVAILABLE,
 				GL_SILENCE_DEPRECATION,
 								RT_IPV6,
 			);
@@ -693,6 +702,7 @@ GCC_PREPROCESSOR_DEFINITIONS = (
 				BOOST_ALL_NO_LIB,
 				NDEBUG,
 				C_GL_MODE,
+				RT_SHADER_PIPELINE_AVAILABLE,
 				GL_SILENCE_DEPRECATION,
 								RT_IPV6,
 			);
