@@ -13,7 +13,7 @@ Seth's GL/GLES messy multi-platform C++ game SDK.  Can output to **Windows**, **
 
 A component based toolbox of useful things built up over the last SEVENTEEN years.  Instead of a giant .lib you link only the .cpp files used when possible to simplify multiplatform support as well as keep code size down.
 
-It's kind of an SDL-like on steroids (while also being able to target SDL2 for setup/input/audio itself when needed) but generally gets the best results with its own native implementations of things. For example, it can target the following audio subsystems: SDL2_mixer, Audiere, FMOD, FMODStudio, Native iOS, Native Android, Denshion.
+It's kind of a SDL-like on steroids (while also being able to target SDL2 for setup/input/audio itself when needed) but generally gets the best results with its own native implementations of things. For example, it can target the following audio subsystems: SDL2_mixer, Audiere, FMOD, FMODStudio, Native iOS, Native Android, Denshion.  It's mostly written in C++.
 
 It's designed with a "Write stuff in Windows, then compile/export to other platforms as needed" mentality.
 
@@ -29,19 +29,19 @@ Deprecated platforms no longer actively supported:  Flash, BBX, WebOS
 
 ### 8/30/2026 Note - the renderer got modernized
 
-Proton SDK has been GL 1.x/GLES1 until now because when I wrote it (2009?), that was what was needed to be compatible with everything.  But... now we're hitting the point where fixed-function rendering is so old... well, it's time to update it.
+Proton SDK has been GL 1.x/GLES1 until now because when I wrote it (2009?), that was what was needed to be compatible with everything... but today that changes!
 
-I need a fancy shader for something and I want to use this, so it's been modified to support a GLES2-class render pipeline alongside the old fixed-function GL 1.x/GLES1 path.
+See, I need a fancy shader for something and I want to use this Proton SDK, so it's been modified to support a GLES2-class render pipeline alongside the old fixed-function GL 1.x/GLES1 path.
 
 The important part: **existing app code needs no changes**, a compatibility shim remaps the fixed-function gl* calls apps make onto the new pipeline, and the regression suite verifies both paths render pixel-identical. 
 
 What this gets you:
 
 * **Custom GLSL shaders** in your app via the new `RTShader` class + `SetActiveShader()`, and **render-to-texture** via `Surface::InitRenderTarget()`.  See the new **RTShader** example app for a short, heavily commented tour that runs on every supported platform: full-screen post-process effects, plus the same 3D cube drawn twice - once with classic fixed-function-style GL calls (no GPU code, the built-in math) and once through a custom vertex+fragment shader that bends it like jelly, so you can flip between them and SEE the difference.
-* The shader pipeline is the **default** in projects that compile it in (all the included demo apps).  On desktop builds you can launch with `-fixedpipeline` to compare against the legacy path, which is still fully intact.  If for some reason you REALLY want to use the old path, you can define `PROTON_USE_FIXED_PIPELINE` in your project to force it.
-* iOS and Android now build as pure GLES2, and **HTML5 targets WebGL directly instead of LEGACY_GL_EMULATION**, speed gains across the board.
+* The shader pipeline is the **default** in projects that compile it in (all the included demo apps).  On desktop builds you can launch with `-fixedpipeline` to compare against the legacy path, which is still fully intact. (for now)  If for some reason you REALLY want to use the old path, you can define `PROTON_USE_FIXED_PIPELINE` in your project to force it.
+* iOS and Android now build as pure GLES2, and **HTML5 targets WebGL directly instead of LEGACY_GL_EMULATION**, granting us speed gains across the board.
 
-The pre-shader engine is tagged `v1.0.0` if you need the old baseline.  Full details and phase history: `docs/renderer-migration.md`.
+The pre-shader engine is tagged `v1.0.0` if you need the old baseline. 
 
 ### 8/29/2023 Note
 
