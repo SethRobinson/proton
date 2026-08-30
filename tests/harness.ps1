@@ -266,8 +266,11 @@ function Invoke-IosDeviceCapture([string]$appName, [int]$settleMs, [string]$bmpO
     $lines = @(
         'set -e'
         'APPNAME=$1; SETTLEMS=$2; TIMEOUTSEC=$3; DEVID=$4'
+        '#prefer an actively connected device (USB shows state "connected"); fall back to any paired one'
+        'if [ -z "$DEVID" ]; then DEVID=$(xcrun devicectl list devices | grep -m1 " connected " | grep -oE "[A-F0-9-]{36}"); fi'
         'if [ -z "$DEVID" ]; then DEVID=$(xcrun devicectl list devices | grep -m1 "available (paired)" | grep -oE "[A-F0-9-]{36}"); fi'
         'if [ -z "$DEVID" ]; then echo "no paired iOS device visible to devicectl"; exit 1; fi'
+        'echo "using device $DEVID"'
         'APP=$(find ~/proton_warncheck/$APPNAME -path "*Debug-iphoneos*" -name "$APPNAME.app" | head -1)'
         'if [ -z "$APP" ]; then echo "no device .app built - run the harness with -PrepareMac -IosDevice"; exit 1; fi'
         'BUNDLE=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$APP/Info.plist")'
