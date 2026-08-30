@@ -84,6 +84,13 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   `GetSystemTimeTick()` for anything that must survive a roll-over or a backgrounded
   browser tab.
 
+## Feature index
+
+- Renderer migration (fixed-function -> shaders): `docs/renderer-migration.md`.
+  Non-obvious constraint: engine rendering code must use the rt* functions from
+  `shared/Renderer/RenderPipeline.h` for fixed-function GL, never the raw gl*
+  names; ES2-portable GL (textures/blend/depth/scissor/etc) stays raw.
+
 ## Renderer regression tests (tests/)
 
 - `tests/harness.ps1` captures golden screenshots of the example apps and
