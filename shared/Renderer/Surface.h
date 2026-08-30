@@ -109,6 +109,16 @@ public:
 	virtual bool InitFromSoftSurface(SoftSurface *pSurf, bool bCreateSurface = true, int mipLevel = 0);
 	bool CreateSoftSurfaceFromSurface(SoftSurface& outSurf, bool bUseOriginalSizes = false);
 	bool IsRenderTarget() {return m_frameBuffer != 0;}
+
+	//Render-to-texture, shader pipeline only (see docs/renderer-migration.md).
+	//InitRenderTarget makes this surface an offscreen target at the exact size
+	//given (no power-of-two padding); draw into it between BeginRenderTarget/
+	//EndRenderTarget using the normal 2D calls (y-down coords, same as the
+	//screen), then Blit it like any other surface.  Note: contents are lost on
+	//a GL context loss (Android), redraw them in your OnLoadSurfaces callback.
+	bool InitRenderTarget(int width, int height);
+	void BeginRenderTarget();
+	void EndRenderTarget();
 	void CopyFromScreen(); //grabs whatever is currently in the gl buffer and creates a new texture with it
 	void FillRandomCrap();
 	void UpdateSurfaceRect(rtRect dstRect, uint8 *pPixelData, bool bUpsideDownMode = true);

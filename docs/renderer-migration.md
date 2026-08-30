@@ -68,9 +68,21 @@ and the existing compatibility/legacy contexts on Windows/Linux/macOS (GLSL
   (particles use the batcher path; the SP vertex shader writes
   gl_PointSize=1.0 on ES2). The remaining html5 app .bats flip the same way
   during the Phase 3 rollout. Still to
-  do: ES2 context creation for iOS/Android, the remaining html5 .bats, FBO
-  render targets, and the public shader API. Notable finding recorded in
-  ShaderPipeline.cpp:
+  Milestone 5 (Aug 2026): the payoff features. Surface gained
+  InitRenderTarget/BeginRenderTarget/EndRenderTarget (FBO-backed
+  render-to-texture, exact-size textures, y-down drawing coords, blits work
+  unchanged since the ortho and blit V-flips cancel; contents lost on GL
+  context loss). New RTShader class (declared in ShaderPipeline.h): custom
+  GLSL programs with a standard contract (attributes a_pos/a_uv/a_color,
+  uniforms uProj/uMV/uColor/uTex) applied to all engine draws via
+  SetActiveShader(). Both shader-pipeline-only. Working example:
+  RenderRTTDemoIfRequested in RTBareBones App.cpp (launch with
+  -shaderpipeline -rttdemo), covered by the RTBareBonesRTT harness scenario
+  on win-shader and html5 targets (0.000% both). Still to do: ES2 context
+  creation for iOS/Android, the remaining html5 .bats (Phase 3 rollout), an
+  optional engine streaming VBO to replace FULL_ES2, and replacing
+  Surface::CopyFromScreen internals with the FBO path. Notable finding
+  recorded in ShaderPipeline.cpp:
   GL_ALPHA_TEST was always a no-op in Proton (glAlphaFunc never called, GL
   default is GL_ALWAYS), so the shader path needs no alpha discard.
 - **Phase 3**: flip defaults per platform (HTML5 first).

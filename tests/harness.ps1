@@ -141,14 +141,15 @@ function Get-EdgePath
 $script:MimeTypes = @{ '.html' = 'text/html'; '.js' = 'text/javascript'; '.wasm' = 'application/wasm'
                        '.data' = 'application/octet-stream'; '.png' = 'image/png'; '.txt' = 'text/plain' }
 
-function Invoke-Html5Capture([string]$pageDir, [string]$pageName, [int]$settleMs, [string]$bmpOutPath)
+function Invoke-Html5Capture([string]$pageDir, [string]$pageName, [int]$settleMs, [string]$bmpOutPath, [string]$extraParms = '')
 {
+    if ($extraParms) { $extraParms = "$extraParms " }
     $port = Get-Random -Minimum 40000 -Maximum 59999
     $listener = New-Object System.Net.HttpListener
     $listener.Prefixes.Add("http://127.0.0.1:$port/")
     $listener.Start()
     $edgeProfile = Join-Path ([IO.Path]::GetTempPath()) "proton_harness_edge"
-    $parms = [Uri]::EscapeDataString("-autoscreenshot shot.bmp $settleMs")
+    $parms = [Uri]::EscapeDataString("$extraParms-autoscreenshot shot.bmp $settleMs")
     $url = "http://127.0.0.1:$port/$pageName`?parms=$parms"
     $edgeArgs = @("--user-data-dir=$edgeProfile", '--no-first-run', '--disable-extensions', '--window-size=1280,960', $url)
     if (-not $ShowBrowser) { $edgeArgs = @('--headless=new') + $edgeArgs }
@@ -371,6 +372,12 @@ foreach ($entry in $scenarios.Apps)
             $results += @{ App = $entry.Name; Step = '-'; Status = 'SKIP'; Note = 'not ShaderReady' }
             continue
         }
+        if (-not $ShaderPipe -and $entry.ContainsKey('RequiresShaderPipe') -and $entry.RequiresShaderPipe)
+        {
+            Write-Host "SKIP  $($entry.Name): shader-pipeline-only scenario (run with -ShaderPipe)" -ForegroundColor Yellow
+            $results += @{ App = $entry.Name; Step = '-'; Status = 'SKIP'; Note = 'needs -ShaderPipe' }
+            continue
+        }
         $exe = Join-Path $RepoRoot $entry.Exe
         if (-not (Test-Path $exe))
         {
@@ -397,7 +404,8 @@ foreach ($entry in $scenarios.Apps)
         if ($Target -eq 'html5')
         {
             $pageFull = Join-Path $RepoRoot $entry.Html5Page
-            Invoke-Html5Capture (Split-Path $pageFull) (Split-Path $pageFull -Leaf) $entry.SettleMs $bmpPath
+            $html5Extra = if ($entry.ContainsKey('ExtraParms')) { $entry.ExtraParms } else { '' }
+            Invoke-Html5Capture (Split-Path $pageFull) (Split-Path $pageFull -Leaf) $entry.SettleMs $bmpPath $html5Extra
         }
         elseif ($Target -eq 'ios')
         {
@@ -412,6 +420,7 @@ foreach ($entry in $scenarios.Apps)
         {
             $appArgs = @('-autoscreenshot', $bmpPath, [string]$entry.SettleMs, '-autoquit')
             if ($ShaderPipe) { $appArgs = @('-shaderpipeline') + $appArgs }
+            if ($entry.ContainsKey('ExtraParms')) { $appArgs = ($entry.ExtraParms -split ' ') + $appArgs }
             $proc = Start-Process -FilePath $exe -WorkingDirectory (Split-Path $exe) -PassThru -ArgumentList $appArgs
 
             $deadline = (Get-Date).AddMilliseconds($entry.SettleMs + 60000)

@@ -41,6 +41,13 @@ bool g_bShaderPipelineActive = false;
 	#define GL_PROGRAM_POINT_SIZE 0x8642
 #endif
 
+#ifndef GL_FRAMEBUFFER
+	#define GL_FRAMEBUFFER 0x8D40
+	#define GL_COLOR_ATTACHMENT0 0x8CE0
+	#define GL_FRAMEBUFFER_COMPLETE 0x8CD5
+	#define GL_FRAMEBUFFER_BINDING 0x8CA6
+#endif
+
 #if defined(_WIN32) && defined(C_GL_MODE)
 
 typedef char SPGLchar;
@@ -66,6 +73,11 @@ typedef void (APIENTRY *PFNSPENABLEVERTEXATTRIBARRAY)(GLuint index);
 typedef void (APIENTRY *PFNSPDISABLEVERTEXATTRIBARRAY)(GLuint index);
 typedef void (APIENTRY *PFNSPVERTEXATTRIBPOINTER)(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer);
 typedef void (APIENTRY *PFNSPVERTEXATTRIB4F)(GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
+typedef void (APIENTRY *PFNSPGENFRAMEBUFFERS)(GLsizei n, GLuint *framebuffers);
+typedef void (APIENTRY *PFNSPDELETEFRAMEBUFFERS)(GLsizei n, const GLuint *framebuffers);
+typedef void (APIENTRY *PFNSPBINDFRAMEBUFFER)(GLenum target, GLuint framebuffer);
+typedef void (APIENTRY *PFNSPFRAMEBUFFERTEXTURE2D)(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
+typedef GLenum (APIENTRY *PFNSPCHECKFRAMEBUFFERSTATUS)(GLenum target);
 
 static PFNSPCREATESHADER spCreateShader = NULL;
 static PFNSPSHADERSOURCE spShaderSource = NULL;
@@ -89,6 +101,11 @@ static PFNSPENABLEVERTEXATTRIBARRAY spEnableVertexAttribArray = NULL;
 static PFNSPDISABLEVERTEXATTRIBARRAY spDisableVertexAttribArray = NULL;
 static PFNSPVERTEXATTRIBPOINTER spVertexAttribPointer = NULL;
 static PFNSPVERTEXATTRIB4F spVertexAttrib4f = NULL;
+static PFNSPGENFRAMEBUFFERS spGenFramebuffers = NULL;
+static PFNSPDELETEFRAMEBUFFERS spDeleteFramebuffers = NULL;
+static PFNSPBINDFRAMEBUFFER spBindFramebuffer = NULL;
+static PFNSPFRAMEBUFFERTEXTURE2D spFramebufferTexture2D = NULL;
+static PFNSPCHECKFRAMEBUFFERSTATUS spCheckFramebufferStatus = NULL;
 
 static bool LoadGL2FunctionPointers()
 {
@@ -115,6 +132,11 @@ static bool LoadGL2FunctionPointers()
 	SP_LOAD(spDisableVertexAttribArray, "glDisableVertexAttribArray");
 	SP_LOAD(spVertexAttribPointer, "glVertexAttribPointer");
 	SP_LOAD(spVertexAttrib4f, "glVertexAttrib4f");
+	SP_LOAD(spGenFramebuffers, "glGenFramebuffers");
+	SP_LOAD(spDeleteFramebuffers, "glDeleteFramebuffers");
+	SP_LOAD(spBindFramebuffer, "glBindFramebuffer");
+	SP_LOAD(spFramebufferTexture2D, "glFramebufferTexture2D");
+	SP_LOAD(spCheckFramebufferStatus, "glCheckFramebufferStatus");
 	#undef SP_LOAD
 	return true;
 }
@@ -144,6 +166,11 @@ static bool LoadGL2FunctionPointers() { return true; }
 #define spDisableVertexAttribArray glDisableVertexAttribArray
 #define spVertexAttribPointer glVertexAttribPointer
 #define spVertexAttrib4f glVertexAttrib4f
+#define spGenFramebuffers glGenFramebuffers
+#define spDeleteFramebuffers glDeleteFramebuffers
+#define spBindFramebuffer glBindFramebuffer
+#define spFramebufferTexture2D glFramebufferTexture2D
+#define spCheckFramebufferStatus glCheckFramebufferStatus
 #endif
 
 //---------------------------------------------------------------------------
@@ -212,6 +239,8 @@ struct SPProgram
 	GLint locNormalMat, locLightPosEye, locLightAmbient, locLightDiffuse, locColorMaterial;
 };
 
+enum { SP_STDLOC_PROJ = 0, SP_STDLOC_MV, SP_STDLOC_COLOR };
+
 struct SPState
 {
 	bool bInitted;
@@ -237,6 +266,14 @@ struct SPState
 
 	SPProgram programs[SP_VARIANT_COUNT];
 	GLuint boundProgram;
+
+	//render target state (single level, no nesting)
+	GLuint boundRenderTargetFBO;
+	GLint savedFBOBinding;
+	GLint savedViewport[4];
+	GLint savedCullFaceMode;
+
+	RTShader *pActiveShader;
 };
 
 static SPState g_sp;
@@ -679,23 +716,45 @@ static bool PrepareToDraw()
 	if (g_sp.bClipPlane) variant |= SP_VARIANT_CLIP;
 	if (g_sp.bLighting && g_sp.bLight0) variant |= SP_VARIANT_LIGHT;
 
-	SPProgram &p = g_sp.programs[variant];
-	if (!p.program)
-	{
-		if (!BuildProgram(variant)) { g_sp.bInitFailed = true; return false; }
-	}
+	SPProgram *pProg = NULL;
 
-	if (g_sp.boundProgram != p.program)
+	if (g_sp.pActiveShader)
 	{
-		spUseProgram(p.program);
-		g_sp.boundProgram = p.program;
+		//a custom app shader replaces the ubershader entirely; the emulated
+		//clip plane / lighting don't apply while it's active
+		variant &= ~(SP_VARIANT_CLIP | SP_VARIANT_LIGHT);
+		GLuint prog = g_sp.pActiveShader->GetProgram();
+		if (g_sp.boundProgram != prog)
+		{
+			spUseProgram(prog);
+			g_sp.boundProgram = prog;
+		}
+		int loc;
+		if ((loc = g_sp.pActiveShader->GetStandardLoc(SP_STDLOC_PROJ)) >= 0) spUniformMatrix4fv(loc, 1, GL_FALSE, g_sp.matrix[1].stack[g_sp.matrix[1].depth].m);
+		if ((loc = g_sp.pActiveShader->GetStandardLoc(SP_STDLOC_MV)) >= 0) spUniformMatrix4fv(loc, 1, GL_FALSE, g_sp.matrix[0].stack[g_sp.matrix[0].depth].m);
+		if ((loc = g_sp.pActiveShader->GetStandardLoc(SP_STDLOC_COLOR)) >= 0) spUniform4fv(loc, 1, g_sp.color);
+		g_sp.pActiveShader->ApplyCustomUniforms();
 	}
+	else
+	{
+		pProg = &g_sp.programs[variant];
+		if (!pProg->program)
+		{
+			if (!BuildProgram(variant)) { g_sp.bInitFailed = true; return false; }
+		}
 
-	//uniforms: cheap enough to set every draw for now; cache when profiling says to
-	spUniformMatrix4fv(p.locProj, 1, GL_FALSE, g_sp.matrix[1].stack[g_sp.matrix[1].depth].m);
-	spUniformMatrix4fv(p.locMV, 1, GL_FALSE, g_sp.matrix[0].stack[g_sp.matrix[0].depth].m);
-	spUniform4fv(p.locColor, 1, g_sp.color);
-	if (variant & SP_VARIANT_CLIP) spUniform4fv(p.locClipPlane, 1, g_sp.clipPlaneEye);
+		if (g_sp.boundProgram != pProg->program)
+		{
+			spUseProgram(pProg->program);
+			g_sp.boundProgram = pProg->program;
+		}
+
+		//uniforms: cheap enough to set every draw for now; cache when profiling says to
+		spUniformMatrix4fv(pProg->locProj, 1, GL_FALSE, g_sp.matrix[1].stack[g_sp.matrix[1].depth].m);
+		spUniformMatrix4fv(pProg->locMV, 1, GL_FALSE, g_sp.matrix[0].stack[g_sp.matrix[0].depth].m);
+		spUniform4fv(pProg->locColor, 1, g_sp.color);
+		if (variant & SP_VARIANT_CLIP) spUniform4fv(pProg->locClipPlane, 1, g_sp.clipPlaneEye);
+	}
 
 	//attributes straight from the client-side arrays (fine on desktop GL and
 	//GLES2; the WebGL flip will route these through a streaming VBO)
@@ -738,11 +797,11 @@ static bool PrepareToDraw()
 		{
 			for (int r = 0; r < 4; r++) normalMat.m[c * 4 + r] = inv.matrix[r * 4 + c];
 		}
-		spUniformMatrix4fv(p.locNormalMat, 1, GL_FALSE, normalMat.m);
-		spUniform4fv(p.locLightPosEye, 1, g_sp.lightPosEye);
-		spUniform4fv(p.locLightAmbient, 1, g_sp.lightAmbient);
-		spUniform4fv(p.locLightDiffuse, 1, g_sp.lightDiffuse);
-		spUniform1f(p.locColorMaterial, g_sp.bColorMaterial ? 1.0f : 0.0f);
+		spUniformMatrix4fv(pProg->locNormalMat, 1, GL_FALSE, normalMat.m);
+		spUniform4fv(pProg->locLightPosEye, 1, g_sp.lightPosEye);
+		spUniform4fv(pProg->locLightAmbient, 1, g_sp.lightAmbient);
+		spUniform4fv(pProg->locLightDiffuse, 1, g_sp.lightDiffuse);
+		spUniform1f(pProg->locColorMaterial, g_sp.bColorMaterial ? 1.0f : 0.0f);
 
 		const SPClientArray &nrm = g_sp.arrays[SP_ARRAY_NORMAL];
 		if (nrm.bEnabled)
@@ -774,6 +833,202 @@ void SP_DrawElements(GLenum mode, GLsizei count, GLenum type, const void *pIndic
 {
 	if (!PrepareToDraw()) return;
 	glDrawElements(mode, count, type, pIndices);
+}
+
+//---------------------------------------------------------------------------
+// Render targets
+//---------------------------------------------------------------------------
+
+unsigned int SP_CreateFrameBuffer(unsigned int glTextureID, int width, int height)
+{
+	if (!SPInit()) return 0;
+
+	GLint prevBinding = 0;
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prevBinding);
+
+	GLuint fbo = 0;
+	spGenFramebuffers(1, &fbo);
+	spBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	spFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, glTextureID, 0);
+	GLenum status = spCheckFramebufferStatus(GL_FRAMEBUFFER);
+	spBindFramebuffer(GL_FRAMEBUFFER, (GLuint)prevBinding);
+
+	if (status != GL_FRAMEBUFFER_COMPLETE)
+	{
+		LogError("SP_CreateFrameBuffer: framebuffer incomplete (status 0x%X) for %dx%d texture", status, width, height);
+		spDeleteFramebuffers(1, &fbo);
+		return 0;
+	}
+	return fbo;
+}
+
+void SP_DestroyFrameBuffer(unsigned int frameBufferID)
+{
+	if (frameBufferID)
+	{
+		GLuint fbo = frameBufferID;
+		spDeleteFramebuffers(1, &fbo);
+	}
+}
+
+void SP_BindFrameBuffer(unsigned int frameBufferID, int width, int height)
+{
+	assert(g_sp.boundRenderTargetFBO == 0 && "render target nesting isn't supported");
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &g_sp.savedFBOBinding);
+	glGetIntegerv(GL_VIEWPORT, g_sp.savedViewport);
+	glGetIntegerv(GL_CULL_FACE_MODE, &g_sp.savedCullFaceMode);
+	spBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
+	glViewport(0, 0, width, height);
+	g_sp.boundRenderTargetFBO = frameBufferID;
+}
+
+void SP_UnbindFrameBuffer()
+{
+	if (!g_sp.boundRenderTargetFBO) return;
+	spBindFramebuffer(GL_FRAMEBUFFER, (GLuint)g_sp.savedFBOBinding);
+	glViewport(g_sp.savedViewport[0], g_sp.savedViewport[1], g_sp.savedViewport[2], g_sp.savedViewport[3]);
+	glCullFace(g_sp.savedCullFaceMode);
+	g_sp.boundRenderTargetFBO = 0;
+}
+
+//---------------------------------------------------------------------------
+// RTShader
+//---------------------------------------------------------------------------
+
+RTShader::RTShader()
+{
+	m_program = 0;
+	m_customUniformCount = 0;
+	for (int i = 0; i < 8; i++) m_standardLocs[i] = -1;
+}
+
+RTShader::~RTShader()
+{
+	Kill();
+}
+
+void RTShader::Kill()
+{
+	if (m_program)
+	{
+		if (g_sp.pActiveShader == this) SetActiveShader(NULL);
+		//no spDeleteProgram loaded yet; programs are cheap and apps hold few, but
+		//be tidy where we can
+		m_program = 0;
+	}
+	m_customUniformCount = 0;
+}
+
+bool RTShader::Load(const char *pVertexSource, const char *pFragmentSource)
+{
+	if (!SPInit()) return false;
+	Kill();
+
+	string fragSrc = pFragmentSource;
+#ifndef C_GL_MODE
+	//ES2 requires a default float precision in fragment shaders
+	if (fragSrc.find("precision") == string::npos)
+	{
+		fragSrc = "precision mediump float;\n" + fragSrc;
+	}
+#endif
+
+	GLuint vs = CompileShader(GL_VERTEX_SHADER, pVertexSource);
+	GLuint fs = CompileShader(GL_FRAGMENT_SHADER, fragSrc.c_str());
+	if (!vs || !fs) return false;
+
+	GLuint prog = spCreateProgram();
+	spAttachShader(prog, vs);
+	spAttachShader(prog, fs);
+	//same attribute contract as the built-in ubershader, so the engine's draw
+	//path needs no special cases
+	spBindAttribLocation(prog, SP_ARRAY_VERTEX, "a_pos");
+	spBindAttribLocation(prog, SP_ARRAY_TEXCOORD, "a_uv");
+	spBindAttribLocation(prog, SP_ARRAY_COLOR, "a_color");
+	spLinkProgram(prog);
+	spDeleteShader(vs);
+	spDeleteShader(fs);
+
+	GLint status = 0;
+	spGetProgramiv(prog, GL_LINK_STATUS, &status);
+	if (!status)
+	{
+		char log[2048];
+		spGetProgramInfoLog(prog, sizeof(log), NULL, log);
+		LogError("RTShader: link failed: %s", log);
+		return false;
+	}
+
+	m_program = prog;
+	m_standardLocs[SP_STDLOC_PROJ] = spGetUniformLocation(prog, "uProj");
+	m_standardLocs[SP_STDLOC_MV] = spGetUniformLocation(prog, "uMV");
+	m_standardLocs[SP_STDLOC_COLOR] = spGetUniformLocation(prog, "uColor");
+
+	GLint texLoc = spGetUniformLocation(prog, "uTex");
+	if (texLoc >= 0)
+	{
+		spUseProgram(prog);
+		spUniform1i(texLoc, 0);
+		spUseProgram(g_sp.boundProgram);
+	}
+	return true;
+}
+
+int RTShader::FindOrAddCustomUniform(const char *pName, int count)
+{
+	if (!m_program) return -1;
+	GLint loc = spGetUniformLocation(m_program, pName);
+	if (loc < 0)
+	{
+		LogError("RTShader: no uniform named %s", pName);
+		return -1;
+	}
+	for (int i = 0; i < m_customUniformCount; i++)
+	{
+		if (m_customUniforms[i].loc == loc) { m_customUniforms[i].count = count; return i; }
+	}
+	if (m_customUniformCount >= MAX_CUSTOM_UNIFORMS) { LogError("RTShader: too many custom uniforms"); return -1; }
+	m_customUniforms[m_customUniformCount].loc = loc;
+	m_customUniforms[m_customUniformCount].count = count;
+	return m_customUniformCount++;
+}
+
+void RTShader::SetUniform1f(const char *pName, float v)
+{
+	int i = FindOrAddCustomUniform(pName, 1);
+	if (i >= 0) m_customUniforms[i].v[0] = v;
+}
+
+void RTShader::SetUniform4f(const char *pName, float x, float y, float z, float w)
+{
+	int i = FindOrAddCustomUniform(pName, 4);
+	if (i < 0) return;
+	m_customUniforms[i].v[0] = x; m_customUniforms[i].v[1] = y;
+	m_customUniforms[i].v[2] = z; m_customUniforms[i].v[3] = w;
+}
+
+void RTShader::ApplyCustomUniforms()
+{
+	for (int i = 0; i < m_customUniformCount; i++)
+	{
+		if (m_customUniforms[i].count == 1) spUniform1f(m_customUniforms[i].loc, m_customUniforms[i].v[0]);
+		else spUniform4fv(m_customUniforms[i].loc, 1, m_customUniforms[i].v);
+	}
+}
+
+void SetActiveShader(RTShader *pShader)
+{
+	if (pShader && !pShader->IsLoaded())
+	{
+		LogError("SetActiveShader: shader isn't loaded, ignoring");
+		return;
+	}
+	g_sp.pActiveShader = pShader;
+}
+
+RTShader * GetActiveShader()
+{
+	return g_sp.pActiveShader;
 }
 
 #endif // RT_SHADER_PIPELINE_AVAILABLE

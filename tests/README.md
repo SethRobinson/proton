@@ -106,6 +106,11 @@ later run when:
 - engine ms/frame exceeds 2x baseline AND baseline+0.5ms AND 1.0ms absolute
   (the guards keep sub-millisecond cache noise from flaking).
 
+Scenario keys beyond the basics: `ShaderReady` (app may run under
+`-ShaderPipe`), `RequiresShaderPipe` (scenario only runs under `-ShaderPipe`
+or on html5, e.g. the RTBareBonesRTT render-to-texture demo), and
+`ExtraParms` (extra command line parms, passed via URL on html5).
+
 This is a tripwire for "everything got horribly slower" bugs, not a profiler.
 Notes: on Windows, `-autoscreenshot` disables vsync and bypasses the app's
 SetFPSLimit so throughput is real, but DWM still caps windowed wall fps near

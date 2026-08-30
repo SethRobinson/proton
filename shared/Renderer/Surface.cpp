@@ -57,10 +57,18 @@ Surface::~Surface()
 
 void Surface::Kill()
 {
+#ifdef RT_SHADER_PIPELINE_AVAILABLE
+	if (m_frameBuffer)
+	{
+		SP_DestroyFrameBuffer(m_frameBuffer);
+		m_frameBuffer = 0;
+	}
+#endif
+
 	if (m_glTextureID != NO_TEXTURE_LOADED)
 	{
 		glDeleteTextures( 1, &m_glTextureID );
-		
+
 #ifdef _DEBUG
 		//LogMsg("Killing texture %s", m_textureLoaded.c_str());
 #endif
@@ -68,6 +76,102 @@ void Surface::Kill()
 		GetBaseApp()->ModTexUsed(-m_memUsed);
 		m_memUsed = 0;
 	}
+}
+
+bool Surface::InitRenderTarget(int width, int height)
+{
+#ifdef RT_SHADER_PIPELINE_AVAILABLE
+	if (!g_bShaderPipelineActive)
+	{
+		LogError("InitRenderTarget: render targets require the shader pipeline (launch with -shaderpipeline, or an RT_SHADER_PIPELINE_ONLY build)");
+		return false;
+	}
+
+	HardKill();
+	assert(width && height);
+	m_textureCreationMethod = TEXTURE_CREATION_BLANK;
+
+	if (m_texWidth == 0)
+	{
+		SetupSignalsForUnloadingAndLoadingTextures();
+	}
+
+	//exact size on purpose: render targets skip the power-of-two padding,
+	//which is fine in GL2/ES2/WebGL1 with clamping and no mipmaps
+	m_originalWidth = width;
+	m_originalHeight = height;
+	m_texWidth = width;
+	m_texHeight = height;
+
+	PrepareGLForNewTexture();
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	CHECK_GL_ERROR();
+
+	m_bUsesAlpha = true;
+	m_mipMapCount = 1;
+	m_memUsed = width * height * 4;
+	GetBaseApp()->ModTexUsed(m_memUsed);
+
+	m_frameBuffer = SP_CreateFrameBuffer(m_glTextureID, width, height);
+	if (!m_frameBuffer)
+	{
+		Kill();
+		return false;
+	}
+	return true;
+#else
+	LogError("InitRenderTarget: this build lacks the shader pipeline (RT_SHADER_PIPELINE_AVAILABLE)");
+	return false;
+#endif
+}
+
+void Surface::BeginRenderTarget()
+{
+#ifdef RT_SHADER_PIPELINE_AVAILABLE
+	if (!m_frameBuffer)
+	{
+		LogError("BeginRenderTarget: not a render target, call InitRenderTarget first");
+		return;
+	}
+
+	g_globalBatcher.Flush(); //anything still batched belongs to the previous target
+
+	SP_BindFrameBuffer(m_frameBuffer, m_texWidth, m_texHeight);
+
+	//same y-down ortho as SetupOrtho: the texture is stored "upside down" in
+	//GL terms, but the engine's blit UV math already V-flips every texture, so
+	//the two flips cancel and the result displays correctly with no special
+	//cases (and winding/culling match normal ortho rendering too)
+	rtMatrixMode(GL_PROJECTION);
+	rtPushMatrix();
+	rtLoadIdentity();
+	rtOrthof(0, (float)m_texWidth, (float)m_texHeight, 0, -1, 1);
+	rtMatrixMode(GL_MODELVIEW);
+	rtPushMatrix();
+	rtLoadIdentity();
+#else
+	LogError("BeginRenderTarget: this build lacks the shader pipeline");
+#endif
+}
+
+void Surface::EndRenderTarget()
+{
+#ifdef RT_SHADER_PIPELINE_AVAILABLE
+	if (!m_frameBuffer) return;
+
+	g_globalBatcher.Flush();
+
+	rtMatrixMode(GL_PROJECTION);
+	rtPopMatrix();
+	rtMatrixMode(GL_MODELVIEW);
+	rtPopMatrix();
+
+	SP_UnbindFrameBuffer(); //also restores the viewport and cull face
+#endif
 }
 
 bool Surface::LoadBMPTexture(uint8 *pMem)

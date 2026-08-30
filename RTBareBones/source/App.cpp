@@ -365,6 +365,74 @@ void App::Update()
 	//game is thinking.  
 }
 
+#ifdef RT_SHADER_PIPELINE_AVAILABLE
+
+//Demo: render a little scene into an offscreen Surface each frame, then blit
+//it twice: once plain, once through a custom wavy channel-swapping shader.
+static Surface g_rttDemoSurf;
+static RTShader g_rttDemoShader;
+
+static void RenderRTTDemoIfRequested()
+{
+	static int demoRequested = -1;
+	if (demoRequested == -1)
+	{
+		demoRequested = 0;
+		vector<string> parms = GetBaseApp()->GetCommandLineParms();
+		for (unsigned int i = 0; i < parms.size(); i++)
+		{
+			if (ToLowerCaseString(parms[i]) == "-rttdemo") demoRequested = 1;
+		}
+	}
+	if (!demoRequested || !g_bShaderPipelineActive) return;
+
+	if (!g_rttDemoSurf.IsRenderTarget())
+	{
+		if (!g_rttDemoSurf.InitRenderTarget(256, 256)) { demoRequested = 0; return; }
+
+		const char *pVertSrc =
+			"attribute vec4 a_pos;\n"
+			"attribute vec2 a_uv;\n"
+			"uniform mat4 uProj;\n"
+			"uniform mat4 uMV;\n"
+			"varying vec2 v_uv;\n"
+			"void main() { gl_Position = uProj * uMV * vec4(a_pos.xyz, 1.0); v_uv = a_uv; }\n";
+
+		const char *pFragSrc =
+			"uniform sampler2D uTex;\n"
+			"uniform vec4 uColor;\n"
+			"uniform float uWave;\n"
+			"varying vec2 v_uv;\n"
+			"void main() {\n"
+			"	vec2 uv = v_uv;\n"
+			"	uv.x += sin(uv.y * 25.0 + uWave) * 0.03;\n"
+			"	vec4 c = texture2D(uTex, uv);\n"
+			"	gl_FragColor = vec4(c.b, c.g, c.r, c.a) * uColor;\n"
+			"}\n";
+
+		if (!g_rttDemoShader.Load(pVertSrc, pFragSrc)) { demoRequested = 0; return; }
+	}
+
+	//step 1: draw a mini scene into the offscreen surface
+	g_rttDemoSurf.BeginRenderTarget();
+	glClearColor(0.1f, 0.15f, 0.35f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	DrawFilledRect(16.0f, 16.0f, 224.0f, 224.0f, MAKE_RGBA(255, 200, 0, 255));
+	DrawFilledRect(48.0f, 48.0f, 160.0f, 160.0f, MAKE_RGBA(200, 30, 30, 255));
+	GetBaseApp()->GetFont(FONT_SMALL)->DrawScaled(30.0f, 100.0f, "Rendered to texture!", 1.0f);
+	g_rttDemoSurf.EndRenderTarget();
+	glClearColor(0, 0, 0, 1); //back to the engine default
+
+	//step 2: blit it twice, plain and through the custom shader
+	g_rttDemoSurf.Blit(GetScreenSizeXf() - 290, 30);
+	SetActiveShader(&g_rttDemoShader);
+	g_rttDemoShader.SetUniform1f("uWave", float(GetBaseApp()->GetGameTick()) * 0.01f); //tick-driven, so deterministic captures stay exact
+	g_rttDemoSurf.Blit(GetScreenSizeXf() - 290, 330);
+	SetActiveShader(NULL);
+}
+
+#endif // RT_SHADER_PIPELINE_AVAILABLE
+
 void App::Draw()
 {
 	//Use this to prepare for raw GL calls
@@ -415,7 +483,14 @@ void App::Draw()
 
 	//GetFont(FONT_SMALL)->Draw(0,0, "test");
 	GetFont(FONT_SMALL)->DrawScaled(0,GetScreenSizeYf()-50, "white `2Green `3Cyan `4Red `5Purp ",1+SinGamePulseByMS(3000)*0.7f);
-	
+
+#ifdef RT_SHADER_PIPELINE_AVAILABLE
+	//optional demo of render-to-texture + custom shaders; launch with
+	//"-shaderpipeline -rttdemo" (or just -rttdemo on RT_SHADER_PIPELINE_ONLY
+	//builds like html5).  See docs/renderer-migration.md in the proton repo.
+	RenderRTTDemoIfRequested();
+#endif
+
 	//the base handles actually drawing the GUI stuff over everything else, if applicable, which in this case it isn't.
 	BaseApp::Draw();
 }

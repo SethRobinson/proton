@@ -33,6 +33,21 @@ Apps = @(
         )
     }
     @{
+        # The render-to-texture + custom shader demo (shader pipeline only, see
+        # RenderRTTDemoIfRequested in RTBareBones App.cpp). Its golden captures
+        # the RTT surface blitted plain and through the wavy shader.
+        Name = 'RTBareBonesRTT'
+        Exe = 'RTBareBones\bin\RTBareBones_Debug GL_Win32.exe'
+        Html5Page = 'RTBareBones\html5\RTBareBones.html'
+        ShaderReady = $true
+        RequiresShaderPipe = $true
+        ExtraParms = '-rttdemo'
+        SettleMs = 6000
+        Steps = @(
+            @{ Action = 'capture'; Name = 'rttdemo' }
+        )
+    }
+    @{
         Name = 'RTSimpleApp'
         Exe = 'RTSimpleApp\bin\RTSimpleApp_Debug_GL.exe'
         Html5Page = 'RTSimpleApp\html5\RTSimpleApp.html'

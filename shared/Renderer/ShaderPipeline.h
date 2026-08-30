@@ -52,6 +52,69 @@ void SP_Lightfv(GLenum light, GLenum pname, const float *params);
 void SP_Hint(GLenum target, GLenum mode);
 void SP_ClipPlane(GLenum plane, const float *pEq4);
 
+//---------------------------------------------------------------------------
+// Render targets (FBOs).  Shader-pipeline only.  Usually used through
+// Surface::InitRenderTarget / BeginRenderTarget / EndRenderTarget.
+//---------------------------------------------------------------------------
+
+//creates an FBO around an existing texture; returns 0 on failure
+unsigned int SP_CreateFrameBuffer(unsigned int glTextureID, int width, int height);
+void SP_DestroyFrameBuffer(unsigned int frameBufferID);
+void SP_BindFrameBuffer(unsigned int frameBufferID, int width, int height); //saves previous binding+viewport, no nesting
+void SP_UnbindFrameBuffer(); //restores what SP_BindFrameBuffer saved
+
+//---------------------------------------------------------------------------
+// RTShader: a custom GLSL program for app use.  Shader-pipeline only.
+//
+// Contract: the engine binds attributes a_pos (vec4), a_uv (vec2), a_color
+// (vec4) and sets uniforms uProj, uMV (mat4), uColor (vec4) and uTex
+// (sampler2D, unit 0) if declared.  Write GLSL ES 1.00 style; on ES2 builds
+// "precision mediump float;" is prepended to the fragment shader if missing.
+// While a shader is active (SetActiveShader), every engine draw (Surface
+// blits, RenderBatcher, DrawFilledRect...) renders through it.
+//---------------------------------------------------------------------------
+
+class RTShader
+{
+public:
+	RTShader();
+	~RTShader();
+
+	bool Load(const char *pVertexSource, const char *pFragmentSource); //compiles+links now; needs GL context
+	void Kill();
+	bool IsLoaded() const { return m_program != 0; }
+
+	//set custom uniforms (applied on every draw while this shader is active)
+	void SetUniform1f(const char *pName, float v);
+	void SetUniform4f(const char *pName, float x, float y, float z, float w);
+
+	//internal use by the pipeline:
+	unsigned int GetProgram() const { return m_program; }
+	int GetStandardLoc(int which) const { return m_standardLocs[which]; }
+	void ApplyCustomUniforms();
+
+private:
+
+	unsigned int m_program;
+	int m_standardLocs[8];
+
+	struct CustomUniform
+	{
+		int loc;
+		int count; //1 or 4 floats
+		float v[4];
+	};
+	static const int MAX_CUSTOM_UNIFORMS = 16;
+	CustomUniform m_customUniforms[MAX_CUSTOM_UNIFORMS];
+	int m_customUniformCount;
+
+	int FindOrAddCustomUniform(const char *pName, int count);
+};
+
+//while set, all engine draws use this program instead of the built-in ubershader
+void SetActiveShader(RTShader *pShader); //NULL to return to normal rendering
+RTShader * GetActiveShader();
+
 #endif // RT_SHADER_PIPELINE_AVAILABLE
 
 #endif // ShaderPipeline_h__
