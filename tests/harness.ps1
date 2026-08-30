@@ -315,19 +315,24 @@ function Invoke-IosDeviceCapture([string]$appName, [int]$settleMs, [string]$bmpO
 # extra (see SharedActivity.onCreate), the app writes the BMP to its internal
 # files dir, and we pull it out with run-as (works for debuggable builds).
 
-function Invoke-AndroidCapture([string]$package, [string]$activity, [int]$settleMs, [string]$bmpOutPath)
+function Invoke-AndroidCapture([string]$package, [string]$activity, [int]$settleMs, [string]$bmpOutPath, [string]$extraParms = '')
 {
     $remoteBmp = "/data/data/$package/files/proton_harness.bmp"
     & adb shell am force-stop $package 2>$null | Out-Null
-    & adb shell run-as $package rm -f files/proton_harness.bmp 2>$null | Out-Null
-    & adb shell am start -n "$package/$activity" --es parms "'-autoscreenshot $remoteBmp $settleMs -autoquit'" | Out-Null
+    & adb shell run-as $package rm -f files/proton_harness.bmp files/proton_harness.bmp.perf.txt 2>$null | Out-Null
+    $parms = "-autoscreenshot $remoteBmp $settleMs -autoquit"
+    if ($extraParms) { $parms = "$extraParms $parms" }
+    & adb shell am start -n "$package/$activity" --es parms "'$parms'" | Out-Null
     $deadline = (Get-Date).AddMilliseconds($settleMs + 60000)
     $found = $false
     while ((Get-Date) -lt $deadline)
     {
         Start-Sleep -Seconds 1
-        $probe = & adb shell run-as $package ls files/proton_harness.bmp 2>$null
-        if ($probe -match 'proton_harness.bmp') { $found = $true; break }
+        #poll for the perf sidecar, which the engine writes AFTER the BMP is
+        #closed - polling the (large) BMP itself can catch it mid-write and
+        #pull a truncated file
+        $probe = & adb shell run-as $package ls files/proton_harness.bmp.perf.txt 2>$null
+        if ($probe -match 'perf.txt') { $found = $true; break }
     }
     & adb shell am force-stop $package 2>$null | Out-Null
     if (-not $found) { throw "app never wrote $remoteBmp (check adb logcat)" }
@@ -481,8 +486,10 @@ foreach ($entry in $scenarios.Apps)
         }
         elseif ($Target -eq 'android')
         {
-            $activity = if ($entry.ContainsKey('AndroidActivity')) { $entry.AndroidActivity } else { '.Main' }
-            Invoke-AndroidCapture $entry.AndroidPackage $activity $entry.SettleMs $bmpPath
+            #every Proton app shares the same java entry class regardless of its applicationId
+            $activity = if ($entry.ContainsKey('AndroidActivity')) { $entry.AndroidActivity } else { 'com.rtsoft.RTAndroidApp.Main' }
+            $extra = if ($entry.ContainsKey('ExtraParms')) { $entry.ExtraParms } else { '' }
+            Invoke-AndroidCapture $entry.AndroidPackage $activity $entry.SettleMs $bmpPath $extra
         }
         else
         {

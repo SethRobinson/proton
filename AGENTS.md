@@ -122,8 +122,8 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   headless Edge (pixel-exact, needs the app's html5 build_release.bat run
   first), `-Target ios` runs on the Mac's iOS simulator over ssh (use
   `-PrepareMac` after code changes; ~0.01% rasterization jitter), and
-  `-Target android` runs on an adb device/emulator (wired but unverified,
-  none was available). Parms reach the app via URL query (?parms=...) on
+  `-Target android` runs on an adb device/emulator (verified on a Lume Pad
+  Gen 2; install with gradlew installDebug first). Parms reach the app via URL query (?parms=...) on
   html5, launch args on iOS, and the "parms" intent extra on Android.
 - Android note: the gradle build's PrepareResources.bat overwrites the app's
   java copies from `shared/android/v3_src/`, so edit the v3_src templates,

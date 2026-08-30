@@ -122,8 +122,11 @@ and the existing compatibility/legacy contexts on Windows/Linux/macOS (GLSL
   ShaderPipeline.cpp with both defines. Verified against the goldens
   recorded under GLES1: simulator 0.012%, real M4 iPad 0.009% (both at
   the pre-existing jitter floor), with engine ms/frame on the iPad down
-  38% (0.612 -> 0.377). Still to do: Android as default (opt-in exists),
-  store-build flips (RTDink iOS etc. live in their own repos).
+  38% (0.612 -> 0.377). Android runtime-verified (Aug 2026): RTBareBones,
+  RTShader, and the RTShaderCube 3D scenario all render correctly on a Lume
+  Pad Gen 2 (Android 12) via the harness android target, ~0.01% variance at
+  2560x1600. Still to do: store-build flips (RTDink iOS/Android live in
+  their own repos).
 - **Phase 4 (delivered with Phase 2/3)**: the public APIs shipped in
   Milestone 5 (RTShader class, SetActiveShader, Surface render targets), and
   the **RTShader example app** (Aug 2026) is the reference for using them: a

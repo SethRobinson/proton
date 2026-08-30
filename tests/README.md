@@ -82,11 +82,16 @@ Per-target notes:
   signing: run `-PrepareMac -IosDevice -MacKeychainPassword <pw>` (the
   password lives in agents_secret.md, never in tracked files).
 - **android**: the app must be installed (debuggable) on the first adb
-  device/emulator; scenario key `AndroidPackage`. Parms are passed as the
-  "parms" intent extra (see SharedActivity.onCreate +
+  device/emulator (`gradlew installDebug`); scenario key `AndroidPackage` is
+  the applicationId (e.g. com.rtsoft.RTShader; the launch activity is always
+  com.rtsoft.RTAndroidApp.Main since every Proton app shares that java
+  class - `AndroidActivity` overrides it if ever needed). Parms are passed
+  as the "parms" intent extra (see SharedActivity.onCreate +
   nativeAddCommandLineParm), the BMP is written to the app's internal files
-  dir and pulled with `adb exec-out run-as`. NOTE: wired but not yet verified
-  end to end (no device/emulator was available when this was written).
+  dir and pulled with `adb exec-out run-as`; the harness polls for the perf
+  sidecar (written after the BMP is closed) so it never pulls a half-written
+  capture. Verified end to end Aug 2026 on a Lume Pad Gen 2 (Android 12),
+  ES2 shader pipeline, ~0.01% run-to-run variance.
 
 ## Things to know
 
