@@ -29,9 +29,9 @@ Deprecated platforms no longer actively supported:  Flash, BBX, WebOS
 
 ### 8/30/2026 Note - the renderer got modernized
 
-Proton SDK has been GL 1.x/GLES1 until now because when I wrote it (2009?), that was what was needed to be compatible with everything... but today that changes!
+Proton SDK has been GL 1.x/GLES1 until now because when I wrote it (2009?) and have been too lazy to ever update it, but today that changes!
 
-See, I need a fancy shader for something and I want to use this Proton SDK, so it's been modified to support a GLES2-class render pipeline alongside the old fixed-function GL 1.x/GLES1 path.
+See, I need a fancy shader for something and I want to use Proton SDK, so it's been modified to support a GLES2-class render pipeline alongside the old fixed-function GL 1.x/GLES1 path.
 
 The important part: **existing app code needs no changes**, a compatibility shim remaps the fixed-function gl* calls apps make onto the new pipeline, and the regression suite verifies both paths render pixel-identical. 
 
