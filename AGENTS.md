@@ -84,6 +84,20 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   `GetSystemTimeTick()` for anything that must survive a roll-over or a backgrounded
   browser tab.
 
+## Renderer regression tests (tests/)
+
+- `tests/harness.ps1` captures golden screenshots of the example apps and
+  diffs them after renderer changes; read `tests/README.md` before touching
+  renderer code. Run `.\harness.ps1 -Mode test` from `tests/` after any change
+  that could affect rendering.
+- Any Proton app supports `-autoscreenshot <file.bmp> <delayMS>` (+`-autoquit`)
+  to write its framebuffer to a BMP at a fixed app-clock time and exit; the
+  code is `BaseApp::ProcessAutoScreenshot()`. On Windows the parm implies
+  run-in-background so it works without focus. Paths must not contain spaces.
+- Goldens are GPU/driver specific and NOT tracked in git (tests/goldens/ is
+  ignored); record a fresh set with `-Mode golden` on the current renderer
+  before starting renderer work on any machine.
+
 ## Automated GUI testing on Windows
 
 - The Win32 demo apps can be driven programmatically without touching the real

@@ -1899,6 +1899,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLin
 		for (unsigned int i = 0; i < parms.size(); i++)
 		{
 			GetBaseApp()->AddCommandLineParm(parms[i]);
+
+			//the render regression harness (tests/ in the repo root) launches apps
+			//without giving them focus, so -autoscreenshot implies the app must
+			//keep updating while in the background or the screenshot never fires
+			if (ToLowerCaseString(parms[i]) == "-autoscreenshot")
+			{
+				g_bAppCanRunInBackground = true;
+			}
 		}
 	}
 

@@ -19,6 +19,7 @@
 !/RTPack/
 !/RTSimpleApp/
 !/shared/
+!/tests/
 
 # Must never be committed (see AGENTS.md), kept explicit even though the
 # top-level whitelist already excludes it
@@ -82,6 +83,11 @@ RTLooneyLadders/bin/
 RTLooneyLadders/windows/x64
 RTLooneyLadders/windows/save.dat
 RTLooneyLadders/windows/log.txt
+
+# tests (goldens and captures are GPU/driver specific, so per-machine and
+# untracked; only the harness scripts are in the repo)
+tests/output/
+tests/goldens/
 
 # shared (third-party libs and local-only bits)
 shared/win/opencv

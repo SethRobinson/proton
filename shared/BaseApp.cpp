@@ -1,6 +1,7 @@
 #include "PlatformPrecomp.h"
 #include "BaseApp.h"
 #include "Renderer/RTGLESExt.h"
+#include "Renderer/SoftSurface.h"
 
 #ifdef PLATFORM_OSX
 #include "OSX/OSXUtils.h"
@@ -40,6 +41,9 @@ BaseApp::BaseApp()
 		m_bIsInBackground = false;
 		SetInputMode(INPUT_MODE_NORMAL);
 		m_version = "No default Version"; // this is over written by network messages that come from IOS and Android. For other platforms (like windows), it will remain this.
+		m_autoScreenshotParmsChecked = false;
+		m_autoScreenshotAtMS = 0;
+		m_autoScreenshotQuit = false;
 		
 		m_touchTracker.resize(C_MAX_TOUCHES_AT_ONCE);
 		ClearError();
@@ -163,6 +167,54 @@ void DrawConsole()
 	//not implemented
 }
 
+//Automation helper for the screenshot-based render regression tests (see tests/ in
+//the repo root).  Launch any Proton app with "-autoscreenshot <file.bmp> <delayMS>"
+//and it will write a BMP of its framebuffer once its app timer passes delayMS (app
+//time rather than wall clock, so animations line up between runs).  Add "-autoquit"
+//to have the app close itself right after.  Completely inert without the parms.
+void BaseApp::ProcessAutoScreenshot()
+{
+	if (!m_autoScreenshotParmsChecked)
+	{
+		m_autoScreenshotParmsChecked = true;
+
+		for (unsigned int i = 0; i < m_commandLineParms.size(); i++)
+		{
+			string parm = ToLowerCaseString(m_commandLineParms[i]);
+			if (parm == "-autoscreenshot" && i + 2 < m_commandLineParms.size())
+			{
+				m_autoScreenshotFile = m_commandLineParms[i + 1];
+				m_autoScreenshotAtMS = atoi(m_commandLineParms[i + 2].c_str());
+			}
+			if (parm == "-autoquit")
+			{
+				m_autoScreenshotQuit = true;
+			}
+		}
+	}
+
+	if (m_autoScreenshotFile.empty() || m_gameTimer.GetTick() < m_autoScreenshotAtMS) return;
+
+#ifndef _CONSOLE
+	//SoftSurface::BlitFromScreenFixed doesn't exist in console builds
+	SoftSurface s;
+	if (s.Init(GetScreenSizeX(), GetScreenSizeY(), SoftSurface::SURFACE_RGBA))
+	{
+		s.BlitFromScreenFixed(0, 0, 0, 0, GetScreenSizeX(), GetScreenSizeY());
+		s.WriteBMPOut(m_autoScreenshotFile);
+		LogMsg("Wrote autoscreenshot to %s at tick %u", m_autoScreenshotFile.c_str(), m_gameTimer.GetTick());
+	}
+#endif
+	m_autoScreenshotFile.clear(); //only fire once
+
+	if (m_autoScreenshotQuit)
+	{
+		OSMessage o;
+		o.m_type = OSMessage::MESSAGE_FINISH_APP;
+		AddOSMessage(o);
+	}
+}
+
 void BaseApp::Draw()
 {
 
@@ -248,6 +300,7 @@ void BaseApp::Draw()
 		}
 	}
 
+	ProcessAutoScreenshot(); //inert unless the -autoscreenshot command line parm was used
 }
 
 #ifdef RT_RUN_STATIC_UPDATE

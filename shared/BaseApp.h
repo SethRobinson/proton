@@ -404,7 +404,9 @@ public:
     
     string GetAppVersion();
 protected:
-    
+
+    void ProcessAutoScreenshot(); //handles the -autoscreenshot/-autoquit command line parms, called from Draw()
+
     bool m_bConsoleVisible;
     bool m_bFPSVisible;
     bool m_bInitted;
@@ -427,6 +429,12 @@ protected:
     vector<TouchTrackInfo> m_touchTracker;
     string m_version;
     bool m_bDisableSubPixelBlits;
+
+    //-autoscreenshot state, see ProcessAutoScreenshot()
+    bool m_autoScreenshotParmsChecked;
+    string m_autoScreenshotFile;
+    unsigned int m_autoScreenshotAtMS;
+    bool m_autoScreenshotQuit;
 };
 
 BaseApp * GetBaseApp(); //supply this yourself.  You create it on the first call if needed.
