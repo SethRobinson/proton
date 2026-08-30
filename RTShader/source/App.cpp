@@ -376,7 +376,10 @@ void App::DrawSceneIntoTexture()
 	m_logoSurf.BlitScaled(w * 0.5f, h * 0.55f, CL_Vec2f(0.6f, 0.6f), ALIGNMENT_CENTER,
 		MAKE_RGBA(255, 255, 255, 255), animTime * 90.0f);
 
-	GetFont(FONT_SMALL)->DrawScaled(20.0f, 20.0f, "This scene was rendered to a texture!", 1.0f);
+	//scale with the screen like the status bar, and sit below the engine's
+	//FPS overlay (which also grows on high-res screens) instead of under it
+	float capScale = rt_max(1.0f, rt_min(w, h) / 768.0f);
+	GetFont(FONT_SMALL)->DrawScaled(20.0f * capScale, 70.0f * capScale, "This scene was rendered to a texture!", capScale);
 
 	m_sceneSurf.EndRenderTarget();
 

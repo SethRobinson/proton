@@ -349,6 +349,16 @@ static float GetDebugOverlayY()
 #endif
 }
 
+//the 0.7 text scale was tuned for ~768-tall desktop windows; on high-res
+//screens (tablets especially) that's unreadably small, so grow it with the
+//smaller screen dimension
+static float GetDebugOverlayTextScale()
+{
+	float s = rt_min(GetScreenSizeXf(), GetScreenSizeYf()) / 768.0f;
+	if (s < 1.0f) s = 1.0f;
+	return 0.7f * s;
+}
+
 void BaseApp::Draw()
 {
 
@@ -391,7 +401,7 @@ void BaseApp::Draw()
 
 		if (GetFont(FONT_SMALL)->IsLoaded())
 		{
-			GetFont(FONT_SMALL)->DrawScaled(GetDebugOverlayX(), GetDebugOverlayY(), stTemp, 0.7f);
+			GetFont(FONT_SMALL)->DrawScaled(GetDebugOverlayX(), GetDebugOverlayY(), stTemp, GetDebugOverlayTextScale());
 		}
 	}
 
@@ -404,11 +414,11 @@ void BaseApp::Draw()
 	switch (GetLastError())
 	{
 	case ERROR_MEM:
-		GetFont(FONT_SMALL)->DrawScaled(GetDebugOverlayX(), GetDebugOverlayY()+12, "LOW MEM!", 0.7f);
+		GetFont(FONT_SMALL)->DrawScaled(GetDebugOverlayX(), GetDebugOverlayY() + 17.0f * GetDebugOverlayTextScale(), "LOW MEM!", GetDebugOverlayTextScale());
 		break;
 
 	case ERROR_SPACE:
-		GetFont(FONT_SMALL)->DrawScaled(GetDebugOverlayX(), GetDebugOverlayY()+12, "LOW STORAGE SPACE!", 0.7f);
+		GetFont(FONT_SMALL)->DrawScaled(GetDebugOverlayX(), GetDebugOverlayY() + 17.0f * GetDebugOverlayTextScale(), "LOW STORAGE SPACE!", GetDebugOverlayTextScale());
 		break;
             
         case ERROR_NONE:
