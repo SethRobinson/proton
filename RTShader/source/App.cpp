@@ -143,7 +143,56 @@ static const char *g_fragScanlines =
 	"	gl_FragColor = vec4(outColor, c.a) * uColor;\n"
 	"}\n";
 
-static const char *g_effectNames[EFFECT_COUNT] = { "No shader", "Wavy", "Grayscale", "Color cycle", "Scanlines", "3D cube" };
+//effects 5 and 6 draw the IDENTICAL cube two ways, to show what "fixed
+//function" vs "shader" actually means:
+//
+//  FIXED FUNCTION (effect 5): you write no GPU code at all.  You set state
+//  and feed geometry (glRotatef, glVertexPointer, glDrawArrays) and the
+//  GPU's BUILT-IN math turns it into pixels - one fixed menu of transform +
+//  texture + light equations.  That's all GL 1.x/GLES1 offered, and it's
+//  how every Proton app was written until 2026.  (On the shader pipeline
+//  the compatibility shim quietly runs it through an internal shader that
+//  reproduces that built-in math exactly.)
+//
+//  CUSTOM SHADER (effect 6): you write the two little programs the GPU runs
+//  yourself - one per vertex, one per pixel - so the math can be ANYTHING.
+//  Below, the vertex shader bends the cube like jelly and the fragment
+//  shader mixes rainbow bands into the texture: things the fixed-function
+//  menu simply doesn't have on it.
+
+static const char *g_cubeVertexShader =
+	"attribute vec4 a_pos;\n"
+	"attribute vec2 a_uv;\n"
+	"uniform mat4 uProj;\n"
+	"uniform mat4 uMV;\n"
+	"uniform float uTime;\n"
+	"varying vec2 v_uv;\n"
+	"varying vec3 v_localPos;\n"
+	"void main()\n"
+	"{\n"
+	"	vec3 pos = a_pos.xyz;\n"
+	"	//push each vertex in and out along its direction from the cube's\n"
+	"	//center - impossible in fixed function, trivial in a vertex shader\n"
+	"	pos += normalize(pos) * sin(uTime * 4.0 + (pos.x + pos.y + pos.z) * 6.0) * 0.12;\n"
+	"	gl_Position = uProj * uMV * vec4(pos, 1.0);\n"
+	"	v_uv = a_uv;\n"
+	"	v_localPos = a_pos.xyz;\n"
+	"}\n";
+
+static const char *g_cubeFragmentShader =
+	"uniform sampler2D uTex;\n"
+	"uniform vec4 uColor;\n"
+	"uniform float uTime;\n"
+	"varying vec2 v_uv;\n"
+	"varying vec3 v_localPos;\n"
+	"void main()\n"
+	"{\n"
+	"	vec4 c = texture2D(uTex, v_uv);\n"
+	"	vec3 rainbow = 0.5 + 0.5 * cos(uTime * 2.0 + v_localPos * 8.0 + vec3(0.0, 2.1, 4.2));\n"
+	"	gl_FragColor = vec4(mix(c.rgb, rainbow, 0.55), 1.0) * uColor;\n"
+	"}\n";
+
+static const char *g_effectNames[EFFECT_COUNT] = { "No shader", "Wavy", "Grayscale", "Color cycle", "Scanlines", "3D cube (fixed function)", "3D cube (custom shader)" };
 
 //---------------------------------------------------------------------------
 
@@ -262,6 +311,8 @@ bool App::InitEffectsIfNeeded()
 	if (!m_effect[2].Load(g_vertexShader, g_fragGrayscale)) return false;
 	if (!m_effect[3].Load(g_vertexShader, g_fragColorCycle)) return false;
 	if (!m_effect[4].Load(g_vertexShader, g_fragScanlines)) return false;
+	//[5] stays unloaded too (the fixed-function cube); [6] is the jelly cube
+	if (!m_effect[6].Load(g_cubeVertexShader, g_cubeFragmentShader)) return false;
 
 	//uniforms can be set any time; they're applied whenever the shader is active
 	m_effect[4].SetUniform4f("uEdgeColor", 0.1f, 0.05f, 0.3f, 1.5f); //vignette tint (a is strength)
@@ -308,11 +359,14 @@ void App::DrawSceneIntoTexture()
 	glClearColor(0, 0, 0, 1); //back to the engine default
 }
 
-//effect 5: a spinning textured 3D cube, written exactly like fixed-function
-//GL code has always looked in Proton apps: matrix stack, client-side vertex
-//arrays, glDrawArrays.  The compatibility shim routes these gl* calls onto
-//the shader pipeline, so the identical code runs on GLES1 and on shaders.
-void App::DrawSpinningCube()
+//effects 5 and 6: a spinning textured 3D cube, written exactly like
+//fixed-function GL code has always looked in Proton apps: matrix stack,
+//client-side vertex arrays, glDrawArrays.  The compatibility shim routes
+//these gl* calls onto the shader pipeline, so the identical code runs on
+//GLES1 and on shaders.  With bUseCustomShader the SAME geometry and draw
+//call render through the custom jelly-cube shader instead - the only
+//difference is SetActiveShader, which is the entire point of the demo.
+void App::DrawSpinningCube(bool bUseCustomShader)
 {
 	//leave 2D ortho mode: this restores the engine's perspective projection
 	//and turns depth testing back on
@@ -363,9 +417,19 @@ void App::DrawSpinningCube()
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
+	if (bUseCustomShader)
+	{
+		//custom shaders work in 3D too: uProj/uMV are fed from the same
+		//matrix stacks the fixed-function-style calls above just set up
+		SetActiveShader(&m_effect[6]);
+		m_effect[6].SetUniform1f("uTime", float(GetGameTick() % 6283) / 1000.0f);
+	}
+
 	glDisable(GL_BLEND); //opaque cube: no draw-order sorting worries
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glEnable(GL_BLEND);
+
+	if (bUseCustomShader) SetActiveShader(NULL);
 
 	glPopMatrix();
 	CHECK_GL_ERROR();
@@ -419,8 +483,8 @@ void App::Draw()
 	//step 2: ...and the texture goes to the screen, through the current
 	//effect.  While a shader is active every engine draw uses it, so the
 	//Blit below (and anything else we drew before deactivating) is filtered.
-	RTShader *pEffect = NULL;
-	if (m_curEffect != 0 && m_effect[m_curEffect].IsLoaded()) pEffect = &m_effect[m_curEffect];
+	RTShader *pEffect = NULL; //effects 1-4 are full-screen post-processes; 0 and the cube modes blit the scene plain
+	if (m_curEffect >= 1 && m_curEffect <= 4 && m_effect[m_curEffect].IsLoaded()) pEffect = &m_effect[m_curEffect];
 
 	if (pEffect)
 	{
@@ -440,11 +504,12 @@ void App::Draw()
 
 	SetActiveShader(NULL); //back to normal rendering for everything below
 
-	//the last "effect" isn't a shader at all: it shows classic 3D running on
-	//the same pipeline
-	if (m_curEffect == 5)
+	//the last two "effects" show 3D: the same cube drawn fixed-function
+	//style (5) and through a custom vertex+fragment shader (6) - flip
+	//between them to see what the difference actually means
+	if (m_curEffect >= 5)
 	{
-		DrawSpinningCube();
+		DrawSpinningCube(m_curEffect == 6);
 	}
 
 	char msg[128];

@@ -10,9 +10,12 @@ The smallest possible demonstration of Proton's shader pipeline features:
    full-screen post-processing effect in a few lines of shader code.
 
 Click, tap, or press space to cycle the effects: no shader, wavy, grayscale,
-color cycle, scanlines+vignette, and a spinning textured 3D cube (that last
-one is not a shader at all: it's classic fixed-function-style GL running on
-the shader pipeline through the compatibility shim). The whole tour is in
+color cycle, scanlines+vignette, and the same spinning textured 3D cube drawn
+two ways: fixed-function style (no GPU code at all, classic gl* calls running
+on the shader pipeline through the compatibility shim) and through a custom
+vertex+fragment shader that bends it like jelly and rainbow-tints it. Flip
+between those last two to see what "fixed function" vs "shader" actually
+means. The whole tour is in
 [source/App.cpp](source/App.cpp), written to be read top to bottom; the
 engine's shader contract (which attributes and uniforms are bound for you) is
 documented in the comment block at the top and in

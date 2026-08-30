@@ -81,6 +81,22 @@ Apps = @(
         )
     }
     @{
+        # The same cube through a custom vertex+fragment shader (the "jelly
+        # cube"): guards custom shaders driving 3D geometry, vertex
+        # displacement included.
+        Name = 'RTShaderCube2'
+        Exe = 'RTShader\bin\RTShader_Debug GL_Win32.exe'
+        Html5Page = 'RTShader\html5\RTShader.html'
+        AndroidPackage = 'com.rtsoft.RTShader'
+        ShaderReady = $true
+        RequiresShaderPipe = $true
+        ExtraParms = '-effect 6'
+        SettleMs = 6000
+        Steps = @(
+            @{ Action = 'capture'; Name = 'jellycube' }
+        )
+    }
+    @{
         Name = 'RTSimpleApp'
         Exe = 'RTSimpleApp\bin\RTSimpleApp_Debug_GL.exe'
         Html5Page = 'RTSimpleApp\html5\RTSimpleApp.html'

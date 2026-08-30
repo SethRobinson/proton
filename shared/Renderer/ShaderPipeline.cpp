@@ -20,8 +20,18 @@
 
 //the shader pipeline is the default wherever it's compiled in; the
 //-fixedpipeline launch parm switches back to fixed function for comparison
-//(except in RT_SHADER_PIPELINE_ONLY builds, which have no legacy path)
+//(except in RT_SHADER_PIPELINE_ONLY builds, which have no legacy path).
+//A project that REALLY wants to default to the legacy path can define
+//PROTON_USE_FIXED_PIPELINE project-wide (-shaderpipeline still opts in at
+//runtime).
+#if defined(PROTON_USE_FIXED_PIPELINE) && defined(RT_SHADER_PIPELINE_ONLY)
+	#error PROTON_USE_FIXED_PIPELINE makes no sense in an RT_SHADER_PIPELINE_ONLY build - there is no fixed-function path compiled in
+#endif
+#ifdef PROTON_USE_FIXED_PIPELINE
+bool g_bShaderPipelineActive = false;
+#else
 bool g_bShaderPipelineActive = true;
+#endif
 
 //---------------------------------------------------------------------------
 // GL2 entry points + constants.  The vendored desktop gl.h is 1.1-only, so
