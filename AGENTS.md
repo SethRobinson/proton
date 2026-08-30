@@ -95,6 +95,12 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   Mac RTBareBones, Linux via Proton.cmake); launch with `-fixedpipeline` to
   get the legacy fixed-function path for comparison.
 
+## Conventions for new app projects
+
+- Name the Windows project folder `windows_vs` (no Visual Studio year).
+  The `windows_vs2017` folders in older apps predate this; RTShader is the
+  pattern to copy for new projects.
+
 ## Renderer regression tests (tests/)
 
 - Test-app policy (per Seth, Aug 2026): only use apps tracked in the proton

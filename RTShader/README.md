@@ -25,7 +25,7 @@ Platform projects included (all cloned from RTBareBones):
 
 | Platform | Where | Notes |
 |----------|-------|-------|
-| Windows | `windows_vs2017/RTShader.sln` | shader pipeline is the default; `-fixedpipeline` shows the fallback message |
+| Windows | `windows_vs/RTShader.sln` | shader pipeline is the default; `-fixedpipeline` shows the fallback message |
 | Mac | `OSX/RTShader.xcodeproj` | desktop GL 2.1 |
 | iOS | `RTShader.xcodeproj` | pure GLES2 build (`RT_SHADER_PIPELINE_ONLY`) |
 | Android | `AndroidGradle/` | GLES2 context via `SharedActivity.useGLES2` |

@@ -50,6 +50,8 @@ xcuserdata
 **/bin/log.txt
 **/bin/*.exe
 */windows_vs2017/x64
+*/windows_vs/x64
+*/windows_vs/Win32
 */html5/WebLoaderData
 */html5/temp*
 */html5/*.wasm
