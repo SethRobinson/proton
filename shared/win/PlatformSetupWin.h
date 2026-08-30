@@ -23,14 +23,7 @@
 #include "Renderer/GL/gl.h"
 
 //help with compatibility so I can use the GL ES calls with normal GL
-
-#define glTexParameterx glTexParameteri
-#define glFrustumf glFrustum
-#define glOrthof glOrtho
-#define glColor4x(r,g,b,a) glColor4f( (float(r)/65536.0f),  (float(g)/65536.0f) , (float(b)/65536.0f), (float(a)/65536.0f));
-#define glActiveTexture glActiveTextureARB
-#define glClientActiveTexture glClientActiveTextureARB
-
+#include "Renderer/GLCompatDesktop.h"
 
 #ifdef _IRR_STATIC_LIB_
 #include <Irrlicht/source/Irrlicht/glext.h>
@@ -68,8 +61,7 @@
 	#include "Irrlicht/source/Irrlicht/gles-ext.h"
 #endif
 
-typedef GLfloat GLdouble;
-#define glClipPlane glClipPlanef
+#include "Renderer/GLCompatGLES.h"
 #endif
 
 #else
@@ -79,13 +71,7 @@ typedef GLfloat GLdouble;
 #include "Renderer/GL/gl.h"
 
 	//help with compatibility so I can use the GL ES calls with normal GL
-
-	#define glTexParameterx glTexParameteri
-	#define glFrustumf glFrustum
-	#define glOrthof glOrtho
-	#define glColor4x(r,g,b,a) glColor4f( (float(r)/65536.0f),  (float(g)/65536.0f) , (float(b)/65536.0f), (float(a)/65536.0f));
-	#define glActiveTexture glActiveTextureARB
-	#define glClientActiveTexture glClientActiveTextureARB
+	#include "Renderer/GLCompatDesktop.h"
 
 #endif
 

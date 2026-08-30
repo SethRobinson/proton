@@ -19,8 +19,7 @@
 #include <Irrlicht/source/Irrlicht/gles-ext.h>
 #endif
 
-typedef GLfloat GLdouble;
-#define glClipPlane glClipPlanef
+#include "Renderer/GLCompatGLES.h"
 
 #ifndef M_PI
 #define M_PI 3.141592f

@@ -92,8 +92,7 @@ typedef intptr_t CSSM_INTPTR;
 //#include <OpenGLES/eagl.h>
 #include <OpenGLES/ES1/glext.h>
 
-typedef GLfloat GLdouble;
-#define glClipPlane glClipPlanef
+#include "Renderer/GLCompatGLES.h"
 
 #define stricmp strcasecmp
 
