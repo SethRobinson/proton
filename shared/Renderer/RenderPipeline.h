@@ -33,7 +33,13 @@
 //Everything else compiles these as pure fixed-function passthroughs.
 #ifdef RT_SHADER_PIPELINE_AVAILABLE
 	#include "Renderer/ShaderPipeline.h"
-	#define RT_PIPE(spCall, glCall) { if (g_bShaderPipelineActive) { spCall; } else { glCall; } }
+	#ifdef RT_SHADER_PIPELINE_ONLY
+		//pure-GLES2 builds (WebGL): the legacy fixed-function functions don't
+		//even exist in the headers, so the glCall tokens are discarded here
+		#define RT_PIPE(spCall, glCall) { spCall; }
+	#else
+		#define RT_PIPE(spCall, glCall) { if (g_bShaderPipelineActive) { spCall; } else { glCall; } }
+	#endif
 #else
 	#define RT_PIPE(spCall, glCall) { glCall; }
 #endif

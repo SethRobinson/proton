@@ -56,7 +56,7 @@ set SRC= %SHARED%\html5\HTML5Main.cpp %SHARED%\html5\HTML5Utils.cpp %SHARED%\Pla
 %SHARED%\Audio\AudioManager.cpp %CLANMATH%\angle.cpp %CLANMATH%\mat3.cpp %CLANMATH%\mat4.cpp %CLANMATH%\rect.cpp %CLANMATH%\vec2.cpp %CLANMATH%\vec3.cpp ^
 %CLANMATH%\vec4.cpp %SHARED%\Entity\Entity.cpp %SHARED%\Entity\Component.cpp %SHARED%\GUI\RTFont.cpp %SHARED%\Manager\Console.cpp %SHARED%\FileSystem\FileManager.cpp ^
 %SHARED%\Manager\GameTimer.cpp %SHARED%\Manager\MessageManager.cpp %SHARED%\Manager\ResourceManager.cpp %SHARED%\Manager\VariantDB.cpp %SHARED%\Math\rtPlane.cpp ^
-%SHARED%\Math\rtRect.cpp %SHARED%\Renderer\RenderBatcher.cpp %SHARED%\Renderer\SoftSurface.cpp %SHARED%\Renderer\Surface.cpp %SHARED%\Renderer\SurfaceAnim.cpp ^
+%SHARED%\Math\rtRect.cpp %SHARED%\Renderer\RenderBatcher.cpp %SHARED%\Renderer\ShaderPipeline.cpp %SHARED%\Renderer\SoftSurface.cpp %SHARED%\Renderer\Surface.cpp %SHARED%\Renderer\SurfaceAnim.cpp ^
 %SHARED%\util\CRandom.cpp %SHARED%\util\GLESUtils.cpp %SHARED%\util\MathUtils.cpp %SHARED%\util\MiscUtils.cpp %SHARED%\util\RenderUtils.cpp %SHARED%\util\ResourceUtils.cpp ^
 %SHARED%\util\Variant.cpp %SHARED%\FileSystem\StreamingInstance.cpp %SHARED%\FileSystem\StreamingInstanceZip.cpp ^
 %SHARED%\FileSystem\StreamingInstanceFile.cpp %SHARED%\BaseApp.cpp %SHARED%\util\unzip\unzip.c %SHARED%\util\unzip\ioapi.c
@@ -78,7 +78,10 @@ REM **************************************** END SOURCE
 :To skip font loading so it needs no resource files or zlib, add  -DC_NO_ZLIB
 :-Wno-c++11-compat-deprecated-writable-strings -Wno-shift-negative-value
 
-SET CUSTOM_FLAGS=-DHAS_SOCKLEN_T -DBOOST_ALL_NO_LIB -DPLATFORM_HTML5 -DRT_USE_SDL_AUDIO -DC_GL_MODE -s LEGACY_GL_EMULATION=1 -sUSE_SDL=1 -s TOTAL_MEMORY=16MB -Wno-deprecated-builtins -Wno-c++11-compat-deprecated-writable-strings ^
+:The shader pipeline build: pure GLES2/WebGL1, no more emscripten LEGACY_GL_EMULATION.
+:FULL_ES2 provides client-side vertex array emulation (a streaming VBO in the engine
+:could replace it later as an optimization).
+SET CUSTOM_FLAGS=-DHAS_SOCKLEN_T -DBOOST_ALL_NO_LIB -DPLATFORM_HTML5 -DRT_USE_SDL_AUDIO -DRT_SHADER_PIPELINE_AVAILABLE -DRT_SHADER_PIPELINE_ONLY -s FULL_ES2=1 -sUSE_SDL=1 -s TOTAL_MEMORY=16MB -Wno-deprecated-builtins -Wno-c++11-compat-deprecated-writable-strings ^
 -Wno-shift-negative-value -Wno-deprecated-non-prototype -s ALLOW_MEMORY_GROWTH=1
 
 SET SECOND_CUSTOM_FLAGS=-

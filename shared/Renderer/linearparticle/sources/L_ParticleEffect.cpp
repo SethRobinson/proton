@@ -30,7 +30,9 @@
 #include "L_ParticleEffect.h"
 #include "L_ParticleMem.h"
 
-#if !defined(C_GL_MODE) &&  !defined( ANDROID_NDK) && !defined( PLATFORM_BBX) && !defined( RT_WEBOS) && !defined( RT_GLES_ADAPTOR_MODE) && !defined( PLATFORM_PSP2)
+//RT_SHADER_PIPELINE_ONLY excluded too: the OES point sprite extension is GLES1
+//only; on the shader pipeline particles render through the batcher path instead
+#if !defined(C_GL_MODE) &&  !defined( ANDROID_NDK) && !defined( PLATFORM_BBX) && !defined( RT_WEBOS) && !defined( RT_GLES_ADAPTOR_MODE) && !defined( PLATFORM_PSP2) && !defined(RT_SHADER_PIPELINE_ONLY)
 	#define RT_USE_POINT_SPRITES
 #endif
 

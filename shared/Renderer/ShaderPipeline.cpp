@@ -17,7 +17,11 @@
 #include "ShaderPipeline.h"
 #include "util/MathUtils.h" //for CL_Mat4f (used for the clip plane inverse only)
 
+#ifdef RT_SHADER_PIPELINE_ONLY
+bool g_bShaderPipelineActive = true; //pure-GLES2 build: there is no legacy path to fall back to
+#else
 bool g_bShaderPipelineActive = false;
+#endif
 
 //---------------------------------------------------------------------------
 // GL2 entry points + constants.  The vendored desktop gl.h is 1.1-only, so on
@@ -274,6 +278,9 @@ static const char *GetVertexShaderSource(int variant)
 	s += "void main() {\n"
 		"	vec4 eyePos = uMV * vec4(a_pos.xyz, 1.0);\n"
 		"	gl_Position = uProj * eyePos;\n";
+#ifndef C_GL_MODE
+	s += "	gl_PointSize = 1.0;\n"; //ES2 points render size 0 without this; desktop uses glPointSize state instead
+#endif
 	if (variant & SP_VARIANT_TEXTURE) s += "	v_uv = a_uv;\n";
 	s += (variant & SP_VARIANT_VCOLOR) ? "	vec4 baseColor = a_color;\n" : "	vec4 baseColor = uColor;\n";
 	if (variant & SP_VARIANT_LIGHT)

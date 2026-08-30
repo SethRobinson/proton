@@ -49,7 +49,7 @@ void L_ParticleMem::init(int size)
 
 	//buffer for fast point sprites
 	//how many can we batch at once?
-#ifndef C_GL_MODE
+#if !defined(C_GL_MODE) && !defined(RT_SHADER_PIPELINE_ONLY)
 	pointSpriteArraySize = 500;
 	pointSpriteArray.resize(pointSpriteArraySize);
 	glGenBuffers(1, &pointSpriteBufferID);

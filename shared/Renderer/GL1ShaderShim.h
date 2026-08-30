@@ -67,17 +67,17 @@ inline void rtShim_glClipPlane(GLenum plane, const void *pEq)
 //no Proton app uses the scalar light params).
 inline void rtShim_glLightf(GLenum light, GLenum pname, float param)
 {
-#ifdef RT_SHADER_PIPELINE_AVAILABLE
+#ifndef RT_SHADER_PIPELINE_ONLY
 	if (g_bShaderPipelineActive) return;
-#endif
 	glLightf(light, pname, param);
+#endif
 }
 inline void rtShim_glShadeModel(GLenum mode)
 {
-#ifdef RT_SHADER_PIPELINE_AVAILABLE
+#ifndef RT_SHADER_PIPELINE_ONLY
 	if (g_bShaderPipelineActive) return;
-#endif
 	glShadeModel(mode);
+#endif
 }
 
 //--- the remap -------------------------------------------------------------
@@ -116,6 +116,9 @@ inline void rtShim_glShadeModel(GLenum mode)
 
 #define glEnable rtEnable
 #define glDisable rtDisable
+#ifdef glClipPlane
+	#undef glClipPlane
+#endif
 #define glClipPlane rtShim_glClipPlane
 #ifdef glClipPlanef
 	#undef glClipPlanef

@@ -16,6 +16,14 @@
 
 #ifndef _CONSOLE
 
+#ifdef RT_SHADER_PIPELINE_ONLY
+	//the WebGL/shader build: pure GLES2 headers, no fixed-function GL at all
+	#include <GLES2/gl2.h>
+	#include "Renderer/GLES2TokenCompat.h"
+	#include "Renderer/GLCompatGLES.h" //GLdouble typedef etc for app code
+	#define glTexParameterx glTexParameteri
+#else
+
 	#ifdef C_GL_MODE
 	#ifdef RT_USING_OSMESA
 	#include <osmesa.h>
@@ -26,7 +34,9 @@
 
 	#endif  // #ifdef C_GL_MODE
 
-#else 
+#endif // RT_SHADER_PIPELINE_ONLY
+
+#else
 
 #ifdef RT_USING_OSMESA
 	#include <osmesa.h>
@@ -37,8 +47,10 @@
 #include "Irrlicht/source/Irrlicht/gles-ext.h"
 #endif
 
+#ifndef RT_SHADER_PIPELINE_ONLY
 //help with compatibility so I can use the GL ES calls with normal GL
 #include "Renderer/GLCompatDesktop.h"
+#endif
 
 #ifndef PLATFORM_HTML5
 #define PLATFORM_HTML5

@@ -52,10 +52,25 @@ and the existing compatibility/legacy contexts on Windows/Linux/macOS (GLSL
   position captured at glLightfv time, transpose(inverse(MV)) normal matrix,
   normals deliberately NOT normalized (GL_NORMALIZE was never enabled).
   RTMindWall renders 0.000% vs its fixed-function golden, which makes ALL
-  SIX suite apps pixel-exact on both pipelines on Windows. Still to
-  do: ES2 context creation per platform, the WebGL
-  flip (streaming VBO + dropping LEGACY_GL_EMULATION), FBO render targets,
-  and the public shader API. Notable finding recorded in ShaderPipeline.cpp:
+  SIX suite apps pixel-exact on both pipelines on Windows. Milestone 4
+  (Aug 2026): the WebGL flip. RT_SHADER_PIPELINE_ONLY mode compiles the
+  legacy branches out entirely (pure <GLES2/gl2.h> headers via
+  PlatformSetupHTML5.h, fixed-function enum tokens from
+  Renderer/GLES2TokenCompat.h, g_bShaderPipelineActive forced true).
+  RTBareBones and RTSimpleApp html5 builds now use
+  -DRT_SHADER_PIPELINE_AVAILABLE -DRT_SHADER_PIPELINE_ONLY -sFULL_ES2=1
+  with LEGACY_GL_EMULATION deleted; both render 0.000% against the goldens
+  recorded under the old emulation, with engine frame time down 30-40%
+  (FULL_ES2 only emulates client-side arrays; an engine streaming VBO could
+  replace it later). ES2 adaptations: GL_GENERATE_MIPMAP became
+  glGenerateMipmap-after-upload in Surface.cpp, glGetTexImage stubbed
+  (needs the FBO work), linearparticle's GLES1 point-sprite path excluded
+  (particles use the batcher path; the SP vertex shader writes
+  gl_PointSize=1.0 on ES2). The remaining html5 app .bats flip the same way
+  during the Phase 3 rollout. Still to
+  do: ES2 context creation for iOS/Android, the remaining html5 .bats, FBO
+  render targets, and the public shader API. Notable finding recorded in
+  ShaderPipeline.cpp:
   GL_ALPHA_TEST was always a no-op in Proton (glAlphaFunc never called, GL
   default is GL_ALWAYS), so the shader path needs no alpha discard.
 - **Phase 3**: flip defaults per platform (HTML5 first).

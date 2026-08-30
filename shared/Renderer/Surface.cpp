@@ -309,6 +309,8 @@ bool Surface::LoadRTTexture(uint8 *pMem)
 #endif
 	int format = GetIntFromMem(&pTexHeader->format);
 
+	bool bGenerateMipmapsAfterUpload = false;
+
 	if (m_bCreateMipMapsIfNeeded)
 	{
 		/* VitaGL does not support GL_GENERATE_MIPMAP */
@@ -316,13 +318,23 @@ bool Surface::LoadRTTexture(uint8 *pMem)
 		if (m_mipMapCount == 1)
 		{
 			m_mipMapCount = 8; //guess, exact # doesn't matter, just must be more than 1
+#ifdef RT_SHADER_PIPELINE_ONLY
+			//ES2 removed the GL_GENERATE_MIPMAP texture param; we call
+			//glGenerateMipmap after the upload instead
+			bGenerateMipmapsAfterUpload = true;
+#else
 			glTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE );
+#endif
 		} else
 		{
+#ifndef RT_SHADER_PIPELINE_ONLY
 			glTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_FALSE );
+#endif
 		}
 #endif
 	}
+
+	(void)bGenerateMipmapsAfterUpload;
 CHECK_GL_ERROR();
 	for (int nMipLevel=0; nMipLevel < pTexHeader->mipmapCount; nMipLevel++)
 	{
@@ -461,6 +473,12 @@ m_blendingMode = BLENDING_PREMULTIPLIED_ALPHA;
 	//unknown parm in emscripten's emulated GL1 support
 #else
 	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_FALSE);
+#endif
+#ifdef RT_SHADER_PIPELINE_ONLY
+	if (bGenerateMipmapsAfterUpload)
+	{
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
 #endif
 	CHECK_GL_ERROR();
 	return true;
@@ -1307,8 +1325,17 @@ bool Surface::CreateSoftSurfaceFromSurface(SoftSurface& outSurf, bool bUseOrigin
 		bytesPerPixel = 3;
 	}
 
+#ifdef RT_SHADER_PIPELINE_ONLY
+	//glGetTexImage doesn't exist in GLES2/WebGL; the proper replacement is an
+	//FBO + glReadPixels, coming with the render-target work.  No shipping code
+	//path hits this on the web today.
+	LogError("CreateSoftSurfaceFromSurface not supported on the GLES2 pipeline yet");
+	memset(tempData, 0, fullDataSize);
+	(void)type;
+#else
 	glGetTexImage(GL_TEXTURE_2D, 0, format, type, tempData);
 	CHECK_GL_ERROR();
+#endif
 
 	SoftSurface::eSurfaceType surfType = m_bUsesAlpha ? SoftSurface::SURFACE_RGBA : SoftSurface::SURFACE_RGB;
 
