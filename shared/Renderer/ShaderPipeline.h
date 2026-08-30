@@ -12,18 +12,19 @@
 //
 //Only compiled into projects that add ShaderPipeline.cpp AND define
 //RT_SHADER_PIPELINE_AVAILABLE (project-wide, so the inline dispatch in
-//RenderPipeline.h is identical in every translation unit).  Runtime opt-in:
-//launch any app with the -shaderpipeline parm.  Without the parm the legacy
-//fixed-function path runs exactly as before.
+//RenderPipeline.h is identical in every translation unit).  It is the
+//DEFAULT renderer in those builds; launch with -fixedpipeline to fall back
+//to the legacy fixed-function path (not possible in RT_SHADER_PIPELINE_ONLY
+//builds, which compile the legacy path out entirely).
 
 #ifndef ShaderPipeline_h__
 #define ShaderPipeline_h__
 
 #ifdef RT_SHADER_PIPELINE_AVAILABLE
 
-extern bool g_bShaderPipelineActive; //set by the -shaderpipeline parm before GL init
+extern bool g_bShaderPipelineActive; //defaults true; cleared by -fixedpipeline before GL init
 
-void SP_ResetState(); //called when the parm is seen, before any GL exists
+void SP_ResetState(); //re-inits backend state; safe before any GL exists
 
 //mirrors of the rt* surface in RenderPipeline.h
 void SP_MatrixMode(GLenum mode);
@@ -100,7 +101,8 @@ private:
 
 	struct CustomUniform
 	{
-		int loc;
+		char name[48];
+		int loc; //-1 = the shader doesn't have it (warned once, then ignored)
 		int count; //1 or 4 floats
 		float v[4];
 	};

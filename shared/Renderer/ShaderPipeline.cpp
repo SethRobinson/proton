@@ -996,20 +996,32 @@ bool RTShader::Load(const char *pVertexSource, const char *pFragmentSource)
 int RTShader::FindOrAddCustomUniform(const char *pName, int count)
 {
 	if (!m_program) return -1;
+
+	for (int i = 0; i < m_customUniformCount; i++)
+	{
+		if (strncmp(m_customUniforms[i].name, pName, sizeof(m_customUniforms[i].name)) == 0)
+		{
+			m_customUniforms[i].count = count;
+			return m_customUniforms[i].loc < 0 ? -1 : i;
+		}
+	}
+
+	if (m_customUniformCount >= MAX_CUSTOM_UNIFORMS) { LogError("RTShader: too many custom uniforms"); return -1; }
+
 	GLint loc = spGetUniformLocation(m_program, pName);
 	if (loc < 0)
 	{
-		LogError("RTShader: no uniform named %s", pName);
-		return -1;
+		//warn once, then remember the miss so setting it every frame is cheap
+		//and silent (a uniform the GLSL compiler optimized out ends up here too)
+		LogMsg("RTShader: no uniform named %s in this shader, ignoring", pName);
 	}
-	for (int i = 0; i < m_customUniformCount; i++)
-	{
-		if (m_customUniforms[i].loc == loc) { m_customUniforms[i].count = count; return i; }
-	}
-	if (m_customUniformCount >= MAX_CUSTOM_UNIFORMS) { LogError("RTShader: too many custom uniforms"); return -1; }
-	m_customUniforms[m_customUniformCount].loc = loc;
-	m_customUniforms[m_customUniformCount].count = count;
-	return m_customUniformCount++;
+	CustomUniform &u = m_customUniforms[m_customUniformCount];
+	strncpy(u.name, pName, sizeof(u.name) - 1);
+	u.name[sizeof(u.name) - 1] = 0;
+	u.loc = loc;
+	u.count = count;
+	m_customUniformCount++;
+	return loc < 0 ? -1 : m_customUniformCount - 1;
 }
 
 void RTShader::SetUniform1f(const char *pName, float v)

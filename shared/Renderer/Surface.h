@@ -171,6 +171,7 @@ private:
 	eBlendingMode m_blendingMode;
 	int m_mipMapCount;
 	GLuint m_frameBuffer;
+	bool m_bRTWasInOrthoMode; //what BeginRenderTarget must restore at End
 	int m_memUsed; //for internal memory monitering
 	string m_textureLoaded;
 	bool m_bCreateMipMapsIfNeeded;

@@ -42,6 +42,7 @@ void Surface::SetDefaults()
 	m_blendingMode = BLENDING_NORMAL;
 	m_mipMapCount = 0;
 	m_frameBuffer = 0;
+	m_bRTWasInOrthoMode = true;
 	m_originalHeight = 0; //sometimes useful to know, if case we had to pad the image to be power of 2 for instance
 	m_originalWidth = 0;
 	m_textureCreationMethod = TEXTURE_CREATION_NONE;
@@ -140,9 +141,15 @@ void Surface::BeginRenderTarget()
 
 	g_globalBatcher.Flush(); //anything still batched belongs to the previous target
 
+	//remember whether the caller was in the engine's lazy 2D-ortho mode or in
+	//raw 3D mode (PrepareForGL), so EndRenderTarget can restore either one
+	m_bRTWasInOrthoMode = !NeedsOrthoSet();
+
 	SP_BindFrameBuffer(m_frameBuffer, m_texWidth, m_texHeight);
 
-	//same y-down ortho as SetupOrtho: the texture is stored "upside down" in
+	//set up a complete 2D state sized to the target - the equivalent of
+	//SetupOrtho, but pushed so End can restore, and working from either mode.
+	//Same y-down ortho as SetupOrtho: the texture is stored "upside down" in
 	//GL terms, but the engine's blit UV math already V-flips every texture, so
 	//the two flips cancel and the result displays correctly with no special
 	//cases (and winding/culling match normal ortho rendering too)
@@ -153,6 +160,19 @@ void Surface::BeginRenderTarget()
 	rtMatrixMode(GL_MODELVIEW);
 	rtPushMatrix();
 	rtLoadIdentity();
+
+	rtEnable(GL_TEXTURE_2D);
+	rtEnableClientState(GL_VERTEX_ARRAY);
+	rtEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	rtDisableClientState(GL_COLOR_ARRAY);
+	rtDisableClientState(GL_NORMAL_ARRAY);
+	glDisable(GL_DEPTH_TEST);
+	glDepthMask(GL_FALSE);
+	glCullFace(GL_FRONT);
+
+	//2D draws inside the target must NOT run SetupOrtho (it would stomp our
+	//target-sized ortho with a screen-sized one and unbalance the stack)
+	SetOrthoModeFlag();
 #else
 	LogError("BeginRenderTarget: this build lacks the shader pipeline");
 #endif
@@ -170,7 +190,20 @@ void Surface::EndRenderTarget()
 	rtMatrixMode(GL_MODELVIEW);
 	rtPopMatrix();
 
-	SP_UnbindFrameBuffer(); //also restores the viewport and cull face
+	SP_UnbindFrameBuffer(); //also restores the viewport
+
+	if (!m_bRTWasInOrthoMode)
+	{
+		//the caller was in raw 3D mode: the pops above restored its
+		//perspective matrices, so restore the matching raw-GL state too
+		//(mirrors what PrepareForGL does when leaving ortho mode)
+		glDepthMask(GL_TRUE);
+		glEnable(GL_DEPTH_TEST);
+		glCullFace(GL_BACK);
+		ResetOrthoFlag();
+	}
+	//else: the caller was in 2D ortho mode; the pops restored its ortho
+	//matrices and the ortho flag is already set correctly
 #endif
 }
 

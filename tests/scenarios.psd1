@@ -49,6 +49,20 @@ Apps = @(
         )
     }
     @{
+        # The custom-shader example app: renders a scene to a texture and
+        # blits it through a GLSL post-process effect (default: wavy).
+        Name = 'RTShader'
+        Exe = 'RTShader\bin\RTShader_Debug GL_Win32.exe'
+        Html5Page = 'RTShader\html5\RTShader.html'
+        IosProject = 'RTShader\RTShader.xcodeproj'
+        ShaderReady = $true
+        RequiresShaderPipe = $true
+        SettleMs = 6000
+        Steps = @(
+            @{ Action = 'capture'; Name = 'wavy' }
+        )
+    }
+    @{
         Name = 'RTSimpleApp'
         Exe = 'RTSimpleApp\bin\RTSimpleApp_Debug_GL.exe'
         Html5Page = 'RTSimpleApp\html5\RTSimpleApp.html'
