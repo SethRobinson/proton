@@ -11,10 +11,20 @@
 #   .\harness.ps1 -Mode test              # capture + compare against goldens
 #   .\harness.ps1 -Mode test -App RTDink  # single app
 #   .\harness.ps1 -Mode test -LegacyPipe  # win: force the old fixed-function path
+#   .\harness.ps1 -Mode test -Resize      # any target: resize the window and simulate a GL context loss mid-run
+#   .\harness.ps1 -Mode test -Target android -Background  # real home-screen-and-back cycle mid-run
 #
 # The shader pipeline is the engine default wherever it's compiled in, so a
 # plain run exercises it; -LegacyPipe launches with -fixedpipeline to regress
 # the legacy path (which must stay pixel-identical until it's retired).
+#
+# -Resize and -Background are the context-rebuild checks: the app is made to
+# resize its window (on Windows that destroys and recreates the GL context) and
+# to unload+reload every surface and shader (BaseApp's -autoresize and
+# -autoreloadsurfaces parms), or on Android is really sent to the home screen
+# and back (GLSurfaceView drops the EGL context), all well before the capture
+# tick. The capture must still match the PLAIN golden: anything that failed to
+# come back shows up as a diff (typically the whole picture going black).
 #
 # Goldens are GPU/driver specific: only compare on the machine that recorded
 # them. Exit code 0 = all pass, 1 = something failed. See tests/README.md.
@@ -25,6 +35,8 @@ param(
     [string]$App = '*',
     [switch]$LegacyPipe,   # win only: launch apps with -fixedpipeline to regress the legacy fixed-function path against the same goldens
     [switch]$ShaderPipe,   # deprecated: the shader pipeline is the default now, so this is a no-op kept for muscle memory
+    [switch]$Resize,       # any target: window resize (a GL context rebuild on Windows) + simulated context loss mid-run, compared against the plain goldens
+    [switch]$Background,   # android only: home screen and back mid-run (a real EGL context loss), compared against the plain goldens
     [switch]$ShowBrowser,  # html5 only: run the browser headed, for debugging
     [switch]$PrepareMac,   # ios only: rsync the tracked tree to the Mac and xcodebuild the sim apps first
     [string]$MacHost = 'seth@studiomac.local', # ios only
@@ -42,6 +54,8 @@ if ($ShaderPipe)
 {
     Write-Host 'NOTE: -ShaderPipe is deprecated; the shader pipeline is the engine default now, so a plain run already tests it (-LegacyPipe forces the old path).' -ForegroundColor Yellow
 }
+if ($Mode -eq 'golden' -and ($Resize -or $Background)) { throw 'goldens are recorded with a plain run; -Resize/-Background compare against them' }
+if ($Background -and $Target -ne 'android') { throw '-Background is android only (a real home-screen cycle); use -Resize for the other targets' }
 
 Add-Type -TypeDefinition @'
 using System;
@@ -315,7 +329,7 @@ function Invoke-IosDeviceCapture([string]$appName, [int]$settleMs, [string]$bmpO
 # extra (see SharedActivity.onCreate), the app writes the BMP to its internal
 # files dir, and we pull it out with run-as (works for debuggable builds).
 
-function Invoke-AndroidCapture([string]$package, [string]$activity, [int]$settleMs, [string]$bmpOutPath, [string]$extraParms = '')
+function Invoke-AndroidCapture([string]$package, [string]$activity, [int]$settleMs, [string]$bmpOutPath, [string]$extraParms = '', [bool]$homeCycle = $false)
 {
     $remoteBmp = "/data/data/$package/files/proton_harness.bmp"
     & adb shell am force-stop $package 2>$null | Out-Null
@@ -323,6 +337,22 @@ function Invoke-AndroidCapture([string]$package, [string]$activity, [int]$settle
     $parms = "-autoscreenshot $remoteBmp $settleMs -autoquit"
     if ($extraParms) { $parms = "$extraParms $parms" }
     & adb shell am start -n "$package/$activity" --es parms "'$parms'" | Out-Null
+    if ($homeCycle)
+    {
+        # -Background: a real pause/resume. GLSurfaceView drops its EGL context on
+        # pause, so on resume every texture, shader and render target has to be
+        # rebuilt (AppPause/AppInit in shared/android/AndroidUtils.cpp). Android
+        # keeps rendering display-synced (~60 fps) even under -autoscreenshot, so
+        # the capture is roughly settleMs of wall clock after the app comes up: go
+        # home a few seconds in, come back two seconds later, well before that.
+        Start-Sleep -Milliseconds ([Math]::Min(3000, [int]($settleMs / 2)))
+        Write-Host '  HOME    sending the app to the home screen'
+        & adb shell input keyevent KEYCODE_HOME | Out-Null
+        Start-Sleep -Seconds 2
+        Write-Host '  RESUME  bringing it back'
+        # the launcher-style intent brings the existing task forward instead of starting a second instance
+        & adb shell am start -a android.intent.action.MAIN -c android.intent.category.LAUNCHER -n "$package/$activity" | Out-Null
+    }
     $deadline = (Get-Date).AddMilliseconds($settleMs + 60000)
     $found = $false
     while ((Get-Date) -lt $deadline)
@@ -371,7 +401,8 @@ if ($Target -eq 'ios' -and $PrepareMac)
     Push-Location $RepoRoot
     try
     {
-        cmd /c "git ls-files -z | tar czf `"%TEMP%\proton_harness_mac.tgz`" --null -T -"
+        # Windows' own bsdtar by full path: a Git-for-Windows GNU tar earlier in PATH (agent shells) reads "C:\..." as host:file
+        cmd /c "git ls-files -z | %SystemRoot%\System32\tar.exe czf `"%TEMP%\proton_harness_mac.tgz`" --null -T -"
         if ($LASTEXITCODE -ne 0) { throw 'tar of tracked files failed' }
         & scp -q "$env:TEMP\proton_harness_mac.tgz" "$MacHost`:/tmp/"
         & ssh $MacHost 'rm -rf ~/proton_warncheck && mkdir -p ~/proton_warncheck && tar xzf /tmp/proton_harness_mac.tgz -C ~/proton_warncheck'
@@ -468,24 +499,33 @@ foreach ($entry in $scenarios.Apps)
     if ($captureSteps.Count -ne 1) { throw "$($entry.Name): expected exactly one capture step" }
     $step = $captureSteps[0]
 
-    Write-Host "RUN   $($entry.Name)" -ForegroundColor Cyan
+    # -Resize: the engine resizes its window (and restores it 1 s later) a third
+    # of the way to the capture and simulates a GL context loss two thirds in;
+    # both are long over by the capture tick. The plain goldens stay the
+    # reference; the variant runs keep their own capture/diff files so a failure
+    # leaves both pictures to look at.
+    $testParms = ''
+    if ($Resize) { $testParms = "-autoresize $([int]($entry.SettleMs / 3)) -autoreloadsurfaces $([int]($entry.SettleMs * 2 / 3))" }
+    $variant = if ($Resize) { '_resize' } elseif ($Background) { '_background' } else { '' }
+    $extra = if ($entry.ContainsKey('ExtraParms')) { $entry.ExtraParms } else { '' }
+    if ($testParms) { $extra = "$extra $testParms".Trim() }
+
+    Write-Host "RUN   $($entry.Name)$(if ($variant) { " ($($variant.TrimStart('_')))" })" -ForegroundColor Cyan
     try
     {
         $prefix = if ($Target -eq 'win') { '' } elseif ($Target -eq 'ios' -and $IosDevice) { 'iosdev_' } else { "$($Target)_" }
         $shotName = "$prefix$($entry.Name)_$($step.Name).png"
-        $bmpPath = Join-Path $outputDir "$prefix$($entry.Name)_$($step.Name).bmp"
+        $bmpPath = Join-Path $outputDir "$prefix$($entry.Name)_$($step.Name)$variant.bmp"
         if ($bmpPath -match ' ') { throw "path contains spaces; Proton's Windows parm tokenizer splits on them: $bmpPath" }
         Remove-Item $bmpPath -Force -ErrorAction SilentlyContinue
 
         if ($Target -eq 'html5')
         {
             $pageFull = Join-Path $RepoRoot $entry.Html5Page
-            $html5Extra = if ($entry.ContainsKey('ExtraParms')) { $entry.ExtraParms } else { '' }
-            Invoke-Html5Capture (Split-Path $pageFull) (Split-Path $pageFull -Leaf) $entry.SettleMs $bmpPath $html5Extra
+            Invoke-Html5Capture (Split-Path $pageFull) (Split-Path $pageFull -Leaf) $entry.SettleMs $bmpPath $extra
         }
         elseif ($Target -eq 'ios')
         {
-            $extra = if ($entry.ContainsKey('ExtraParms')) { $entry.ExtraParms } else { '' }
             $iosApp = if ($entry.ContainsKey('IosAppName')) { $entry.IosAppName } else { $entry.Name }
             if ($IosDevice) { Invoke-IosDeviceCapture $iosApp $entry.SettleMs $bmpPath $extra }
             else { Invoke-IosCapture $entry.IosProject $iosApp $entry.SettleMs $bmpPath $extra }
@@ -494,14 +534,13 @@ foreach ($entry in $scenarios.Apps)
         {
             #every Proton app shares the same java entry class regardless of its applicationId
             $activity = if ($entry.ContainsKey('AndroidActivity')) { $entry.AndroidActivity } else { 'com.rtsoft.RTAndroidApp.Main' }
-            $extra = if ($entry.ContainsKey('ExtraParms')) { $entry.ExtraParms } else { '' }
-            Invoke-AndroidCapture $entry.AndroidPackage $activity $entry.SettleMs $bmpPath $extra
+            Invoke-AndroidCapture $entry.AndroidPackage $activity $entry.SettleMs $bmpPath $extra ([bool]$Background)
         }
         else
         {
             $appArgs = @('-autoscreenshot', $bmpPath, [string]$entry.SettleMs, '-autoquit')
             if ($LegacyPipe) { $appArgs = @('-fixedpipeline') + $appArgs }
-            if ($entry.ContainsKey('ExtraParms')) { $appArgs = ($entry.ExtraParms -split ' ') + $appArgs }
+            if ($extra) { $appArgs = ($extra -split ' ') + $appArgs }
             $proc = Start-Process -FilePath $exe -WorkingDirectory (Split-Path $exe) -PassThru -ArgumentList $appArgs
 
             $deadline = (Get-Date).AddMilliseconds($entry.SettleMs + 60000)
@@ -515,7 +554,7 @@ foreach ($entry in $scenarios.Apps)
         }
 
         $ignore = if ($step.ContainsKey('IgnoreRects')) { $step.IgnoreRects } elseif ($entry.ContainsKey('IgnoreRects')) { $entry.IgnoreRects } else { $null }
-        $capturePath = Join-Path $outputDir $shotName
+        $capturePath = Join-Path $outputDir ($shotName -replace '\.png$', "$variant.png")
         Convert-ShotToPng $bmpPath $capturePath $ignore
         Remove-Item $bmpPath -Force
 
@@ -536,12 +575,12 @@ foreach ($entry in $scenarios.Apps)
             }
             $tol = if ($step.ContainsKey('ChannelTol')) { $step.ChannelTol } elseif ($entry.ContainsKey('ChannelTol')) { $entry.ChannelTol } else { 12 }
             $maxPct = if ($step.ContainsKey('MaxDiffPct')) { $step.MaxDiffPct } elseif ($entry.ContainsKey('MaxDiffPct')) { $entry.MaxDiffPct } else { 0.5 }
-            $cmp = Compare-Shots $goldenPath $capturePath $tol (Join-Path $outputDir "$($entry.Name)_$($step.Name)_DIFF.png")
+            $cmp = Compare-Shots $goldenPath $capturePath $tol (Join-Path $outputDir "$($entry.Name)_$($step.Name)${variant}_DIFF.png")
             $pass = $cmp.DiffPct -le $maxPct
             if (-not $pass) { $anyFailed = $true }
             $status = if ($pass) { 'PASS' } else { 'FAIL' }
             $color = if ($pass) { 'Green' } else { 'Red' }
-            Write-Host ("  {0}    {1}  ({2:N3}% differ, limit {3}%; {4})" -f $status, $shotName, $cmp.DiffPct, $maxPct, $cmp.Note) -ForegroundColor $color
+            Write-Host ("  {0}    {1}  ({2:N3}% differ, limit {3}%; {4})" -f $status, (Split-Path $capturePath -Leaf), $cmp.DiffPct, $maxPct, $cmp.Note) -ForegroundColor $color
             $results += @{ App = $entry.Name; Step = $step.Name; Status = $status; Note = ("{0:N3}%" -f $cmp.DiffPct) }
         }
 
@@ -554,13 +593,16 @@ foreach ($entry in $scenarios.Apps)
         # vsync is uncapped on win, but html5/ios are capped near 60 by the
         # browser/display, so those only catch drops below the cap.
         $perfPath = "$bmpPath.perf.txt"
-        if ($LegacyPipe -and (Test-Path $perfPath))
+        if (($LegacyPipe -or $variant) -and (Test-Path $perfPath))
         {
-            # informational only: legacy-path perf isn't compared against the (default, shader-path) baselines
+            # informational only: legacy-path perf isn't compared against the (default,
+            # shader-path) baselines, and the resize/background runs spend wall clock
+            # on context rebuilds (or sitting on the home screen) that a baseline can't own
             $perfRaw = Get-Content $perfPath -Raw
             if ($perfRaw -match 'fps=([0-9.]+)') { $fps = $Matches[1] } else { $fps = '?' }
             if ($perfRaw -match 'engineMS=([0-9.]+)') { $engMS = $Matches[1] } else { $engMS = '?' }
-            Write-Host "  PERF    info  $fps fps, $engMS engine ms/frame (legacy path, not gated)"
+            $why = if ($LegacyPipe) { 'legacy path' } else { "$($variant.TrimStart('_')) run" }
+            Write-Host "  PERF    info  $fps fps, $engMS engine ms/frame ($why, not gated)"
         }
         elseif (Test-Path $perfPath)
         {

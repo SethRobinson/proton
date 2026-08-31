@@ -53,7 +53,11 @@ BaseApp::BaseApp()
 		m_autoScreenshotStartWallMS = 0;
 		m_autoScreenshotUpdateStampMS = 0;
 		m_autoScreenshotEngineMS = 0;
-		
+		m_autoResizeAtMS = 0;
+		m_autoResizeRestoreAtMS = 0;
+		m_autoResizeOrigX = m_autoResizeOrigY = 0;
+		m_autoReloadSurfacesAtMS = 0;
+
 		m_touchTracker.resize(C_MAX_TOUCHES_AT_ONCE);
 		ClearError();
 		g_isBaseAppInitted = true;
@@ -231,6 +235,17 @@ void BaseApp::CheckAutoScreenshotParms()
 				LogMsg("autoscreenshot: capture speed pinned to %d fps", fps);
 			}
 		}
+
+		//the context-rebuild tests, see ProcessAutoTestEvents().  A 0 would never
+		//fire, so it means "as soon as possible"
+		if (parm == "-autoresize" && i + 1 < m_commandLineParms.size())
+		{
+			m_autoResizeAtMS = rt_max(1, atoi(m_commandLineParms[i + 1].c_str()));
+		}
+		if (parm == "-autoreloadsurfaces" && i + 1 < m_commandLineParms.size())
+		{
+			m_autoReloadSurfacesAtMS = rt_max(1, atoi(m_commandLineParms[i + 1].c_str()));
+		}
 	}
 
 	if (!m_autoScreenshotFile.empty())
@@ -238,6 +253,86 @@ void BaseApp::CheckAutoScreenshotParms()
 		m_gameTimer.SetLockedTimestepMS(16);
 		srand(31337);
 		LogMsg("autoscreenshot: locked 16ms timestep and fixed rand seed for deterministic capture");
+	}
+}
+
+//Two more automation parms in the same spirit, meant to be combined with
+//-autoscreenshot so the capture proves the app survived the event:
+//
+//  -autoresize <atMS>          once the app timer passes atMS, shrink the window to
+//                              3/4 size through the platform's real resize path and
+//                              put it back 1000 ms later.  On Windows a resize tears
+//                              down and recreates the GL context (see
+//                              MESSAGE_SET_VIDEO_MODE in win/app/main.cpp), so every
+//                              texture, shader and render target must come back or
+//                              the picture goes black; Mac/Linux keep their context
+//                              and re-layout; html5 resizes the canvas' CSS box like a
+//                              browser window resize would, which the main loop's
+//                              CSS-size poll picks up.  iOS/Android have no resizable
+//                              window, it just logs there.
+//  -autoreloadsurfaces <atMS>  fire m_sig_unloadSurfaces then m_sig_loadSurfaces at
+//                              that tick: a simulated GL context loss that works on
+//                              every platform (it's exactly what an Android
+//                              background/foreground cycle runs through).
+//
+//Both must leave the app looking as if nothing happened: the regression harness
+//(tests/harness.ps1 -Resize) adds them to every scenario and compares the capture
+//against the plain golden.
+
+static void AutoResizeWindow(int x, int y, bool bRestore)
+{
+#if defined(PLATFORM_HTML5)
+	//not SetVideoMode (on html5 that toggles soft fullscreen); size the canvas' CSS
+	//box instead and let SyncScreenToCanvasCSSSize in HTML5Main.cpp notice.  The
+	//restore clears the override so the canvas follows the page again, falling back
+	//to explicit pixels if the page's CSS doesn't land on the original size.
+	EM_ASM({
+		var c = document.getElementById('canvas');
+		if ($2) { c.style.width = ''; c.style.height = ''; }
+		var r = c.getBoundingClientRect();
+		if (!$2 || Math.round(r.width) != $0 || Math.round(r.height) != $1)
+		{
+			c.style.width = $0 + 'px';
+			c.style.height = $1 + 'px';
+		}
+	}, x, y, bRestore ? 1 : 0);
+#elif defined(PLATFORM_IOS) || defined(PLATFORM_ANDROID)
+	LogMsg("autoresize: no resizable window on this platform (use -autoreloadsurfaces to exercise the reload path)");
+#else
+	GetBaseApp()->SetVideoMode(x, y, false);
+#endif
+}
+
+void BaseApp::ProcessAutoTestEvents()
+{
+	if (m_autoResizeAtMS == 0 && m_autoResizeRestoreAtMS == 0 && m_autoReloadSurfacesAtMS == 0) return;
+
+	unsigned int tick = m_gameTimer.GetTick();
+
+	if (m_autoResizeAtMS != 0 && tick >= m_autoResizeAtMS)
+	{
+		m_autoResizeAtMS = 0;
+		m_autoResizeOrigX = GetPrimaryGLX();
+		m_autoResizeOrigY = GetPrimaryGLY();
+		int newX = (m_autoResizeOrigX * 3) / 4;
+		int newY = (m_autoResizeOrigY * 3) / 4;
+		LogMsg("autoresize: tick %u, resizing %dx%d -> %dx%d (restoring in 1000 ms)", tick, m_autoResizeOrigX, m_autoResizeOrigY, newX, newY);
+		AutoResizeWindow(newX, newY, false);
+		m_autoResizeRestoreAtMS = tick + 1000;
+	}
+	else if (m_autoResizeRestoreAtMS != 0 && tick >= m_autoResizeRestoreAtMS)
+	{
+		m_autoResizeRestoreAtMS = 0;
+		LogMsg("autoresize: tick %u, restoring %dx%d", tick, m_autoResizeOrigX, m_autoResizeOrigY);
+		AutoResizeWindow(m_autoResizeOrigX, m_autoResizeOrigY, true);
+	}
+
+	if (m_autoReloadSurfacesAtMS != 0 && tick >= m_autoReloadSurfacesAtMS)
+	{
+		m_autoReloadSurfacesAtMS = 0;
+		LogMsg("autoreloadsurfaces: tick %u, simulating a GL context loss (unloading and reloading every surface and shader)", tick);
+		m_sig_unloadSurfaces();
+		m_sig_loadSurfaces();
 	}
 }
 
@@ -444,6 +539,7 @@ void BaseApp::Draw()
 		}
 	}
 
+	ProcessAutoTestEvents(); //inert unless -autoresize/-autoreloadsurfaces were used
 	ProcessAutoScreenshot(); //inert unless the -autoscreenshot command line parm was used
 }
 

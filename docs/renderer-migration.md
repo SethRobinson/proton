@@ -115,9 +115,18 @@ and the existing compatibility/legacy contexts on Windows/Linux/macOS (GLSL
   put it in `InitializeGLDefaults`: at startup `InitVideo` sets the
   perspective projection (SetupScreenInfo -> OnScreenSizeChange) before
   `BaseApp::Init` calls that, and wiping the stacks there lost every 3D
-  scene's projection (harness caught it). End-to-end check: RTGameBot's
+  scene's projection (harness caught it). End-to-end checks: RTGameBot's
   `tests/resize_check.ps1` (SetWindowPos on the app's own window between two
-  `-autoscreenshot` captures; the old exe fails with 0% lit pixels).
+  `-autoscreenshot` captures; the old exe fails with 0% lit pixels), and
+  since then the engine-level `-autoresize <ms>` / `-autoreloadsurfaces <ms>`
+  parms (`BaseApp::ProcessAutoTestEvents`): the first does a real window
+  resize and restore through `SetVideoMode` (a context rebuild on Windows,
+  a re-layout on Mac/Linux, a canvas CSS resize on html5), the second fires
+  the unload/load signals directly (a simulated context loss on any
+  platform). `tests/harness.ps1 -Resize` runs both mid-capture on every
+  scenario and target against the plain goldens; `-Target android
+  -Background` does a real home-screen-and-back cycle (EGL context loss).
+  See tests/README.md for the verification record.
 - **Phase 3 (in progress)**: flip defaults per platform. Rollout wave 1
   (Aug 2026): all sanctioned html5 apps (RTBareBones, RTSimpleApp, RTDink,
   RTDScroll, RTMindWall, ArduboySim) build shader-pipeline-only, and

@@ -43,6 +43,8 @@ cd tests
 .\harness.ps1 -Mode test -Target html5      # wasm/WebGL in headless Edge
 .\harness.ps1 -Mode test -Target ios        # iOS simulator on the Mac (ssh)
 .\harness.ps1 -Mode test -Target android    # device/emulator via adb
+.\harness.ps1 -Mode test -Resize            # any target: window resize + simulated GL context loss mid-run
+.\harness.ps1 -Mode test -Target android -Background  # real home-screen-and-back cycle mid-run
 ```
 
 The shader pipeline is the engine default wherever it's compiled in
@@ -55,6 +57,64 @@ Exit code 0 = all pass. Both `output/` (scratch) and `goldens/` are
 git-ignored: goldens are GPU/driver specific, so each machine records its own
 per target with `-Mode golden` before starting renderer work. Golden files are
 prefixed by target (`html5_`, `ios_`, `android_`; win has no prefix).
+
+## Context-rebuild checks (-Resize / -Background)
+
+A window resize on Windows destroys and recreates the GL context
+(`MESSAGE_SET_VIDEO_MODE` in shared/win/app/main.cpp), and Android drops its
+EGL context whenever the app goes to the home screen: every texture, shader
+and render target has to be rebuilt afterwards or the picture goes black,
+which is exactly the kind of bug a plain golden run never sees. Two engine
+parms make those events happen at a fixed app tick so the SAME goldens can
+judge the result (`BaseApp::ProcessAutoTestEvents`, next to the autoscreenshot
+code):
+
+- `-autoresize <ms>`: at that tick shrink the window to 3/4 size and restore
+  it 1000 ms later, through the platform's real resize path (`SetVideoMode`
+  on Windows/Mac/Linux, i.e. a full context rebuild on Windows and a
+  re-layout on Mac/Linux; the canvas CSS box on html5, picked up by the
+  main loop's CSS-size poll). iOS/Android have no resizable window and only
+  log.
+- `-autoreloadsurfaces <ms>`: at that tick fire `m_sig_unloadSurfaces` then
+  `m_sig_loadSurfaces`, a simulated context loss that runs the reload code
+  on every platform (it is what an Android background/foreground cycle goes
+  through, minus the real EGL loss).
+
+`-Resize` adds both to every scenario (resize a third of the way to the
+capture, reload two thirds in; both are long over by the capture tick) and
+compares against the plain goldens; the captures and diffs get a `_resize`
+suffix in `output/`, so a failure leaves both pictures to look at. It works
+on every target. `-Background` (android only) instead really sends the app
+to the home screen ~3 s after launch and brings it back 2 s later
+(`_background` suffix). Perf is reported but not gated on these runs, since
+they spend wall clock on the rebuilds. Both parms also work by hand: run any
+app with `-autoresize 3000` and watch it shrink and come back.
+
+Verification record (Aug 2026, shader pipeline everywhere):
+
+- **win** `-Resize`: all 9 scenarios 0.000% (RTBareBones, RTBareBonesRTT,
+  RTShader x3, RTSimpleApp, RTLooneyLadders, RTDink, RTMindWall); each log
+  shows two real context rebuilds (e.g. 1024x768 -> 768x576 -> 1024x768)
+  plus the simulated reload.
+- **html5** `-Resize`: all 6 scenarios 0.000% (headless Edge; the canvas
+  CSS box shrinks to 3/4 size and back, and the engine follows it).
+- **ios** simulator `-Resize`: 0.03-0.04%, identical to the plain-run
+  jitter measured the same day (there `-autoresize` only logs, the reload
+  parm does the work).
+- **android** (Lume Pad Gen 2, ES2) `-Resize` and `-Background`: 0.03-0.04%,
+  same as plain runs. `-Background` is a real EGL context loss: logcat shows
+  the pause unloading everything and AppInit reloading it. Building this
+  found that the nav bar hiding in SharedActivity was racy (see the
+  "Android surface size" note in AGENTS.md), so goldens recorded before that
+  fix were sometimes 2560x1520 instead of 2560x1600.
+- **Mac** and **Linux** have no harness target yet; checked by hand with
+  plain vs `-autoresize 2000 -autoreloadsurfaces 4000` captures of the same
+  five RTShader/RTBareBones scenarios. Linux (glados, SDL/GL in the
+  freedesktop flatpak, 1920x1080 -> 1440x810 -> back): byte-identical. Mac
+  (studiomac, GL 2.1 Metal, 1024x768 -> 768x576 -> back): identical except
+  the "F:" free-memory digits in the FPS overlay, which differ between any
+  two Mac runs (~230 px); the "T:" texture-memory figure is identical, so
+  the reload accounting is right too.
 
 Per-target notes:
 

@@ -408,6 +408,7 @@ protected:
 
     void ProcessAutoScreenshot(); //handles the -autoscreenshot/-autoquit command line parms, called from Draw()
     void CheckAutoScreenshotParms(); //parses those parms and enables deterministic mode (locked timestep + fixed rand seed), called from Init()
+    void ProcessAutoTestEvents(); //handles the -autoresize/-autoreloadsurfaces test parms (window resize / simulated GL context loss at a fixed tick), called from Draw()
 
     bool m_bConsoleVisible;
     bool m_bFPSVisible;
@@ -441,6 +442,12 @@ protected:
     double m_autoScreenshotStartWallMS;
     double m_autoScreenshotUpdateStampMS;
     double m_autoScreenshotEngineMS; //accumulated Update+Draw time, excludes the swap/vsync wait
+
+    //-autoresize / -autoreloadsurfaces state, see ProcessAutoTestEvents()
+    unsigned int m_autoResizeAtMS;        //shrink the window at this tick (0 = off)...
+    unsigned int m_autoResizeRestoreAtMS; //...and put it back at this one (0 = nothing pending)
+    int m_autoResizeOrigX, m_autoResizeOrigY;
+    unsigned int m_autoReloadSurfacesAtMS; //fire m_sig_unloadSurfaces + m_sig_loadSurfaces at this tick (0 = off)
 };
 
 BaseApp * GetBaseApp(); //supply this yourself.  You create it on the first call if needed.

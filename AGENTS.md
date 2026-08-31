@@ -131,7 +131,8 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   (Windows resize/fullscreen toggle, Android context loss) runs through
   `m_sig_unloadSurfaces`/`m_sig_loadSurfaces`: the shader pipeline,
   `RTShader`s and render-target `Surface`s restore themselves there (render
-  target CONTENTS come back blank; redraw them). Details in the doc.
+  target CONTENTS come back blank; redraw them). `tests/harness.ps1 -Resize`
+  regresses that path on every target. Details in the doc.
 - AI / LLM client (`shared/AI/`): `docs/ai-llm.md`. Non-obvious constraints:
   apps must also compile `Network/NetHTTP,NetSocket,NetUtils` and
   `util/cJSON.c`; the socket backend is plain HTTP/1.0, non-streaming, one
@@ -171,6 +172,26 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   java copies from `shared/android/v3_src/`, so edit the v3_src templates,
   never the per-app copies. Gradle needs JAVA_HOME set to a JDK 17 (the local
   path is machine-specific, see agents_local.md).
+- Android surface size: `SharedActivity.HideStatusBar()` (v3_src) hides the
+  bars the sticky/lay-out-behind way (WindowInsetsController on API 30+,
+  IMMERSIVE_STICKY flags below) and is re-applied in `onWindowFocusChanged`
+  (fixed Aug 2026). With the old plain HIDE flags the first GL surface
+  randomly came up short by the nav bar height (a Lume Pad flipped between
+  2560x1600 and 2560x1520 run to run, which shows up as a golden "size
+  mismatch"), and a trip to the home screen brought the bars back for good.
+  Android goldens recorded before that fix may be 1520 tall: re-record.
+- Context-rebuild checks: `-Resize` (any target) launches every scenario with
+  the engine's `-autoresize <ms>` and `-autoreloadsurfaces <ms>` parms
+  (`BaseApp::ProcessAutoTestEvents`): a real window resize mid-run (a full GL
+  context teardown/rebuild on Windows, a re-layout on Mac/Linux/html5) plus
+  a simulated context loss (unload+reload of every surface and shader), and
+  the capture must still match the PLAIN golden. `-Target android
+  -Background` really sends the app to the home screen and back (EGL context
+  loss). Run `-Resize` after touching anything that owns GL objects (Surface,
+  RTFont, ShaderPipeline/RTShader, render targets, app-level textures).
+- Agent-shell gotcha: run the harness from PowerShell, not Git Bash. From the
+  Bash tool, `cmd /c` gets MSYS path-mangled into `C:\` (the html5 .bats and
+  gradlew silently never run), and GNU tar/scp read `C:\...` as host:file.
 - Any Proton app supports `-autoscreenshot <file.bmp> <delayMS>` (+`-autoquit`)
   to write its framebuffer to a BMP and exit; the code is
   `BaseApp::ProcessAutoScreenshot()`. The parm also enables deterministic mode

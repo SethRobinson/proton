@@ -235,14 +235,44 @@ import android.view.ViewTreeObserver;
     
 	public void HideStatusBar()
 	{
+		// Hide both the navigation bar and the status bar, the proper fullscreen-game
+		// way: lay the window out BEHIND the bars so the GL surface is created at the
+		// full screen size straight away, and keep them hidden (sticky) so they only
+		// peek in on a swipe and go away again by themselves.  The old plain
+		// HIDE_NAVIGATION|FULLSCREEN flags were neither: the first surface could come
+		// up short by the bar's height and only grow once the bar had animated away
+		// (the regression harness saw a Lume Pad flip between 2560x1600 and
+		// 2560x1520 from run to run), and any focus loss (home screen, a dialog)
+		// brought the bars back for good.  onWindowFocusChanged calls this again for
+		// that last case.
 		View decorView = getWindow().getDecorView();
-		// Hide both the navigation bar and the status bar.
-		// SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
-		// a general rule, you should design your app to hide the status bar whenever you
-		// hide the navigation bar.
-		int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-					  | View.SYSTEM_UI_FLAG_FULLSCREEN;
-		decorView.setSystemUiVisibility(uiOptions);
+		if (Build.VERSION.SDK_INT >= 30)
+		{
+			getWindow().setDecorFitsSystemWindows(false);
+			android.view.WindowInsetsController controller = decorView.getWindowInsetsController();
+			if (controller != null)
+			{
+				controller.hide(android.view.WindowInsets.Type.statusBars() | android.view.WindowInsets.Type.navigationBars());
+				controller.setSystemBarsBehavior(android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+			}
+		}
+		else
+		{
+			int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+						  | View.SYSTEM_UI_FLAG_FULLSCREEN
+						  | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+						  | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+						  | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+						  | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+			decorView.setSystemUiVisibility(uiOptions);
+		}
+	}
+
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus)
+	{
+		super.onWindowFocusChanged(hasFocus);
+		if (hasFocus) HideStatusBar(); //the system UI flags don't survive a trip to the home screen
 	}
 
 	@Override
