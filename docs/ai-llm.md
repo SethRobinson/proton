@@ -22,6 +22,21 @@ RTGameBot (an LLM plays Infocom games). Header comment has a usage example.
   whole max_tokens budget in the `reasoning` field and return content:null
   (surfaced as "model produced only reasoning" through m_sig_error).
 
+## Logging and stats (for debug overlays)
+
+- `SetLogFile(path, bAppend=false)` mirrors every request body, response body
+  and error to a timestamped text file (truncated at Setup time unless
+  bAppend). This is the exact bytes on the wire, which is what you want when
+  a model starts misbehaving; `GetLogFile()` returns the path so an app can
+  offer an "open the log" button.
+- After each completed reply: `GetLastPromptTokens()` /
+  `GetLastCompletionTokens()` (from the server's `usage` object, 0 if it
+  didn't send one), `GetLastReplyMS()`, `GetLastTPS()` (completion tokens per
+  second) and `GetLastRequestBytes()`. While a request is in flight,
+  `GetInFlightMS()` gives its age (0 when idle).
+- Timing uses `GetTick()`, so under the engine's deterministic screenshot mode
+  (locked timestep) these durations count frames, not wall clock.
+
 ## Completion contract (boost::signals2, fired from Update)
 
 - `m_sig_response`: `Get(0)` = assistant reply text. The client does NOT add

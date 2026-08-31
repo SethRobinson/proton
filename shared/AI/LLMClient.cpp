@@ -1,6 +1,16 @@
 #include "PlatformPrecomp.h"
 #include "LLMClient.h"
 #include "util/cJSON.h"
+#include <time.h>
+
+static std::string LogTimestamp()
+{
+	time_t now = time(NULL);
+	struct tm *pTM = localtime(&now);
+	char buf[64];
+	strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", pTM);
+	return buf;
+}
 
 void LLMConversation::TrimToLastExchanges(int maxPairs)
 {
@@ -67,12 +77,63 @@ void LLMClient::SetParms(float temperature, int maxTokens, int maxRetries)
 	m_maxRetries = maxRetries;
 }
 
+void LLMClient::SetLogFile(const std::string &path, bool bAppend)
+{
+	m_logPath = path;
+	if (m_logPath.empty() || bAppend)
+		return;
+
+	FILE *fp = fopen(m_logPath.c_str(), "wb");
+	if (!fp)
+	{
+		LogMsg("LLMClient: can't create log file %s", m_logPath.c_str());
+		m_logPath.clear();
+		return;
+	}
+	std::string header = "LLM log started " + LogTimestamp() + "\n";
+	fwrite(header.c_str(), 1, header.length(), fp);
+	fclose(fp);
+}
+
+void LLMClient::AppendToLog(const std::string &header, const std::string &body)
+{
+	if (m_logPath.empty())
+		return;
+
+	FILE *fp = fopen(m_logPath.c_str(), "ab");
+	if (!fp)
+		return;
+	std::string entry = "\n==== " + LogTimestamp() + " " + header + " ====\n" + body + "\n";
+	fwrite(entry.c_str(), 1, entry.length(), fp);
+	fclose(fp);
+}
+
+float LLMClient::GetLastTPS() const
+{
+	if (m_lastReplyMS <= 0 || m_lastCompletionTokens <= 0)
+		return 0;
+	return m_lastCompletionTokens * 1000.0f / m_lastReplyMS;
+}
+
+int LLMClient::GetInFlightMS() const
+{
+	if (!IsBusy())
+		return 0;
+	return (int)(GetTick() - m_requestStartTick);
+}
+
 bool LLMClient::SendAsync(const LLMConversation &convo)
 {
 	if (IsBusy())
 		return false;
 
 	m_pendingBody = MergeExtraBody(convo.BuildChatCompletionJSON(m_model, m_temperature, m_maxTokens));
+	m_lastRequestBytes = (int)m_pendingBody.length();
+
+	char header[256];
+	sprintf(header, "REQUEST to %s:%d/%s (%d bytes)", m_serverName.c_str(), m_port, m_apiPath.c_str(), m_lastRequestBytes);
+	AppendToLog(header, m_pendingBody);
+
 	m_attempt = 0;
 	StartRequest();
 	return true;
@@ -116,6 +177,7 @@ void LLMClient::StartRequest()
 {
 	m_attempt++;
 	m_bRetryPending = false;
+	m_requestStartTick = GetTick();
 
 	m_netHTTP.Reset(true);
 	m_netHTTP.Setup(m_serverName, m_port, m_apiPath, NetHTTP::END_OF_DATA_SIGNAL_HTTP);
@@ -165,8 +227,17 @@ void LLMClient::Update()
 
 	if (m_netHTTP.GetState() == NetHTTP::STATE_FINISHED)
 	{
+		m_lastReplyMS = (int)(GetTick() - m_requestStartTick);
+
+		const char *pRaw = (const char*)m_netHTTP.GetDownloadedData();
 		std::string parseErr;
-		std::string content = ParseAssistantContent((const char*)m_netHTTP.GetDownloadedData(), parseErr);
+		std::string content = ParseAssistantContent(pRaw, parseErr);
+
+		char header[128];
+		sprintf(header, "RESPONSE (%d ms, prompt %d tok, completion %d tok, %.1f tok/s)",
+			m_lastReplyMS, m_lastPromptTokens, m_lastCompletionTokens, GetLastTPS());
+		AppendToLog(header, pRaw ? pRaw : "(empty)");
+
 		if (!parseErr.empty())
 		{
 			HandleFailure(parseErr);
@@ -203,6 +274,10 @@ void LLMClient::HandleFailure(const std::string &errorMsg)
 
 	LogMsg("LLMClient: attempt %d failed (%s), %d retries left", m_attempt, errorMsg.c_str(), retriesLeft);
 
+	char header[128];
+	sprintf(header, "ERROR (attempt %d, %d retries left)", m_attempt, retriesLeft);
+	AppendToLog(header, errorMsg);
+
 	VariantList v;
 	v.Get(0).Set(errorMsg);
 	v.Get(1).Set(uint32(retriesLeft));
@@ -224,6 +299,17 @@ std::string LLMClient::ParseAssistantContent(const char *pJSON, std::string &err
 	{
 		errOut = "response isn't valid JSON";
 		return "";
+	}
+
+	m_lastPromptTokens = 0;
+	m_lastCompletionTokens = 0;
+	cJSON *pUsage = cJSON_GetObjectItem(pRoot, "usage");
+	if (pUsage)
+	{
+		cJSON *pPrompt = cJSON_GetObjectItem(pUsage, "prompt_tokens");
+		cJSON *pCompletion = cJSON_GetObjectItem(pUsage, "completion_tokens");
+		if (pPrompt && cJSON_IsNumber(pPrompt)) m_lastPromptTokens = pPrompt->valueint;
+		if (pCompletion && cJSON_IsNumber(pCompletion)) m_lastCompletionTokens = pCompletion->valueint;
 	}
 
 	std::string content;

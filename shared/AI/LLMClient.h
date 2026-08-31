@@ -95,6 +95,20 @@ public:
 	//  {"chat_template_kwargs":{"enable_thinking":false}}
 	void SetExtraBodyJSON(const std::string &jsonObject) { m_extraBodyJSON = jsonObject; }
 
+	//mirror every request/response/error body to a text file, timestamped
+	//("" disables). Truncates any existing file unless bAppend.
+	void SetLogFile(const std::string &path, bool bAppend = false);
+	const std::string & GetLogFile() const { return m_logPath; }
+
+	//stats from the most recent completed reply (0 until one finishes); the
+	//token counts come from the server's "usage" object when present
+	int GetLastPromptTokens() const { return m_lastPromptTokens; }
+	int GetLastCompletionTokens() const { return m_lastCompletionTokens; }
+	int GetLastReplyMS() const { return m_lastReplyMS; }
+	float GetLastTPS() const; //completion tokens per second of the last reply
+	int GetLastRequestBytes() const { return m_lastRequestBytes; } //POST body size
+	int GetInFlightMS() const; //ms the current request has been running, 0 if idle
+
 	//snapshots the conversation into a request; false if one is in flight
 	bool SendAsync(const LLMConversation &convo);
 
@@ -109,8 +123,10 @@ private:
 
 	void StartRequest();
 	void HandleFailure(const std::string &errorMsg);
-	//pulls choices[0].message.content out of the reply; on failure returns "" and sets errOut
+	//pulls choices[0].message.content out of the reply; on failure returns "" and sets errOut.
+	//Also captures usage stats (m_lastPromptTokens/m_lastCompletionTokens).
 	std::string ParseAssistantContent(const char *pJSON, std::string &errOut);
+	void AppendToLog(const std::string &header, const std::string &body);
 
 	std::string m_serverName;
 	int m_port = 8000;
@@ -131,6 +147,13 @@ private:
 	bool m_bRetryPending = false;
 	int m_attempt = 0;
 	unsigned int m_retryAtTick = 0;
+
+	std::string m_logPath;
+	unsigned int m_requestStartTick = 0;
+	int m_lastRequestBytes = 0;
+	int m_lastReplyMS = 0;
+	int m_lastPromptTokens = 0;
+	int m_lastCompletionTokens = 0;
 };
 
 #endif // LLMClient_h__
