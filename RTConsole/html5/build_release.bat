@@ -99,7 +99,10 @@ REM **************************************** END SOURCE
 
 :unused so far: -s USE_GLFW=3 -s NO_EXIT_RUNTIME=1 -s FORCE_ALIGNED_MEMORY=1 -s EMTERPRETIFY=1  -s EMTERPRETIFY_ASYNC=1 -DRT_EMTERPRETER_ENABLED
 :To skip font loading so it needs no resource files or zlib, add  -DC_NO_ZLIB
-SET CUSTOM_FLAGS= -DHAS_SOCKLEN_T -DBOOST_ALL_NO_LIB -DPLATFORM_HTML5 -DRT_USE_SDL_AUDIO -DRT_JPG_SUPPORT -DC_GL_MODE -s LEGACY_GL_EMULATION=1 -Wno-switch -s WASM=1 -DPLATFORM_HTML5 -s TOTAL_MEMORY=16MB -Wno-c++11-compat-deprecated-writable-strings -Wno-shift-negative-value -s ALLOW_MEMORY_GROWTH=1 -DC_NO_ZLIB -D_CONSOLE
+:Modernized for Emscripten 6 (Aug 2026): this is a pure console build (no GL
+:sources are compiled), so the old C_GL_MODE + LEGACY_GL_EMULATION flags were
+:removed as vestigial rather than flipped to the shader pipeline.
+SET CUSTOM_FLAGS= -DHAS_SOCKLEN_T -DBOOST_ALL_NO_LIB -DPLATFORM_HTML5 -DRT_USE_SDL_AUDIO -DRT_JPG_SUPPORT -Wno-switch -s WASM=1 -s TOTAL_MEMORY=16MB -Wno-c++11-compat-deprecated-writable-strings -Wno-shift-negative-value -Wno-deprecated-builtins -Wno-deprecated-non-prototype -s ALLOW_MEMORY_GROWTH=1 -DC_NO_ZLIB -D_CONSOLE
 
 :unused:   -s FULL_ES2=1 --emrun
 
@@ -114,10 +117,10 @@ SET FINAL_EXTENSION=html
 
 IF %DEBUG% EQU 0 (
 echo Compiling in release mode
-SET CUSTOM_FLAGS=%CUSTOM_FLAGS% -O2 -DNDEBUG -DRT_EMTERPRETER_ENABLED 
+SET CUSTOM_FLAGS=%CUSTOM_FLAGS% -O2 -DNDEBUG
 ) else (
 echo Compiling in debug mode
-SET CUSTOM_FLAGS=%CUSTOM_FLAGS% -D_DEBUG -s GL_UNSAFE_OPTS=0 -s WARN_ON_UNDEFINED_SYMBOLS=1 -s EXCEPTION_DEBUG=1 -s DEMANGLE_SUPPORT=1 -s ALIASING_FUNCTION_POINTERS=0 --emrun
+SET CUSTOM_FLAGS=%CUSTOM_FLAGS% -O0 -gsource-map -D_DEBUG -s ASSERTIONS=1
 )
 
 SET INCLUDE_DIRS=-I%SHARED% -I%APP% -I../../shared/util/boost -I../../shared/ClanLib-2.0/Sources -I../../shared/Network/enet/include ^

@@ -1,6 +1,6 @@
 SET _FTP_USER_=rtsoft
 SET _FTP_SITE_=rtsoft.com
-SET WEB_SUB_DIR=web/rtbarebones
+SET WEB_SUB_DIR=web/rtshader
 
 set CURPATH=%cd%
 cd ..
@@ -16,6 +16,9 @@ ssh %_FTP_USER_%@%_FTP_SITE_% "mkdir ~/www/%WEB_SUB_DIR%"
 ssh %_FTP_USER_%@%_FTP_SITE_% "rm -rf ~/www/%WEB_SUB_DIR%/WebLoaderData"
 scp %APP_NAME%*.* %_FTP_USER_%@%_FTP_SITE_%:www/%WEB_SUB_DIR%
 scp -r WebLoaderData %_FTP_USER_%@%_FTP_SITE_%:www/%WEB_SUB_DIR%
+:scp from Windows can create dirs/files without group read, and Apache runs in
+:the rtsoft group, so fix modes or WebLoaderData 403s and the loader never runs
+ssh %_FTP_USER_%@%_FTP_SITE_% "chmod -R u=rwX,go=rX ~/www/%WEB_SUB_DIR%"
 
 :Let's go ahead an open a browser to test it
 start http://www.%_FTP_SITE_%/%WEB_SUB_DIR%/%APP_NAME%.html

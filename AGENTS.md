@@ -61,6 +61,18 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   without it the SDL includes in `HTML5Main.cpp` fail and the .bat still exits
   0, so check the output for errors). ArduboySim's html5 script likely needs the
   same flag treatment.
+- RTConsole's html5 build was modernized for Emscripten 6 (Aug 2026). It is a
+  pure console build (main.cpp + reduced _CONSOLE sources, no GL, no
+  HTML5Main.cpp), so the old `C_GL_MODE` + `LEGACY_GL_EMULATION` flags were
+  deleted as vestigial rather than flipped to the shader pipeline, and it needs
+  no `-sUSE_SDL`. Output goes through emcc's `--shell-file`
+  `shared/html5/templates/shell_minimal.html` (already `{{{ SCRIPT }}}`
+  compatible). Deployed at rtsoft.com/web/rtconsole/RTConsole.html (unlinked
+  dev page).
+- RTShader's html5 UploadToWebsite.bat was a stale copy of RTBareBones' and
+  uploaded to `web/rtbarebones` (fixed Aug 2026 to `web/rtshader`, live at
+  rtsoft.com/web/rtshader/RTShader.html and linked from the /web/ arcade
+  page). When cloning an app's html5 folder, always fix WEB_SUB_DIR.
 - The html5 `UploadToWebsite.bat` scripts must `chmod -R u=rwX,go=rX` the web
   dir after scp (RTDink/RTDScroll always did; RTBareBones/RTSimpleApp/RTConsole
   gained it Aug 2026 after a live 403 incident): scp from Windows can create
