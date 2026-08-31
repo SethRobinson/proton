@@ -206,27 +206,12 @@ bool NetSocket::Init( string url, int port )
 
 #ifdef WINAPI
 
-		//u_long iMode = 0;
-		//ioctlsocket(m_socket, FIOASYNC, &iMode);
-/*
-		if (WSAAsyncSelect(m_socket, GetForegroundWindow(), WM_USER+1, FD_READ) == SOCKET_ERROR)
+		//Non-blocking via ioctlsocket; see the note in the non-RT_IPV6 path
+		//below about why WSAAsyncSelect(GetForegroundWindow(), ...) was wrong.
 		{
-			LogMsg("Error setting socket FD_READ: %d", WSAGetLastError());
+			u_long nonBlocking = 1;
+			ioctlsocket(m_socket, FIONBIO, &nonBlocking);
 		}
-
-		if (WSAAsyncSelect(m_socket, GetForegroundWindow(), WM_USER+1, FD_WRITE) == SOCKET_ERROR)
-		{
-			LogMsg("Error setting socket FD_WRITE: %d", WSAGetLastError());
-		}
-		if (WSAAsyncSelect(m_socket, GetForegroundWindow(), WM_USER+1, FD_CONNECT) == SOCKET_ERROR)
-		{
-			LogMsg("Error setting socket FD_CONNECT: %d", WSAGetLastError());
-		}
-		if (WSAAsyncSelect(m_socket, GetForegroundWindow(), WM_USER+1, FD_OOB) == SOCKET_ERROR)
-		{
-			LogMsg("Error setting socket FD_OOB: %d", WSAGetLastError());
-		} 
-		*/
 
 #else
 		fcntl (m_socket, F_SETFL, O_NONBLOCK);
@@ -287,15 +272,20 @@ bool NetSocket::Init( string url, int port )
 
 #ifdef WINAPI
 
-	//u_long iMode = 0;
-	//ioctlsocket(m_socket, FIOASYNC, &iMode);
-
-#pragma warning(suppress:4996) //WSAAsyncSelect is deprecated but the window-message based notify is what we want here
-	WSAAsyncSelect(m_socket, GetForegroundWindow(), WM_USER + 1, FD_READ | FD_WRITE | FD_CONNECT | FD_OOB);
+	//Make the socket non-blocking directly.  This used to be done as a side
+	//effect of WSAAsyncSelect(m_socket, GetForegroundWindow(), ...), but that
+	//fails whenever our window isn't the foreground window (the handle then
+	//belongs to another process), silently leaving the socket BLOCKING and
+	//freezing the main thread inside recv().  Nothing ever handled the
+	//WM_USER+1 messages anyway; NetHTTP/NetSocket poll from Update().
+	{
+		u_long nonBlocking = 1;
+		ioctlsocket(m_socket, FIONBIO, &nonBlocking);
+	}
 
 #else
 		fcntl (m_socket, F_SETFL, O_NONBLOCK);
-	
+
 #endif
 	
 	int ret = connect(m_socket,(struct sockaddr *)&sa,sizeof sa);

@@ -103,6 +103,7 @@ public:
 	bool AddPutData(const string data); //can only be set once.  Can't be used with AddPostData
 	bool SetFileOutput(const string &fName); //call this before Start, allows you to save to a file instead of memory
 	void SetPostHeaderOverride(string header); //example: "Content-Type: application/json\r\n"
+	void SetIdleTimeoutMS(int ms) {m_idleTimeOutMS = ms;} //give up if no data arrives for this long (default 25000)
 	bool Start();
 	
 	eState GetState() {return m_state;}

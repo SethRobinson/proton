@@ -15,6 +15,16 @@ Project operating instructions for AI assistants working in this repository.
 
 Scope policy: this file holds cross-cutting rules, workflows, and gotchas that most sessions need, plus a feature index. Keep it around 30 KB. Feature deep-dives live in `docs/<topic>.md`: before working on a feature listed in the index, read its doc; when finishing feature work, update that doc and keep the index entry here to one or two lines (where it lives + the non-obvious constraint). Cross-cutting rules and new gotchas still land here directly. When a change makes anything stale, here or in a linked doc, update it in the same change.
 
+## Codebase map
+
+- `docs/codebase-overview.md` is a map of the engine: what each `shared/`
+  subsystem does, the core classes (BaseApp, Entity/Component, Variant,
+  MessageManager...), platform backends, what each sample app demonstrates,
+  and a "where do I look to..." task index. Read it BEFORE exploring or
+  searching the tree to locate functionality; it is far cheaper than
+  re-discovering the layout. Keep it current: when a change moves or renames
+  something the map mentions, update the map in the same change.
+
 ## Testing
 
 - When possible, design automated tests for new features and bug fixes.
@@ -118,6 +128,10 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   `RT_SHADER_PIPELINE_AVAILABLE` (all desktop GL configs of the suite apps,
   Mac RTBareBones, Linux via Proton.cmake); launch with `-fixedpipeline` to
   get the legacy fixed-function path for comparison.
+- AI / LLM client (`shared/AI/`): `docs/ai-llm.md`. Non-obvious constraints:
+  apps must also compile `Network/NetHTTP,NetSocket,NetUtils` and
+  `util/cJSON.c`; the socket backend is plain HTTP/1.0, non-streaming, one
+  request in flight per LLMClient, polled from Update().
 
 ## Conventions for new app projects
 
@@ -189,6 +203,10 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   the demo apps render a virtual screen (e.g. 480x320) scaled to the window,
   so click coords must be measured from a screenshot, not taken from game
   coordinates.
+- Posting WM_CHAR does nothing: `shared/win/app/main.cpp` defines
+  `C_DONT_USE_WM_CHAR`, so keyboard input must be driven with
+  WM_KEYDOWN/WM_KEYUP (the WM_KEYDOWN handler synthesizes
+  MESSAGE_TYPE_GUI_CHAR itself).
 - Park the REAL cursor inside the window (SetCursorPos) before posting drags:
   the main loop polls GetCursorPos (CheckIfMouseLeftWindowArea) and calls
   ResetTouches when the real cursor sits/moves outside the window area with no
