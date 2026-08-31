@@ -9,7 +9,6 @@
 
 #include "NetHTTP.h"
 #include "NetUtils.h"
-#include "util/TextScanner.h"
 
 #define NET_END_MARK_CHECK_DELAY_MS 333
 #define C_END_DOWNLOAD_MARKER_STRING "RTENDMARKERBS1001"
@@ -48,6 +47,7 @@ void NetHTTP::Reset(bool bClearPostdata)
 	m_timer = 0;
 	m_idleTimeOutMS = C_DEFAULT_IDLE_TIMEOUT_MS;
 	m_expectedFileBytes= 0;
+	m_resultCode = 0;
 	m_downloadData.clear();
 	m_replyHeader.clear();
 	m_query.clear();
@@ -198,6 +198,7 @@ bool NetHTTP::Start()
 	m_downloadData.clear();
 	m_downloadHeader.clear();
 	m_expectedFileBytes = 0;
+	m_resultCode = 0;
 	string header = BuildHTTPHeader();
 
 #ifdef _DEBUG
@@ -250,40 +251,75 @@ bool CheckCharVectorForString(vector<char> &v, string marker, int *pIndexOfMarke
 	return false;
 }
 
+//a reply header field by name. Case-insensitive on the name: HTTP allows any
+//case and servers like uvicorn send "content-length", which used to make the
+//length invisible here (binary bodies then got cut at the first "\n\n" they
+//happened to contain). The value keeps its case
+static string GetHeaderValue(const string &header, const string &name)
+{
+	size_t pos = 0;
+	while (pos < header.length())
+	{
+		size_t end = header.find('\n', pos);
+		if (end == string::npos) end = header.length();
+		string line = header.substr(pos, end - pos);
+		pos = end + 1;
+
+		size_t colon = line.find(':');
+		if (colon == string::npos || colon != name.length())
+			continue;
+
+		bool bMatch = true;
+		for (size_t i = 0; i < colon && bMatch; i++)
+		{
+			if (tolower((unsigned char)line[i]) != tolower((unsigned char)name[i]))
+				bMatch = false;
+		}
+		if (!bMatch)
+			continue;
+
+		return TrimLeft(TrimRight(line.substr(colon + 1), " \t\r"), " \t");
+	}
+	return "";
+}
+
 int NetHTTP::ScanDownloadedHeader()
 {
-	TextScanner t(m_downloadHeader.c_str());
-	string temp = t.GetParmString("Content-Length", 1, ":");
-	m_expectedFileBytes = atoi(temp.c_str());
+	m_expectedFileBytes = atoi(GetHeaderValue(m_downloadHeader, "Content-Length").c_str());
 
-	int resultCode = (int)atol(SeparateStringSTL(t.m_lines[0], 1, ' ').c_str());
+	//"HTTP/1.1 200 OK": the status is the second word of the first line
+	string firstLine = m_downloadHeader.substr(0, m_downloadHeader.find('\n'));
+	int resultCode = (int)atol(SeparateStringSTL(firstLine, 1, ' ').c_str());
+	m_resultCode = resultCode;
+
 	switch (resultCode)
 	{
 		case 404:
 			OnError(ERROR_404_FILE_NOT_FOUND);
 			break;
-		
+
 		case 301: //moved permanently
 		case 302: //moved temporarily
-		
-		string url = t.GetParmString("Location:",1, " ");
-
-		if (!url.empty())
 		{
-			string domain;
-			string request;
-			int port = 80;
-			BreakDownURLIntoPieces(url, domain, request, port);
-			string fNameTemp = m_fileName;
-			Reset(false); //end connection, setup new one
-			if (!fNameTemp.empty())
+			string url = GetHeaderValue(m_downloadHeader, "Location");
+
+			if (!url.empty())
 			{
-				SetFileOutput(fNameTemp);
+				string domain;
+				string request;
+				int port = 80;
+				BreakDownURLIntoPieces(url, domain, request, port);
+				string fNameTemp = m_fileName;
+				Reset(false); //end connection, setup new one
+				if (!fNameTemp.empty())
+				{
+					SetFileOutput(fNameTemp);
+				}
+				Setup(domain, port, request, m_endOfDataSignal);
+				Start();
 			}
-			Setup(domain, port, request, m_endOfDataSignal);
-			Start();
 		}
-		
+		break;
 	}
 
 	return resultCode;

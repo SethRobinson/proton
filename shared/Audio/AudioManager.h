@@ -116,6 +116,15 @@ public:
 	 */
 	virtual void FadeOutMusic(unsigned int duration = 1000) {StopMusic();}
 	virtual void KillCachedSounds(bool bKillMusic, bool bKillLooping, int ignoreSoundsUsedInLastMS, int killSoundsLowerPriorityThanThis, bool bKillSoundsPlaying) {}
+	/**
+	 * Drops one cached sound, looked up by the file name it was played with,
+	 * so the next Play of that name reloads it from disk. Needed when a file
+	 * gets rewritten at runtime (generated speech, downloaded clips): the
+	 * backends cache by name and would keep playing the old audio. Stop the
+	 * sound first. Returns false if nothing matched or the backend has no
+	 * per-name cache.
+	 */
+	virtual bool DeleteSoundObjectByFileName(string fName) { return false; }
 	virtual int GetMemoryUsed(){return 0;}
 	virtual void SetFrequency(AudioHandle soundID, int freq) {}
 	virtual void SetPan(AudioHandle soundID, float pan) {} //0 is normal stereo, -1 is all left, +1 is all right

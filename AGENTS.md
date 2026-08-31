@@ -133,10 +133,16 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   `RTShader`s and render-target `Surface`s restore themselves there (render
   target CONTENTS come back blank; redraw them). `tests/harness.ps1 -Resize`
   regresses that path on every target. Details in the doc.
-- AI / LLM client (`shared/AI/`): `docs/ai-llm.md`. Non-obvious constraints:
-  apps must also compile `Network/NetHTTP,NetSocket,NetUtils` and
-  `util/cJSON.c`; the socket backend is plain HTTP/1.0, non-streaming, one
-  request in flight per LLMClient, polled from Update().
+- AI / LLM + TTS clients (`shared/AI/`): `docs/ai-llm.md`. Non-obvious
+  constraints: apps must also compile `Network/NetHTTP,NetSocket,NetUtils`
+  (and `util/cJSON.c` for LLMClient); the socket backend is plain HTTP/1.0,
+  non-streaming, one request in flight per client, polled from Update().
+  `TTSClient` (Aug 2026) writes the audio reply to a file with a latest-wins
+  queue; the AudioManager caches sounds by file name, so never reuse a clip
+  name without `DeleteSoundObjectByFileName` (a base-class virtual now).
+  NetHTTP's reply-header lookup is case-insensitive since Aug 2026 (uvicorn
+  sends `content-length`; binary bodies used to get cut at the first "\n\n"
+  inside them) and `GetResultCode()` exposes the HTTP status.
 
 ## Conventions for new app projects
 
@@ -228,6 +234,12 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   the demo apps render a virtual screen (e.g. 480x320) scaled to the window,
   so click coords must be measured from a screenshot, not taken from game
   coordinates.
+- `-runinbackground` (any Proton app on Windows, Aug 2026) keeps the main loop
+  updating without focus the way `-autoscreenshot` does, minus the capture
+  mode and its locked timestep: use it for scripted self-test runs that need
+  wall-clock timing (RTGameBot's `-speechtest`). Re-posting WM_SETFOCUS
+  periodically works too; a one-off post is not enough if anything else
+  (a build spawning a console, the user) takes the foreground mid-run.
 - Posting WM_CHAR does nothing: `shared/win/app/main.cpp` defines
   `C_DONT_USE_WM_CHAR`, so keyboard input must be driven with
   WM_KEYDOWN/WM_KEYUP (the WM_KEYDOWN handler synthesizes

@@ -1958,6 +1958,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLin
 				g_bAppCanRunInBackground = true;
 				g_autoScreenshotMode = true;
 			}
+			//the same need for any other scripted run (an app's own self-test
+			//mode, say) that must not inherit the capture mode's locked timestep
+			if (ToLowerCaseString(parms[i]) == "-runinbackground")
+			{
+				g_bAppCanRunInBackground = true;
+			}
 		}
 	}
 

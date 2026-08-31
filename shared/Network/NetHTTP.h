@@ -111,6 +111,7 @@ public:
 
 	int GetDownloadedBytes();
 	int GetExpectedBytes() {return m_expectedFileBytes;} //0 if unknown
+	int GetResultCode() {return m_resultCode;} //HTTP status of the reply (200, 404, 500...), 0 until its header has arrived
 	const uint8 * GetDownloadedData();
 	void Update();
 	void Reset(bool bClearPostData=true); //completely clears it out so it can be used again
@@ -178,6 +179,7 @@ private:
 	vector<uint8> m_downloadData; //holds the actual file/stream of what we've got
 	string m_downloadHeader;
 	uint32 m_expectedFileBytes; //0 if content-length is unknown
+	int m_resultCode; //HTTP status from the reply header, 0 until known
 	string m_postData; //optional, for if we want to send post data
 	unsigned int m_timer; //we scan for an end of mark, we don't want to do it too often
 	int m_idleTimeOutMS;

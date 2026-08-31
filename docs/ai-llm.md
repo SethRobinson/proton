@@ -67,8 +67,77 @@ RTGameBot (an LLM plays Infocom games). Header comment has a usage example.
   `<think>` blocks are the caller's problem (RTGameBot strips them, see its
   GameDirector::ParseAIResponse).
 - `NetHTTP::SetIdleTimeoutMS(ms)` was added for this (public, default 25s).
+- `NetHTTP::GetResultCode()` (Aug 2026) returns the reply's HTTP status (0
+  until the header arrived); only 404 is turned into a NetHTTP error, so a
+  500 with a JSON body looks like a successful download otherwise.
+- The reply-header lookup in `NetHTTP::ScanDownloadedHeader` is
+  case-insensitive since Aug 2026 (`GetHeaderValue`). Before that,
+  `Content-Length` was matched exactly and uvicorn's lowercase
+  `content-length` was never seen, so the `END_OF_DATA_SIGNAL_HTTP` path
+  ended a body at the first `"\n\n"` in it: harmless for JSON, fatal for
+  binary audio (found by TTSClient). `Location` redirects had the same bug.
 - Windows NetSocket fix that this depends on: sockets are now made
   non-blocking with `ioctlsocket(FIONBIO)`; the old
   `WSAAsyncSelect(GetForegroundWindow(), ...)` silently left the socket
   BLOCKING whenever the app window wasn't foreground, freezing the main
   thread in recv().
+
+# shared/AI: TTS client
+
+`shared/AI/TTSClient.h/.cpp` speaks text through an HTTP text-to-speech
+server: it form-POSTs the text plus any fields you set and writes the audio
+reply to a file, ready for `AudioManager::Play`. First user: RTGameBot's
+narrator/player voices (its `docs/speech.md`). Built for hal's `POST /tts`
+(fields `text`, `voice`, `scene`; reply = a WAV) but any endpoint that takes
+an `application/x-www-form-urlencoded` POST and answers with the audio bytes
+plus a `Content-Length` works. Header comment has a usage example. Compiles
+with the same files as LLMClient minus cJSON.
+
+## API
+
+- `Setup(server, port, "tts")`; `SetField(name, value)` for the extra form
+  fields (`""` removes one); `SetTextFieldName` (default `text`);
+  `SetTimeoutMS` (idle cap per attempt, default 90 s: generation is silent
+  until the audio is done); `SetMaxRetries` (default 1, transport failures).
+- `Speak(text, outFile)` returns a request id (0 = not set up / empty text).
+  `Update()` every frame; `IsBusy()` / `IsInFlight()`; `Abort()`.
+- `m_sig_ready`: `Get(0)` = the file path, `Get(1)` = request id (uint32),
+  `Get(2)` = the text. `m_sig_error`: `Get(0)` = error string, `Get(1)` =
+  request id. Both fire from `Update()`.
+- Stats: `GetLastReplyMS()`, `GetLastAudioBytes()`, `GetInFlightMS()`.
+
+## Queueing: latest wins
+
+One request in flight plus ONE pending slot. `Speak()` while busy parks the
+line in the slot, a newer `Speak()` replaces it, and when the in-flight
+request finishes its audio is dropped unfired if something newer is waiting
+(a pending retry is skipped the same way). That is right for a talking
+character (say the newest thing, no backlog of stale lines); an app that
+needs every line heard waits for `IsBusy()` to clear before the next
+`Speak()`.
+
+## Reply validation
+
+`GetResultCode() >= 400` is an error carrying the start of the body (hal
+answers an unknown voice with a 500 and a JSON `detail`). Otherwise
+`TTSClient::ValidateAudio` (public static, so tests can feed it buffers)
+requires >= 64 bytes and a known signature (`RIFF`, `OggS`, `fLaC`, `ID3`,
+an MP3 frame) and, for RIFF, that the body is at least as long as the size
+field claims (0 / 0xFFFFFFFF, what streaming encoders write, is accepted),
+so a truncated download is rejected instead of played.
+
+## Gotchas
+
+- The `AudioManager` backends cache sound objects by file name and would
+  replay the OLD audio for a rewritten file: use a fresh name per line, or
+  call `AudioManager::DeleteSoundObjectByFileName` (base-class virtual, Aug
+  2026; every backend already had the method) before reusing one. Stop the
+  sound first.
+- A server that is down but whose host resolves costs the full idle timeout
+  per attempt: `NetSocket` reads a refused connection as "not ready", not
+  as a disconnect. Probe the server first if that matters (RTGameBot does a
+  `GET /voices` with a 5 s idle timeout and switches the voices off on
+  failure).
+- The whole reply is held in memory before the file is written (a paragraph
+  of 24 kHz speech is around a megabyte); `NetHTTP`'s 333 ms end-of-data poll
+  adds up to that much latency per line.
