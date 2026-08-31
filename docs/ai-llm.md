@@ -16,6 +16,11 @@ RTGameBot (an LLM plays Infocom games). Header comment has a usage example.
   `SendAsync(convo)` (snapshots the JSON; false if busy), and poll `Update()`
   every frame. `SetParms(temperature, maxTokens, maxRetries)`,
   `SetTimeoutMS(ms)` (per-attempt, default 15s), `Abort()`.
+  `SetExtraBodyJSON(json)` merges arbitrary fields into every request body,
+  e.g. `{"chat_template_kwargs":{"enable_thinking":false}}` for Qwen on
+  vLLM. That one matters: with thinking left on, the model can burn the
+  whole max_tokens budget in the `reasoning` field and return content:null
+  (surfaced as "model produced only reasoning" through m_sig_error).
 
 ## Completion contract (boost::signals2, fired from Update)
 

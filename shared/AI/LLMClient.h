@@ -90,6 +90,11 @@ public:
 	void SetParms(float temperature, int maxTokens, int maxRetries);
 	void SetTimeoutMS(int ms) { m_timeoutMS = ms; } //per-attempt cap on waiting for the reply
 
+	//a JSON object whose fields get merged into every request body; for
+	//server-specific extras, e.g. vLLM/Qwen:
+	//  {"chat_template_kwargs":{"enable_thinking":false}}
+	void SetExtraBodyJSON(const std::string &jsonObject) { m_extraBodyJSON = jsonObject; }
+
 	//snapshots the conversation into a request; false if one is in flight
 	bool SendAsync(const LLMConversation &convo);
 
@@ -117,7 +122,10 @@ private:
 	int m_maxRetries = 3;
 	int m_timeoutMS = 15 * 1000;
 
+	std::string MergeExtraBody(const std::string &body) const;
+
 	NetHTTP m_netHTTP;
+	std::string m_extraBodyJSON;
 	std::string m_pendingBody; //the request being sent (kept for retries)
 	bool m_bBusy = false;
 	bool m_bRetryPending = false;

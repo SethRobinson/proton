@@ -526,7 +526,10 @@ string GetCountryCode() //return the 2 letter ISO country code, or 00 if we fail
 	return country;
 }
 
-inline string TrimRight (const string & s, const string & t)
+//NOT inline: an inline definition in a .cpp is invisible to other translation
+//units, so optimized builds get LNK2019 on any outside caller (debug builds
+//happened to emit a callable copy, hiding the bug)
+string TrimRight (const string & s, const string & t)
 { 
 	string d (s); 
 	string::size_type i (d.find_last_not_of (t));

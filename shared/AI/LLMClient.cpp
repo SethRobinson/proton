@@ -72,10 +72,44 @@ bool LLMClient::SendAsync(const LLMConversation &convo)
 	if (IsBusy())
 		return false;
 
-	m_pendingBody = convo.BuildChatCompletionJSON(m_model, m_temperature, m_maxTokens);
+	m_pendingBody = MergeExtraBody(convo.BuildChatCompletionJSON(m_model, m_temperature, m_maxTokens));
 	m_attempt = 0;
 	StartRequest();
 	return true;
+}
+
+std::string LLMClient::MergeExtraBody(const std::string &body) const
+{
+	if (m_extraBodyJSON.empty())
+		return body;
+
+	cJSON *pRoot = cJSON_Parse(body.c_str());
+	cJSON *pExtra = cJSON_Parse(m_extraBodyJSON.c_str());
+
+	if (!pRoot || !pExtra)
+	{
+		LogMsg("LLMClient: SetExtraBodyJSON content isn't valid JSON, ignoring");
+		if (pRoot) cJSON_Delete(pRoot);
+		if (pExtra) cJSON_Delete(pExtra);
+		return body;
+	}
+
+	cJSON *pChild = pExtra->child;
+	while (pChild)
+	{
+		cJSON *pNext = pChild->next; //detaching invalidates the links
+		cJSON *pDetached = cJSON_DetachItemViaPointer(pExtra, pChild);
+		cJSON_DeleteItemFromObject(pRoot, pDetached->string); //extra wins on collision
+		cJSON_AddItemToObject(pRoot, pDetached->string, pDetached);
+		pChild = pNext;
+	}
+
+	char *pText = cJSON_PrintUnformatted(pRoot);
+	std::string merged = pText ? pText : body;
+	if (pText) cJSON_free(pText);
+	cJSON_Delete(pRoot);
+	cJSON_Delete(pExtra);
+	return merged;
 }
 
 void LLMClient::StartRequest()
@@ -218,9 +252,20 @@ std::string LLMClient::ParseAssistantContent(const char *pJSON, std::string &err
 		cJSON *pContent = pMessage ? cJSON_GetObjectItem(pMessage, "content") : NULL;
 
 		if (pContent && cJSON_IsString(pContent))
+		{
 			content = pContent->valuestring;
+		}
+		else if (pMessage && cJSON_GetObjectItem(pMessage, "reasoning"))
+		{
+			//reasoning models can burn the whole max_tokens budget "thinking"
+			//and return content:null; the fix is usually to disable thinking
+			//(SetExtraBodyJSON) or raise maxTokens
+			errOut = "model produced only reasoning, no content (out of tokens?)";
+		}
 		else
+		{
 			errOut = "response is missing choices[0].message.content";
+		}
 	}
 
 	cJSON_Delete(pRoot);
