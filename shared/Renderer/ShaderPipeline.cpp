@@ -86,6 +86,7 @@ typedef void (APIENTRY *PFNSPGETPROGRAMIV)(GLuint program, GLenum pname, GLint *
 typedef void (APIENTRY *PFNSPGETPROGRAMINFOLOG)(GLuint program, GLsizei bufSize, GLsizei *length, SPGLchar *infoLog);
 typedef void (APIENTRY *PFNSPUSEPROGRAM)(GLuint program);
 typedef void (APIENTRY *PFNSPDELETESHADER)(GLuint shader);
+typedef void (APIENTRY *PFNSPDELETEPROGRAM)(GLuint program);
 typedef GLint (APIENTRY *PFNSPGETUNIFORMLOCATION)(GLuint program, const SPGLchar *name);
 typedef void (APIENTRY *PFNSPUNIFORMMATRIX4FV)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
 typedef void (APIENTRY *PFNSPUNIFORM4FV)(GLint location, GLsizei count, const GLfloat *value);
@@ -114,6 +115,7 @@ static PFNSPGETPROGRAMIV spGetProgramiv = NULL;
 static PFNSPGETPROGRAMINFOLOG spGetProgramInfoLog = NULL;
 static PFNSPUSEPROGRAM spUseProgram = NULL;
 static PFNSPDELETESHADER spDeleteShader = NULL;
+static PFNSPDELETEPROGRAM spDeleteProgram = NULL;
 static PFNSPGETUNIFORMLOCATION spGetUniformLocation = NULL;
 static PFNSPUNIFORMMATRIX4FV spUniformMatrix4fv = NULL;
 static PFNSPUNIFORM4FV spUniform4fv = NULL;
@@ -145,6 +147,7 @@ static bool LoadGL2FunctionPointers()
 	SP_LOAD(spGetProgramInfoLog, "glGetProgramInfoLog");
 	SP_LOAD(spUseProgram, "glUseProgram");
 	SP_LOAD(spDeleteShader, "glDeleteShader");
+	SP_LOAD(spDeleteProgram, "glDeleteProgram");
 	SP_LOAD(spGetUniformLocation, "glGetUniformLocation");
 	SP_LOAD(spUniformMatrix4fv, "glUniformMatrix4fv");
 	SP_LOAD(spUniform4fv, "glUniform4fv");
@@ -179,6 +182,7 @@ static bool LoadGL2FunctionPointers() { return true; }
 #define spGetProgramInfoLog glGetProgramInfoLog
 #define spUseProgram glUseProgram
 #define spDeleteShader glDeleteShader
+#define spDeleteProgram glDeleteProgram
 #define spGetUniformLocation glGetUniformLocation
 #define spUniformMatrix4fv glUniformMatrix4fv
 #define spUniform4fv glUniform4fv
@@ -455,6 +459,57 @@ static bool BuildProgram(int variant)
 	return true;
 }
 
+//---------------------------------------------------------------------------
+// GL context rebuilds.  Windows recreates the context on a window resize or
+// fullscreen toggle (win/app/main.cpp, MESSAGE_SET_VIDEO_MODE) and Android
+// can lose it in the background; both announce it through BaseApp's
+// m_sig_unloadSurfaces (old context, still alive on Windows) and
+// m_sig_loadSurfaces (new context current).  Every GL object cached here dies
+// with the context: the ubershader variants (rebuilt lazily by the next
+// draw), the app's RTShaders (relinked from their kept source) and SPInit's
+// per-context setup (redone by clearing bInitted; the entry points get
+// re-fetched then, but stay valid in between so the Surface unload slots can
+// still delete their framebuffers).
+//---------------------------------------------------------------------------
+
+static std::vector<RTShader*> & GetShaderRegistry()
+{
+	static std::vector<RTShader*> registry; //function-local: RTShaders can be globals that construct before other statics
+	return registry;
+}
+
+static void SP_OnUnloadSurfaces()
+{
+	for (int i = 0; i < SP_VARIANT_COUNT; i++)
+	{
+		if (g_sp.programs[i].program)
+		{
+			spDeleteProgram(g_sp.programs[i].program);
+			g_sp.programs[i].program = 0;
+		}
+	}
+	if (g_sp.boundProgram)
+	{
+		spUseProgram(0);
+		g_sp.boundProgram = 0;
+	}
+	g_sp.boundRenderTargetFBO = 0;
+
+	std::vector<RTShader*> &shaders = GetShaderRegistry();
+	for (size_t i = 0; i < shaders.size(); i++) shaders[i]->OnGLContextLost();
+
+	glGetError(); //deleting names on a context that is already gone (Android) errors harmlessly
+
+	g_sp.bInitted = false; //next SPInit re-fetches the entry points and redoes the per-context setup
+	g_sp.bInitFailed = false;
+}
+
+static void SP_OnLoadSurfaces()
+{
+	std::vector<RTShader*> &shaders = GetShaderRegistry();
+	for (size_t i = 0; i < shaders.size(); i++) shaders[i]->OnGLContextRestored();
+}
+
 static bool SPInit()
 {
 	if (g_sp.bInitted) return !g_sp.bInitFailed;
@@ -472,6 +527,16 @@ static bool SPInit()
 	glEnable(GL_PROGRAM_POINT_SIZE); //so GL_POINTS behave; harmless if unsupported
 	glGetError(); //eat any error from the above on old drivers
 #endif
+
+	//once per process: follow the GL context through rebuilds (see above).
+	//Group 0 runs before the Surfaces' group 1 slots.
+	static bool bHookedContextSignals = false;
+	if (!bHookedContextSignals)
+	{
+		bHookedContextSignals = true;
+		GetBaseApp()->m_sig_unloadSurfaces.connect(0, &SP_OnUnloadSurfaces);
+		GetBaseApp()->m_sig_loadSurfaces.connect(0, &SP_OnLoadSurfaces);
+	}
 
 	LogMsg("ShaderPipeline: initialized (%s)", (const char*)glGetString(GL_VERSION));
 	return true;
@@ -497,6 +562,14 @@ void SPState::Reset()
 void SP_ResetState()
 {
 	g_sp.Reset();
+}
+
+void SP_DropPushedMatrices()
+{
+	//the base matrices stay: at startup the perspective projection is already
+	//in place when this runs, and a rebuild re-sets it anyway (OnScreenSizeChange)
+	g_sp.matrix[0].depth = 0;
+	g_sp.matrix[1].depth = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -929,31 +1002,78 @@ RTShader::RTShader()
 	m_program = 0;
 	m_customUniformCount = 0;
 	for (int i = 0; i < 8; i++) m_standardLocs[i] = -1;
+	GetShaderRegistry().push_back(this);
 }
 
 RTShader::~RTShader()
 {
-	Kill();
+	//no GL calls here: global RTShaders die at process exit, after the context
+	//is gone, and a driver entry point with no current context is not safe to call
+	if (g_sp.pActiveShader == this) g_sp.pActiveShader = NULL;
+	m_program = 0;
+
+	std::vector<RTShader*> &shaders = GetShaderRegistry();
+	for (size_t i = 0; i < shaders.size(); i++)
+	{
+		if (shaders[i] == this)
+		{
+			shaders.erase(shaders.begin() + i);
+			break;
+		}
+	}
 }
 
 void RTShader::Kill()
 {
-	if (m_program)
-	{
-		if (g_sp.pActiveShader == this) SetActiveShader(NULL);
-		//no spDeleteProgram loaded yet; programs are cheap and apps hold few, but
-		//be tidy where we can
-		m_program = 0;
-	}
+	OnGLContextLost();
+	m_vertexSource.clear(); //an explicit kill stays dead through context rebuilds
+	m_fragmentSource.clear();
 	m_customUniformCount = 0;
+}
+
+void RTShader::OnGLContextLost()
+{
+	if (!m_program) return;
+	if (g_sp.pActiveShader == this) SetActiveShader(NULL);
+	spDeleteProgram(m_program); //on a context that is already gone the name is just stale; harmless
+	m_program = 0;
+}
+
+void RTShader::OnGLContextRestored()
+{
+	if (m_program || m_vertexSource.empty()) return; //still alive, or never loaded / explicitly killed
+
+	if (!Build())
+	{
+		LogError("RTShader: relink after the GL context rebuild failed, the shader stays unloaded");
+		return;
+	}
+
+	//same source, so the uniforms are all still there; only their locations may have moved
+	for (int i = 0; i < m_customUniformCount; i++)
+	{
+		m_customUniforms[i].loc = spGetUniformLocation(m_program, m_customUniforms[i].name);
+	}
 }
 
 bool RTShader::Load(const char *pVertexSource, const char *pFragmentSource)
 {
-	if (!SPInit()) return false;
 	Kill();
+	m_vertexSource = pVertexSource;
+	m_fragmentSource = pFragmentSource;
+	if (Build()) return true;
 
-	string fragSrc = pFragmentSource;
+	//don't keep source that won't compile: a context rebuild would just retry it
+	m_vertexSource.clear();
+	m_fragmentSource.clear();
+	return false;
+}
+
+bool RTShader::Build()
+{
+	if (!SPInit()) return false;
+
+	string fragSrc = m_fragmentSource;
 #ifndef C_GL_MODE
 	//ES2 requires a default float precision in fragment shaders
 	if (fragSrc.find("precision") == string::npos)
@@ -962,7 +1082,7 @@ bool RTShader::Load(const char *pVertexSource, const char *pFragmentSource)
 	}
 #endif
 
-	GLuint vs = CompileShader(GL_VERTEX_SHADER, pVertexSource);
+	GLuint vs = CompileShader(GL_VERTEX_SHADER, m_vertexSource.c_str());
 	GLuint fs = CompileShader(GL_FRAGMENT_SHADER, fragSrc.c_str());
 	if (!vs || !fs) return false;
 

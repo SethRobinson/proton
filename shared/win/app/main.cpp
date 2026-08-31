@@ -5,6 +5,9 @@
 #include "main.h"
 #include "WebOS/SDLMain.h"
 #include "BaseApp.h"
+#ifdef RT_SHADER_PIPELINE_AVAILABLE
+	#include "Renderer/ShaderPipeline.h" //SP_DropPushedMatrices in InitVideo
+#endif
 
 #define byte rpc_byte
 #include "shellscalingapi.h" //for DPI awareness, this means Win7+ from now on
@@ -1443,6 +1446,13 @@ bool InitVideo(int width, int height, bool bFullscreen, float aspectRatio)
 
 	bool bDoingNativeFullScreenToggle = false;
 
+#ifdef RT_SHADER_PIPELINE_AVAILABLE
+	//the previous frame may have left its 2D ortho matrices pushed; resetting
+	//the flag abandons them, which is fine for the GL stacks (they go with
+	//the context) but the shader pipeline keeps its stacks on the CPU and
+	//would leak a level per resize (assert after 31)
+	SP_DropPushedMatrices();
+#endif
 	ResetOrthoFlag();
 
 	LogMsg("Setting video mode to %d, %d - Fullscreen: %d  Aspect Ratio: %.2f", width, height, int(bFullscreen), aspectRatio);

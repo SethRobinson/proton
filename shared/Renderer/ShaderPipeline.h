@@ -25,6 +25,7 @@
 extern bool g_bShaderPipelineActive; //defaults true; cleared by -fixedpipeline before GL init
 
 void SP_ResetState(); //re-inits backend state; safe before any GL exists
+void SP_DropPushedMatrices(); //pops both stacks to depth 0 (keeping the base matrices): for when the engine abandons pushed state along with the ortho flag on a GL context rebuild (win/app/main.cpp InitVideo)
 
 //mirrors of the rt* surface in RenderPipeline.h
 void SP_MatrixMode(GLenum mode);
@@ -76,6 +77,11 @@ void SP_UnbindFrameBuffer(); //restores what SP_BindFrameBuffer saved
 // past a few hundred (see the uTime handling in RTShader's App.cpp).
 // While a shader is active (SetActiveShader), every engine draw (Surface
 // blits, RenderBatcher, DrawFilledRect...) renders through it.
+// A GL context rebuild (window resize or fullscreen toggle on Windows, a
+// lost context on Android) is transparent: the pipeline listens to BaseApp's
+// m_sig_unloadSurfaces/m_sig_loadSurfaces, drops every program there and
+// relinks each live RTShader from the source it keeps, custom uniform values
+// included.  Only an explicit Kill() makes a shader stay dead.
 //---------------------------------------------------------------------------
 
 class RTShader
@@ -96,11 +102,16 @@ public:
 	unsigned int GetProgram() const { return m_program; }
 	int GetStandardLoc(int which) const { return m_standardLocs[which]; }
 	void ApplyCustomUniforms();
+	void OnGLContextLost();     //forget the program (deleting it while the context is alive), keep source + uniforms
+	void OnGLContextRestored(); //relink from the kept source, re-resolve the custom uniform locations
 
 private:
 
+	bool Build(); //compile + link m_vertexSource/m_fragmentSource into m_program
+
 	unsigned int m_program;
 	int m_standardLocs[8];
+	std::string m_vertexSource, m_fragmentSource; //kept so a context rebuild can relink; cleared by Kill()
 
 	struct CustomUniform
 	{

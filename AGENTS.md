@@ -127,7 +127,11 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   The shader pipeline is the DEFAULT in any build that defines
   `RT_SHADER_PIPELINE_AVAILABLE` (all desktop GL configs of the suite apps,
   Mac RTBareBones, Linux via Proton.cmake); launch with `-fixedpipeline` to
-  get the legacy fixed-function path for comparison.
+  get the legacy fixed-function path for comparison. A GL context rebuild
+  (Windows resize/fullscreen toggle, Android context loss) runs through
+  `m_sig_unloadSurfaces`/`m_sig_loadSurfaces`: the shader pipeline,
+  `RTShader`s and render-target `Surface`s restore themselves there (render
+  target CONTENTS come back blank; redraw them). Details in the doc.
 - AI / LLM client (`shared/AI/`): `docs/ai-llm.md`. Non-obvious constraints:
   apps must also compile `Network/NetHTTP,NetSocket,NetUtils` and
   `util/cJSON.c`; the socket backend is plain HTTP/1.0, non-streaming, one

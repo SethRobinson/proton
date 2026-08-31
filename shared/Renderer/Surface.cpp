@@ -90,7 +90,7 @@ bool Surface::InitRenderTarget(int width, int height)
 
 	HardKill();
 	assert(width && height);
-	m_textureCreationMethod = TEXTURE_CREATION_BLANK;
+	m_textureCreationMethod = TEXTURE_CREATION_RENDER_TARGET; //so OnLoadSurfaces rebuilds the framebuffer too
 
 	if (m_texWidth == 0)
 	{
@@ -1396,13 +1396,24 @@ void Surface::OnLoadSurfaces()
 			}
 			else
 			{
-			#ifdef _DEBUG	
+			#ifdef _DEBUG
 				LogMsg("Not restoring surface, it has no originalWidth data");
-			#endif	
+			#endif
 
 			}
 			break;
-                
+
+		case TEXTURE_CREATION_RENDER_TARGET:
+
+			if (m_originalWidth != 0)
+			{
+				//like blank, but with the framebuffer back around it (a plain
+				//InitBlankSurface would leave BeginRenderTarget with nothing to
+				//bind).  The contents are gone; the owner redraws them.
+				InitRenderTarget(m_originalWidth, m_originalHeight);
+			}
+			break;
+
             default: ;
 		}
 }

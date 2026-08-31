@@ -114,8 +114,11 @@ public:
 	//InitRenderTarget makes this surface an offscreen target at the exact size
 	//given (no power-of-two padding); draw into it between BeginRenderTarget/
 	//EndRenderTarget using the normal 2D calls (y-down coords, same as the
-	//screen), then Blit it like any other surface.  Note: contents are lost on
-	//a GL context loss (Android), redraw them in your OnLoadSurfaces callback.
+	//screen), then Blit it like any other surface.  The target survives a GL
+	//context rebuild (window resize/fullscreen toggle on Windows, a lost context
+	//on Android): it comes back through m_sig_loadSurfaces like any texture, but
+	//BLANK; redraw the contents yourself (every frame, or from your own
+	//m_sig_loadSurfaces slot).
 	bool InitRenderTarget(int width, int height);
 	void BeginRenderTarget();
 	void EndRenderTarget();
@@ -149,7 +152,8 @@ protected:
 		TEXTURE_CREATION_NONE, //we haven't made a texture yet
 		TEXTURE_CREATION_FILE, //we'll reload automatically
 		TEXTURE_CREATION_MEMORY, //we'll lose it, but not restore it
-		TEXTURE_CREATION_BLANK //we'll reinitialize the texture as blank, up to you to redraw it
+		TEXTURE_CREATION_BLANK, //we'll reinitialize the texture as blank, up to you to redraw it
+		TEXTURE_CREATION_RENDER_TARGET //FBO-backed (InitRenderTarget): recreated blank with its framebuffer, up to you to redraw it
 	};
 
 

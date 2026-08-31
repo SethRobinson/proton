@@ -72,8 +72,9 @@ and the existing compatibility/legacy contexts on Windows/Linux/macOS (GLSL
   Milestone 5 (Aug 2026): the payoff features. Surface gained
   InitRenderTarget/BeginRenderTarget/EndRenderTarget (FBO-backed
   render-to-texture, exact-size textures, y-down drawing coords, blits work
-  unchanged since the ortho and blit V-flips cancel; contents lost on GL
-  context loss). New RTShader class (declared in ShaderPipeline.h): custom
+  unchanged since the ortho and blit V-flips cancel; the target survives a
+  GL context rebuild but comes back blank, see the context-rebuild bullet
+  below). New RTShader class (declared in ShaderPipeline.h): custom
   GLSL programs with a standard contract (attributes a_pos/a_uv/a_color,
   uniforms uProj/uMV/uColor/uTex) applied to all engine draws via
   SetActiveShader(). Both shader-pipeline-only. Working example:
@@ -86,6 +87,37 @@ and the existing compatibility/legacy contexts on Windows/Linux/macOS (GLSL
   recorded in ShaderPipeline.cpp:
   GL_ALPHA_TEST was always a no-op in Proton (glAlphaFunc never called, GL
   default is GL_ALWAYS), so the shader path needs no alpha discard.
+- **GL context rebuilds (Aug 2026)**, found when RTGameBot's CRT console went
+  black on a window resize. Windows destroys and recreates the GL context on
+  every resize and fullscreen toggle (`MESSAGE_SET_VIDEO_MODE` in
+  win/app/main.cpp), Android can lose it in the background; both announce it
+  through BaseApp's `m_sig_unloadSurfaces` (old context, still alive on
+  Windows) and `m_sig_loadSurfaces` (new context current). Nothing on the
+  shader path survived that: the ubershader variants kept stale program ids
+  (every draw silently drew nothing), RTShaders had no source to relink
+  from, and `Surface::OnLoadSurfaces` brought a render target back as a
+  plain blank texture with no framebuffer. Now `SPInit` hooks both signals
+  (group 0, ahead of the Surfaces): unload deletes the variant programs
+  (`glDeleteProgram` joined the loader) and every live RTShader's program,
+  and clears `bInitted` so the next `SPInit` re-fetches the entry points and
+  redoes the per-context setup; load relinks each RTShader from the source it
+  now keeps (custom uniform values survive, locations are re-resolved; only an
+  explicit `Kill()` stays dead). Surface got `TEXTURE_CREATION_RENDER_TARGET`
+  so `OnLoadSurfaces` calls `InitRenderTarget` again (blank; owners redraw).
+  Related leak: `InitVideo` (win/app/main.cpp) calls `ResetOrthoFlag()`
+  after the previous frame left its ortho matrices pushed, which is fine
+  for the fresh GL stacks but leaked one level of the pipeline's CPU stacks
+  per resize (assert after 31), so it now calls `SP_DropPushedMatrices()`
+  first (depth back to 0, base matrices kept). That is the ONLY place that
+  abandons pushed state; `PrepareForGL` and `Surface::EndRenderTarget` reset
+  the flag after balanced pops, and on Android the flag and the CPU stacks
+  both persist across a context loss, so they stay consistent there. Don't
+  put it in `InitializeGLDefaults`: at startup `InitVideo` sets the
+  perspective projection (SetupScreenInfo -> OnScreenSizeChange) before
+  `BaseApp::Init` calls that, and wiping the stacks there lost every 3D
+  scene's projection (harness caught it). End-to-end check: RTGameBot's
+  `tests/resize_check.ps1` (SetWindowPos on the app's own window between two
+  `-autoscreenshot` captures; the old exe fails with 0% lit pixels).
 - **Phase 3 (in progress)**: flip defaults per platform. Rollout wave 1
   (Aug 2026): all sanctioned html5 apps (RTBareBones, RTSimpleApp, RTDink,
   RTDScroll, RTMindWall, ArduboySim) build shader-pipeline-only, and
