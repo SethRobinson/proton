@@ -120,14 +120,16 @@ void ScrollComponent::OnOverStart(VariantList *pVList)
 	m_lastTouchPos = pVList->m_variant[0].GetVector2();
 }
 
-// handles MESSAGE_TYPE_GUI_MOUSEWHEEL only. Platforms other than Windows and HTML 5 don't seem to send this
+// handles MESSAGE_TYPE_GUI_MOUSEWHEEL only. Only desktops (Win, Mac, HTML5) send this.
+// The delta uses the Windows convention (positive = wheel rolled away = scroll up); every
+// platform's sender normalizes to that, so no per-platform tweaks here.
 void ScrollComponent::OnInput(VariantList* pVList)
 {
 	float f = pVList->Get(0).GetFloat();
-	if ((int)f == MESSAGE_TYPE_GUI_MOUSEWHEEL) 
+	if ((int)f == MESSAGE_TYPE_GUI_MOUSEWHEEL)
 	{
 		SetIsScrolling(true);
-		m_vecDisplacement.y += pVList->Get(4).GetVector2().x * *m_pPowerMod * 0.75f;//Maybe change if on HTML5?
+		m_vecDisplacement.y += pVList->Get(4).GetVector2().x * *m_pPowerMod * 0.75f;
 		m_vTotalDisplacementOnCurrentSwipe.y += pVList->Get(4).GetVector2().x * *m_pPowerMod * 0.75f;
 		SetPosition(m_vecDisplacement, false);
 	}

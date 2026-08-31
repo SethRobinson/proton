@@ -154,7 +154,7 @@ void LogDisplayComponent::OnEnableScrollingChanged(Variant *pVariant)
 	UpdateScrollBar();
 }
 
-// handles MESSAGE_TYPE_GUI_MOUSEWHEEL only. Platforms other than Windows and HTML 5 don't seem to send this
+// handles MESSAGE_TYPE_GUI_MOUSEWHEEL only. Only desktops (Win, Mac, HTML5) send this
 void LogDisplayComponent::OnInput(VariantList* pVList)
 {
 	float f = pVList->Get(0).GetFloat();

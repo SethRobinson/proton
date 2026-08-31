@@ -61,6 +61,12 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   without it the SDL includes in `HTML5Main.cpp` fail and the .bat still exits
   0, so check the output for errors). ArduboySim's html5 script likely needs the
   same flag treatment.
+- The html5 `UploadToWebsite.bat` scripts must `chmod -R u=rwX,go=rX` the web
+  dir after scp (RTDink/RTDScroll always did; RTBareBones/RTSimpleApp/RTConsole
+  gained it Aug 2026 after a live 403 incident): scp from Windows can create
+  the re-uploaded `WebLoaderData` dir with no group permissions, and Apache on
+  rtsoft.com is in the `rtsoft` group, so the loader 403s and the page hangs on
+  "Setting up...".
 - If an AI assistant's shell has `NoDefaultCurrentDirectoryInExePath=1` (common in
   sandboxed tooling), `cmd` refuses to run batch files from the current directory and
   these build scripts fail with "'emsdk_env.bat' is not recognized". Clear it for the
@@ -75,6 +81,12 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
 - When converting a large `double` to an integer on wasm, cast to `uint64` first if
   you want modulo wrap-around. A direct `double`->`unsigned int` cast saturates at
   `UINT32_MAX` (same trap as above) instead of wrapping.
+- The DOM wheel event's deltaY is positive when scrolling DOWN (opposite of Windows'
+  WM_MOUSEWHEEL) and its units vary by deltaMode (Firefox sends lines, ~3 per notch,
+  not pixels). `wheel_callback` in HTML5Main.cpp normalizes both to the engine's
+  MESSAGE_TYPE_GUI_MOUSEWHEEL convention (positive = wheel rolled away = scroll up,
+  ~120 per notch, per Windows). If a scroll/zoom direction feels wrong on one
+  platform, fix that platform's sender, never the component consuming the message.
 - `GetSystemTimeTick()` has no common epoch across platforms (time since boot on
   Windows, Unix epoch ms on iOS/OSX, time since page load on HTML5), so never assume
   a starting value. It also rolls over every ~49 days on every platform. Engine-level
@@ -158,6 +170,18 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   Run the exe with working dir = the project's `bin/` folder (media lives there).
   A crash shows up as the process going not-responding with a WER dialog; the
   Application event log (Id 1000) has the exception code.
+- If SetForegroundWindow is denied (normal for a background shell), the app
+  FREEZES: the main loop skips Update/Draw while `g_bHasFocus` is false, and
+  clicks are ignored. Posting WM_SETFOCUS (0x0007) to the window sets
+  `g_bHasFocus` and unfreezes it; no real OS focus is needed after that. Note
+  the demo apps render a virtual screen (e.g. 480x320) scaled to the window,
+  so click coords must be measured from a screenshot, not taken from game
+  coordinates.
+- The html5 builds can be driven interactively too: serve the app's html5 dir
+  (copy harness.ps1's HttpListener pattern), launch headless Edge with
+  `--remote-debugging-port`, then use CDP over its websocket:
+  Input.dispatchMouseEvent (mousePressed/mouseReleased/mouseWheel) and
+  Page.captureScreenshot. Verified working for the RTSimpleApp scroll test.
 
 ## Versioning
 

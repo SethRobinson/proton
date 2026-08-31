@@ -954,7 +954,21 @@ EM_BOOL wheel_callback(int eventType, const EmscriptenWheelEvent *e, void *userD
 		(float)e->deltaX, (float)e->deltaY, (float)e->deltaZ, e->deltaMode);
 		*/
 
-	GetMessageManager()->SendGUIEx2(MESSAGE_TYPE_GUI_MOUSEWHEEL, (float)e->deltaY, 0, 0, 0); //last parm is "winkey modifers"...
+	//Convert to the engine's MESSAGE_TYPE_GUI_MOUSEWHEEL convention, which follows Windows'
+	//WM_MOUSEWHEEL: positive means the wheel rolled away from the user (scroll up), ~120 per
+	//notch.  The DOM's deltaY is positive when scrolling DOWN, so flip the sign.  Its units
+	//also depend on deltaMode: pixels (Chrome/Edge, ~100 per notch), lines (Firefox, 3 per
+	//notch), or pages, so scale each mode to roughly Windows notch units.
+	float delta = (float)e->deltaY;
+
+	switch (e->deltaMode)
+	{
+	case DOM_DELTA_PIXEL: delta *= 1.2f; break;
+	case DOM_DELTA_LINE: delta *= 40.0f; break;
+	case DOM_DELTA_PAGE: delta *= 120.0f; break;
+	}
+
+	GetMessageManager()->SendGUIEx2(MESSAGE_TYPE_GUI_MOUSEWHEEL, -delta, 0, 0, 0); //last parm is "winkey modifers"...
 
 	return 0;
 }
