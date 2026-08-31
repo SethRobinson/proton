@@ -59,7 +59,7 @@ private:
 	void OnFileNameChanged(Variant *pDataObject);
 	bool GetRectOfScrollCapsule(CL_Rectf* pRectout);
 
-	void StartCapsuleDrag(CL_Vec2f vDragOffset);
+	void StartCapsuleDrag(float dragStartMouseY);
 
 	void StopCapsuleDrag();
 
@@ -75,7 +75,8 @@ private:
 	string *m_pFileName;
 	bool m_bUsingScrollComponent;
 	bool m_isCapsuleDragging;
-	CL_Vec2f m_capsuleDragOffset;
+	float m_dragStartMouseY; //where the grab began, so the capsule keeps its grab point while dragging
+	float m_dragStartProgressY;
 	ScrollComponent* m_pScrollComp; //Null if not used
 	
 };

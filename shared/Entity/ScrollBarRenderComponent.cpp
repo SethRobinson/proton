@@ -11,6 +11,8 @@ ScrollBarRenderComponent::ScrollBarRenderComponent()
 	SetName("ScrollBarRender");
 	m_bUsingScrollComponent = false;
 	m_isCapsuleDragging = false;
+	m_dragStartMouseY = 0;
+	m_dragStartProgressY = 0;
 	m_pScrollComp = NULL;
 }
 
@@ -122,10 +124,14 @@ bool ScrollBarRenderComponent::GetRectOfScrollCapsule(CL_Rectf *pRectout)
 	return false;
 }
 
-void ScrollBarRenderComponent::StartCapsuleDrag(CL_Vec2f vDragOffset)
+void ScrollBarRenderComponent::StartCapsuleDrag(float dragStartMouseY)
 {
 	m_isCapsuleDragging = true;
-	m_capsuleDragOffset = vDragOffset;
+	//remember where the grab began and the progress at that moment; the drag moves relative
+	//to this, so the capsule keeps its grab point like a normal OS scroll bar instead of
+	//snapping its center to the mouse
+	m_dragStartMouseY = dragStartMouseY;
+	m_dragStartProgressY = m_pProgress2d->y;
 	if (m_pScrollComp)
 	{
 		m_pScrollComp->SetDraggingByContentEnabled(false);
@@ -158,8 +164,8 @@ void ScrollBarRenderComponent::OnTargetOverStart(VariantList *pVList)
 		
 		if (r.contains(vMousePos))
 		{
-			StartCapsuleDrag(r.get_center() - vMousePos);
-		
+			StartCapsuleDrag(vMousePos.y);
+
 			GetBaseApp()->GetTouch(0)->SetWasHandled(true, GetParent());
 		}
 
@@ -188,13 +194,15 @@ void ScrollBarRenderComponent::OnTargetOverMove(VariantList* pVList)
 	if (touchID != 0) return; //only care about the first touch (for now
 	GetBaseApp()->GetTouch(0)->SetWasHandled(true, GetParent());
 
-	float barHeight = (float)GetCapsuleHeight();
+	//the rendered capsule travels (size.y - capsule height) pixels over progress 0..1 (see
+	//OnRender), so moving relative to the grab makes it track the mouse 1:1 without jumping
+	float trackRange = m_pSize2d->y - (float)GetCapsuleHeight();
+	if (trackRange < 1) return; //content fits, nowhere to drag to
 
 	CL_Vec2f percentProgressTemp = *m_pProgress2d;
+	percentProgressTemp.y = m_dragStartProgressY + (vMousePos.y - m_dragStartMouseY) / trackRange;
+	ForceRange(percentProgressTemp.y, 0.0f, 1.0f);
 
-	//this math is suspect to say the least.  It doesn't quite work right
-	percentProgressTemp.y = ( ((vMousePos.y - (barHeight/2))) / (m_pSize2d->y - barHeight))-0.05f;
-	
 	if (m_pScrollComp)
 	{
 		//m_pScrollComp->SetPositionByPercent(percentProgressTemp);
@@ -228,7 +236,14 @@ void ScrollBarRenderComponent::OnRemove()
 }
 
 void ScrollBarRenderComponent::OnUpdate(VariantList *pVList)
-{	
+{
+	//safety net: if the touch we were dragging with is no longer down (say, the release
+	//happened outside the window and only ResetTouches' fake release reached the engine,
+	//which a filter may have kept from arriving as an OnOverEnd), stop dragging
+	if (m_isCapsuleDragging && !GetBaseApp()->GetTouch(0)->IsDown())
+	{
+		StopCapsuleDrag();
+	}
 }
 
 void ScrollBarRenderComponent::OnRender(VariantList *pVList)

@@ -189,11 +189,19 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   the demo apps render a virtual screen (e.g. 480x320) scaled to the window,
   so click coords must be measured from a screenshot, not taken from game
   coordinates.
+- Park the REAL cursor inside the window (SetCursorPos) before posting drags:
+  the main loop polls GetCursorPos (CheckIfMouseLeftWindowArea) and calls
+  ResetTouches when the real cursor sits/moves outside the window area, which
+  cancels posted clicks mid-drag at random. Conversely, moving the real cursor
+  out of the window IS how to test the leave-window-releases-touches behavior.
 - The html5 builds can be driven interactively too: serve the app's html5 dir
   (copy harness.ps1's HttpListener pattern), launch headless Edge with
   `--remote-debugging-port`, then use CDP over its websocket:
   Input.dispatchMouseEvent (mousePressed/mouseReleased/mouseWheel) and
-  Page.captureScreenshot. Verified working for the RTSimpleApp scroll test.
+  Page.captureScreenshot. DOM events CDP can't produce directly (e.g. a canvas
+  mouseleave) can be fired with Runtime.evaluate + dispatchEvent; Emscripten's
+  callbacks don't check isTrusted. Verified working for the RTSimpleApp
+  scroll bar tests.
 
 ## Versioning
 

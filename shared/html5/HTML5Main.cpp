@@ -944,6 +944,15 @@ EM_BOOL mouse_callback(int eventType, const EmscriptenMouseEvent *e, void *userD
 	return 0;
 }
 
+EM_BOOL mouseleave_callback(int eventType, const EmscriptenMouseEvent *e, void *userData)
+{
+	//the mouse left the canvas; a mouseup outside it would never reach us, so release any
+	//held touches the same way the Windows build does when the mouse leaves the window area
+	//(otherwise a scroll bar capsule or content drag stays "grabbed" forever)
+	GetBaseApp()->ResetTouches();
+	return 0;
+}
+
 EM_BOOL wheel_callback(int eventType, const EmscriptenWheelEvent *e, void *userData)
 {
 	/*
@@ -1335,6 +1344,8 @@ void mainHTML()
 	TEST_RESULT(emscripten_set_mouseup_callback);
 	ret = emscripten_set_mousemove_callback(webIDTarget.c_str(), 0, 1, mouse_callback);
 	TEST_RESULT(emscripten_set_mousemove_callback);
+	ret = emscripten_set_mouseleave_callback(webIDTarget.c_str(), 0, 1, mouseleave_callback);
+	TEST_RESULT(emscripten_set_mouseleave_callback);
 	ret = emscripten_set_wheel_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, wheel_callback);
 	TEST_RESULT(emscripten_set_wheel_callback);
 
