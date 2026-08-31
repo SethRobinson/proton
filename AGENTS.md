@@ -191,9 +191,10 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   coordinates.
 - Park the REAL cursor inside the window (SetCursorPos) before posting drags:
   the main loop polls GetCursorPos (CheckIfMouseLeftWindowArea) and calls
-  ResetTouches when the real cursor sits/moves outside the window area, which
-  cancels posted clicks mid-drag at random. Conversely, moving the real cursor
-  out of the window IS how to test the leave-window-releases-touches behavior.
+  ResetTouches when the real cursor sits/moves outside the window area with no
+  button held, which can cancel posted clicks at random. While a button is held
+  the engine treats it as a captured drag (SetCapture) and keeps the touches
+  alive outside the window until the button-up, like OS scroll bars do.
 - The html5 builds can be driven interactively too: serve the app's html5 dir
   (copy harness.ps1's HttpListener pattern), launch headless Edge with
   `--remote-debugging-port`, then use CDP over its websocket:

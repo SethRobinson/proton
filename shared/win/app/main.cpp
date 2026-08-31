@@ -1057,6 +1057,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 #endif
 			
 			g_leftMouseButtonDown = true;
+			SetCapture(hWnd); //keep getting moves and the button-up even outside the window, so a drag survives leaving it
 			int xPos = GET_X_LPARAM(lParam);
 			int yPos = GET_Y_LPARAM(lParam);
 			ConvertCoordinatesIfRequired(xPos, yPos);
@@ -1077,6 +1078,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			ConvertCoordinatesIfRequired(xPos, yPos);
 			GetMessageManager()->SendGUIEx2(MESSAGE_TYPE_GUI_CLICK_END, (float)xPos, (float)yPos, 0, GetWinkeyModifiers());
 			g_leftMouseButtonDown = false;
+			if (!g_rightMouseButtonDown) ReleaseCapture();
 		}
 		//return true;
 		break;
@@ -1097,6 +1099,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 #endif
 			
 			g_rightMouseButtonDown = true;
+			SetCapture(hWnd);
 			int xPos = GET_X_LPARAM(lParam);
 			int yPos = GET_Y_LPARAM(lParam);
 			ConvertCoordinatesIfRequired(xPos, yPos);
@@ -1112,14 +1115,29 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			}
 
-		
+
 			int xPos = GET_X_LPARAM(lParam);
 			int yPos = GET_Y_LPARAM(lParam);
 			ConvertCoordinatesIfRequired(xPos, yPos);
 			GetMessageManager()->SendGUIEx2(MESSAGE_TYPE_GUI_CLICK_END, (float)xPos, (float)yPos, 1, GetWinkeyModifiers());
 			g_rightMouseButtonDown = false;
+			if (!g_leftMouseButtonDown) ReleaseCapture();
 		}
 		//return true;
+		break;
+
+	case WM_CAPTURECHANGED:
+		//we only hold capture during a button-held drag; losing it to another window means
+		//the button-up will never reach us, so treat the drag as released
+		if ((HWND)lParam != hWnd && (g_leftMouseButtonDown || g_rightMouseButtonDown))
+		{
+			g_leftMouseButtonDown = false;
+			g_rightMouseButtonDown = false;
+			if (IsBaseAppInitted())
+			{
+				GetBaseApp()->ResetTouches();
+			}
+		}
 		break;
 	
 	case WM_MOUSEMOVE:
@@ -1833,7 +1851,13 @@ void CheckIfMouseLeftWindowArea()
 				{
 					//LogMsg("We left the window area with  mouse");
 					g_bMouseIsInsideArea = false;
-					GetBaseApp()->ResetTouches();
+					//if a button is held this is a captured drag (SetCapture): moves and the
+					//release still reach us out there, so keep the touches alive; a grabbed
+					//scroll bar stays grabbed until the button is let go, like OS scroll bars
+					if (!g_leftMouseButtonDown && !g_rightMouseButtonDown)
+					{
+						GetBaseApp()->ResetTouches();
+					}
 				} else
 				{
 					//still out, no change

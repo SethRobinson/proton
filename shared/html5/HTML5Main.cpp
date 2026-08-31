@@ -902,54 +902,74 @@ EM_BOOL mouse_callback(int eventType, const EmscriptenMouseEvent *e, void *userD
 		e->button, e->buttons, e->movementX, e->movementY, e->canvasX, e->canvasY, e->targetX, e->targetY);
 		*/
 
-	switch (eventType)
+	//only mousedown is registered here (on the canvas); moves and releases go through
+	//window_mouse_callback below so an active drag keeps working outside the canvas
+	if (eventType == EMSCRIPTEN_EVENT_MOUSEDOWN)
 	{
-
-	case EMSCRIPTEN_EVENT_MOUSEDOWN:
-	case EMSCRIPTEN_EVENT_MOUSEUP:
-	case EMSCRIPTEN_EVENT_MOUSEMOVE:
-
 		float xPos = e->targetX;
 		float yPos = e->targetY;
 
 		ConvertCoordinatesIfRequired(xPos, yPos);
 
-		switch (eventType)
+		static bool bFirstTime = true;
+		if (bFirstTime)
 		{
-		case EMSCRIPTEN_EVENT_MOUSEDOWN:
-			{
-				static bool bFirstTime = true;
-				if (bFirstTime)
-				{
-					//unlock audio on iOS
-					FirstClickUnlock();
-					bFirstTime = false;
-				} 
-			}
-
-			GetMessageManager()->SendGUIEx(MESSAGE_TYPE_GUI_CLICK_START, xPos, yPos, e->button);
-			break;
-		case EMSCRIPTEN_EVENT_MOUSEUP:
-			GetMessageManager()->SendGUIEx(MESSAGE_TYPE_GUI_CLICK_END, xPos, yPos, e->button);
-			break;
-		case EMSCRIPTEN_EVENT_MOUSEMOVE:
-			GetMessageManager()->SendGUIEx(MESSAGE_TYPE_GUI_CLICK_MOVE, xPos, yPos, e->button);
-			break;
-
+			//unlock audio on iOS
+			FirstClickUnlock();
+			bFirstTime = false;
 		}
-		break;
 
+		GetMessageManager()->SendGUIEx(MESSAGE_TYPE_GUI_CLICK_START, xPos, yPos, e->button);
 	}
-	
+
 	return 0;
 }
 
-EM_BOOL mouseleave_callback(int eventType, const EmscriptenMouseEvent *e, void *userData)
+EM_BOOL window_mouse_callback(int eventType, const EmscriptenMouseEvent *e, void *userData)
 {
-	//the mouse left the canvas; a mouseup outside it would never reach us, so release any
-	//held touches the same way the Windows build does when the mouse leaves the window area
-	//(otherwise a scroll bar capsule or content drag stays "grabbed" forever)
-	GetBaseApp()->ResetTouches();
+	//moves and releases are listened for on the whole window rather than the canvas, so a
+	//drag that started on the canvas keeps tracking after the pointer leaves it, and the
+	//button release is seen wherever it happens (browsers keep delivering these during a
+	//drag even outside their own window).  A grabbed scroll bar capsule therefore stays
+	//grabbed until the mouse button is actually let go, like a normal OS scroll bar.
+
+	//window-level coords are viewport-relative; make them canvas-relative to match what
+	//targetX gives the canvas-registered mousedown
+	double rect[4] = { 0, 0, 0, 0 }; //left, top, width, height
+	EM_ASM(
+	{
+		var c = document.querySelector('canvas');
+		if (c)
+		{
+			var r = c.getBoundingClientRect();
+			HEAPF64[$0 >> 3] = r.left;
+			HEAPF64[($0 >> 3) + 1] = r.top;
+			HEAPF64[($0 >> 3) + 2] = r.width;
+			HEAPF64[($0 >> 3) + 3] = r.height;
+		}
+	}, rect);
+
+	float xPos = (float)((double)e->clientX - rect[0]);
+	float yPos = (float)((double)e->clientY - rect[1]);
+
+	if (eventType == EMSCRIPTEN_EVENT_MOUSEMOVE && e->buttons == 0)
+	{
+		//no buttons held, so this is just the pointer wandering the page; only forward it
+		//when it's actually over the canvas, like the old canvas-only listener did
+		if (xPos < 0 || yPos < 0 || xPos >= rect[2] || yPos >= rect[3]) return 0;
+	}
+
+	ConvertCoordinatesIfRequired(xPos, yPos);
+
+	if (eventType == EMSCRIPTEN_EVENT_MOUSEUP)
+	{
+		GetMessageManager()->SendGUIEx(MESSAGE_TYPE_GUI_CLICK_END, xPos, yPos, e->button);
+	}
+	else if (eventType == EMSCRIPTEN_EVENT_MOUSEMOVE)
+	{
+		GetMessageManager()->SendGUIEx(MESSAGE_TYPE_GUI_CLICK_MOVE, xPos, yPos, e->button);
+	}
+
 	return 0;
 }
 
@@ -992,6 +1012,7 @@ EM_BOOL focus_callback(int eventType, const EmscriptenFocusEvent* event, void* u
 			case EMSCRIPTEN_EVENT_BLUR:
 			{
 				LogMsg("Got blur");
+				GetBaseApp()->ResetTouches(); //if a drag was in progress we may never see its mouseup, so release it
 				GetBaseApp()->OnEnterBackground();
 				//s_ctx.m_eventQueue.postSuspendEvent(s_defaultWindow, Suspend::DidSuspend);
 				return true;
@@ -1340,12 +1361,11 @@ void mainHTML()
 		
 	ret = emscripten_set_mousedown_callback(webIDTarget.c_str(), 0, 1, mouse_callback);
 	TEST_RESULT(emscripten_set_mousedown_callback);
-	ret = emscripten_set_mouseup_callback(webIDTarget.c_str(), 0, 1, mouse_callback);
+	//up/move are window-level so drags keep working outside the canvas (see window_mouse_callback)
+	ret = emscripten_set_mouseup_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, window_mouse_callback);
 	TEST_RESULT(emscripten_set_mouseup_callback);
-	ret = emscripten_set_mousemove_callback(webIDTarget.c_str(), 0, 1, mouse_callback);
+	ret = emscripten_set_mousemove_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, window_mouse_callback);
 	TEST_RESULT(emscripten_set_mousemove_callback);
-	ret = emscripten_set_mouseleave_callback(webIDTarget.c_str(), 0, 1, mouseleave_callback);
-	TEST_RESULT(emscripten_set_mouseleave_callback);
 	ret = emscripten_set_wheel_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, wheel_callback);
 	TEST_RESULT(emscripten_set_wheel_callback);
 

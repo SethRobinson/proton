@@ -159,7 +159,16 @@ void ScrollComponent::OnOverMove(VariantList *pVList)
 	}
 
 	if (!isInterestingFinger(fingerID)) return;
-		
+
+	if (!m_bDraggingByContentEnabled)
+	{
+		//the scroll bar capsule owns this drag; don't accumulate content-drag movement
+		//(it would hit as momentum when the capsule is released and spring the view).
+		//Still track the touch position so re-enabling doesn't see a stale delta.
+		m_lastTouchPos = pVList->m_variant[0].GetVector2();
+		return;
+	}
+
 	//LogMsg("moved %s", PrintVector2(pVList->m_variant[0].GetVector2()).c_str());
 
 	if (*m_pScrollStyle == STYLE_EXACT)
@@ -217,10 +226,10 @@ void ScrollComponent::SetDraggingByContentEnabled(bool bEnabled)
 {
 	m_bDraggingByContentEnabled = bEnabled;
 
-	if (!m_bDraggingByContentEnabled)
-	{
-		m_vecDisplacement = CL_Vec2f(0,0); //don't want weird moving when we enabled it later
-	}
+	//zero on both transitions: anything accumulated while we weren't the active drag
+	//(the scroll bar capsule was) would be applied as momentum the moment we're
+	//re-enabled, springing the view away from where the capsule was released
+	m_vecDisplacement = CL_Vec2f(0,0);
 }
 
 void ScrollComponent::SetPosition(CL_Vec2f vDisplacement, bool bForceUpdate)
