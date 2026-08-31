@@ -1,7 +1,6 @@
 #include "PlatformPrecomp.h"
 #include "SliderComponent.h"
 #include "util/GLESUtils.h"
-#include "Entity/EntityUtils.h"
 #include "BaseApp.h"
 
 SliderComponent::SliderComponent()
@@ -29,6 +28,7 @@ void SliderComponent::OnAdd(Entity *pEnt)
 	m_pSliderButton = GetParent()->GetVarWithDefault("sliderButton", (Entity*)NULL)->GetEntity();
 	
 	m_pProgress = &GetVarWithDefault("progress", Variant(0.0f))->GetFloat();
+	m_pVertical = &GetVarWithDefault("vertical", Variant(uint32(0)))->GetUINT32();
 
 	//register ourselves to render if the parent does
 	//GetParent()->GetFunction("OnRender")->sig_function.connect(1, boost::bind(&SliderComponent::OnRender, this, _1));
@@ -81,40 +81,55 @@ Entity * SliderComponent::GetSliderButton()
 	return m_pSliderButton;
 }
 
+float SliderComponent::GetTrackLength()
+{
+	return *m_pVertical ? m_pSize2d->y : m_pSize2d->x;
+}
+
 void SliderComponent::SetSliderPosition()
 {
 	if (!GetSliderButton()) return;
 
 	CL_Vec2f vPos = m_pSliderButton->GetVar("pos2d")->GetVector2();
-	vPos.x = m_pSize2d->x* *m_pProgress;
+	if (*m_pVertical)
+		vPos.y = m_pSize2d->y * *m_pProgress;
+	else
+		vPos.x = m_pSize2d->x * *m_pProgress;
 	m_pSliderButton->GetVar("pos2d")->Set(vPos);
 };
 
+//along = distance from the start of the track, clamped here
+void SliderComponent::SetKnobAlongTrack(float along)
+{
+	float length = GetTrackLength();
+	ForceRange(along, 0.0f, length);
+
+	CL_Vec2f vPos = m_pSliderButton->GetVar("pos2d")->GetVector2();
+	if (*m_pVertical)
+		vPos.y = along;
+	else
+		vPos.x = along;
+	m_pSliderButton->GetVar("pos2d")->Set(vPos);
+
+	GetVar("progress")->Set(length > 0 ? along / length : 0.0f);
+}
+
 void SliderComponent::UpdatePositionByTouch(CL_Vec2f pt)
 {
-		if (!GetSliderButton()) return;
+	if (!GetSliderButton()) return;
 
-		CL_Vec2f vPos = m_pSliderButton->GetVar("pos2d")->GetVector2();
-		vPos.x += (pt-m_pClickStartPos).x;
-		ForceRange(vPos.x, 0, m_pSize2d->x);
-		m_pSliderButton->GetVar("pos2d")->Set(vPos);
-		m_pClickStartPos = pt;
-
-		GetVar("progress")->Set(vPos.x / m_pSize2d->x);
+	CL_Vec2f vPos = m_pSliderButton->GetVar("pos2d")->GetVector2();
+	CL_Vec2f vDelta = pt - m_pClickStartPos;
+	m_pClickStartPos = pt;
+	SetKnobAlongTrack(*m_pVertical ? vPos.y + vDelta.y : vPos.x + vDelta.x);
 }
 
 void SliderComponent::SetPositionWithMouseClick(CL_Vec2f pt)
 {
 	if (!GetSliderButton()) return;
 
-	CL_Vec2f vOrigPos = GetPos2DEntity(m_pSliderButton);
-	vOrigPos.x = pt.x - m_pPos2d->x;
-
-	//limit to bounds
-	ForceRange(vOrigPos.x, 0, m_pSize2d->x);
-	//LogMsg("Clicked %s - Setting pos to %s", PrintVector2(pt).c_str(), PrintVector2(vOrigPos).c_str());
-	SetPos2DEntity(m_pSliderButton, vOrigPos);
-	GetVar("progress")->Set(vOrigPos.x / m_pSize2d->x);
+	//LogMsg("Clicked %s", PrintVector2(pt).c_str());
+	SetKnobAlongTrack(*m_pVertical ? pt.y - m_pPos2d->y : pt.x - m_pPos2d->x);
 }
 
 void SliderComponent::OnInput( VariantList *pVList )
@@ -127,10 +142,14 @@ void SliderComponent::OnInput( VariantList *pVList )
 	case MESSAGE_TYPE_GUI_CLICK_START:
 	{
 
-		float paddingYForClick = 12;
+		float paddingForClick = 12; //across the track, so a thin track is still easy to hit
 
 		//the rect around the slider, so we can test if the pt is inside of it
-		CL_Rectf rectSlider = CL_Rectf(m_pPos2d->x, m_pPos2d->y- paddingYForClick, m_pPos2d->x + m_pSize2d->x, m_pPos2d->y + m_pSize2d->y+ paddingYForClick);
+		CL_Rectf rectSlider;
+		if (*m_pVertical)
+			rectSlider = CL_Rectf(m_pPos2d->x - paddingForClick, m_pPos2d->y, m_pPos2d->x + m_pSize2d->x + paddingForClick, m_pPos2d->y + m_pSize2d->y);
+		else
+			rectSlider = CL_Rectf(m_pPos2d->x, m_pPos2d->y - paddingForClick, m_pPos2d->x + m_pSize2d->x, m_pPos2d->y + m_pSize2d->y + paddingForClick);
 
 		if (rectSlider.contains(pt) == false)
 		{
