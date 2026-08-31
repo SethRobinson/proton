@@ -29,21 +29,31 @@
 //    GetAudioManager()->Play(pVList->Get(0).GetString(), false, false, false);
 //
 //  m_sig_ready: Get(0) = audio file path, Get(1) = request id (uint32),
-//  Get(2) = the text that was spoken.
+//  Get(2) = the text that was spoken, Get(3) = generation time in ms
+//  (uint32, request to reply), Get(4) = audio length in ms (uint32, read
+//  from the WAV header, 0 if it couldn't be).
 //  m_sig_error: Get(0) = error string, Get(1) = request id (uint32).
 //
-//  One request in flight per client, plus ONE pending slot: Speak() while
-//  busy parks the line there, a newer Speak() replaces it (latest wins), and
-//  when the in-flight request completes its audio is dropped, unfired, if
-//  something newer is waiting.  That is what a talking character wants (say
-//  the newest thing, never work through a backlog of stale lines); if every
-//  line must be heard, wait for IsBusy() to clear before the next Speak().
+//  It is a request POOL: Speak() queues a line and returns its id, up to
+//  SetMaxParallel() requests are on the wire at once (default 1), the rest
+//  wait in a priority queue (higher priority first, FIFO within one).
+//  Cancel(id) / CancelAll() drop queued lines and abort in-flight ones (the
+//  server still finishes generating those, nothing can stop that); a
+//  cancelled request fires no signal.  Per-request fields override the
+//  client-wide ones, so one pool can serve several voices.
+//
+//  About SetMaxParallel: a server that serializes generation (hal does: three
+//  concurrent short lines all came back together after 3x the time of one)
+//  gains nothing from more than 1, and the FIRST reply arrives later since it
+//  only comes back with the batch.  Raise it only for a server with several
+//  workers.  To keep a long text flowing, split it into short chunks and
+//  keep a couple queued: the first chunk plays while the rest generate.
 //
 //  Notes/limits:
 //  - Needs shared/Network/NetHTTP.cpp, NetSocket.cpp, NetUtils.cpp in the
 //    project (same as LLMClient; Ws2_32.lib on Windows).
-//  - Plain HTTP, no TLS.  The whole reply is held in memory before the file
-//    is written (a paragraph of 24 kHz speech is around a megabyte).
+//  - Plain HTTP, no TLS.  Each reply is held in memory before the file is
+//    written (a paragraph of 24 kHz speech is around a megabyte).
 //  - Generation is synchronous on the server, so nothing arrives until the
 //    audio is done: the idle timeout (default 90 s) is the cap on that wait.
 //    A server that is down but whose host resolves also costs that long per
@@ -62,6 +72,8 @@
 
 #include <string>
 #include <map>
+#include <deque>
+#include <vector>
 #include "util/Variant.h" //also brings in boost::signals2
 #include "Network/NetHTTP.h"
 
@@ -69,7 +81,10 @@ class TTSClient : public boost::signals2::trackable
 {
 public:
 
+	typedef std::map<std::string, std::string> FieldMap;
+
 	TTSClient();
+	~TTSClient();
 
 	//serverName is a bare host ("hal.local"), apiPath has no leading slash ("tts")
 	void Setup(const std::string &serverName, int port, const std::string &apiPath);
@@ -82,27 +97,40 @@ public:
 
 	void SetTimeoutMS(int ms) { m_timeoutMS = ms; } //per attempt: give up if the server stays silent this long
 	void SetMaxRetries(int n) { m_maxRetries = n; } //extra attempts after a transport failure (default 1)
+	void SetMaxParallel(int n); //requests on the wire at once, default 1 (see the header comment before raising it)
+	int GetMaxParallel() const { return m_maxParallel; }
 
 	//queues text; the audio lands in outFile (overwritten). Returns the
 	//request id the signals will carry, 0 if text/outFile are empty or Setup
-	//wasn't called. See the header comment for the latest-wins queueing
-	uint32 Speak(const std::string &text, const std::string &outFile);
+	//wasn't called. Higher priority lines are sent before lower ones waiting
+	//in the queue; per-request fields override the client-wide ones
+	uint32 Speak(const std::string &text, const std::string &outFile, int priority = 0);
+	uint32 Speak(const std::string &text, const std::string &outFile, const FieldMap &fields, int priority = 0);
+
+	bool Cancel(uint32 id); //true if it was queued or in flight; no signal will fire for it
+	void CancelAll();       //everything queued and in flight, go idle
+	bool IsPending(uint32 id) const;  //queued or in flight
+	bool IsInFlight(uint32 id) const; //on the wire right now
 
 	void Update(); //poll every frame
-	bool IsBusy() const { return m_bBusy || m_bRetryPending || m_bHasPending; } //anything generating or waiting to
-	bool IsInFlight() const { return m_bBusy; } //a request is on the wire right now
-	void Abort(); //drop the in-flight request and anything pending, go idle
+	bool IsBusy() const { return GetInFlightCount() > 0 || !m_queue.empty(); }
+	int GetInFlightCount() const;
+	int GetQueuedCount() const { return (int)m_queue.size(); }
 
-	//stats from the most recent finished line
+	//stats from the most recently finished line
 	int GetLastReplyMS() const { return m_lastReplyMS; }
 	int GetLastAudioBytes() const { return m_lastAudioBytes; }
-	int GetInFlightMS() const; //ms the current request has been running, 0 if idle
+	int GetLastAudioMS() const { return m_lastAudioMS; }
 
 	//the reply-body check described above; public so tests can feed it buffers.
 	//False with a reason in errOut
 	static bool ValidateAudio(const uint8 *pData, int len, std::string &errOut);
+	//length of a PCM WAV in ms from its header (fmt byte rate + data chunk
+	//size), 0 if it isn't one we can read. A data chunk that claims more than
+	//the buffer holds is clamped to what's there
+	static int GetWavDurationMS(const uint8 *pData, int len);
 
-	boost::signals2::signal<void (VariantList*)> m_sig_ready; //Get(0) = file path, Get(1) = request id, Get(2) = text
+	boost::signals2::signal<void (VariantList*)> m_sig_ready; //Get(0) = file path, Get(1) = request id, Get(2) = text, Get(3) = generation ms, Get(4) = audio ms
 	boost::signals2::signal<void (VariantList*)> m_sig_error; //Get(0) = error string, Get(1) = request id
 
 private:
@@ -110,37 +138,47 @@ private:
 	struct Request
 	{
 		uint32 id = 0;
+		int priority = 0;
 		std::string text;
 		std::string outFile;
+		FieldMap fields;
 	};
 
-	void StartRequest();
-	void FinishRequest(); //in-flight is done (either way): reset, promote the pending line if any
-	void HandleFailure(const std::string &errorMsg);
+	struct Worker
+	{
+		NetHTTP net;
+		Request req;
+		bool bBusy = false;         //a request is on the wire
+		bool bRetryPending = false; //waiting out the backoff before resending req
+		int attempt = 0;
+		unsigned int startTick = 0;
+		unsigned int retryAtTick = 0;
+	};
+
+	void Dispatch(); //hands queued lines to free workers
+	void StartOnWorker(Worker &w);
+	void UpdateWorker(Worker &w);
+	void FreeWorker(Worker &w);
+	void HandleFailure(Worker &w, const std::string &errorMsg);
 	static std::string BodyPreview(const uint8 *pData, int len, int maxChars);
 	static bool WriteFile(const std::string &path, const uint8 *pData, int len);
 
 	std::string m_serverName;
 	int m_port = 8899;
 	std::string m_apiPath;
-	std::map<std::string, std::string> m_fields;
+	FieldMap m_fields;
 	std::string m_textField = "text";
 	int m_timeoutMS = 90 * 1000;
 	int m_maxRetries = 1;
+	int m_maxParallel = 1;
 
-	NetHTTP m_netHTTP;
-	Request m_current;  //what's on the wire (or retrying)
-	Request m_pending;  //the newest line waiting for its turn
-	bool m_bBusy = false;
-	bool m_bHasPending = false;
-	bool m_bRetryPending = false;
-	int m_attempt = 0;
-	unsigned int m_retryAtTick = 0;
-	unsigned int m_requestStartTick = 0;
+	std::deque<Request> m_queue;    //waiting: higher priority first, FIFO within one
+	std::vector<Worker*> m_workers; //grown on demand up to m_maxParallel
 	uint32 m_nextID = 1;
 
 	int m_lastReplyMS = 0;
 	int m_lastAudioBytes = 0;
+	int m_lastAudioMS = 0;
 };
 
 #endif // TTSClient_h__

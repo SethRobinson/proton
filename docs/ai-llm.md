@@ -86,7 +86,8 @@ RTGameBot (an LLM plays Infocom games). Header comment has a usage example.
 
 `shared/AI/TTSClient.h/.cpp` speaks text through an HTTP text-to-speech
 server: it form-POSTs the text plus any fields you set and writes the audio
-reply to a file, ready for `AudioManager::Play`. First user: RTGameBot's
+reply to a file, ready for `AudioManager::Play`. It is a request pool (see
+Queueing below). First user: RTGameBot's
 narrator/player voices (its `docs/speech.md`). Built for hal's `POST /tts`
 (fields `text`, `voice`, `scene`; reply = a WAV) but any endpoint that takes
 an `application/x-www-form-urlencoded` POST and answers with the audio bytes
@@ -95,26 +96,39 @@ with the same files as LLMClient minus cJSON.
 
 ## API
 
-- `Setup(server, port, "tts")`; `SetField(name, value)` for the extra form
-  fields (`""` removes one); `SetTextFieldName` (default `text`);
+- `Setup(server, port, "tts")`; `SetField(name, value)` for the client-wide
+  form fields (`""` removes one); `SetTextFieldName` (default `text`);
   `SetTimeoutMS` (idle cap per attempt, default 90 s: generation is silent
-  until the audio is done); `SetMaxRetries` (default 1, transport failures).
-- `Speak(text, outFile)` returns a request id (0 = not set up / empty text).
-  `Update()` every frame; `IsBusy()` / `IsInFlight()`; `Abort()`.
+  until the audio is done); `SetMaxRetries` (default 1, transport failures);
+  `SetMaxParallel(n)` (requests on the wire at once, default 1).
+- `Speak(text, outFile, priority = 0)` and `Speak(text, outFile, fields,
+  priority)` (per-request fields override the client-wide ones, so one pool
+  serves several voices) return a request id (0 = not set up / empty text).
+  `Cancel(id)` / `CancelAll()`; `IsPending(id)` / `IsInFlight(id)`;
+  `Update()` every frame; `IsBusy()`, `GetInFlightCount()`,
+  `GetQueuedCount()`.
 - `m_sig_ready`: `Get(0)` = the file path, `Get(1)` = request id (uint32),
-  `Get(2)` = the text. `m_sig_error`: `Get(0)` = error string, `Get(1)` =
-  request id. Both fire from `Update()`.
-- Stats: `GetLastReplyMS()`, `GetLastAudioBytes()`, `GetInFlightMS()`.
+  `Get(2)` = the text, `Get(3)` = generation ms, `Get(4)` = audio ms (from
+  the WAV header via the public static `GetWavDurationMS`, 0 if unreadable).
+  `m_sig_error`: `Get(0)` = error string, `Get(1)` = request id. Both fire
+  from `Update()`, after the freed slot has been handed to the next queued
+  line. A cancelled request fires nothing.
+- Stats of the most recently finished line: `GetLastReplyMS()`,
+  `GetLastAudioBytes()`, `GetLastAudioMS()`.
 
-## Queueing: latest wins
+## Queueing: a pool
 
-One request in flight plus ONE pending slot. `Speak()` while busy parks the
-line in the slot, a newer `Speak()` replaces it, and when the in-flight
-request finishes its audio is dropped unfired if something newer is waiting
-(a pending retry is skipped the same way). That is right for a talking
-character (say the newest thing, no backlog of stale lines); an app that
-needs every line heard waits for `IsBusy()` to clear before the next
-`Speak()`.
+`Speak()` queues; up to `SetMaxParallel` requests are on the wire, the rest
+wait in a priority queue (higher priority first, FIFO within one). `Cancel`
+drops a queued line or aborts an in-flight one (the socket is reset and the
+slot freed; the server still finishes generating, nothing can stop that).
+hal serializes generation: three concurrent short lines all came back
+together after 3x the time of one, so more than 1 in parallel gains nothing
+there and makes the first reply arrive later (it only comes back with the
+batch). To keep a long text flowing, split it into short chunks and keep a
+couple queued so the first plays while the rest generate; RTGameBot's
+`SpeechDirector` does exactly that (its `docs/speech.md`). A caller that
+wants "only the newest line" does `CancelAll()` before `Speak()`.
 
 ## Reply validation
 

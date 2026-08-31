@@ -5,6 +5,13 @@ TTSClient::TTSClient()
 {
 }
 
+TTSClient::~TTSClient()
+{
+	CancelAll();
+	for (size_t i = 0; i < m_workers.size(); i++)
+		delete m_workers[i];
+}
+
 void TTSClient::Setup(const std::string &serverName, int port, const std::string &apiPath)
 {
 	m_serverName = serverName;
@@ -20,14 +27,25 @@ void TTSClient::SetField(const std::string &name, const std::string &value)
 		m_fields[name] = value;
 }
 
-int TTSClient::GetInFlightMS() const
+void TTSClient::SetMaxParallel(int n)
 {
-	if (!m_bBusy)
-		return 0;
-	return (int)(GetTick() - m_requestStartTick);
+	m_maxParallel = (n < 1) ? 1 : n;
 }
 
-uint32 TTSClient::Speak(const std::string &text, const std::string &outFile)
+int TTSClient::GetInFlightCount() const
+{
+	int count = 0;
+	for (size_t i = 0; i < m_workers.size(); i++)
+		if (m_workers[i]->bBusy || m_workers[i]->bRetryPending) count++;
+	return count;
+}
+
+uint32 TTSClient::Speak(const std::string &text, const std::string &outFile, int priority)
+{
+	return Speak(text, outFile, FieldMap(), priority);
+}
+
+uint32 TTSClient::Speak(const std::string &text, const std::string &outFile, const FieldMap &fields, int priority)
 {
 	if (m_serverName.empty())
 	{
@@ -39,120 +57,170 @@ uint32 TTSClient::Speak(const std::string &text, const std::string &outFile)
 
 	Request r;
 	r.id = m_nextID++;
+	r.priority = priority;
 	r.text = text;
 	r.outFile = outFile;
+	r.fields = fields;
 
-	if (m_bBusy || m_bRetryPending)
-	{
-		//latest wins: whatever was waiting never gets generated
-		if (m_bHasPending)
-			LogMsg("TTSClient: line #%u replaced pending line #%u", r.id, m_pending.id);
-		m_pending = r;
-		m_bHasPending = true;
-		return r.id;
-	}
+	//behind everything of the same or higher priority
+	std::deque<Request>::iterator it = m_queue.begin();
+	while (it != m_queue.end() && it->priority >= priority)
+		++it;
+	m_queue.insert(it, r);
 
-	m_current = r;
-	m_attempt = 0;
-	StartRequest();
+	Dispatch();
 	return r.id;
 }
 
-void TTSClient::StartRequest()
+bool TTSClient::Cancel(uint32 id)
 {
-	m_attempt++;
-	m_bRetryPending = false;
-	m_requestStartTick = GetTick();
+	for (std::deque<Request>::iterator it = m_queue.begin(); it != m_queue.end(); ++it)
+	{
+		if (it->id == id)
+		{
+			m_queue.erase(it);
+			return true;
+		}
+	}
+	for (size_t i = 0; i < m_workers.size(); i++)
+	{
+		Worker &w = *m_workers[i];
+		if ((w.bBusy || w.bRetryPending) && w.req.id == id)
+		{
+			LogMsg("TTSClient: line #%u cancelled while in flight", id);
+			FreeWorker(w);
+			Dispatch();
+			return true;
+		}
+	}
+	return false;
+}
 
-	m_netHTTP.Reset(true);
-	m_netHTTP.Setup(m_serverName, m_port, m_apiPath, NetHTTP::END_OF_DATA_SIGNAL_HTTP);
-	m_netHTTP.SetIdleTimeoutMS(m_timeoutMS);
+void TTSClient::CancelAll()
+{
+	m_queue.clear();
+	for (size_t i = 0; i < m_workers.size(); i++)
+	{
+		Worker &w = *m_workers[i];
+		if (w.bBusy || w.bRetryPending)
+			FreeWorker(w);
+	}
+}
+
+bool TTSClient::IsPending(uint32 id) const
+{
+	for (std::deque<Request>::const_iterator it = m_queue.begin(); it != m_queue.end(); ++it)
+		if (it->id == id) return true;
+	for (size_t i = 0; i < m_workers.size(); i++)
+		if ((m_workers[i]->bBusy || m_workers[i]->bRetryPending) && m_workers[i]->req.id == id) return true;
+	return false;
+}
+
+bool TTSClient::IsInFlight(uint32 id) const
+{
+	for (size_t i = 0; i < m_workers.size(); i++)
+		if ((m_workers[i]->bBusy || m_workers[i]->bRetryPending) && m_workers[i]->req.id == id) return true;
+	return false;
+}
+
+void TTSClient::Dispatch()
+{
+	while (!m_queue.empty())
+	{
+		Worker *pFree = NULL;
+		for (size_t i = 0; i < m_workers.size() && !pFree; i++)
+		{
+			if (!m_workers[i]->bBusy && !m_workers[i]->bRetryPending)
+				pFree = m_workers[i];
+		}
+		if (!pFree && (int)m_workers.size() < m_maxParallel)
+		{
+			pFree = new Worker;
+			m_workers.push_back(pFree);
+		}
+		if (!pFree)
+			return; //every slot is taken, the rest keep waiting
+
+		pFree->req = m_queue.front();
+		m_queue.pop_front();
+		pFree->attempt = 0;
+		StartOnWorker(*pFree);
+	}
+}
+
+void TTSClient::StartOnWorker(Worker &w)
+{
+	w.attempt++;
+	w.bRetryPending = false;
+	w.startTick = GetTick();
+
+	w.net.Reset(true);
+	w.net.Setup(m_serverName, m_port, m_apiPath, NetHTTP::END_OF_DATA_SIGNAL_HTTP);
+	w.net.SetIdleTimeoutMS(m_timeoutMS);
 	//NetHTTP's default post encoding (application/x-www-form-urlencoded) is
 	//what a form-field TTS endpoint expects; the text goes first
-	m_netHTTP.AddPostData(m_textField, (const uint8*)m_current.text.c_str(), (int)m_current.text.length());
-	for (std::map<std::string, std::string>::const_iterator it = m_fields.begin(); it != m_fields.end(); ++it)
+	w.net.AddPostData(m_textField, (const uint8*)w.req.text.c_str(), (int)w.req.text.length());
+
+	//client-wide fields, overridden by the request's own
+	FieldMap fields = m_fields;
+	for (FieldMap::const_iterator it = w.req.fields.begin(); it != w.req.fields.end(); ++it)
+		fields[it->first] = it->second;
+	for (FieldMap::const_iterator it = fields.begin(); it != fields.end(); ++it)
 	{
 		if (!it->second.empty()) //the encoder asserts on empty data
-			m_netHTTP.AddPostData(it->first, (const uint8*)it->second.c_str(), (int)it->second.length());
+			w.net.AddPostData(it->first, (const uint8*)it->second.c_str(), (int)it->second.length());
 	}
 
-	m_bBusy = true;
-	if (!m_netHTTP.Start())
-		HandleFailure("couldn't start HTTP request (can't resolve " + m_serverName + "?)");
+	w.bBusy = true;
+	if (!w.net.Start())
+		HandleFailure(w, "couldn't start HTTP request (can't resolve " + m_serverName + "?)");
 }
 
-void TTSClient::Abort()
+void TTSClient::FreeWorker(Worker &w)
 {
-	m_netHTTP.Reset(true);
-	m_bBusy = false;
-	m_bRetryPending = false;
-	m_bHasPending = false;
-	m_current = Request();
-	m_pending = Request();
-}
-
-void TTSClient::FinishRequest()
-{
-	m_netHTTP.Reset(true);
-	m_bBusy = false;
-	m_bRetryPending = false;
-	m_current = Request();
-
-	if (m_bHasPending)
-	{
-		m_current = m_pending;
-		m_pending = Request();
-		m_bHasPending = false;
-		m_attempt = 0;
-		StartRequest();
-	}
+	w.net.Reset(true);
+	w.bBusy = false;
+	w.bRetryPending = false;
+	w.req = Request();
 }
 
 void TTSClient::Update()
 {
-	if (m_bRetryPending)
+	//by index: a signal handler may Speak() and grow the vector
+	for (size_t i = 0; i < m_workers.size(); i++)
+		UpdateWorker(*m_workers[i]);
+	Dispatch();
+}
+
+void TTSClient::UpdateWorker(Worker &w)
+{
+	if (w.bRetryPending)
 	{
-		if (m_bHasPending)
-		{
-			//no point retrying a line that's already been superseded
-			LogMsg("TTSClient: line #%u superseded before its retry, skipping it", m_current.id);
-			FinishRequest();
-			return;
-		}
-		if ((int)(GetTick() - m_retryAtTick) >= 0)
-			StartRequest();
+		if ((int)(GetTick() - w.retryAtTick) >= 0)
+			StartOnWorker(w);
 		return;
 	}
 
-	if (!m_bBusy)
+	if (!w.bBusy)
 		return;
 
-	m_netHTTP.Update();
+	w.net.Update();
 
-	if (m_netHTTP.GetError() != NetHTTP::ERROR_NONE)
+	if (w.net.GetError() != NetHTTP::ERROR_NONE)
 	{
 		char err[64];
-		sprintf(err, "HTTP error %d", (int)m_netHTTP.GetError());
-		HandleFailure(err);
+		sprintf(err, "HTTP error %d", (int)w.net.GetError());
+		HandleFailure(w, err);
 		return;
 	}
 
-	if (m_netHTTP.GetState() != NetHTTP::STATE_FINISHED)
+	if (w.net.GetState() != NetHTTP::STATE_FINISHED)
 		return;
 
-	m_lastReplyMS = (int)(GetTick() - m_requestStartTick);
-
-	if (m_bHasPending)
-	{
-		//a newer line arrived while this one was generating: it's stale now
-		LogMsg("TTSClient: line #%u finished (%d ms) but #%u supersedes it, dropped", m_current.id, m_lastReplyMS, m_pending.id);
-		FinishRequest();
-		return;
-	}
-
-	const uint8 *pData = m_netHTTP.GetDownloadedData();
-	int len = m_netHTTP.GetDownloadedBytes();
-	int resultCode = m_netHTTP.GetResultCode();
+	int replyMS = (int)(GetTick() - w.startTick);
+	const uint8 *pData = w.net.GetDownloadedData();
+	int len = w.net.GetDownloadedBytes();
+	int resultCode = w.net.GetResultCode();
 
 	std::string err;
 	if (resultCode >= 400)
@@ -162,49 +230,56 @@ void TTSClient::Update()
 
 	if (!err.empty())
 	{
-		HandleFailure(err);
+		HandleFailure(w, err);
 		return;
 	}
 
-	if (!WriteFile(m_current.outFile, pData, len))
+	if (!WriteFile(w.req.outFile, pData, len))
 	{
-		HandleFailure("couldn't write " + m_current.outFile);
+		HandleFailure(w, "couldn't write " + w.req.outFile);
 		return;
 	}
 
+	int audioMS = GetWavDurationMS(pData, len);
+	m_lastReplyMS = replyMS;
 	m_lastAudioBytes = len;
-	LogMsg("TTSClient: line #%u ready, %d chars -> %d bytes in %d ms (%s)", m_current.id,
-		(int)m_current.text.length(), len, m_lastReplyMS, m_current.outFile.c_str());
+	m_lastAudioMS = audioMS;
+	LogMsg("TTSClient: line #%u ready, %d chars -> %.1f s of audio in %d ms (%s)",
+		w.req.id, (int)w.req.text.length(), audioMS / 1000.0f, replyMS, w.req.outFile.c_str());
 
-	Request done = m_current;
-	FinishRequest(); //may start the pending line; do it before handing out the result
+	Request done = w.req;
+	FreeWorker(w);
+	Dispatch(); //the slot goes to the next line before the handler runs
 
 	VariantList v;
 	v.Get(0).Set(done.outFile);
 	v.Get(1).Set(uint32(done.id));
 	v.Get(2).Set(done.text);
+	v.Get(3).Set(uint32(replyMS));
+	v.Get(4).Set(uint32(audioMS));
 	m_sig_ready(&v);
 }
 
-void TTSClient::HandleFailure(const std::string &errorMsg)
+void TTSClient::HandleFailure(Worker &w, const std::string &errorMsg)
 {
-	m_netHTTP.Reset(true);
-	m_bBusy = false;
+	w.net.Reset(true);
+	w.bBusy = false;
 
-	int retriesLeft = m_maxRetries - (m_attempt - 1);
+	int retriesLeft = m_maxRetries - (w.attempt - 1);
 	if (retriesLeft < 0) retriesLeft = 0;
 
-	LogMsg("TTSClient: line #%u attempt %d failed (%s), %d retries left", m_current.id, m_attempt, errorMsg.c_str(), retriesLeft);
+	LogMsg("TTSClient: line #%u attempt %d failed (%s), %d retries left", w.req.id, w.attempt, errorMsg.c_str(), retriesLeft);
 
-	if (retriesLeft > 0 && !m_bHasPending)
+	if (retriesLeft > 0)
 	{
-		m_bRetryPending = true;
-		m_retryAtTick = GetTick() + 1500 * m_attempt;
+		w.bRetryPending = true;
+		w.retryAtTick = GetTick() + 1500 * w.attempt; //linear backoff
 		return;
 	}
 
-	Request failed = m_current;
-	FinishRequest(); //moves on to the pending line if there is one
+	Request failed = w.req;
+	FreeWorker(w);
+	Dispatch();
 
 	VariantList v;
 	v.Get(0).Set(errorMsg);
@@ -261,6 +336,43 @@ bool TTSClient::ValidateAudio(const uint8 *pData, int len, std::string &errOut)
 
 	errOut = "reply isn't audio: " + BodyPreview(pData, len, 300);
 	return false;
+}
+
+static uint32 ReadLE32(const uint8 *p)
+{
+	return (uint32)p[0] | ((uint32)p[1] << 8) | ((uint32)p[2] << 16) | ((uint32)p[3] << 24);
+}
+
+int TTSClient::GetWavDurationMS(const uint8 *pData, int len)
+{
+	if (!pData || len < 12 || memcmp(pData, "RIFF", 4) != 0 || memcmp(pData + 8, "WAVE", 4) != 0)
+		return 0;
+
+	uint32 byteRate = 0;
+	uint32 dataSize = 0;
+	int pos = 12;
+	while (pos + 8 <= len)
+	{
+		const uint8 *pChunk = pData + pos;
+		uint32 chunkSize = ReadLE32(pChunk + 4);
+		if (memcmp(pChunk, "fmt ", 4) == 0 && chunkSize >= 16 && pos + 8 + 16 <= len)
+		{
+			byteRate = ReadLE32(pChunk + 8 + 8); //sample rate * channels * bytes per sample
+		}
+		else if (memcmp(pChunk, "data", 4) == 0)
+		{
+			dataSize = chunkSize;
+			uint32 present = (uint32)(len - pos - 8);
+			if (dataSize > present) dataSize = present; //truncated, or a streaming encoder's placeholder
+			break;
+		}
+		pos += 8 + (int)chunkSize + (int)(chunkSize & 1); //chunks are word aligned
+		if (chunkSize > (uint32)len) break; //nonsense size, don't loop on it
+	}
+
+	if (byteRate == 0 || dataSize == 0)
+		return 0;
+	return (int)(((unsigned long long)dataSize * 1000) / byteRate);
 }
 
 bool TTSClient::WriteFile(const std::string &path, const uint8 *pData, int len)

@@ -137,9 +137,10 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   constraints: apps must also compile `Network/NetHTTP,NetSocket,NetUtils`
   (and `util/cJSON.c` for LLMClient); the socket backend is plain HTTP/1.0,
   non-streaming, one request in flight per client, polled from Update().
-  `TTSClient` (Aug 2026) writes the audio reply to a file with a latest-wins
-  queue; the AudioManager caches sounds by file name, so never reuse a clip
-  name without `DeleteSoundObjectByFileName` (a base-class virtual now).
+  `TTSClient` (Aug 2026) is a request pool (SetMaxParallel, priority queue,
+  Cancel) that writes each audio reply to a file; the AudioManager caches
+  sounds by file name, so never reuse a clip name without
+  `DeleteSoundObjectByFileName` (a base-class virtual now).
   NetHTTP's reply-header lookup is case-insensitive since Aug 2026 (uvicorn
   sends `content-length`; binary bodies used to get cut at the first "\n\n"
   inside them) and `GetResultCode()` exposes the HTTP status.
