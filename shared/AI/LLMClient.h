@@ -28,11 +28,21 @@
 //  m_sig_error: Get(0) = error string, Get(1) = uint32 retries left (fires
 //  once per failed attempt; 0 means the client gave up and is idle again).
 //
+//  Streaming (opt-in, SetStreaming(true)): the request asks for an SSE
+//  stream and m_sig_delta fires as fragments arrive (Get(0) = the text,
+//  Get(1) = uint32 eLLMDeltaKind: the reply, or the model's reasoning).
+//  m_sig_response still fires at the end with the whole reply, so handlers
+//  written for the non-streamed case keep working.  GetStreamedReasoning()
+//  and GetStreamedContent() hold the text so far while a request is in
+//  flight; GetLastReasoning() is the reasoning of the last completed reply
+//  (captured for non-streamed replies too, when the server sends it).
+//
 //  Notes/limits:
 //  - Add shared/Network/NetHTTP.cpp, NetSocket.cpp, NetUtils.cpp and
 //    shared/util/cJSON.c to your project (see docs/ai-llm.md).
-//  - The default socket backend is plain HTTP (no TLS) and non-streaming:
-//    the whole reply arrives at once.  Fine for LAN servers.
+//  - The default socket backend is plain HTTP (no TLS).  Fine for LAN
+//    servers.  Streaming needs the socket backend (NetHTTP stream mode);
+//    the html5/libcurl backends deliver the reply whole at the end.
 //  - One request in flight per LLMClient; SendAsync returns false if busy.
 
 #ifndef LLMClient_h__
@@ -61,6 +71,7 @@ public:
 
 	void AddUserMessage(const std::string &text) { m_messages.push_back(LLMMessage("user", text)); }
 	void AddAssistantMessage(const std::string &text) { m_messages.push_back(LLMMessage("assistant", text)); }
+	void RemoveLastMessage() { if (!m_messages.empty()) m_messages.pop_back(); } //e.g. a user turn whose request got aborted
 	void Clear() { m_messages.clear(); }
 
 	//bound the history: keep only the last maxPairs user/assistant exchanges
@@ -69,13 +80,86 @@ public:
 
 	const std::vector<LLMMessage> & GetMessages() const { return m_messages; }
 
-	//the full request body for a /v1/chat/completions POST
-	std::string BuildChatCompletionJSON(const std::string &model, float temperature, int maxTokens) const;
+	//the full request body for a /v1/chat/completions POST. bStream adds
+	//"stream":true plus stream_options.include_usage (so the usage stats
+	//still arrive, as the stream's final chunk)
+	std::string BuildChatCompletionJSON(const std::string &model, float temperature, int maxTokens, bool bStream = false) const;
 
 private:
 
 	std::string m_systemPrompt;
 	std::vector<LLMMessage> m_messages;
+};
+
+enum eLLMDeltaKind
+{
+	LLM_DELTA_CONTENT = 0,  //the reply
+	LLM_DELTA_REASONING = 1 //the model's thinking (reasoning models with thinking on)
+};
+
+//Incremental parser for an OpenAI-compatible SSE chat completion stream.
+//Pure: feed it "the body so far" (it keeps its own consumed offset) and
+//drain the deltas. Handles delta.content, delta.reasoning /
+//delta.reasoning_content, a leading <think>...</think> block inline in the
+//content (the tags may be split across deltas), the usage chunk,
+//finish_reason, "data: [DONE]", error events, and a body that turns out not
+//to be SSE at all (a JSON error object, or a server that ignored stream:true)
+class LLMStreamParser
+{
+public:
+
+	struct Delta
+	{
+		eLLMDeltaKind kind;
+		std::string text;
+	};
+
+	enum eBodyKind
+	{
+		BODY_UNKNOWN, //nothing decisive received yet
+		BODY_SSE,     //"data:" lines
+		BODY_OTHER    //not a stream: parse the whole body as a normal reply
+	};
+
+	void Reset();
+	//bFinal: the body is complete, also take an unterminated last line and
+	//flush anything the <think> router was holding back
+	void Feed(const std::string &bodySoFar, bool bFinal);
+	std::vector<Delta> & GetPendingDeltas() { return m_pending; } //drain and clear after each Feed
+
+	eBodyKind GetBodyKind() const { return m_bodyKind; }
+	bool IsDone() const { return m_bDone; } //saw data: [DONE]
+	int GetChunkCount() const { return m_chunks; }
+	const std::string & GetError() const { return m_error; } //non-empty once an error event arrived
+	const std::string & GetFinishReason() const { return m_finishReason; } //"stop", "length", ... ("" if not sent)
+	int GetPromptTokens() const { return m_promptTokens; }
+	int GetCompletionTokens() const { return m_completionTokens; }
+	const std::string & GetContent() const { return m_content; }     //accumulated
+	const std::string & GetReasoning() const { return m_reasoning; } //accumulated
+
+private:
+
+	void OnLine(const std::string &line);
+	void OnChunk(const std::string &json);
+	void RouteContent(const std::string &text); //the <think> state machine
+	void FlushThink();
+	void Emit(eLLMDeltaKind kind, const std::string &text);
+
+	enum eThinkState { THINK_UNDECIDED, THINK_INSIDE, THINK_PLAIN };
+
+	size_t m_consumed = 0;
+	eBodyKind m_bodyKind = BODY_UNKNOWN;
+	bool m_bDone = false;
+	int m_chunks = 0;
+	std::string m_error;
+	std::string m_finishReason;
+	std::string m_content;
+	std::string m_reasoning;
+	std::string m_thinkPending; //content held back until we know whether it opens a <think> tag
+	eThinkState m_thinkState = THINK_UNDECIDED;
+	int m_promptTokens = 0;
+	int m_completionTokens = 0;
+	std::vector<Delta> m_pending;
 };
 
 class LLMClient : public boost::signals2::trackable
@@ -88,12 +172,20 @@ public:
 	//("v1/chat/completions"), model is the server's model id
 	void Setup(const std::string &serverName, int port, const std::string &apiPath, const std::string &model);
 	void SetParms(float temperature, int maxTokens, int maxRetries);
-	void SetTimeoutMS(int ms) { m_timeoutMS = ms; } //per-attempt cap on waiting for the reply
+	//idle cap per attempt: give up if nothing arrives for this long. A stream
+	//resets it with every fragment, so with streaming on it only has to cover
+	//the wait for the first token
+	void SetTimeoutMS(int ms) { m_timeoutMS = ms; }
 
 	//a JSON object whose fields get merged into every request body; for
 	//server-specific extras, e.g. vLLM/Qwen:
 	//  {"chat_template_kwargs":{"enable_thinking":false}}
 	void SetExtraBodyJSON(const std::string &jsonObject) { m_extraBodyJSON = jsonObject; }
+
+	//opt-in SSE streaming (see the header comment). Takes effect at the next
+	//SendAsync
+	void SetStreaming(bool bStream) { m_bStreaming = bStream; }
+	bool GetStreaming() const { return m_bStreaming; }
 
 	//mirror every request/response/error body to a text file, timestamped
 	//("" disables). Truncates any existing file unless bAppend.
@@ -108,6 +200,17 @@ public:
 	float GetLastTPS() const; //completion tokens per second of the last reply
 	int GetLastRequestBytes() const { return m_lastRequestBytes; } //POST body size
 	int GetInFlightMS() const; //ms the current request has been running, 0 if idle
+	int GetLastFirstTokenMS() const { return m_lastFirstTokenMS; } //streamed replies: ms until the first fragment (0 otherwise)
+	const std::string & GetLastFinishReason() const { return m_lastFinishReason; } //"stop", "length"... ("" if the server didn't say)
+
+	//the model's reasoning ("thinking") text: what the server sent alongside
+	//the last completed reply ("" if none), and the live text of the request
+	//in flight when streaming (cleared when an attempt starts; still
+	//readable after Abort until the next SendAsync)
+	const std::string & GetLastReasoning() const { return m_lastReasoning; }
+	const std::string & GetStreamedReasoning() const { return m_streamReasoning; }
+	const std::string & GetStreamedContent() const { return m_streamContent; }
+	int GetStreamChunkCount() const { return m_streamChunks; }
 
 	//snapshots the conversation into a request; false if one is in flight
 	bool SendAsync(const LLMConversation &convo);
@@ -118,14 +221,21 @@ public:
 
 	boost::signals2::signal<void (VariantList*)> m_sig_response; //Get(0) = assistant text
 	boost::signals2::signal<void (VariantList*)> m_sig_error;    //Get(0) = error string, Get(1) = uint32 retries left
+	boost::signals2::signal<void (VariantList*)> m_sig_delta;    //streaming only: Get(0) = text fragment, Get(1) = uint32 eLLMDeltaKind
 
 private:
 
 	void StartRequest();
 	void HandleFailure(const std::string &errorMsg);
+	//the non-streamed path: parse the whole body, log it, deliver or fail
+	void DeliverWholeReply(const char *pRaw);
+	//streaming: feed the parser, fire m_sig_delta for what's new
+	void PumpStream(const std::string &body, bool bFinal);
+	void FinishStreamedReply();
 	//pulls choices[0].message.content out of the reply; on failure returns "" and sets errOut.
-	//Also captures usage stats (m_lastPromptTokens/m_lastCompletionTokens).
+	//Also captures usage stats, finish_reason and any reasoning text.
 	std::string ParseAssistantContent(const char *pJSON, std::string &errOut);
+	void ReadUsage(void *pRootJSON); //m_lastPromptTokens/m_lastCompletionTokens from a reply's "usage"
 	void AppendToLog(const std::string &header, const std::string &body);
 
 	std::string m_serverName;
@@ -148,12 +258,24 @@ private:
 	int m_attempt = 0;
 	unsigned int m_retryAtTick = 0;
 
+	//streaming
+	bool m_bStreaming = false;
+	bool m_bStreamRequest = false; //what the request in flight asked for (snapshot of m_bStreaming at SendAsync)
+	LLMStreamParser m_parser;
+	std::string m_streamContent;
+	std::string m_streamReasoning;
+	int m_streamChunks = 0;
+	bool m_bGotFirstToken = false;
+
 	std::string m_logPath;
 	unsigned int m_requestStartTick = 0;
 	int m_lastRequestBytes = 0;
 	int m_lastReplyMS = 0;
+	int m_lastFirstTokenMS = 0;
 	int m_lastPromptTokens = 0;
 	int m_lastCompletionTokens = 0;
+	std::string m_lastReasoning;
+	std::string m_lastFinishReason;
 };
 
 #endif // LLMClient_h__

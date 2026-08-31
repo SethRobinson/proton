@@ -136,7 +136,10 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
 - AI / LLM + TTS clients (`shared/AI/`): `docs/ai-llm.md`. Non-obvious
   constraints: apps must also compile `Network/NetHTTP,NetSocket,NetUtils`
   (and `util/cJSON.c` for LLMClient); the socket backend is plain HTTP/1.0,
-  non-streaming, one request in flight per client, polled from Update().
+  one request in flight per client, polled from Update(). SSE streaming is
+  opt-in (Sep 2026: `LLMClient::SetStreaming`, `m_sig_delta`,
+  `GetLastReasoning`; `NetHTTP::SetStreamMode`, which `Reset()` clears, so
+  set it after Reset/Setup and before Start; socket backend only).
   `TTSClient` (Aug 2026) is a request pool (SetMaxParallel, priority queue,
   Cancel) that writes each audio reply to a file; the AudioManager caches
   sounds by file name, so never reuse a clip name without

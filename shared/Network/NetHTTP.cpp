@@ -51,6 +51,7 @@ void NetHTTP::Reset(bool bClearPostdata)
 	m_downloadData.clear();
 	m_replyHeader.clear();
 	m_query.clear();
+	ResetStreamState();
 
 	if (bClearPostdata)
 	{
@@ -199,6 +200,7 @@ bool NetHTTP::Start()
 	m_downloadHeader.clear();
 	m_expectedFileBytes = 0;
 	m_resultCode = 0;
+	ClearStreamBuffers();
 	string header = BuildHTTPHeader();
 
 #ifdef _DEBUG
@@ -287,6 +289,13 @@ int NetHTTP::ScanDownloadedHeader()
 {
 	m_expectedFileBytes = atoi(GetHeaderValue(m_downloadHeader, "Content-Length").c_str());
 
+	//chunked transfer-encoding (only decoded in stream mode; an HTTP/1.0
+	//request like ours normally gets a plain body). The two are exclusive
+	string transferEncoding = ToLowerCaseString(GetHeaderValue(m_downloadHeader, "Transfer-Encoding"));
+	m_bChunked = (transferEncoding.find("chunked") != string::npos);
+	if (m_bChunked)
+		m_expectedFileBytes = 0;
+
 	//"HTTP/1.1 200 OK": the status is the second word of the first line
 	string firstLine = m_downloadHeader.substr(0, m_downloadHeader.find('\n'));
 	int resultCode = (int)atol(SeparateStringSTL(firstLine, 1, ' ').c_str());
@@ -310,12 +319,14 @@ int NetHTTP::ScanDownloadedHeader()
 				int port = 80;
 				BreakDownURLIntoPieces(url, domain, request, port);
 				string fNameTemp = m_fileName;
+				bool bStreamModeTemp = m_bStreamMode; //Reset clears it, like the file name
 				Reset(false); //end connection, setup new one
 				if (!fNameTemp.empty())
 				{
 					SetFileOutput(fNameTemp);
 				}
 				Setup(domain, port, request, m_endOfDataSignal);
+				m_bStreamMode = bStreamModeTemp;
 				Start();
 			}
 		}
@@ -333,7 +344,14 @@ void NetHTTP::Update()
 	{
 		//we don't know how many bytes are coming in this case, so we'll look for a special marker.
 
-		if (m_timer < GetTick())
+		if (m_bStreamMode)
+		{
+			//stream mode has its own end-of-body rules and no check delay
+			UpdateStream();
+			if (m_state != STATE_ACTIVE)
+				return;
+		}
+		else if (m_timer < GetTick())
 		{
 			m_timer = GetTick()+NET_END_MARK_CHECK_DELAY_MS;
 		
@@ -447,6 +465,137 @@ void NetHTTP::Update()
 	}
 }
 
+//stream mode: runs every frame (no 333 ms gate) and drains the socket buffer
+//into m_streamBody as it arrives, so a caller can read the body mid-reply.
+//Ends on Content-Length, the chunked terminator, or the server closing the
+//connection; the "\n\n" heuristic would cut an SSE stream at its first event
+void NetHTTP::UpdateStream()
+{
+	vector<char> &s = m_netSocket.GetBuffer();
+
+	if (m_downloadHeader.empty())
+	{
+		int indexOfEndOfHeader;
+		if (!CheckCharVectorForString(s, "\r\n\r\n", &indexOfEndOfHeader)
+			&& !CheckCharVectorForString(s, "\n\n", &indexOfEndOfHeader))
+		{
+			if (m_netSocket.WasDisconnected())
+				FinishDownload(); //closed without a header: reports ERROR_CANT_RESOLVE_URL like the normal path
+			return;
+		}
+
+		m_downloadHeader.insert(m_downloadHeader.begin(), s.begin(), s.begin() + indexOfEndOfHeader);
+		int result = ScanDownloadedHeader();
+		if (result == 301 || result == 302)
+			return; //a new connection was started
+		if (GetState() == STATE_ABORT)
+			return;
+
+		//from here on only body bytes live in the socket buffer
+		s.erase(s.begin(), s.begin() + indexOfEndOfHeader);
+	}
+
+	if (!s.empty())
+	{
+		if (m_bChunked)
+			DecodeChunkedBytes(&s[0], s.size());
+		else
+			m_streamBody.append(s.begin(), s.end());
+		s.clear();
+	}
+
+	if (m_bChunked && m_chunkState == CHUNK_DONE)
+	{
+		FinishDownload();
+		return;
+	}
+	if (m_expectedFileBytes > 0 && m_streamBody.size() >= m_expectedFileBytes)
+	{
+		FinishDownload();
+		return;
+	}
+	if (m_netSocket.WasDisconnected())
+	{
+		FinishDownload();
+		return;
+	}
+}
+
+//Transfer-Encoding: chunked, decoded byte by byte so it works on whatever
+//pieces the socket hands us: "<hex size>[;ext]\r\n<data>\r\n" repeated, then
+//"0\r\n", optional trailer headers, and an empty line
+bool NetHTTP::DecodeChunkedBytes(const char *pData, size_t len)
+{
+	for (size_t i = 0; i < len; i++)
+	{
+		char c = pData[i];
+		switch (m_chunkState)
+		{
+		case CHUNK_SIZE:
+			if (c == '\n')
+			{
+				if (m_chunkLine.empty() || m_chunkLine == "\r")
+					break; //a stray blank line, keep looking for the size
+				m_chunkBytesLeft = strtoul(m_chunkLine.c_str(), NULL, 16); //stops at ';' or '\r' by itself
+				m_chunkLine.clear();
+				m_chunkState = (m_chunkBytesLeft > 0) ? CHUNK_DATA : CHUNK_TRAILER;
+			}
+			else if (m_chunkLine.length() < 64)
+			{
+				m_chunkLine += c;
+			}
+			else
+			{
+				//that's no chunk size line: the body isn't what the header said, pass the rest through raw
+				LogMsg("NetHTTP: malformed chunked body, treating the rest as raw data");
+				m_bChunked = false;
+				m_streamBody += m_chunkLine;
+				m_chunkLine.clear();
+				m_streamBody.append(pData + i, len - i);
+				return false;
+			}
+			break;
+
+		case CHUNK_DATA:
+			{
+				size_t n = len - i;
+				if (n > m_chunkBytesLeft) n = m_chunkBytesLeft;
+				m_streamBody.append(pData + i, n);
+				m_chunkBytesLeft -= n;
+				i += n - 1; //the loop's i++ steps past the last byte taken
+				if (m_chunkBytesLeft == 0)
+					m_chunkState = CHUNK_DATA_CRLF;
+			}
+			break;
+
+		case CHUNK_DATA_CRLF: //the line end after a chunk's data
+			if (c == '\n')
+				m_chunkState = CHUNK_SIZE;
+			break;
+
+		case CHUNK_TRAILER: //after the zero-size chunk: optional headers, then an empty line
+			if (c == '\n')
+			{
+				if (m_chunkLine.empty() || m_chunkLine == "\r")
+				{
+					m_chunkState = CHUNK_DONE;
+					return true;
+				}
+				m_chunkLine.clear();
+			}
+			else
+			{
+				m_chunkLine += c;
+			}
+			break;
+
+		case CHUNK_DONE:
+			return true; //anything after the terminator is ignored
+		}
+	}
+	return true;
+}
+
 void NetHTTP::OnError(eError e)
 {
 	m_error = e;
@@ -459,6 +608,15 @@ void NetHTTP::FinishDownload()
 	if (m_downloadHeader.empty())
 	{
 		OnError(ERROR_CANT_RESOLVE_URL);
+		return;
+	}
+
+	if (m_bStreamMode)
+	{
+		//the body was decoded as it arrived
+		m_downloadData.assign(m_streamBody.begin(), m_streamBody.end());
+		m_downloadData.push_back(0);
+		m_state = STATE_FINISHED;
 		return;
 	}
 
@@ -518,7 +676,12 @@ int NetHTTP::GetDownloadedBytes()
 	{
 		return m_bytesWrittenToFile;
 	}
-	
+
+	if (m_bStreamMode && m_state == STATE_ACTIVE)
+	{
+		return (int)m_streamBody.size(); //so far
+	}
+
 	if (m_downloadData.size() == 0) return 0;
 	return (int)m_downloadData.size()-1; //the -1 is for the null we added
 }

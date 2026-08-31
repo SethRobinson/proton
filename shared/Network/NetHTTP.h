@@ -117,6 +117,22 @@ public:
 	void Reset(bool bClearPostData=true); //completely clears it out so it can be used again
 	void SetForcePost(bool bNew) { m_bForcePost = bNew; } //always send as POST, even if not sending data.  Note: I didn't set this up for NetHTTP_libCURL.cpp yet
 
+	//Stream mode (socket backend only): the reply body is readable while it
+	//arrives (GetStreamBody), the "\n\n" end-of-body heuristic of
+	//END_OF_DATA_SIGNAL_HTTP is off, chunked transfer-encoding is decoded, and
+	//the reply ends on Content-Length, the chunked terminator, or the server
+	//closing the connection.  Made for SSE streams (LLMClient::SetStreaming).
+	//Reset() clears it, so call it AFTER Reset()/Setup() and BEFORE Start().
+	//Not for use with SetFileOutput.  The html5/libcurl backends ignore it
+	//(the body still arrives whole at STATE_FINISHED).
+	void SetStreamMode(bool bStream) { m_bStreamMode = bStream; }
+	bool GetStreamMode() const { return m_bStreamMode; }
+	//the decoded body received so far, reply header stripped.  Grows while
+	//STATE_ACTIVE, holds the whole body at STATE_FINISHED (the same bytes
+	//GetDownloadedData returns then), cleared by Reset
+	const string & GetStreamBody() const { return m_streamBody; }
+	bool IsHeaderReceived() const { return !m_downloadHeader.empty(); }
+
 protected:
 
 #ifdef PLATFORM_HTML5
@@ -190,6 +206,20 @@ private:
 	bool m_bHasEncodedPostData = false; //used by the libcurl implementation
 	bool m_bForcePost = false; //always post, even if not sending data
 	string m_postHeaderOverride;
+
+	//stream mode (see SetStreamMode); the two functions live in the socket backend only
+	void UpdateStream(); //the STATE_ACTIVE step in stream mode
+	bool DecodeChunkedBytes(const char *pData, size_t len); //appends decoded bytes to m_streamBody; false = malformed, dropped to raw
+	void ClearStreamBuffers() { m_bChunked = false; m_streamBody.clear(); m_chunkState = CHUNK_SIZE; m_chunkBytesLeft = 0; m_chunkLine.clear(); } //per Start(), keeps the mode flag
+	void ResetStreamState() { m_bStreamMode = false; ClearStreamBuffers(); }
+
+	enum eChunkState { CHUNK_SIZE, CHUNK_DATA, CHUNK_DATA_CRLF, CHUNK_TRAILER, CHUNK_DONE };
+	bool m_bStreamMode = false;
+	bool m_bChunked = false; //the reply header said Transfer-Encoding: chunked
+	string m_streamBody; //stream mode: the decoded body so far
+	eChunkState m_chunkState = CHUNK_SIZE;
+	size_t m_chunkBytesLeft = 0;
+	string m_chunkLine; //a partial chunk-size or trailer line
 };
 
 bool CheckCharVectorForString(vector<char> &v, string marker, int *pIndexOfMarkerEndPosOut=NULL);

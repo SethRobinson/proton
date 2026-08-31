@@ -71,6 +71,7 @@ void NetHTTP::Reset(bool bClearPostdata)
 	m_downloadData.clear();
 	m_replyHeader.clear();
 	m_query.clear();
+	ResetStreamState(); //stream mode isn't supported here, the flag just gets cleared
 	if (bClearPostdata)
 	{
 		m_postData.clear();
@@ -178,7 +179,9 @@ bool NetHTTP::Start()
 	m_downloadHeader.clear();
 	m_expectedFileBytes = 0;
 
-	
+	if (m_bStreamMode)
+		LogMsg("NetHTTP: stream mode isn't supported by this backend, the reply arrives whole");
+
 #ifdef _DEBUG
 LogMsg("Opening %s on port %d.  Postdata has %d chars", m_serverName.c_str(), m_port, m_postData.length());
 

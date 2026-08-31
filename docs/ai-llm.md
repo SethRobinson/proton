@@ -9,18 +9,25 @@ RTGameBot (an LLM plays Infocom games). Header comment has a usage example.
 - `LLMMessage`: role ("user"/"assistant") + content.
 - `LLMConversation`: system prompt + message history. `TrimToLastExchanges(n)`
   bounds the history (system prompt always kept, window starts on a user
-  message). `BuildChatCompletionJSON(model, temperature, maxTokens)` builds
-  the request body with cJSON.
+  message), `RemoveLastMessage()` drops a user turn whose request got
+  aborted. `BuildChatCompletionJSON(model, temperature, maxTokens, bStream)`
+  builds the request body with cJSON (`bStream` adds `"stream":true` and
+  `stream_options.include_usage`).
+- `LLMStreamParser`: the incremental SSE parser streaming uses (pure, no
+  network; see Streaming below). Feed it the body so far, drain the deltas.
 - `LLMClient`: owns one `NetHTTP`, runs ONE request at a time.
   `Setup(server, port, "v1/chat/completions", modelId)`, then
   `SendAsync(convo)` (snapshots the JSON; false if busy), and poll `Update()`
   every frame. `SetParms(temperature, maxTokens, maxRetries)`,
-  `SetTimeoutMS(ms)` (per-attempt, default 15s), `Abort()`.
+  `SetTimeoutMS(ms)` (an idle cap per attempt, default 15s; a stream resets
+  it with every fragment), `SetStreaming(bool)`, `Abort()`.
   `SetExtraBodyJSON(json)` merges arbitrary fields into every request body,
   e.g. `{"chat_template_kwargs":{"enable_thinking":false}}` for Qwen on
   vLLM. That one matters: with thinking left on, the model can burn the
   whole max_tokens budget in the `reasoning` field and return content:null
-  (surfaced as "model produced only reasoning" through m_sig_error).
+  (surfaced as "model produced only reasoning" through m_sig_error). With
+  thinking on, raise max_tokens (the reasoning shares the budget) and turn
+  streaming on.
 
 ## Logging and stats (for debug overlays)
 
@@ -32,8 +39,12 @@ RTGameBot (an LLM plays Infocom games). Header comment has a usage example.
 - After each completed reply: `GetLastPromptTokens()` /
   `GetLastCompletionTokens()` (from the server's `usage` object, 0 if it
   didn't send one), `GetLastReplyMS()`, `GetLastTPS()` (completion tokens per
-  second) and `GetLastRequestBytes()`. While a request is in flight,
-  `GetInFlightMS()` gives its age (0 when idle).
+  second), `GetLastRequestBytes()`, `GetLastFinishReason()` ("stop",
+  "length"...), `GetLastReasoning()` (the reasoning text a thinking model
+  sent, from `message.reasoning` / `reasoning_content`, or a leading
+  `<think>` block in the content; "" if none) and, for streamed replies,
+  `GetLastFirstTokenMS()`. While a request is in flight, `GetInFlightMS()`
+  gives its age (0 when idle).
 - Timing uses `GetTick()`, so under the engine's deterministic screenshot mode
   (locked timestep) these durations count frames, not wall clock.
 
@@ -41,12 +52,57 @@ RTGameBot (an LLM plays Infocom games). Header comment has a usage example.
 
 - `m_sig_response`: `Get(0)` = assistant reply text. The client does NOT add
   it to your conversation; call `AddAssistantMessage` yourself if you want
-  multi-turn memory.
+  multi-turn memory. Fires for streamed replies too, with the whole content,
+  once the stream ends.
 - `m_sig_error`: `Get(0)` = error string, `Get(1)` = uint32 retries left.
   Fires once per failed attempt (transport error, timeout, unparsable body,
-  or a server-side error object). retriesLeft == 0 means the client gave up
-  and is idle. Failed attempts resend the same snapshot with linear backoff.
-  On parse/server errors the raw body (first 400 chars) is LogMsg'd.
+  a server-side error object, or a stream that ended without content).
+  retriesLeft == 0 means the client gave up and is idle. Failed attempts
+  resend the same snapshot with linear backoff. On parse/server errors the
+  raw body (first 400 chars) is LogMsg'd.
+- `m_sig_delta` (streaming only): `Get(0)` = a text fragment, `Get(1)` =
+  uint32 `eLLMDeltaKind` (`LLM_DELTA_CONTENT` or `LLM_DELTA_REASONING`), in
+  arrival order. A handler may `Abort()`. Apps that only want to show the
+  live text can skip the signal and poll `GetStreamedReasoning()` /
+  `GetStreamedContent()` each frame instead (RTGameBot does).
+
+## Streaming (SSE), opt-in since Sep 2026
+
+`SetStreaming(true)` makes the next `SendAsync` ask for a stream
+(`"stream":true`, `stream_options.include_usage` so the usage stats still
+arrive as the final chunk). The client puts its `NetHTTP` into stream mode
+and, every frame, feeds the body received so far to an `LLMStreamParser`:
+complete `data:` lines only (a partial line waits), `[DONE]` ends the reply
+without waiting for the server to close, `choices[0].delta.content` is the
+reply and `delta.reasoning` (newer vLLM) or `delta.reasoning_content`
+(older vLLM, DeepSeek) the thinking. A server without a reasoning parser
+sends the thinking inline as `<think>...</think>` at the start of the
+content; the parser routes a leading block to reasoning even when the tags
+are split across deltas (it holds back only the bytes that could still be a
+tag). A body that turns out not to be SSE (an error object, HTTP 4xx/5xx, a
+server that ignored `stream:true`) goes through the normal whole-reply
+parse, so nothing changes for the caller. A stream that ends with reasoning
+but no content (finish_reason "length": the budget ran out) fails with the
+same "only reasoning" message as the non-streamed case. Each retry attempt
+starts a fresh stream. The RESPONSE log block holds the reassembled
+`[reasoning]` / `[content]` text (chunk count, first-token time), not the
+raw SSE.
+
+`NetHTTP::SetStreamMode(true)` (socket backend): the header is located every
+frame (no 333 ms check delay), the socket buffer is drained into
+`GetStreamBody()` as it arrives (`Transfer-Encoding: chunked` is decoded,
+though an HTTP/1.0 request like ours normally gets a plain body), the
+`"\n\n"` end-of-body heuristic of `END_OF_DATA_SIGNAL_HTTP` is off (it would
+cut an SSE stream at its first event), and the reply ends on Content-Length,
+the chunked terminator or the server closing the connection. `Reset()`
+clears the flag, so set it AFTER `Reset()`/`Setup()` and BEFORE `Start()`
+(redirects re-apply it). Not for use with `SetFileOutput`. The html5 and
+libcurl backends ignore it: the body still arrives whole at
+`STATE_FINISHED`, and `LLMClient` copes (no live deltas, the same
+`m_sig_response` at the end). The idle timeout is per gap between
+fragments, so a long reasoning phase no longer needs a long timeout, only
+the wait for the first token does. RTGameBot's `-llmtest` exercises the
+parser on canned bodies in 1-byte, 7-byte and whole pieces.
 
 ## What a project must compile (engine is source-only)
 
@@ -61,11 +117,13 @@ RTGameBot (an LLM plays Infocom games). Header comment has a usage example.
   HTTPS an app would need the `RT_USE_LIBCURL` backend, which currently
   can't send custom headers (`SetPostHeaderOverride` isn't implemented
   there), so it would need a small patch first.
-- Non-streaming: the whole reply arrives at once. Streaming (SSE) would need
-  a data callback hook in the NetHTTP backends.
-- Reply content is returned verbatim; reasoning-model artifacts like
-  `<think>` blocks are the caller's problem (RTGameBot strips them, see its
-  GameDirector::ParseAIResponse).
+- Streaming is opt-in (see above); the default is still the whole reply at
+  once, on the code path every existing caller uses.
+- Non-streamed reply content is returned verbatim; a leading `<think>` block
+  is copied into `GetLastReasoning()` but NOT stripped from the content
+  (RTGameBot strips it, see its GameDirector::ParseAIResponse). Streamed
+  content never carries the tags: the parser routes the block to the
+  reasoning side.
 - `NetHTTP::SetIdleTimeoutMS(ms)` was added for this (public, default 25s).
 - `NetHTTP::GetResultCode()` (Aug 2026) returns the reply's HTTP status (0
   until the header arrived); only 404 is turned into a NetHTTP error, so a
