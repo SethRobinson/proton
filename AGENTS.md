@@ -148,6 +148,17 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   sends `content-length`; binary bodies used to get cut at the first "\n\n"
   inside them) and `GetResultCode()` exposes the HTTP status.
 
+- Logging: `LogMsg` appends to `GetSavePath() + "log.txt"`, truncated by
+  the platform main at startup. On Windows an app can move it with
+  `SetLogFileName(name)` (`win/app/main.cpp`, declared in
+  `PlatformEnums.h`, Sep 2026; it truncates the new file), called from the
+  App constructor, which `GetBaseApp()` runs before anything is logged
+  (RTGameBot keeps its log in `bin\logs\`). Gotcha for that constructor:
+  `IsBaseAppInitted()` is already true inside it while `GetBaseApp()`'s
+  pointer isn't set yet, so any `LogMsg` there constructs a second App
+  without end; use raw calls, not helpers that may log (`RemoveFile` does
+  in Debug on a missing file).
+
 ## Conventions for new app projects
 
 - Name the Windows project folder `windows_vs` (no Visual Studio year).

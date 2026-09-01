@@ -2254,6 +2254,19 @@ void AddText(const char *tex ,const char *filename)
 }
 #ifndef RT_CUSTOM_LOGMSG
 
+//the log file, relative to GetSavePath(). An app that wants it elsewhere (a
+//logs\ folder, say) calls SetLogFileName from its App constructor: that runs
+//from GetBaseApp() early in WinMain, before anything reaches the file. Note
+//that nothing may LogMsg from inside that constructor: IsBaseAppInitted() is
+//already true there while GetBaseApp()'s pointer isn't set yet, so a log
+//line would construct a second app (hence the plain _unlink here)
+static std::string g_logFileName = "log.txt";
+
+void SetLogFileName(const std::string &fileName)
+{
+	g_logFileName = fileName;
+	_unlink((GetSavePath() + fileName).c_str()); //a fresh log per run, as WinMain gives the default name
+}
 
 void LogMsgNoCR(const char* traceStr, ...)
 {
@@ -2272,8 +2285,7 @@ void LogMsgNoCR(const char* traceStr, ...)
 	if (IsBaseAppInitted())
 	{
 		GetBaseApp()->GetConsole()->AddLine(buffer);
-		//OutputDebugString( (string("writing to ")+GetSavePath()+"log.txt\n").c_str());
-		AddText(buffer, (GetSavePath() + "log.txt").c_str());
+		AddText(buffer, (GetSavePath() + g_logFileName).c_str());
 	}
 
 }
@@ -2298,8 +2310,7 @@ void LogMsg ( const char* traceStr, ... )
 	{
 		GetBaseApp()->GetConsole()->AddLine(buffer);
 		strcat(buffer, "\r\n");
-		//OutputDebugString( (string("writing to ")+GetSavePath()+"log.txt\n").c_str());
-		AddText(buffer, (GetSavePath()+"log.txt").c_str());
+		AddText(buffer, (GetSavePath() + g_logFileName).c_str());
 	}
 
 }

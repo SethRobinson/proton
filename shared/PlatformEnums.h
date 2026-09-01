@@ -125,6 +125,11 @@ void FireAchievement(std::string achievement);
 void LogMsg(const char *lpFormat, ...);
 void LogMsgNoCR(const char *lpFormat, ...); //not implemented for all platforms yet
 void LogError (const char* traceStr, ... );
+//where LogMsg writes, relative to GetSavePath() ("log.txt" by default); the new
+//file is truncated. Windows only (win/app/main.cpp; the other platforms keep
+//the fixed name): call it before anything is logged, e.g. from the App
+//constructor, which GetBaseApp() runs early in WinMain
+void SetLogFileName(const std::string &fileName);
 void SetLastStringInput(std::string s);
 std::string GetLastStringInput();
 bool GetLastWriteDateOfFile(int *monthOut, int *dayOut, int *yearOut, int *hourOut, int *minOut, int *secOut, std::string fileName, bool bAddSavePath = true);
