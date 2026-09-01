@@ -71,6 +71,7 @@ bool g_bAppCanRunInBackground = false;
 #endif
 
 bool g_autoScreenshotMode = false; //true when the -autoscreenshot parm is in use (render regression harness)
+bool g_bNoActivateWindow = false; //-nofocus: the window is shown without activation and behind everything, so a scripted launch never takes the foreground
 
 void InitVideoSize()
 {
@@ -1437,7 +1438,8 @@ void CenterWindow(HWND hWnd)
 	wb = (desk.right - desk.left) / 2;
 	hb = (desk.bottom - desk.top) / 2;
 
-	SetWindowPos(hWnd, NULL, wb - wa, hb - ha, r.right - r.left, r.bottom - r.top, 0); 
+	//-nofocus: moving it must not activate it or pull it up the z-order
+	SetWindowPos(hWnd, NULL, wb - wa, hb - ha, r.right - r.left, r.bottom - r.top, g_bNoActivateWindow ? (SWP_NOACTIVATE | SWP_NOZORDER) : 0);
 
 }
 
@@ -1742,7 +1744,16 @@ assert(!g_hDC);
 	{
 		CenterWindow(g_hWnd);
 	}
-	ShowWindow(g_hWnd, SW_SHOW);
+	if (g_bNoActivateWindow)
+	{
+		//-nofocus: visible, never activated, and behind every other window
+		ShowWindow(g_hWnd, SW_SHOWNOACTIVATE);
+		SetWindowPos(g_hWnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+	}
+	else
+	{
+		ShowWindow(g_hWnd, SW_SHOW);
+	}
 
 #ifdef RT_WIN_MULTITOUCH_SUPPORT
 	InitMultiTouch();
@@ -1962,6 +1973,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLin
 			//mode, say) that must not inherit the capture mode's locked timestep
 			if (ToLowerCaseString(parms[i]) == "-runinbackground")
 			{
+				g_bAppCanRunInBackground = true;
+			}
+			//a launch that must not take the foreground from whatever the user
+			//is doing (a self test or a capture while a game is up): the window
+			//is shown without activation and behind everything, and the app
+			//keeps updating without focus, since it never gets any
+			if (ToLowerCaseString(parms[i]) == "-nofocus")
+			{
+				g_bNoActivateWindow = true;
 				g_bAppCanRunInBackground = true;
 			}
 		}

@@ -95,7 +95,7 @@ main loop, and input conversion into engine `Message`s:
 
 | Platform | Entry / main loop | Notes |
 |---|---|---|
-| Windows | `shared/win/app/main.cpp` | Win32 message pump, `g_bHasFocus` gating, mouse capture, `-autoscreenshot` parm; vendored libs under `shared/win/` |
+| Windows | `shared/win/app/main.cpp` | Win32 message pump, `g_bHasFocus` gating, mouse capture, the `-autoscreenshot`, `-runinbackground` and `-nofocus` (shown without activation, behind everything) parms; vendored libs under `shared/win/` |
 | HTML5/wasm | `shared/html5/HTML5Main.cpp` | Emscripten; two loop styles (emterpreter vs `emscripten_set_main_loop`); `templates/` has the shell html; many gotchas in AGENTS.md |
 | Android | `shared/android/AndroidApp.cpp` | JNI bridge; ALWAYS edit the `v3_src/` java templates (`SharedActivity.java`), never per-app copies (gradle overwrites them) |
 | iOS | `shared/iOS/app/` | `EAGLView.mm`, `MyAppDelegate.mm`, `MyViewController.mm` |

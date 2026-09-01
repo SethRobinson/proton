@@ -244,6 +244,14 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   wall-clock timing (RTGameBot's `-speechtest`). Re-posting WM_SETFOCUS
   periodically works too; a one-off post is not enough if anything else
   (a build spawning a console, the user) takes the foreground mid-run.
+- `-nofocus` (any Proton app on Windows, Sep 2026): the window is shown
+  without activation (`SW_SHOWNOACTIVATE`, centered with `SWP_NOACTIVATE`)
+  and put at the bottom of the z-order, so a scripted launch, self test or
+  capture never takes the foreground from whatever the user is doing (a
+  game stays up). It implies run-in-background (the app never gets focus,
+  so it would otherwise freeze), and `g_bHasFocus` starts true as always,
+  so posted clicks work. Clicking the window later activates it normally.
+  Use it on every launch a script makes while a person may be at the PC.
 - Posting WM_CHAR does nothing: `shared/win/app/main.cpp` defines
   `C_DONT_USE_WM_CHAR`, so keyboard input must be driven with
   WM_KEYDOWN/WM_KEYUP (the WM_KEYDOWN handler synthesizes
