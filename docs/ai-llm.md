@@ -9,8 +9,12 @@ RTGameBot (an LLM plays Infocom games). Header comment has a usage example.
 - `LLMMessage`: role ("user"/"assistant") + content.
 - `LLMConversation`: system prompt + message history. `TrimToLastExchanges(n)`
   bounds the history (system prompt always kept, window starts on a user
-  message), `RemoveLastMessage()` drops a user turn whose request got
-  aborted. `BuildChatCompletionJSON(model, temperature, maxTokens, bStream)`
+  message), `RemoveOldestMessages(n)` drops the n oldest (then any leading
+  non-user messages, same rule; for an app that summarized them elsewhere,
+  as RTGameBot's HistoryCompactor does), `RemoveLastMessage()` drops a user
+  turn whose request got aborted, `GetTotalChars()` is the system prompt
+  plus every message (a cheap token estimate).
+  `BuildChatCompletionJSON(model, temperature, maxTokens, bStream)`
   builds the request body with cJSON (`bStream` adds `"stream":true` and
   `stream_options.include_usage`).
 - `LLMStreamParser`: the incremental SSE parser streaming uses (pure, no
@@ -37,7 +41,9 @@ RTGameBot (an LLM plays Infocom games). Header comment has a usage example.
   and error to a timestamped text file (truncated at Setup time unless
   bAppend). This is the exact bytes on the wire, which is what you want when
   a model starts misbehaving; `GetLogFile()` returns the path so an app can
-  offer an "open the log" button.
+  offer an "open the log" button. Several clients can share one file
+  (`bAppend` on all but the first) and `SetLogLabel("summary")` tags a
+  client's entries (`[summary] REQUEST ...`) so they can be told apart.
 - After each completed reply: `GetLastPromptTokens()` /
   `GetLastCompletionTokens()` (from the server's `usage` object, 0 if it
   didn't send one), `GetLastReplyMS()`, `GetLastTPS()` (completion tokens per

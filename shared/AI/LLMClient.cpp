@@ -26,6 +26,27 @@ void LLMConversation::TrimToLastExchanges(int maxPairs)
 		m_messages.erase(m_messages.begin());
 }
 
+void LLMConversation::RemoveOldestMessages(int count)
+{
+	if (count <= 0)
+		return;
+	if (count > (int)m_messages.size())
+		count = (int)m_messages.size();
+	m_messages.erase(m_messages.begin(), m_messages.begin() + count);
+
+	//same rule as TrimToLastExchanges: the window starts on a user message
+	while (!m_messages.empty() && m_messages[0].m_role != "user")
+		m_messages.erase(m_messages.begin());
+}
+
+int LLMConversation::GetTotalChars() const
+{
+	int chars = (int)m_systemPrompt.length();
+	for (size_t i = 0; i < m_messages.size(); i++)
+		chars += (int)m_messages[i].m_content.length();
+	return chars;
+}
+
 std::string LLMConversation::BuildChatCompletionJSON(const std::string &model, float temperature, int maxTokens, bool bStream) const
 {
 	cJSON *pRoot = cJSON_CreateObject();
@@ -351,7 +372,8 @@ void LLMClient::AppendToLog(const std::string &header, const std::string &body)
 	FILE *fp = fopen(m_logPath.c_str(), "ab");
 	if (!fp)
 		return;
-	std::string entry = "\n==== " + LogTimestamp() + " " + header + " ====\n" + body + "\n";
+	std::string label = m_logLabel.empty() ? std::string() : "[" + m_logLabel + "] ";
+	std::string entry = "\n==== " + LogTimestamp() + " " + label + header + " ====\n" + body + "\n";
 	fwrite(entry.c_str(), 1, entry.length(), fp);
 	fclose(fp);
 }

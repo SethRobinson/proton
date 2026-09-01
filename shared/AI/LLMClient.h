@@ -78,6 +78,15 @@ public:
 	//(the system prompt is separate and always kept)
 	void TrimToLastExchanges(int maxPairs);
 
+	//drops the oldest count messages (e.g. turns an app has summarized
+	//elsewhere), then any leading non-user messages so the history still
+	//starts on a user turn
+	void RemoveOldestMessages(int count);
+
+	//system prompt plus every message, in chars: a cheap token estimate
+	//(English runs about 4 chars a token)
+	int GetTotalChars() const;
+
 	const std::vector<LLMMessage> & GetMessages() const { return m_messages; }
 
 	//the full request body for a /v1/chat/completions POST. maxTokens <= 0
@@ -194,6 +203,9 @@ public:
 	//("" disables). Truncates any existing file unless bAppend.
 	void SetLogFile(const std::string &path, bool bAppend = false);
 	const std::string & GetLogFile() const { return m_logPath; }
+	//a tag on this client's log entries ("[summary] REQUEST ..."), for apps
+	//that mirror several clients into one file
+	void SetLogLabel(const std::string &label) { m_logLabel = label; }
 
 	//stats from the most recent completed reply (0 until one finishes); the
 	//token counts come from the server's "usage" object when present
@@ -271,6 +283,7 @@ private:
 	bool m_bGotFirstToken = false;
 
 	std::string m_logPath;
+	std::string m_logLabel;
 	unsigned int m_requestStartTick = 0;
 	int m_lastRequestBytes = 0;
 	int m_lastReplyMS = 0;
