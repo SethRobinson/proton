@@ -18,9 +18,11 @@ RTGameBot (an LLM plays Infocom games). Header comment has a usage example.
 - `LLMClient`: owns one `NetHTTP`, runs ONE request at a time.
   `Setup(server, port, "v1/chat/completions", modelId)`, then
   `SendAsync(convo)` (snapshots the JSON; false if busy), and poll `Update()`
-  every frame. `SetParms(temperature, maxTokens, maxRetries)`,
-  `SetTimeoutMS(ms)` (an idle cap per attempt, default 15s; a stream resets
-  it with every fragment), `SetStreaming(bool)`, `Abort()`.
+  every frame. `SetParms(temperature, maxTokens, maxRetries)` (maxTokens
+  <= 0 sends no `max_tokens` at all: the model stops when it's done, within
+  the server's own limit), `SetTimeoutMS(ms)` (an idle cap per attempt,
+  default 15s; a stream resets it with every fragment), `SetStreaming(bool)`,
+  `Abort()`.
   `SetExtraBodyJSON(json)` merges arbitrary fields into every request body,
   e.g. `{"chat_template_kwargs":{"enable_thinking":false}}` for Qwen on
   vLLM. That one matters: with thinking left on, the model can burn the

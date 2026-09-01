@@ -31,7 +31,8 @@ std::string LLMConversation::BuildChatCompletionJSON(const std::string &model, f
 	cJSON *pRoot = cJSON_CreateObject();
 	cJSON_AddStringToObject(pRoot, "model", model.c_str());
 	cJSON_AddNumberToObject(pRoot, "temperature", temperature);
-	cJSON_AddNumberToObject(pRoot, "max_tokens", maxTokens);
+	if (maxTokens > 0)
+		cJSON_AddNumberToObject(pRoot, "max_tokens", maxTokens); //else the server's own limit applies
 
 	if (bStream)
 	{

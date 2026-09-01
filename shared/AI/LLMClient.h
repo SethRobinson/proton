@@ -80,9 +80,11 @@ public:
 
 	const std::vector<LLMMessage> & GetMessages() const { return m_messages; }
 
-	//the full request body for a /v1/chat/completions POST. bStream adds
-	//"stream":true plus stream_options.include_usage (so the usage stats
-	//still arrive, as the stream's final chunk)
+	//the full request body for a /v1/chat/completions POST. maxTokens <= 0
+	//sends no max_tokens at all (the model stops when it's done, within the
+	//server's own limit). bStream adds "stream":true plus
+	//stream_options.include_usage (so the usage stats still arrive, as the
+	//stream's final chunk)
 	std::string BuildChatCompletionJSON(const std::string &model, float temperature, int maxTokens, bool bStream = false) const;
 
 private:
@@ -171,6 +173,7 @@ public:
 	//serverName is a bare host ("hal.local"), apiPath has no leading slash
 	//("v1/chat/completions"), model is the server's model id
 	void Setup(const std::string &serverName, int port, const std::string &apiPath, const std::string &model);
+	//maxTokens <= 0 = no cap (no max_tokens in the request; the server's limit applies)
 	void SetParms(float temperature, int maxTokens, int maxRetries);
 	//idle cap per attempt: give up if nothing arrives for this long. A stream
 	//resets it with every fragment, so with streaming on it only has to cover
