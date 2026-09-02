@@ -5,6 +5,7 @@
 #include "main.h"
 #include "WebOS/SDLMain.h"
 #include "BaseApp.h"
+#include "Network/HostResolver.h" //the lookups in flight are waited for before WSACleanup
 #ifdef RT_SHADER_PIPELINE_AVAILABLE
 	#include "Renderer/ShaderPipeline.h" //SP_DropPushedMatrices in InitVideo
 #endif
@@ -2226,7 +2227,17 @@ cleanup:
 
 	DestroyVideo(true);
 
-	WSACleanup(); 
+	//the host name lookups' worker threads (HostResolver.h) are joined before
+	//Winsock and the CRT go away: a thread still running through either at
+	//exit crashes it. Bounded; a lookup that is still stuck after that is
+	//left to the OS, which reclaims everything at exit, WSACleanup skipped
+	int pendingLookups = HostResolver::GetPendingCount();
+	if (pendingLookups > 0)
+		LogMsg("Waiting for %d host name lookup(s) to finish before exiting", pendingLookups);
+	if (HostResolver::Shutdown(5000))
+		WSACleanup();
+	else
+		LogMsg("A host name lookup is still stuck, exiting without WSACleanup");
 	return 0;
 }
 

@@ -1,5 +1,6 @@
 #include "PlatformPrecomp.h"
 #include "NetSocket.h"
+#include "HostResolver.h"
 #include "util/MiscUtils.h"
 
 #ifndef WINAPI
@@ -131,175 +132,93 @@ bool NetSocket::Init( string url, int port )
 
 	m_idleTimer = m_idleReadTimer = GetSystemTimeTick();
 
-	//ipv6 way
-#ifdef RT_IPV6
-
-	struct addrinfo hints, *servinfo, *p;
-	int rv;
-
-	string stPort = toString(port);
-
-	memset(&hints, 0, sizeof hints);
-	hints.ai_family = AF_UNSPEC; // use AF_INET6 to force IPv6
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_protocol = IPPROTO_TCP;
-
-	if ((rv = getaddrinfo(url.c_str(), stPort.c_str(), &hints, &servinfo)) != 0) 
+	//the host's addresses: from the resolver's cache when an earlier Init or
+	//an app's HostResolver::Prefetch put them there, else resolved here and
+	//now, which blocks (most of a second for an mDNS name like hal.local:
+	//that is the stall Prefetch exists to avoid, see HostResolver.h)
+	std::vector<HostResolver::Address> addrs;
+	if (!HostResolver::Lookup(url, addrs))
 	{
-		//LogMsg("getaddrinfo: %s", gai_strerror(rv));
-		return false;
-	}
-
-	// loop through all the results and connect to the first we can
-	int typeCount = 0;
-	
-    bool bPreferipv4 =true; //very bad idea if you want ipv6 support
-	
-	
-	bool bipv4Exists = false;
-	
-	for(p = servinfo; p != NULL; p = p->ai_next)
-	{
-		typeCount++;
-		if (p->ai_addr->sa_family == AF_INET)
-			{
-				bipv4Exists = true;
-			}
-		char str[INET6_ADDRSTRLEN];
-		get_ip_str(p->ai_addr, str,INET6_ADDRSTRLEN);
-		//LogMsg("(%s) IP %d: %s", url.c_str(), typeCount, str);
-	}
-	
-	for(p = servinfo; p != NULL; p = p->ai_next)
-	{
-		
-		if (bPreferipv4 && bipv4Exists)
-			{
-				if (p->ai_addr->sa_family != AF_INET)
-				{
-					//ignore ipv6 addresses
-					continue;
-				}
-			}
-		
-		char str[INET6_ADDRSTRLEN];
-		get_ip_str(p->ai_addr, str,INET6_ADDRSTRLEN);
-		//LogMsg("Connecting to %s",  str);
-		
-	
-		if (p->ai_protocol == IPPROTO_TCP)
+		int err = HostResolver::ResolveNow(url, addrs);
+		if (err != 0 || addrs.empty())
 		{
-			//LogMsg("Protocol is TCP");
-		} else
-		{
-			//LogMsg("Protocol is %d",p->ai_protocol );
+			LogMsg("NetSocket: can't resolve %s (getaddrinfo error %d)", url.c_str(), err);
+			return false;
 		}
+		LogMsg("NetSocket: resolved %s on the main thread (not prefetched)", url.c_str());
+	}
 
-		if ((m_socket = (int)socket(p->ai_family, p->ai_socktype,
-			p->ai_protocol)) == -1)
+	//the first address that takes a socket, IPv4 preferred: an RT_IPV6 build
+	//gets IPv6 addresses in the list too and only tries one when there is no
+	//IPv4 address (very bad idea if you want ipv6 support, as it always was)
+	bool bHaveIPv4 = false;
+	for (size_t i = 0; i < addrs.size(); i++)
+		if (addrs[i].family == AF_INET) bHaveIPv4 = true;
+
+	for (size_t i = 0; i < addrs.size(); i++)
+	{
+		const HostResolver::Address &a = addrs[i];
+		if (bHaveIPv4 && a.family != AF_INET)
+			continue;
+
+		m_socket = (int)socket(a.family, a.socktype, a.protocol);
+		if (m_socket < 0)
 		{
-			//LogMsg("Skipping socket...");
+			m_socket = (int)INVALID_SOCKET;
 			continue;
 		}
-		
-
 
 #ifdef WINAPI
-
-		//Non-blocking via ioctlsocket; see the note in the non-RT_IPV6 path
-		//below about why WSAAsyncSelect(GetForegroundWindow(), ...) was wrong.
+		//Make the socket non-blocking directly.  This used to be done as a side
+		//effect of WSAAsyncSelect(m_socket, GetForegroundWindow(), ...), but that
+		//fails whenever our window isn't the foreground window (the handle then
+		//belongs to another process), silently leaving the socket BLOCKING and
+		//freezing the main thread inside recv().  Nothing ever handled the
+		//WM_USER+1 messages anyway; NetHTTP/NetSocket poll from Update().
 		{
 			u_long nonBlocking = 1;
 			ioctlsocket(m_socket, FIONBIO, &nonBlocking);
 		}
-
 #else
-		fcntl (m_socket, F_SETFL, O_NONBLOCK);
-
+		fcntl(m_socket, F_SETFL, O_NONBLOCK);
 #endif
 
-		if (connect(m_socket, p->ai_addr, (int)p->ai_addrlen) == -1)
+		//the cached address carries no port
+		struct sockaddr_storage sa;
+		memset(&sa, 0, sizeof(sa));
+		memcpy(&sa, a.addr, a.addrLen);
+		if (sa.ss_family == AF_INET)
+			((struct sockaddr_in *)&sa)->sin_port = htons((unsigned short)port);
+#ifdef RT_IPV6
+		else if (sa.ss_family == AF_INET6)
+			((struct sockaddr_in6 *)&sa)->sin6_port = htons((unsigned short)port);
+#endif
+
+		//a non-blocking connect reports "in progress" as an error: that is the
+		//expected outcome, the connection completes on its own
+		int ret = connect(m_socket, (struct sockaddr *)&sa, a.addrLen);
+		if (ret != 0)
 		{
-
-			if (errno != 115 && errno != 36) //EINPROGRESS is 115 or 36, depending.   but not defined on some platforms so doing it manually
-			{
 #ifdef WINAPI
-				LogError("Socket connect error: %d?", WSAGetLastError());
+			int err = WSAGetLastError();
+			bool bInProgress = (err == WSAEWOULDBLOCK || err == WSAEINPROGRESS);
 #else
-				LogMsg("Socket connect error on socket %d, error %d", m_socket, errno);
+			int err = errno;
+			bool bInProgress = (err == EINPROGRESS || err == EWOULDBLOCK || err == EAGAIN);
 #endif
-
-				rt_closesocket(m_socket);
-				continue;
-			} else
+			if (!bInProgress)
 			{
-				//it's not ready, but that's to be expected as we aren't blocking
+				LogError("Socket connect error: %d", err);
+				rt_closesocket(m_socket);
+				m_socket = (int)INVALID_SOCKET;
+				continue;
 			}
 		}
-
-		break; // if we get here, we must have connected successfully
-	}
-	if (p == NULL) 
-	{
-		// looped off the end of the list with no connection
-		LogError("Failed to connect");
-		return false;
+		return true;
 	}
 
-#else
-	//old ipv4 way
-
-	
-	struct sockaddr_in sa;
-	struct hostent     *hp;
-	
-	if ((hp= gethostbyname(url.c_str())) == NULL) 
-	{
-#ifndef PLATFORM_BBX
-		//no errno on bbx.  Wait, why am I even setting this?  Does this matter?
-		errno= ECONNREFUSED;                       
-#endif
-		return false;                             
-	}
-
-	memset(&sa,0,sizeof(sa));
-	memcpy((char *)&sa.sin_addr,hp->h_addr,hp->h_length);    
-	sa.sin_family= hp->h_addrtype;
-	sa.sin_port= htons((unsigned short)port);
-
-	if ((m_socket= (int)socket(hp->h_addrtype,SOCK_STREAM,0)) < 0)    
-		return false;
-
-#ifdef WINAPI
-
-	//Make the socket non-blocking directly.  This used to be done as a side
-	//effect of WSAAsyncSelect(m_socket, GetForegroundWindow(), ...), but that
-	//fails whenever our window isn't the foreground window (the handle then
-	//belongs to another process), silently leaving the socket BLOCKING and
-	//freezing the main thread inside recv().  Nothing ever handled the
-	//WM_USER+1 messages anyway; NetHTTP/NetSocket poll from Update().
-	{
-		u_long nonBlocking = 1;
-		ioctlsocket(m_socket, FIONBIO, &nonBlocking);
-	}
-
-#else
-		fcntl (m_socket, F_SETFL, O_NONBLOCK);
-
-#endif
-	
-	int ret = connect(m_socket,(struct sockaddr *)&sa,sizeof sa);
-
-    if (ret == -1)
-    {
-	  //um, it returns -1 when it works properly on Windows.  Docs wrong?!  Huh?!
-      //  LogError("Couldn't open socket.");
-      //  return false;
-    }
-
-#endif
-
-	return true;
+	LogError("Failed to connect to %s", url.c_str());
+	return false;
 }
 
 bool NetSocket::InitHost( int port, int connections )
@@ -595,4 +514,324 @@ int NetSocket::GetIdleTimeMS()
 int NetSocket::GetIdleReadTimeMS()
 {
 	return GetSystemTimeTick()-m_idleReadTimer;
+}
+
+
+//*** HostResolver (HostResolver.h): host names resolved on a worker thread
+//and cached, so Init above rarely has to block on a lookup. It lives in
+//this file so that no project has to add a source file for it: every app
+//that compiles NetSocket.cpp gets it. Platforms without threads (HTML5)
+//resolve in place
+
+#include <map>
+#include <mutex>
+#include <chrono>
+#include <memory>
+#if !defined(PLATFORM_HTML5)
+	#define RT_HOSTRESOLVER_THREADS
+	#include <thread>
+	#include <atomic>
+#endif
+
+namespace
+{
+	struct HostEntry
+	{
+		std::vector<HostResolver::Address> addrs;
+		std::chrono::steady_clock::time_point stamp; //when addrs was last set (or a refresh last failed)
+		bool bPending = false;                       //a background lookup is in flight
+		int lastError = 0;
+	};
+
+#ifdef RT_HOSTRESOLVER_THREADS
+	//a lookup's thread, kept joinable: a thread that outlives the CRT's exit
+	//crashes it, so Shutdown joins them all, and Prefetch reaps the finished
+	//ones (a finished thread joins at once)
+	struct Worker
+	{
+		std::thread thread;
+		std::shared_ptr<std::atomic<bool> > done;
+	};
+#endif
+
+	struct HostCache
+	{
+		std::mutex mutex;
+		std::map<std::string, HostEntry> entries;
+		unsigned int refreshAgeMS = 60000;
+		int pending = 0; //lookups in flight
+#ifdef RT_HOSTRESOLVER_THREADS
+		std::vector<Worker> workers;
+#endif
+	};
+
+	//made on first use, freed by Shutdown once every worker has been joined
+	//(a worker that had to be left running keeps it alive instead: the
+	//engine's Debug leak report then names it, which is the right outcome)
+	HostCache *g_pHostCache = NULL;
+	HostCache * GetCache()
+	{
+		if (!g_pHostCache)
+			g_pHostCache = new HostCache;
+		return g_pHostCache;
+	}
+
+	//no engine helpers here: this runs on the worker too
+	std::string KeyOf(const std::string &host)
+	{
+		std::string key = host;
+		for (size_t i = 0; i < key.length(); i++)
+			key[i] = (char)tolower((unsigned char)key[i]);
+		return key;
+	}
+
+	int ResolveWithGetaddrinfo(const std::string &host, std::vector<HostResolver::Address> &out)
+	{
+		out.clear();
+		struct addrinfo hints;
+		memset(&hints, 0, sizeof(hints));
+#ifdef RT_IPV6
+		hints.ai_family = AF_UNSPEC;
+#else
+		hints.ai_family = AF_INET;
+#endif
+		hints.ai_socktype = SOCK_STREAM;
+		hints.ai_protocol = IPPROTO_TCP;
+
+		struct addrinfo *pInfo = NULL;
+		int rv = getaddrinfo(host.c_str(), NULL, &hints, &pInfo);
+		if (rv != 0)
+			return rv;
+		for (struct addrinfo *p = pInfo; p != NULL; p = p->ai_next)
+		{
+			if (!p->ai_addr || p->ai_addrlen > sizeof(HostResolver::Address().addr))
+				continue;
+			HostResolver::Address a;
+			a.family = p->ai_family;
+			a.socktype = p->ai_socktype;
+			a.protocol = p->ai_protocol;
+			memcpy(a.addr, p->ai_addr, p->ai_addrlen);
+			a.addrLen = (int)p->ai_addrlen;
+			out.push_back(a);
+		}
+		freeaddrinfo(pInfo);
+		return out.empty() ? -1 : 0;
+	}
+
+	void Store(const std::string &key, const std::vector<HostResolver::Address> &addrs, int err)
+	{
+		HostCache *pCache = GetCache();
+		std::lock_guard<std::mutex> lock(pCache->mutex);
+		HostEntry &e = pCache->entries[key];
+		if (e.bPending)
+		{
+			e.bPending = false;
+			pCache->pending--;
+		}
+		e.lastError = err;
+		//a lookup that failed keeps the old answer (stale beats a stall) and
+		//waits another refresh period before it is tried again
+		if (err == 0 && !addrs.empty())
+			e.addrs = addrs;
+		e.stamp = std::chrono::steady_clock::now();
+	}
+
+#ifdef RT_HOSTRESOLVER_THREADS
+	//joins the workers whose lookup has landed (instant) and drops them;
+	//with the cache's mutex held
+	void ReapFinishedWorkers(HostCache *pCache)
+	{
+		for (size_t i = 0; i < pCache->workers.size();)
+		{
+			if (pCache->workers[i].done->load())
+			{
+				if (pCache->workers[i].thread.joinable())
+					pCache->workers[i].thread.join();
+				pCache->workers.erase(pCache->workers.begin() + i);
+			}
+			else
+				i++;
+		}
+	}
+#endif
+}
+
+bool HostResolver::Lookup(const std::string &host, std::vector<Address> &out)
+{
+	out.clear();
+	std::string key = KeyOf(host);
+	HostCache *pCache = GetCache();
+	bool bStale = false;
+	{
+		std::lock_guard<std::mutex> lock(pCache->mutex);
+		std::map<std::string, HostEntry>::iterator it = pCache->entries.find(key);
+		if (it == pCache->entries.end() || it->second.addrs.empty())
+			return false;
+		out = it->second.addrs;
+		long long ageMS = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - it->second.stamp).count();
+		bStale = ageMS > (long long)pCache->refreshAgeMS && !it->second.bPending;
+	}
+	if (bStale)
+		Prefetch(host);
+	return true;
+}
+
+int HostResolver::ResolveNow(const std::string &host, std::vector<Address> &out)
+{
+	int err = ResolveWithGetaddrinfo(host, out);
+	Store(KeyOf(host), out, err);
+	return err;
+}
+
+void HostResolver::Prefetch(const std::string &host)
+{
+	if (host.empty())
+		return;
+	std::string key = KeyOf(host);
+	HostCache *pCache = GetCache();
+	{
+		std::lock_guard<std::mutex> lock(pCache->mutex);
+		HostEntry &e = pCache->entries[key];
+		if (e.bPending)
+			return;
+		e.bPending = true;
+		pCache->pending++;
+	}
+
+#ifdef RT_HOSTRESOLVER_THREADS
+	try
+	{
+		Worker w;
+		w.done = std::make_shared<std::atomic<bool> >(false);
+		std::shared_ptr<std::atomic<bool> > done = w.done;
+		std::string h = host;
+		w.thread = std::thread([h, key, done]()
+		{
+			std::vector<Address> addrs;
+			int err = ResolveWithGetaddrinfo(h, addrs);
+			Store(key, addrs, err);
+			done->store(true);
+		});
+		std::lock_guard<std::mutex> lock(pCache->mutex);
+		ReapFinishedWorkers(pCache);
+		pCache->workers.push_back(std::move(w));
+		return;
+	}
+	catch (...)
+	{
+		//no thread to be had: resolve here instead
+	}
+#endif
+	std::vector<Address> addrs;
+	ResolveNow(host, addrs);
+}
+
+bool HostResolver::Shutdown(unsigned int maxMS)
+{
+#ifdef RT_HOSTRESOLVER_THREADS
+	std::vector<Worker> workers;
+	{
+		HostCache *pCache = GetCache();
+		std::lock_guard<std::mutex> lock(pCache->mutex);
+		workers.swap(pCache->workers);
+	}
+	bool bAllJoined = true;
+	std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+	for (size_t i = 0; i < workers.size(); i++)
+	{
+		std::thread &t = workers[i].thread;
+		if (!t.joinable())
+			continue;
+#ifdef WINAPI
+		long long elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start).count();
+		long long left = (long long)maxMS - elapsed;
+		if (left < 0) left = 0;
+		if (WaitForSingleObject((HANDLE)t.native_handle(), (DWORD)left) == WAIT_OBJECT_0)
+			t.join();
+		else
+		{
+			t.detach(); //still inside getaddrinfo: the caller skips WSACleanup
+			bAllJoined = false;
+		}
+#else
+		(void)maxMS;
+		t.join(); //no timed join here; a lookup ends within seconds anyway
+#endif
+	}
+	if (bAllJoined && g_pHostCache)
+	{
+		delete g_pHostCache; //nothing can touch it now
+		g_pHostCache = NULL;
+	}
+	return bAllJoined;
+#else
+	(void)maxMS;
+	delete g_pHostCache;
+	g_pHostCache = NULL;
+	return true;
+#endif
+}
+
+bool HostResolver::IsPending(const std::string &host)
+{
+	HostCache *pCache = GetCache();
+	std::lock_guard<std::mutex> lock(pCache->mutex);
+	std::map<std::string, HostEntry>::iterator it = pCache->entries.find(KeyOf(host));
+	return it != pCache->entries.end() && it->second.bPending;
+}
+
+bool HostResolver::IsCached(const std::string &host)
+{
+	HostCache *pCache = GetCache();
+	std::lock_guard<std::mutex> lock(pCache->mutex);
+	std::map<std::string, HostEntry>::iterator it = pCache->entries.find(KeyOf(host));
+	return it != pCache->entries.end() && !it->second.addrs.empty();
+}
+
+void HostResolver::Forget(const std::string &host)
+{
+	HostCache *pCache = GetCache();
+	std::lock_guard<std::mutex> lock(pCache->mutex);
+	std::map<std::string, HostEntry>::iterator it = pCache->entries.find(KeyOf(host));
+	if (it == pCache->entries.end())
+		return;
+	if (it->second.bPending)
+		it->second.addrs.clear(); //the lookup in flight will refill it
+	else
+		pCache->entries.erase(it);
+}
+
+int HostResolver::GetPendingCount()
+{
+	HostCache *pCache = GetCache();
+	std::lock_guard<std::mutex> lock(pCache->mutex);
+	return pCache->pending;
+}
+
+void HostResolver::SetRefreshAgeMS(unsigned int ms)
+{
+	HostCache *pCache = GetCache();
+	std::lock_guard<std::mutex> lock(pCache->mutex);
+	pCache->refreshAgeMS = ms;
+}
+
+std::string HostResolver::GetDebugText()
+{
+	HostCache *pCache = GetCache();
+	std::lock_guard<std::mutex> lock(pCache->mutex);
+	std::string s = "hosts:";
+	int pending = 0;
+	for (std::map<std::string, HostEntry>::iterator it = pCache->entries.begin(); it != pCache->entries.end(); ++it)
+	{
+		s += " " + it->first;
+		if (it->second.addrs.empty())
+			s += it->second.bPending ? "(resolving)" : "(unresolved)";
+		if (it->second.bPending)
+			pending++;
+	}
+	if (pCache->entries.empty())
+		s += " none";
+	if (pending)
+		s += " (" + std::to_string(pending) + " lookup" + (pending == 1 ? "" : "s") + " in flight)";
+	return s;
 }

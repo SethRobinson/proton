@@ -148,6 +148,34 @@ parser on canned bodies in 1-byte, 7-byte and whole pieces.
   BLOCKING whenever the app window wasn't foreground, freezing the main
   thread in recv().
 
+## Host name lookups (shared/Network/HostResolver.h, Sep 2026)
+
+`NetSocket::Init` used to resolve its host with a blocking
+gethostbyname/getaddrinfo on every connect. On Windows an mDNS name
+(`hal.local`) costs most of a second per lookup and the answer is cached
+only briefly, so every request start (an LLM turn, each TTS line) froze
+the calling app's frame for that long (RTGameBot's `-profile` measured
+860 ms per request). `HostResolver` (declared in `HostResolver.h`,
+implemented at the bottom of `NetSocket.cpp` so that no project file needs
+a new source) caches the addresses per host and fills the cache on worker
+threads: `Init` connects at once on a hit, and a miss still resolves in
+place (log line `NetSocket: resolved X on the main thread (not
+prefetched)`), so nothing changes for a caller. An app calls
+`HostResolver::Prefetch(host)` at startup and whenever a setting names a
+new server, so no request ever pays for the lookup; `IsPending(host)` lets
+a caller hold a request until the prefetch lands (RTGameBot's TTS probe and
+model list fetch do). A hit older than 60 s starts a background refresh
+and still returns what it has, and a refresh that fails keeps the old
+answer. Threading rules: a worker only calls getaddrinfo and touches the
+cache under its mutex, never the engine, never the log; the workers are
+kept joinable and `Shutdown(maxMS)` joins them, which the Windows main
+does before `WSACleanup` (a worker still stuck after 5 s is detached and
+WSACleanup skipped): a worker thread alive during the CRT's exit crashes
+the process (a Debug breakpoint in the CRT's teardown), and Winsock torn
+down under getaddrinfo does too. Other platform mains should call
+`Shutdown` the same way before their own network teardown. HTML5 has no
+threads and resolves in place.
+
 # shared/AI: TTS client
 
 `shared/AI/TTSClient.h/.cpp` speaks text through an HTTP text-to-speech

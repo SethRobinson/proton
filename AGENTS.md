@@ -147,6 +147,15 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   NetHTTP's reply-header lookup is case-insensitive since Aug 2026 (uvicorn
   sends `content-length`; binary bodies used to get cut at the first "\n\n"
   inside them) and `GetResultCode()` exposes the HTTP status.
+  Host names are resolved off the main thread since Sep 2026
+  (`Network/HostResolver.h`, implemented inside `NetSocket.cpp`, so no
+  project file changed): `NetSocket::Init` uses the cache and only blocks
+  on a miss, apps `HostResolver::Prefetch()` their servers at startup (an
+  mDNS name like `hal.local` costs ~860 ms per lookup on Windows), and the
+  Windows main joins the workers before `WSACleanup`
+  (`HostResolver::Shutdown`). A thread still running when the process
+  exits crashes the Debug CRT on the way out: never leave a detached
+  thread behind in the engine.
 
 - Logging: `LogMsg` appends to `GetSavePath() + "log.txt"`, truncated by
   the platform main at startup. On Windows an app can move it with
