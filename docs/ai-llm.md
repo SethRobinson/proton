@@ -12,8 +12,11 @@ RTGameBot (an LLM plays Infocom games). Header comment has a usage example.
   message), `RemoveOldestMessages(n)` drops the n oldest (then any leading
   non-user messages, same rule; for an app that summarized them elsewhere,
   as RTGameBot's HistoryCompactor does), `RemoveLastMessage()` drops a user
-  turn whose request got aborted, `GetTotalChars()` is the system prompt
-  plus every message (a cheap token estimate).
+  turn whose request got aborted, `SetMessageContent(index, text)` rewrites
+  one stored message in place with its role kept (RTGameBot trims an
+  answered chat block out of a turn with it; false when out of range),
+  `GetTotalChars()` is the system prompt plus every message (a cheap token
+  estimate).
   `BuildChatCompletionJSON(model, temperature, maxTokens, bStream)`
   builds the request body with cJSON (`bStream` adds `"stream":true` and
   `stream_options.include_usage`).

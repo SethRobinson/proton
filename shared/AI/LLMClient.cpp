@@ -39,6 +39,14 @@ void LLMConversation::RemoveOldestMessages(int count)
 		m_messages.erase(m_messages.begin());
 }
 
+bool LLMConversation::SetMessageContent(size_t index, const std::string &content)
+{
+	if (index >= m_messages.size())
+		return false;
+	m_messages[index].m_content = content;
+	return true;
+}
+
 int LLMConversation::GetTotalChars() const
 {
 	int chars = (int)m_systemPrompt.length();

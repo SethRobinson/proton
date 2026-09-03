@@ -72,6 +72,10 @@ public:
 	void AddUserMessage(const std::string &text) { m_messages.push_back(LLMMessage("user", text)); }
 	void AddAssistantMessage(const std::string &text) { m_messages.push_back(LLMMessage("assistant", text)); }
 	void RemoveLastMessage() { if (!m_messages.empty()) m_messages.pop_back(); } //e.g. a user turn whose request got aborted
+	//replaces one stored message's text in place, the role kept (an app that
+	//trims a block out of a turn once it has been answered); false when index
+	//is out of range
+	bool SetMessageContent(size_t index, const std::string &content);
 	void Clear() { m_messages.clear(); }
 
 	//bound the history: keep only the last maxPairs user/assistant exchanges
