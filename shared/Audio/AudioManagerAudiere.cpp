@@ -53,20 +53,82 @@ void AudioManagerAudiere::KillCachedSounds(bool bKillMusic, bool bKillLooping, i
 			itor++;
 			continue; //skip this one
 		}
-		
-		delete (*itor);
+
+		Retire(*itor); //released after the delay, never right now (the header comment)
 		list<AudiereSoundObject*>::iterator itorTemp = itor;
 		itor++;
 		m_soundList.erase(itorTemp);
 	}
-	
+
+}
+
+void AudioManagerAudiere::Retire(AudiereSoundObject *pObject)
+{
+	if (pObject->m_pSound && pObject->m_pSound->isPlaying())
+		pObject->m_pSound->stop();
+	pObject->m_retiredTick = GetSystemTimeTick(); //the raw clock: a paused or locked game timer must not hold these
+	m_retired.push_back(pObject);
+}
+
+void AudioManagerAudiere::SweepRetired(bool bForce)
+{
+	unsigned int now = GetSystemTimeTick();
+	list<AudiereSoundObject*>::iterator itor = m_retired.begin();
+
+	while (itor != m_retired.end())
+	{
+		AudiereSoundObject *pObject = *itor;
+		if (!bForce)
+		{
+			if (now - pObject->m_retiredTick < (unsigned int)C_AUDIERE_RELEASE_DELAY_MS)
+			{
+				itor++;
+				continue;
+			}
+			if (pObject->m_pSound && pObject->m_pSound->isPlaying())
+			{
+				//not expected (Retire stopped it): stop it now and give the
+				//stop its own delay, since a stop signals the notification again
+				pObject->m_pSound->stop();
+				pObject->m_retiredTick = now;
+				itor++;
+				continue;
+			}
+		}
+		delete pObject; //the last reference: the notification was consumed long ago, nothing can take a new one
+		itor = m_retired.erase(itor);
+	}
 }
 
 void AudioManagerAudiere::Kill()
 {
 	if (m_pDevice)
 	{
-		KillCachedSounds(true, true, 0, 100, true);
+		//the order matters (the header comment): stop everything, let
+		//audiere's poll consume the stop notifications and its event thread
+		//let go of the references those take, then free it all on this
+		//thread, then the device (its destructor waits for both of audiere's
+		//threads, so nothing may still be dying on them)
+		list<AudiereSoundObject*>::iterator itor;
+		for (itor = m_soundList.begin(); itor != m_soundList.end(); itor++)
+		{
+			if ((*itor)->m_pSound && (*itor)->m_pSound->isPlaying())
+				(*itor)->m_pSound->stop();
+		}
+		for (itor = m_retired.begin(); itor != m_retired.end(); itor++)
+		{
+			if ((*itor)->m_pSound && (*itor)->m_pSound->isPlaying())
+				(*itor)->m_pSound->stop();
+		}
+#ifdef _WIN32
+		Sleep(C_AUDIERE_KILL_SETTLE_MS);
+#else
+		usleep(C_AUDIERE_KILL_SETTLE_MS * 1000);
+#endif
+		SweepRetired(true);
+		for (itor = m_soundList.begin(); itor != m_soundList.end(); itor++)
+			delete (*itor);
+		m_soundList.clear();
 		m_pDevice = NULL;
 	}
 
@@ -80,14 +142,17 @@ bool AudioManagerAudiere::DeleteSoundObjectByFileName(string fName)
 	{
 		if ( (*itor)->m_fileName == fName)
 		{
-			delete (*itor);
+			//gone as far as the app can tell (a new sound of this name gets
+			//its own object, a stale handle finds nothing); the stream itself
+			//is released after the delay, never right now (the header comment)
+			Retire(*itor);
 			m_soundList.erase(itor);
 			return true; //deleted
 		}
 		itor++;
 	}
 
-	return false; 
+	return false;
 }
 
 AudiereSoundObject * AudioManagerAudiere::GetSoundObjectByFileName(string fName)
@@ -142,7 +207,10 @@ void AudioManagerAudiere::Preload( string fName, bool bLooping /*= false*/, bool
 	{
 		basePath = GetBaseAppPath();
 	}
-	AudiereSoundObject *pObject = GetSoundObjectByFileName((GetBaseAppPath()+fName).c_str());
+	//the objects are stored under fName as given (below), so that is the key;
+	//a lookup under the base path never matched and every repeated Preload
+	//of a name leaked a duplicate object (fixed Sep 2026)
+	AudiereSoundObject *pObject = GetSoundObjectByFileName(fName);
 
 	if (!pObject)
 	{
@@ -258,7 +326,9 @@ AudioHandle AudioManagerAudiere::Play( string fName, int vol, int pan)
 
 void AudioManagerAudiere::Update()
 {
-	//no need to update
+	//the retired sounds' streams, released once their delay is up (the header comment)
+	if (m_pDevice && !m_retired.empty())
+		SweepRetired(false);
 }
 
 void AudioManagerAudiere::Stop( AudioHandle soundID )

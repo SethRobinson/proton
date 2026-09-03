@@ -143,7 +143,13 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   `TTSClient` (Aug 2026) is a request pool (SetMaxParallel, priority queue,
   Cancel) that writes each audio reply to a file; the AudioManager caches
   sounds by file name, so never reuse a clip name without
-  `DeleteSoundObjectByFileName` (a base-class virtual now).
+  `DeleteSoundObjectByFileName` (a base-class virtual now). On audiere
+  (Sep 2026) that delete only retires the sound: the stream is released
+  from `Update` a second later, since audiere's own poll thread can
+  resurrect a buffer released within 50 ms of its end and destroy it twice
+  (an R6025 box or a heap corruption, found on RTGameBot's streaming PC;
+  `AudioManagerAudiere.h` has the mechanism, RTGameBot's docs/deploy.md
+  the dumps). The file may still be removed right after the delete.
   NetHTTP's reply-header lookup is case-insensitive since Aug 2026 (uvicorn
   sends `content-length`; binary bodies used to get cut at the first "\n\n"
   inside them) and `GetResultCode()` exposes the HTTP status.
