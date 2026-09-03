@@ -131,6 +131,13 @@ float GetScreenSizeYf();
 float GetScreenSizeXf();
 bool IsLargeScreen();
 void SetPrimaryScreenSize(int width, int height); //implemented by each platform, must be called VERY early, mostly for win testing
+//Windows only (win/app/main.cpp): where the window is created (the outer rect's
+//top-left, screen coordinates) instead of centered on the desktop, and whether it
+//is shown maximized (never under -nofocus: a maximize activates). Call it before
+//the window exists, from OnPreInitVideo like SetPrimaryScreenSize. The engine
+//keeps the last normal position itself from then on (WM_MOVE), so a window it
+//recreates (a fullscreen toggle back) comes back where it was
+void SetPrimaryWindowPosition(int x, int y, bool bMaximized = false);
 
 //Useful for certain things when you need to know if someone is actually using a gamepad or the touch controls
 unsigned int GetTimeOfLastTouchMS();

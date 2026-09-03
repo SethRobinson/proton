@@ -161,7 +161,12 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   Windows main joins the workers before `WSACleanup`
   (`HostResolver::Shutdown`). A thread still running when the process
   exits crashes the Debug CRT on the way out: never leave a detached
-  thread behind in the engine.
+  thread behind in the engine. Known issue (seen Sep 3 2026, not fixed):
+  since that change the Windows `main.cpp` references `HostResolver`
+  unconditionally, so every Windows app must compile
+  `Network/NetSocket.cpp`; RTBareBones' `windows_vs2017` project does not
+  and fails to link (`LNK2019 HostResolver::Shutdown`), so it is not a
+  usable Windows smoke build until its project gets the file.
 
 - Logging: `LogMsg` appends to `GetSavePath() + "log.txt"`, truncated by
   the platform main at startup. On Windows an app can move it with
@@ -278,6 +283,20 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   so it would otherwise freeze), and `g_bHasFocus` starts true as always,
   so posted clicks work. Clicking the window later activates it normally.
   Use it on every launch a script makes while a person may be at the PC.
+- `SetPrimaryWindowPosition(x, y, bMaximized)` (Windows only, `PlatformSetup.h`,
+  Sep 2026): an app calls it from `OnPreInitVideo` next to
+  `SetPrimaryScreenSize` and the window is CREATED at that outer top-left
+  (screen coordinates) instead of centered, shown maximized if asked (not
+  under `-nofocus`, a maximize activates). `main.cpp` keeps the last normal
+  position itself from `WM_MOVE`, so a window `InitVideo` recreates (a
+  fullscreen toggle back) lands where it was. Two fixes came with it: the
+  restyle a rebuild does keeps the `WS_MAXIMIZE`/`WS_MINIMIZE` bits (it used
+  to strip them, so `IsZoomed` read false on a maximized window after the
+  first resize), and `WM_SIZE`'s `SIZE_MINIMIZED` sets `g_bIsMinimized`
+  (a minimize not made through the system menu, Win+D say, used to reach
+  the video-mode rebuild, which recreated the iconic window centered and
+  visible). RTGameBot restores its window with it (its docs/config.md "The
+  window's place").
 - Posting WM_CHAR does nothing: `shared/win/app/main.cpp` defines
   `C_DONT_USE_WM_CHAR`, so keyboard input must be driven with
   WM_KEYDOWN/WM_KEYUP (the WM_KEYDOWN handler synthesizes

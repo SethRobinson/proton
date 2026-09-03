@@ -74,6 +74,15 @@ bool g_bAppCanRunInBackground = false;
 bool g_autoScreenshotMode = false; //true when the -autoscreenshot parm is in use (render regression harness)
 bool g_bNoActivateWindow = false; //-nofocus: the window is shown without activation and behind everything, so a scripted launch never takes the foreground
 
+//where the window is created (SetPrimaryWindowPosition, PlatformSetup.h): the outer
+//rect's top-left, else centered. WM_MOVE keeps it at the last NORMAL position (not
+//minimized, maximized or fullscreen), so a window InitVideo recreates comes back
+//where it was. The maximized flag is one shot: the first show only
+bool g_bWinWindowPosSet = false;
+int g_winWindowPosX = 0;
+int g_winWindowPosY = 0;
+bool g_bWinWindowMaximized = false;
+
 void InitVideoSize()
 {
 #ifdef RT_WEBOS_ARM
@@ -186,6 +195,14 @@ void SetPrimaryScreenSize(int width, int height)
 {
 	g_winVideoScreenX = width;
 	g_winVideoScreenY = height;
+}
+
+void SetPrimaryWindowPosition(int x, int y, bool bMaximized)
+{
+	g_winWindowPosX = x;
+	g_winWindowPosY = y;
+	g_bWinWindowPosSet = true;
+	g_bWinWindowMaximized = bMaximized;
 }
  
 void AddVideoMode(string name, int x, int y, ePlatformID platformID, eOrientationMode forceOrientation)
@@ -713,10 +730,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	
 	case WM_SIZE:
 		{
-		
-			// Respond to the message:				
+			//a minimize from anywhere (Win+D, Show desktop, another process), not
+			//just the system menu's SC_MINIMIZE below: an iconic window must never
+			//reach the SetVideoMode rebuild, which used to find its client rect
+			//wrong and recreate the window centered and visible
+			if (wParam == SIZE_MINIMIZED)
+			{
+				g_bIsMinimized = true;
+				break;
+			}
+			if (wParam == SIZE_RESTORED || wParam == SIZE_MAXIMIZED)
+			{
+				g_bIsMinimized = false;
+			}
+
+			// Respond to the message:
 			int Width = LOWORD( lParam );
-			int Height = HIWORD( lParam ); 
+			int Height = HIWORD( lParam );
 
 			if (Width != GetPrimaryGLX() || Height != GetPrimaryGLY())
 			{
@@ -1222,8 +1252,27 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_WINDOWPOSCHANGING:
 		//CheckWindowLagTimer();
-	
+
 		break;
+
+	case WM_MOVE:
+		//the last normal position, for SetPrimaryWindowPosition's globals: a
+		//window InitVideo recreates (a fullscreen toggle back) lands there instead
+		//of the center. A minimize or maximize sets its style bit before the move
+		//that follows, and a fullscreen window has g_bIsFullScreen set before it
+		//is created, so none of those count; -32000 is where Windows parks icons
+		if (!g_bIsFullScreen && !IsIconic(hWnd) && !IsZoomed(hWnd))
+		{
+			RECT r;
+			if (GetWindowRect(hWnd, &r) && r.left > -32000)
+			{
+				g_winWindowPosX = r.left;
+				g_winWindowPosY = r.top;
+				g_bWinWindowPosSet = true;
+			}
+		}
+		break;
+
 	case WM_EXITSIZEMOVE:
 #ifdef _DEBUG
 		//LogMsg("Exit size move");
@@ -1605,13 +1654,25 @@ bool InitVideo(int width, int height, bool bFullscreen, float aspectRatio)
 		assert(sRect.right - sRect.left != 0);
 		bCenterWindow = true;
 
+		//a windowed app that asked for a place (SetPrimaryWindowPosition), or
+		//whose window was somewhere before this recreate, goes there; a fullscreen
+		//window always sits at 0,0
+		int x = 0;
+		int y = 0;
+		if (!bFullscreen && g_bWinWindowPosSet)
+		{
+			x = g_winWindowPosX;
+			y = g_winWindowPosY;
+			bCenterWindow = false;
+		}
+
 		g_hWnd = CreateWindowEx(
 		ex_style,
 		WINDOW_CLASS,
 		GetAppName(),
 		style,
-		0,
-		0, 
+		x,
+		y,
 		sRect.right-sRect.left,
 		sRect.bottom-sRect.top,
 		NULL,
@@ -1620,7 +1681,10 @@ bool InitVideo(int width, int height, bool bFullscreen, float aspectRatio)
 		NULL);
 	} else
 	{
-		SetWindowLong(g_hWnd, GWL_STYLE, style);
+		//the window keeps its maximized/minimized state bit through the restyle:
+		//without it IsZoomed read false on a maximized window from the first
+		//rebuild on and the caption offered to maximize it again
+		SetWindowLong(g_hWnd, GWL_STYLE, style | (GetWindowLong(g_hWnd, GWL_STYLE) & (WS_MAXIMIZE | WS_MINIMIZE)));
 	}
 	
 assert(!g_hDC);
@@ -1747,14 +1811,26 @@ assert(!g_hDC);
 	}
 	if (g_bNoActivateWindow)
 	{
-		//-nofocus: visible, never activated, and behind every other window
+		//-nofocus: visible, never activated, and behind every other window (a
+		//maximize would activate it, so a requested maximized state is skipped)
 		ShowWindow(g_hWnd, SW_SHOWNOACTIVATE);
 		SetWindowPos(g_hWnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+	}
+	else if (!bFullscreen && g_bWinWindowMaximized)
+	{
+		//SetPrimaryWindowPosition asked for a maximized window: the WM_SIZE this
+		//sends queues the usual SetVideoMode rebuild, the path a user's maximize
+		//takes. The first ShowWindow of a process can be overridden by the
+		//launcher's STARTUPINFO show state, hence the check after it
+		ShowWindow(g_hWnd, SW_SHOWMAXIMIZED);
+		if (!IsZoomed(g_hWnd))
+			ShowWindow(g_hWnd, SW_MAXIMIZE);
 	}
 	else
 	{
 		ShowWindow(g_hWnd, SW_SHOW);
 	}
+	g_bWinWindowMaximized = false; //one shot: a later recreate shows the window as it is
 
 #ifdef RT_WIN_MULTITOUCH_SUPPORT
 	InitMultiTouch();
