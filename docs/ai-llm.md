@@ -125,9 +125,22 @@ parser on canned bodies in 1-byte, 7-byte and whole pieces.
 
 - The default socket NetHTTP backend is plain HTTP (no TLS) and HTTP/1.0:
   fine for LAN servers (vLLM/uvicorn reply Content-Length + close). For
-  HTTPS an app would need the `RT_USE_LIBCURL` backend, which currently
-  can't send custom headers (`SetPostHeaderOverride` isn't implemented
-  there), so it would need a small patch first.
+  HTTPS there are two ways. `RT_USE_LIBCURL` swaps NetHTTP's backend for
+  libcurl for the WHOLE build (no stream mode, no custom headers:
+  `SetPostHeaderOverride` isn't implemented there, no idle timeout, no
+  `GetResultCode`). `Network/NetHTTPCurl.h/.cpp` (Sep 2026) is a separate
+  class on libcurl's multi interface that an app compiles BESIDE the socket
+  NetHTTP for the one thing that needs HTTPS: a full URL, `AddHeader`, a raw
+  POST body with its content type, connect and total timeouts, the HTTP
+  status, the body in memory (4 MB cap by default), polled from `Update` on
+  the main thread; `GlobalInit` (called by `Start`) logs the library version
+  and whether it resolves names on its own thread (AsynchDNS: the Windows
+  DLL in `shared/win/lib/x64` does). The app links `libcurl.dll.a` and
+  ships `libcurl-x64.dll`, `libssl-1_1-x64.dll`, `libcrypto-1_1-x64.dll`
+  and `curl-ca-bundle.crt` next to its exe, and calls `GlobalShutdown` from
+  its Kill. RTGameBot's Twitch viewer count (its docs/twitch.md "The viewer
+  count") is the example; never set `CURLOPT_VERBOSE` (it prints the
+  Authorization header).
 - Streaming is opt-in (see above); the default is still the whole reply at
   once, on the code path every existing caller uses.
 - Non-streamed reply content is returned verbatim; a leading `<think>` block

@@ -167,6 +167,14 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   `Network/NetSocket.cpp`; RTBareBones' `windows_vs2017` project does not
   and fails to link (`LNK2019 HostResolver::Shutdown`), so it is not a
   usable Windows smoke build until its project gets the file.
+  HTTPS beside the socket backend (Sep 2026): `Network/NetHTTPCurl.h/.cpp`,
+  a separate libcurl-multi class (custom headers, a raw body, timeouts, the
+  status) polled from Update, compiled only by an app that links
+  `shared/win/lib/x64/libcurl.dll.a` and ships `libcurl-x64.dll`,
+  `libssl-1_1-x64.dll`, `libcrypto-1_1-x64.dll` and `curl-ca-bundle.crt`
+  next to its exe (RTGameBot's viewer count is the example; `docs/ai-llm.md`
+  "Limits"). `NetHTTP` and its stream mode are untouched; never
+  `CURLOPT_VERBOSE` there (it prints the Authorization header).
 
 - Logging: `LogMsg` appends to `GetSavePath() + "log.txt"`, truncated by
   the platform main at startup. On Windows an app can move it with
