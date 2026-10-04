@@ -213,6 +213,10 @@ public:
     virtual ~BaseApp();
     
     virtual bool Init();
+    // Windows apps defining RT_COMMAND_LINE_TASKS may handle an offline command
+    // before video, input, audio, network initialization or changing directory.
+    // Return true when handled, setting the process exit code. No GL is available.
+    virtual bool RunCommandLineTask(const vector<string>& args, int& exitCode) { return false; }
     virtual void Kill();
     virtual bool OnPreInitVideo();
     virtual void Draw();

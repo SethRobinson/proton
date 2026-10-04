@@ -1997,6 +1997,15 @@ void SetVSync(int sync)
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, TCHAR *lpCmdLine, int nCmdShow)
 {
+
+#ifdef RT_COMMAND_LINE_TASKS
+	// Opt-in only: leave other apps' startup order unchanged. CRT argument parsing
+	// preserves quoted paths for hardware-free replay and self-test commands.
+	vector<string> taskArgs;
+	for (int i = 1; i < __argc; ++i) taskArgs.push_back(__argv[i]);
+	int taskExitCode = 0;
+	if (GetBaseApp()->RunCommandLineTask(taskArgs, taskExitCode)) return taskExitCode;
+#endif
 	
 #ifdef WIN32
 	

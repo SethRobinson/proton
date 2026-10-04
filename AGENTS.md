@@ -344,3 +344,12 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
 - NEVER `git push` unless explicitly told to push. "Commit" means commit
   locally only; committing is not permission to push.
 
+
+## Offline Windows command-line tasks
+
+- `docs/command-line-tasks.md` describes the opt-in `RT_COMMAND_LINE_TASKS`
+  hook in `shared/win/app/main.cpp` and `BaseApp::RunCommandLineTask`. It runs
+  before GUI/input/audio/network initialization or chdir, accepts CRT-parsed
+  arguments, and exits with the app-supplied code when handled. Do not use GL
+  or subsystem-dependent helpers there; keep App constructors inert. Apps
+  without the define keep their existing startup order.
