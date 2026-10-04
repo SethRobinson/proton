@@ -33,6 +33,9 @@ public:
 	void Kill();
 	void SetSocket(int socket);
 	bool WasDisconnected() {return m_bWasDisconnected;}
+	// Worker-owned sockets can suppress the UI logger; their owner reports errors
+	// on the main thread. Defaults to the historical behavior for existing apps.
+	void SetLoggingEnabled(bool enabled) { m_loggingEnabled = enabled; }
 	std::string GetClientIPAsString();
 
 protected:
@@ -46,6 +49,7 @@ protected:
 	std::vector<char> m_writeBuffer;
 	unsigned int m_idleTimer, m_idleReadTimer; //time of last communication
 	bool m_bWasDisconnected;
+	bool m_loggingEnabled = true;
 
 private:
 };

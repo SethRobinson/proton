@@ -142,10 +142,10 @@ bool NetSocket::Init( string url, int port )
 		int err = HostResolver::ResolveNow(url, addrs);
 		if (err != 0 || addrs.empty())
 		{
-			LogMsg("NetSocket: can't resolve %s (getaddrinfo error %d)", url.c_str(), err);
+			if (m_loggingEnabled) LogMsg("NetSocket: can't resolve %s (getaddrinfo error %d)", url.c_str(), err);
 			return false;
 		}
-		LogMsg("NetSocket: resolved %s on the main thread (not prefetched)", url.c_str());
+		if (m_loggingEnabled) LogMsg("NetSocket: resolved %s on the main thread (not prefetched)", url.c_str());
 	}
 
 	//the first address that takes a socket, IPv4 preferred: an RT_IPV6 build
@@ -208,7 +208,7 @@ bool NetSocket::Init( string url, int port )
 #endif
 			if (!bInProgress)
 			{
-				LogError("Socket connect error: %d", err);
+				if (m_loggingEnabled) LogError("Socket connect error: %d", err);
 				rt_closesocket(m_socket);
 				m_socket = (int)INVALID_SOCKET;
 				continue;
@@ -217,7 +217,7 @@ bool NetSocket::Init( string url, int port )
 		return true;
 	}
 
-	LogError("Failed to connect to %s", url.c_str());
+	if (m_loggingEnabled) LogError("Failed to connect to %s", url.c_str());
 	return false;
 }
 
@@ -235,7 +235,7 @@ bool NetSocket::InitHost( int port, int connections )
 	m_socket = (int)socket(AF_INET, SOCK_STREAM, 0);
 	if (m_socket == INVALID_SOCKET )
 	{
-		LogMsg("socket command: INVALID_SOCKET");
+		if (m_loggingEnabled) LogMsg("socket command: INVALID_SOCKET");
 		return false;
 	}
 
@@ -260,7 +260,7 @@ bool NetSocket::InitHost( int port, int connections )
 	{
 		rt_closesocket(m_socket);
 		Kill();
-		LogMsg("bind: INVALID_SOCKET");
+		if (m_loggingEnabled) LogMsg("bind: INVALID_SOCKET");
 		return false;
 	}
 
@@ -274,7 +274,7 @@ bool NetSocket::InitHost( int port, int connections )
 	NonBlock = 1;
 	if (ioctlsocket(m_socket, FIONBIO, &NonBlock) == SOCKET_ERROR)
 	{
-		LogError("ioctlsocket() failed \n");
+		if (m_loggingEnabled) LogError("ioctlsocket() failed \n");
 		return false;
 	}
 
@@ -438,7 +438,7 @@ void NetSocket::UpdateRead()
 			if (!m_bWasDisconnected)
 			{
 				#ifdef _DEBUG
-					LogMsg("Client disconnected.  Buffer size is %d", m_readBuffer.size());
+					if (m_loggingEnabled) LogMsg("Client disconnected.  Buffer size is %d", (int)m_readBuffer.size());
 				#endif
 				m_bWasDisconnected = true;
 			}

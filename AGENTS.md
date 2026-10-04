@@ -345,6 +345,10 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   locally only; committing is not permission to push.
 
 
+### Worker-owned NetSocket logging
+
+`NetSocket::SetLoggingEnabled(false)` suppresses internal socket diagnostics for worker-owned sockets. Logging defaults to enabled for existing callers. RTSlideShow uses this opt-out and queues network diagnostics for its main thread because Proton console/UI logging is not thread-safe.
+
 ## Offline Windows command-line tasks
 
 - `docs/command-line-tasks.md` describes the opt-in `RT_COMMAND_LINE_TASKS`
