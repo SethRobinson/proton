@@ -573,6 +573,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_FMOD_GL|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\shared\BaseApp.cpp" />
+    <ClCompile Include="..\..\shared\Network\NetSocket.cpp" />
     <ClCompile Include="..\..\shared\bbx\bbutil.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_GL|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_FMOD_GL|Win32'">true</ExcludedFromBuild>

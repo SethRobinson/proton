@@ -1,0 +1,2 @@
+# Shell scripts also run under WSL or are piped to sh on remote hosts from Windows.
+*.sh text eol=lf

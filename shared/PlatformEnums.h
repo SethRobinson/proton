@@ -135,6 +135,8 @@ std::string GetLastStringInput();
 bool GetLastWriteDateOfFile(int *monthOut, int *dayOut, int *yearOut, int *hourOut, int *minOut, int *secOut, std::string fileName, bool bAddSavePath = true);
 void RemoveFile(std::string fileName, bool bAddSavePath = true);
 void CreateDirectoryRecursively(std::string basePath, std::string path);
+// Requires an absolute, non-root path without dot components or linked ancestors.
+// Validate the base path before appending a literal child. Relative paths fail closed.
 bool RemoveDirectoryRecursively(std::string path);
 std::vector<std::string> GetDirectoriesAtPath(std::string path);
 std::vector<std::string> GetFilesAtPath(std::string path);

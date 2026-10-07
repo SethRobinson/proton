@@ -806,6 +806,7 @@
     </ClCompile>
     <ClCompile Include="..\..\shared\Audio\AudioManager.cpp" />
     <ClCompile Include="..\..\shared\BaseApp.cpp" />
+    <ClCompile Include="..\..\shared\Network\NetSocket.cpp" />
     <ClCompile Include="..\..\shared\bbx\bbutil.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Common Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Common Debug|x64'">true</ExcludedFromBuild>

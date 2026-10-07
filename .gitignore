@@ -4,6 +4,7 @@
 # one, add a "!/FolderName/" line below.
 /*
 !/.gitignore
+!/.gitattributes
 !/AGENTS.md
 !/README.md
 !/LICENSE.md

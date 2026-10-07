@@ -405,7 +405,7 @@ if ($Target -eq 'ios' -and $PrepareMac)
         cmd /c "git ls-files -z | %SystemRoot%\System32\tar.exe czf `"%TEMP%\proton_harness_mac.tgz`" --null -T -"
         if ($LASTEXITCODE -ne 0) { throw 'tar of tracked files failed' }
         & scp -q "$env:TEMP\proton_harness_mac.tgz" "$MacHost`:/tmp/"
-        & ssh $MacHost 'rm -rf ~/proton_warncheck && mkdir -p ~/proton_warncheck && tar xzf /tmp/proton_harness_mac.tgz -C ~/proton_warncheck'
+        & ssh $MacHost 'set -eu; : "${HOME:?Remote HOME must be set}"; case "$HOME" in /|//) exit 1;; /*) ;; *) exit 1;; esac; test "$(cd -- "$HOME" && pwd -P)" = "$HOME"; test ! -L "$HOME/proton_warncheck"; rm -rf -- "${HOME:?}/proton_warncheck" && mkdir -p "$HOME/proton_warncheck" && tar xzf /tmp/proton_harness_mac.tgz -C "$HOME/proton_warncheck"'
         if ($LASTEXITCODE -ne 0) { throw 'remote extract failed' }
         $builtApps = @{} #several scenarios can share one app (IosAppName); build it once
         foreach ($entry in $scenarios.Apps)
@@ -517,7 +517,7 @@ foreach ($entry in $scenarios.Apps)
         $shotName = "$prefix$($entry.Name)_$($step.Name).png"
         $bmpPath = Join-Path $outputDir "$prefix$($entry.Name)_$($step.Name)$variant.bmp"
         if ($bmpPath -match ' ') { throw "path contains spaces; Proton's Windows parm tokenizer splits on them: $bmpPath" }
-        Remove-Item $bmpPath -Force -ErrorAction SilentlyContinue
+        Remove-Item -LiteralPath $bmpPath -Force -ErrorAction SilentlyContinue
 
         if ($Target -eq 'html5')
         {
@@ -556,7 +556,7 @@ foreach ($entry in $scenarios.Apps)
         $ignore = if ($step.ContainsKey('IgnoreRects')) { $step.IgnoreRects } elseif ($entry.ContainsKey('IgnoreRects')) { $entry.IgnoreRects } else { $null }
         $capturePath = Join-Path $outputDir ($shotName -replace '\.png$', "$variant.png")
         Convert-ShotToPng $bmpPath $capturePath $ignore
-        Remove-Item $bmpPath -Force
+        Remove-Item -LiteralPath $bmpPath -Force
 
         if ($Mode -eq 'golden')
         {

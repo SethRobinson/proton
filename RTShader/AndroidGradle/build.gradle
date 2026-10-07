@@ -5,5 +5,14 @@ plugins {
 }
 
 task clean(type: Delete) {
-    delete rootProject.buildDir
+    // Only this project's literal build child may be removed, even if buildDir is overridden.
+    def cleanupDir = new File(rootProject.projectDir.canonicalFile, 'build')
+    doFirst {
+        if (rootProject.buildDir.canonicalFile != cleanupDir.canonicalFile ||
+            cleanupDir.canonicalFile != cleanupDir.absoluteFile ||
+            java.nio.file.Files.isSymbolicLink(cleanupDir.toPath())) {
+            throw new GradleException('Refusing unsafe clean build directory')
+        }
+    }
+    delete cleanupDir
 }

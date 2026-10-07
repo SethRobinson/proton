@@ -40,6 +40,38 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
 - Do not put secrets in commit messages, logs, issue text, pull request descriptions, generated docs, or other tracked files.
 - Before committing, review staged changes for accidental secrets.
 
+## Destructive file operations
+
+- Never perform wildcard or recursive deletion based on an assumed current
+  working directory or an unchecked path variable. This includes `del`, `rd`,
+  `rmdir`, `deltree`, `rm`, `Remove-Item`, recursive filesystem APIs, and sync
+  commands with `--delete` or `/MIR`.
+- Anchor cleanup to the script's own directory or an explicitly supplied,
+  validated absolute project directory. Check every environment variable used
+  to construct the target for missing/blank values **before** appending anything.
+  Keep a literal child name in the target whenever possible: a checked base plus
+  `templates` is safer than deleting the base itself. Quote paths, reject roots,
+  traversal and unexpected wildcards, and verify containment before deletion.
+  Never continue after a failed directory change or failed safety check.
+- Use `shared/win/utils/SafeRemove.ps1` for batch cleanup (absolute `-Root`,
+  literal `-RelativePath`; wildcards require `-FilesOnly`). Check `errorlevel`
+  immediately. It rejects drive roots, escaping paths and reparse points.
+  Linux helpers live in `shared/linux/safe_paths.sh`; remote HTML5 cleanup uses
+  the allowlisted `shared/linux/clean_web_loader.sh`. Do not inline unchecked
+  shell commands around these helpers.
+- Generic source helpers cannot hardcode an app's directory. Callers must check
+  the base and append an intended literal child; `RemoveDirectoryRecursively`
+  now also rejects relative/empty/root paths, dot components and linked ancestors
+  through `shared/util/SafeDelete.h`. `delete_wildcard` requires an absolute
+  directory and a leaf pattern. Apple `RemoveFile` removes files only, like the
+  other platforms. Existing callers relying on relative directory deletion must
+  supply an explicit absolute path.
+- See `docs/deletion-safety.md` for the audit scope, changed script arguments,
+  consumer compatibility/build results, and regression tests. RTDink needs the
+  companion `source/DMODCleanup.h` migration in its own repo: its old uninstall
+  and autotest callers pass relative paths. These checks prevent accidental path
+  mistakes; they are not a boundary against concurrent filesystem changes.
+
 ## Build/test machines
 
 - Cross-platform testing (OSX via xcodebuild over ssh, Linux via a remote box or WSL) uses whatever machines are described in `agents_local.md` on the current computer. Building OSX demo apps looks like `xcodebuild -project RTLooneyLadders/OSX/RTLooneyLadders.xcodeproj -target RTLooneyLadders -configuration Debug build` from the repo root.
@@ -52,7 +84,7 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
 
 ## Compiler warnings policy (cleanup pass done Aug 2026)
 
-- The tracked projects build warning-free on MSVC /W3 (VS18), Apple clang (Xcode 26), GCC 13 default flags, and Emscripten 6. Please keep new code warning-clean.
+- The August 2026 cleanup targeted warning-free builds on MSVC /W3 (VS18), Apple clang (Xcode 26), GCC 13 default flags, and Emscripten 6. Please keep new code warning-clean. The October consumer review found existing Emscripten/Android warnings (including EM_ASM JavaScript tokens and legacy build flags); see `docs/deletion-safety.md` for coverage. The cleanup test binaries are warning-clean.
 - Vendored libs (ClanLib math, jpeglib, minizip) are quieted via targeted pragmas in `shared/ClanLib-2.0/Sources/Core/precomp.h`, `jmemmgr.c`, `jdhuff.c`, `jdphuff.c`, and `shared/util/unzip/unzip.c` rather than code edits.
 - Intentionally left alone: RTPack Win32 Debug's LNK4075 (EditAndContinue vs /SAFESEH project setting), and Xcode project-level warnings (CFBundleIdentifier vs PRODUCT_BUNDLE_IDENTIFIER mismatch, ONLY_ACTIVE_ARCH, duplicate -rpath) since fixing those means touching pbxproj build settings.
 - The legacy `if (this == 0)` null guards in BaseApp.cpp/HTTPComponent.cpp are kept but wrapped in clang pragmas; they are technically UB and a modern optimizer may delete them.
@@ -69,8 +101,8 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
 - `RTSimpleApp\html5\build_release.bat nopause` and RTBareBones' equivalent also
   work now (Aug 2026: both needed `-sUSE_SDL=1` added for newer Emscriptens;
   without it the SDL includes in `HTML5Main.cpp` fail and the .bat still exits
-  0, so check the output for errors). ArduboySim's html5 script likely needs the
-  same flag treatment.
+  0, so check the output for errors). ArduboySim's existing HTML5 script also
+  compiled successfully with Emscripten 6 in the October 2026 consumer review.
 - RTConsole's html5 build was modernized for Emscripten 6 (Aug 2026). It is a
   pure console build (main.cpp + reduced _CONSOLE sources, no GL, no
   HTML5Main.cpp), so the old `C_GL_MODE` + `LEGACY_GL_EMULATION` flags were
@@ -161,12 +193,10 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   Windows main joins the workers before `WSACleanup`
   (`HostResolver::Shutdown`). A thread still running when the process
   exits crashes the Debug CRT on the way out: never leave a detached
-  thread behind in the engine. Known issue (seen Sep 3 2026, not fixed):
-  since that change the Windows `main.cpp` references `HostResolver`
-  unconditionally, so every Windows app must compile
-  `Network/NetSocket.cpp`; RTBareBones' `windows_vs2017` project does not
-  and fails to link (`LNK2019 HostResolver::Shutdown`), so it is not a
-  usable Windows smoke build until its project gets the file.
+  thread behind in the engine. Windows `main.cpp` references `HostResolver`
+  unconditionally, so every Windows app must compile `Network/NetSocket.cpp`.
+  RTBareBones, RTShader and RTSimpleApp were missing it; their Windows projects
+  now include it (October 2026), fixing the Shutdown/GetPendingCount link errors.
   HTTPS beside the socket backend (Sep 2026): `Network/NetHTTPCurl.h/.cpp`,
   a separate libcurl-multi class (custom headers, a raw body, timeouts, the
   status) polled from Update, compiled only by an app that links

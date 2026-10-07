@@ -1,3 +1,5 @@
+@setlocal DisableDelayedExpansion
+cd /d "%~dp0" || exit /b 1
 echo Makes a zip of all third party libs from the /shared dir (ie, tapjoy, chartboost, fmod, win gles drivers, etc), 
 echo these items can't be put in the proton shared dir so this is a way to give all those items to someone else
 echo on your team as a big zip, assuming you added them all.
@@ -7,8 +9,10 @@ CHCP 437
 
 set FNAME=ProtonThirdPartyLibs_%DATE:~4,2%_%DATE:~7,2%.zip
 
-del %FNAME% > NULL
-rmdir /q /s ztemp
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0shared\win\utils\SafeRemove.ps1" -Root "%~dp0." -RelativePath "ProtonThirdPartyLibs_%DATE:~4,2%_%DATE:~7,2%.zip" -FilesOnly
+if errorlevel 1 exit /b 1
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0shared\win\utils\SafeRemove.ps1" -Root "%~dp0." -RelativePath "ztemp" -Recurse
+if errorlevel 1 exit /b 1
 mkdir ztemp
 mkdir ztemp\shared
 
@@ -17,7 +21,8 @@ mkdir ztemp\shared\android
 xcopy shared\android\optional_src ztemp\shared\android\optional_src /E /F /Y /I
 
 :remove the part that is under version control
-rmdir /q /s ztemp\shared\android\optional_src\com\android
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0shared\win\utils\SafeRemove.ps1" -Root "%~dp0." -RelativePath "ztemp\shared\android\optional_src\com\android" -Recurse
+if errorlevel 1 exit /b 1
 
 :ios stuff
 mkdir ztemp\shared\iOS
@@ -36,8 +41,8 @@ REM xcopy shared\mysql ztemp\shared\mysql /E /F /Y /I
 
 :make final zip, leaving out the .svn crap
 
-cd ztemp
+cd /d "%~dp0ztemp" || exit /b 1
 ..\shared\win\utils\7za.exe a -r -tzip  ..\%FNAME% * -x!.svn
 cd ..
-REM rmdir /q /s ztemp
+REM Leave ztemp for inspection; cleanup above is checked and script-relative.
 pause

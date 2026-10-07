@@ -1,3 +1,5 @@
+@setlocal DisableDelayedExpansion
+cd /d "%~dp0" || exit /b 1
 :Set below to DEBUG=1 for debug mode builds - slower but way easier to see problems. Disables the ASYNC stuff as that doesn't seem to play
 :well with the rest
 
@@ -14,14 +16,18 @@ SET USE_HTML5_CUSTOM_MAIN=1
 SET CUSTOM_TEMPLATE=..\..\shared\html5\templates\CustomMainFullTemplate.html
 
 
-set CURPATH=%cd%
-cd ..
+set "CURPATH=%~dp0"
+cd /d "%~dp0.." || exit /b 1
+set "APP_NAME="
 call app_info_setup.bat
+if not defined APP_NAME exit /b 1
+if not "%APP_NAME%"=="RTShader" exit /b 1
 :um, why does the emsdk_env.bat not fully work unless I'm in the emscripten dir?  Whatever, we'll move there and then back
-cd %EMSCRIPTEN_ROOT%
+if not defined EMSCRIPTEN_ROOT exit /b 1
+cd /d "%EMSCRIPTEN_ROOT%" || exit /b 1
 call emsdk_env.bat
 :Move back to original directory
-cd %CURPATH%
+cd /d "%~dp0" || exit /b 1
 
 
 where /q emsdk_env.bat
@@ -109,13 +115,19 @@ SET INCLUDE_DIRS=-I%SHARED% -I%APP% -I../../shared/util/boost -I../../shared/Cla
 
 :compile some libs into a separate thing, otherwise our list of files is too long and breaks stuff
 
-del %APP_NAME%.js*
-del %APP_NAME%.html
-del %APP_NAME%.wasm*
-del %APP_NAME%.data
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\..\shared\win\utils\SafeRemove.ps1" -Root "%~dp0.." -RelativePath "html5\RTShader.js*" -FilesOnly
+if errorlevel 1 exit /b 1
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\..\shared\win\utils\SafeRemove.ps1" -Root "%~dp0.." -RelativePath "html5\RTShader.html" -FilesOnly
+if errorlevel 1 exit /b 1
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\..\shared\win\utils\SafeRemove.ps1" -Root "%~dp0.." -RelativePath "html5\RTShader.wasm*" -FilesOnly
+if errorlevel 1 exit /b 1
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\..\shared\win\utils\SafeRemove.ps1" -Root "%~dp0.." -RelativePath "html5\RTShader.data" -FilesOnly
+if errorlevel 1 exit /b 1
 
-del %APP_NAME%.mem
-del temp.bc
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\..\shared\win\utils\SafeRemove.ps1" -Root "%~dp0.." -RelativePath "html5\RTShader.mem" -FilesOnly
+if errorlevel 1 exit /b 1
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\..\shared\win\utils\SafeRemove.ps1" -Root "%~dp0.." -RelativePath "html5\temp.bc" -FilesOnly
+if errorlevel 1 exit /b 1
 
 :grab our shared WebLoaderData, this has default graphics and scripts that handle various emscripten/html5 communication
 :if you need to customize it, you can stop copying these and customize yours instead

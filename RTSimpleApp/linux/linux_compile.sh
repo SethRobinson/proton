@@ -1,23 +1,28 @@
 #!/bin/bash
+set -eu
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P) || exit 1
+[ -n "$script_dir" ] && [ "$script_dir" != / ] || exit 1
+cd -- "$script_dir" || exit 1
 
 # Check if a parameter is provided, if not, display an error and exit
-if [ -z "$1" ]; then
+if [ -z "${1-}" ]; then
     echo "Usage: $0 <program_name>"
     exit 1
 fi
 
 # Set the program name from the parameter
 program_name="$1"
+case "$program_name" in ""|.|..|*[!a-zA-Z0-9_.-]*) echo "Invalid program name" >&2; exit 1;; esac
 
 # Remove the old program files
-rm -f "build/$program_name"
-rm -f "../bin/$program_name"
+rm -f -- "${script_dir:?}/build/$program_name"
+rm -f -- "${script_dir:?}/../bin/$program_name"
 
 # Create the build directory quietly
 mkdir -p build > /dev/null 2>&1
 
 # Navigate to the build directory
-cd build
+cd build || exit 1
 
 # Run cmake and make
 cmake -DDEFINE_RELEASE=ON ..

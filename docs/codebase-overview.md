@@ -165,6 +165,10 @@ test-app policy in AGENTS.md for which ones may be used for testing.
 - **Run an offline task before Windows GUI startup**: opt in to
   `BaseApp::RunCommandLineTask` with `RT_COMMAND_LINE_TASKS`; see
   `docs/command-line-tasks.md`. No GL, capture, audio or networking is initialized.
+- **Delete generated files safely**: `docs/deletion-safety.md`;
+  `shared/util/SafeDelete.h`, `shared/win/utils/SafeRemove.ps1` and
+  `shared/linux/safe_paths.sh` validate deletion paths. Never infer a cleanup
+  root from the caller's working directory.
 - **Pack assets** (.rttex/.rtfont): the `RTPack/` tool; formats in
   `shared/util/RTFileFormat.h` and `shared/GUI/RTFontFileFormat.h`.
 - **Show a console/log overlay**: `shared/Manager/Console.h` +

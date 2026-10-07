@@ -1,5 +1,6 @@
 
 
+#include "util/SafeDelete.h"
 #include <errno.h>
 
 using namespace std;
@@ -460,51 +461,7 @@ vector<string> GetFilesAtPath(string path)
 //based on a snippet fromFeroz Zahid (http://www.codeguru.com/cpp/w-p/files/folderdirectorymaintenance/article.php/c8999/
 bool RemoveDirectoryRecursively(string path)
 {
-		dirent * buf, * ent;
-		DIR *dp;
-		dirent_extra *pExtra = NULL;
-
-		dp = opendir(path.c_str());
-		if (!dp)
-		{
-			LogError("RemoveDirectoryRecursively: opendir failed");
-			return false;
-		}
-
-		buf = (dirent*) malloc(sizeof(dirent)+512);
-		while (readdir_r(dp, buf, &ent) == 0 && ent)
-		{
-			pExtra = _DEXTRA_FIRST(ent);
-
-			if (ent->d_name[0] == '.' && ent->d_name[1] == 0) continue;
-			if (ent->d_name[0] == '.' && ent->d_name[1] == '.' && ent->d_name[2] == 0) continue;
-
-			//LogMsg("Got %s. type %d", ent->d_name, int(ent->d_type));
-			if (pExtra->d_type == 4) //regular file
-			{
-				string fName = path+string("/")+ent->d_name;
-				//LogMsg("Deleting %s", fName.c_str());
-				unlink( fName.c_str());
-			}
-
-			if (pExtra->d_type == 0) //regular file
-			{
-				string fName = path+string("/")+ent->d_name;
-				//LogMsg("Entering DIR %s",fName.c_str());
-				if (!RemoveDirectoryRecursively(fName.c_str()))
-				{
-					LogError("Error removing dir %s", fName.c_str());
-					break;
-				}
-			}
-		}
-
-		free (buf);
-		closedir(dp);
-
-		//delete the final dir as well
-		rmdir( path.c_str());
-		return true; //success
+	return ProtonSafeDelete::RemoveTree(path);
 }
 
 

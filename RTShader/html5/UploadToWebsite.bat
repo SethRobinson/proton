@@ -1,19 +1,27 @@
+@setlocal DisableDelayedExpansion
+cd /d "%~dp0" || exit /b 1
 SET _FTP_USER_=rtsoft
 SET _FTP_SITE_=rtsoft.com
 SET WEB_SUB_DIR=web/rtshader
 
-set CURPATH=%cd%
-cd ..
+set "CURPATH=%~dp0"
+cd /d "%~dp0.." || exit /b 1
+set "APP_NAME="
 call app_info_setup.bat
-cd %CURPATH%
+if not defined APP_NAME exit /b 1
+if not "%APP_NAME%"=="RTShader" exit /b 1
+cd /d "%~dp0" || exit /b 1
 
 if not exist %APP_NAME%.js %RT_UTIL%\beeper.exe /p
 :Get rid of files we don't actually need
-del %APP_NAME%.js.orig.js
-del temp.bc
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\..\shared\win\utils\SafeRemove.ps1" -Root "%~dp0.." -RelativePath "html5\RTShader.js.orig.js" -FilesOnly
+if errorlevel 1 exit /b 1
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\..\shared\win\utils\SafeRemove.ps1" -Root "%~dp0.." -RelativePath "html5\temp.bc" -FilesOnly
+if errorlevel 1 exit /b 1
 :SSH transfer, this assumes you have ssh and valid keys setup already
 ssh %_FTP_USER_%@%_FTP_SITE_% "mkdir ~/www/%WEB_SUB_DIR%"
-ssh %_FTP_USER_%@%_FTP_SITE_% "rm -rf ~/www/%WEB_SUB_DIR%/WebLoaderData"
+ssh %_FTP_USER_%@%_FTP_SITE_% "sh -s -- rtshader" < "%~dp0..\..\shared\linux\clean_web_loader.sh"
+if errorlevel 1 exit /b 1
 scp %APP_NAME%*.* %_FTP_USER_%@%_FTP_SITE_%:www/%WEB_SUB_DIR%
 scp -r WebLoaderData %_FTP_USER_%@%_FTP_SITE_%:www/%WEB_SUB_DIR%
 :scp from Windows can create dirs/files without group read, and Apache runs in

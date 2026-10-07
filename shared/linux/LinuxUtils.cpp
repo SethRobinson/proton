@@ -1,3 +1,4 @@
+#include "util/SafeDelete.h"
 #include "LinuxUtils.h"
 #include <errno.h>
 #include <stdio.h>
@@ -414,60 +415,7 @@ vector<string> GetFilesAtPath(string path)
 
 bool RemoveDirectoryRecursively(string path)
 {
-//	LogMsg(" RemoveDirectoryRecursively: %s", path.c_str());
-	
-	dirent * ent;
-	DIR *dp;
-
-	dp = opendir(path.c_str());
-	if (!dp)
-	{
-		string error = "unknown";
-		switch (errno)
-		{
-			case EACCES: error = "EACCES";	break;
-			case EAGAIN: error = "EBADFID";	break;
-			case EBUSY: error = "EBUSY";	break;
-			case EEXIST: error = "EEXIST";	break;
-			case EFAULT: error = "EFAULT";	break;
-
-			default: ;
-		}
-		LogError("RemoveDirectoryRecursively: opendir of %s failed with error %d (%s)", path.c_str(), errno, error.c_str());
-		return false;
-	}
-
-	while ((ent = readdir(dp)) != NULL) //readdir_r is deprecated in modern glibc, readdir is the recommended replacement
-	{
-		
-		if (ent->d_name[0] == '.' && ent->d_name[1] == 0) continue;
-		if (ent->d_name[0] == '.' && ent->d_name[1] == '.' && ent->d_name[2] == 0) continue;
-
-//		LogMsg("Got %s. type %d", ent->d_name, int(ent->d_type));
-		if (ent->d_type != DT_DIR) //regular file
-		{
-			string fName = path+string("/")+ent->d_name;
-//			LogMsg("Deleting %s", fName.c_str());
-			unlink( fName.c_str());
-		}
-
-		if (ent->d_type == DT_DIR) //regular file
-		{
-			string fName = path+string("/")+ent->d_name;
-//			LogMsg("Entering DIR %s",fName.c_str());
-			if (!RemoveDirectoryRecursively(fName.c_str()))
-			{
-				LogError("Error removing dir %s", fName.c_str());
-				break;
-			}
-		}
-	}
-
-	closedir(dp);
-
-	//delete the final dir as well
-	rmdir( path.c_str());
-	return true; //success
+	return ProtonSafeDelete::RemoveTree(path);
 }
 
 bool CheckIfOtherAudioIsPlaying()

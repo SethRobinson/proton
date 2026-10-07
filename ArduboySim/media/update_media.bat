@@ -1,11 +1,12 @@
+@setlocal DisableDelayedExpansion
+cd /d "%~dp0" || exit /b 1
 REM Make fonts
 
 set PACK_EXE=..\..\.\shared\win\utils\RTPack.exe
 
 REM Delete all existing packed textures from this dir
-cd interface
-for /r %%f in (*.rttex) do del %%f
-cd ..
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\..\shared\win\utils\SafeRemove.ps1" -Root "%~dp0.." -RelativePath "media\interface\*.rttex" -Recurse -FilesOnly
+if errorlevel 1 exit /b 1
 
 for /r %%f in (font*.txt) do %PACK_EXE% -make_font %%f
 
@@ -17,9 +18,9 @@ REM -pvrtc4 for compressed, -pvrt4444 or -pvrt8888 (32 bit)  for uncompressed
 :for /r %%f in (*.bmp *.png) do ..\%PACK_EXE%  -pvrt8888 %%f
 :cd ..
 
-cd interface
+cd interface || exit /b 1
 for /r %%f in (*.bmp *.png) do ..\%PACK_EXE%  -pvrt8888 %%f
-cd ..
+cd .. || exit /b 1
 
 REM Custom things that don't need preprocessing
 
@@ -27,10 +28,10 @@ REM Final compression
 for /r %%f in (*.rttex) do %PACK_EXE% %%f
 
 REM Delete things we don't want copied
-del interface\font_*.rttex
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\..\shared\win\utils\SafeRemove.ps1" -Root "%~dp0.." -RelativePath "media\interface\font_*.rttex" -FilesOnly
+if errorlevel 1 exit /b 1
 
-:Commenting this out, just in case people build media anyway, don't want to erase a svn controlled dir
-//rmdir ..\bin\interface /S /Q
+REM Preserve the version-controlled bin/interface directory.
 
 REM copy the stuff we care about
 

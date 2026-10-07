@@ -123,6 +123,7 @@ void strip_beginning_spaces(char *s);
 
 void show( HWND g_hWnd, char title[100], LPSTR fmt, ... );
 
+// Requires an absolute directory and a leaf-only search pattern; never changes cwd.
 int delete_wildcard ( char st_path[255], char st_search_pattern[255]);
 bool get_files_with_wildard ( TCHAR st_path[], TCHAR st_search_pattern[], TCHAR *st_return);
 void switch_to_my_dir();

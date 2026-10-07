@@ -4,6 +4,7 @@
  *  For license info, check the license.txt file that should have come with this.
  *
  */
+#include "util/SafeDelete.h"
 #include "PlatformSetup.h"
 #include "OSXUtils.h"
 
@@ -234,17 +235,12 @@ void CreateAppCacheDirIfNeeded()
 }
 
 void RemoveFile(string fileName, bool bAddSavePath)
-{ 
-	if (bAddSavePath)
-	{
-		fileName = GetSavePath()+fileName;
-	}
-	
-	NSString *str =  [NSString stringWithCString: fileName.c_str() encoding: [NSString defaultCStringEncoding]];
-	
-	NSFileManager *FM = [NSFileManager defaultManager];
-	[FM removeItemAtPath:str error:NULL];
-}	
+{
+    if (fileName.empty()) return;
+    if (bAddSavePath) fileName = GetSavePath() + fileName;
+    // Match the other platforms: this API removes files, never directory trees.
+    unlink(fileName.c_str());
+}
 
 //The below function is based on a Snippet from http://iphonedevelopertips.com/device/determine-if-iphone-is-3g-or-3gs-determine-if-ipod-is-first-or-second-generation.html
 
@@ -389,8 +385,7 @@ void CreateDirectoryRecursively(string basePath, string path)
 
 bool RemoveDirectoryRecursively(string path)
 {
-	RemoveFile(path, false);
-	return true;
+	return ProtonSafeDelete::RemoveTree(path);
 }
 
 vector<string> GetDirectoriesAtPath(string path)

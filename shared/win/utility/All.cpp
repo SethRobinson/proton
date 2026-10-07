@@ -10,6 +10,7 @@
 
 
 #include "all.h"
+#include "../../util/SafeDelete.h"
 #include "cassert"
 #include <process.h>
 #include <direct.h>
@@ -1134,64 +1135,10 @@ void ProcessError(HWND hw, int result, char filename[255], char url[255])
 
 int delete_wildcard ( char st_path[255], char st_search_pattern[255])
 {
-    
-    HANDLE		dir;
-    WIN32_FIND_DATA	fd;
-    unsigned long	cnt;
-    
-    char		*dename;
-    
-   	//get current dir and save it
-    char st_old_dir[255];
-
-        if (!_getcwd(st_old_dir, 255))
-        {
-            LogError("Error getting working directory.");
-        }
-  
-        //first move to the dir
-    if (chdir(st_path) != 0)
-    {
-#ifndef _NOLOGMSG
-        LogMsg("Error switching to dir %s, aborting wildcard command.",st_path);
-#endif
-        return 0;
-    }
-    
-    cnt = 0;
-    dir = FindFirstFile( st_search_pattern, &fd );
-    if( dir == NULL )
-    {
-#ifndef _NOLOGMSG
-        LogMsg( "Could not open current directory\n" );
-#endif
-        //move back to original dir
-        chdir(st_old_dir);
-        return(0);
-    }
-    
-    
-    while( 1 ) 
-    {
-        if( !(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ) 
-        {
-            cnt++;
-            dename = fd.cFileName;
-            unlink(dename);				
-        }
-        if( !FindNextFile( dir, &fd ) ) {
-            break;
-        }
-    }
-    
-    FindClose( dir );
-    //LogMsg("All done finding files.");
-    chdir(st_old_dir);
-    
-    return(cnt);
+    if (!st_path || !st_search_pattern) return 0;
+    return ProtonSafeDelete::RemoveMatchingFiles(st_path, st_search_pattern);
 }
 
- 
 
 void show( HWND g_hWnd, char title[], LPSTR fmt, ... )
 {

@@ -1,15 +1,21 @@
+@setlocal DisableDelayedExpansion
+cd /d "%~dp0" || exit /b 1
 :This has to be hand edited if you add/remove .cpp files to your project.  Running this .bat by double clicking in
 :Windows explorer will build the html5 (javascript webbrowser version)
 :See http://www.rtsoft.com/wiki/doku.php?id=proton:html5_setup for info on how to setup Emscripten
 
-set CURPATH=%cd%
-cd ..
+set "CURPATH=%~dp0"
+cd /d "%~dp0.." || exit /b 1
+set "APP_NAME="
 call app_info_setup.bat
+if not defined APP_NAME exit /b 1
+if not "%APP_NAME%"=="ArduboySim" exit /b 1
 :um, why does the emsdk_env.bat not fully work unless I'm in the emscripten dir?  Whatever, we'll move there and then back
-cd %EMSCRIPTEN_ROOT%
+if not defined EMSCRIPTEN_ROOT exit /b 1
+cd /d "%EMSCRIPTEN_ROOT%" || exit /b 1
 call emsdk_env.bat
 :Move back to original directory
-cd %CURPATH%
+cd /d "%~dp0" || exit /b 1
 
 where /q emcc
 
@@ -91,8 +97,10 @@ SET CUSTOM_FLAGS=%CUSTOM_FLAGS% -D_DEBUG -s GL_UNSAFE_OPTS=0 -s WARN_ON_UNDEFINE
 SET INCLUDE_DIRS=-I%SHARED% -I%SHARED_ARDUBOY% -I%APP% -I%ARDUBOY% -I../../shared/util/boost -I../../shared/ClanLib-2.0/Sources -I../../shared/Network/enet/include ^
 -I%ZLIBPATH% -I../../shared/win/include
 
-del %APP_NAME%.js
-del %APP_NAME%.html
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\..\shared\win\utils\SafeRemove.ps1" -Root "%~dp0.." -RelativePath "html5\ArduboySim.js" -FilesOnly
+if errorlevel 1 exit /b 1
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\..\shared\win\utils\SafeRemove.ps1" -Root "%~dp0.." -RelativePath "html5\ArduboySim.html" -FilesOnly
+if errorlevel 1 exit /b 1
 
 call emcc %CUSTOM_FLAGS% %INCLUDE_DIRS% ^
 %ZLIB_SRC% %SRC% -r -o temp.o
@@ -101,7 +109,8 @@ call emcc %CUSTOM_FLAGS% %INCLUDE_DIRS% ^
 %APP_SRC% %ARDUBOY_SRC% %COMPONENT_SRC% temp.o ^
 --js-library %SHARED%\html5\SharedJSLIB.js -lidbfs.js ^
 --embed-file ../bin/interface@interface/ --embed-file ../bin/audio@audio/ -o %APP_NAME%.html
-del temp.o
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\..\shared\win\utils\SafeRemove.ps1" -Root "%~dp0.." -RelativePath "html5\temp.o" -FilesOnly
+if errorlevel 1 exit /b 1
 
 REM Make sure the file compiled ok
 if not exist %APP_NAME%.js beeper.exe /p

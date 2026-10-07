@@ -1,4 +1,11 @@
 #!/bin/bash
+set -eu
+TOOLDIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P) || exit 1
+: "${1:?Usage: buildAndRun.sh /absolute/project/linux}"
+case "$1" in /*) ;; *) exit 1;; esac
+project_dir=$(CDPATH= cd -- "$1" && pwd -P) || exit 1
+app_dir=$(CDPATH= cd -- "$project_dir/.." && pwd -P) || exit 1
+cd -- "$project_dir" || exit 1
 
 if [[ ! -f "CMakeLists.txt" ]];
 then
@@ -6,7 +13,6 @@ then
 	exit 1
 fi
 
-TOOLDIR=$(cd `dirname $0`; pwd)
 
 # Build
 mkdir -p build
@@ -24,9 +30,9 @@ else
 fi
 
 # Update media
-cd ../../media
-$TOOLDIR/update_media.sh
+cd -- "$app_dir/media" || exit 1
+bash "$TOOLDIR/update_media.sh" "$app_dir/media"
 
 # Run
-cd ../bin
-$EXECUTABLE
+cd -- "$app_dir/bin" || exit 1
+"$EXECUTABLE"

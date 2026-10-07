@@ -20,6 +20,7 @@ using namespace std;
 #include <cstdlib>
 #include <cstdarg>
 #include <cassert>
+#include "util/SafeDelete.h"
 
 
 
@@ -507,123 +508,7 @@ vector<string> GetFilesAtPath(string path)
 //based on a snippet fromFeroz Zahid (http://www.codeguru.com/cpp/w-p/files/folderdirectorymaintenance/article.php/c8999/
 bool RemoveDirectoryRecursively(string path)
 {
-#ifdef WIN32
-	const TCHAR* sPath = path.c_str();
-	HANDLE hFind;    // file handle
-	WIN32_FIND_DATA FindFileData;
-
-	TCHAR DirPath[MAX_PATH];
-	TCHAR FileName[MAX_PATH];
-
-	_tcscpy(DirPath,sPath);
-	_tcscat(DirPath,"\\*");    // searching all files
-	_tcscpy(FileName,sPath);
-	_tcscat(FileName,"\\");
-
-	// find the first file
-
-	//SETH: This is actually wrong as it's ignoring the first file.  But since it's always "." which means the current dir it doesn't
-	//matter, right?
-
-	hFind = FindFirstFile(DirPath,&FindFileData);
-	if(hFind == INVALID_HANDLE_VALUE) return FALSE;
-	_tcscpy(DirPath,FileName);
-
-	bool bSearch = true;
-	while(bSearch) {    // until we find an entry
-		if(FindNextFile(hFind,&FindFileData)) 
-		{
-			if(IsDots(FindFileData.cFileName)) continue;
-			_tcscat(FileName,FindFileData.cFileName);
-			if((FindFileData.dwFileAttributes &
-				FILE_ATTRIBUTE_DIRECTORY))
-			{
-
-					// we have found a directory, recurse
-					if(!RemoveDirectoryRecursively(FileName))
-					{
-						FindClose(hFind);
-						return FALSE;    // directory couldn't be deleted
-					}
-					// remove the empty directory
-					RemoveDirectory(FileName);
-					_tcscpy(FileName,DirPath);
-			} else 
-			{
-				if(FindFileData.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
-					// change read-only file mode
-					_chmod(FileName, _S_IWRITE);
-				
-				if(!DeleteFile(FileName))
-				{    // delete the file
-					FindClose(hFind);
-					return FALSE;
-				}
-				_tcscpy(FileName,DirPath);
-			}
-		}
-		else {
-			// no more files there
-			if(GetLastError() == ERROR_NO_MORE_FILES)
-				bSearch = false;
-			else {
-				// some error occurred; close the handle and return FALSE
-				FindClose(hFind);
-				return FALSE;
-			}
-
-		}
-
-	}
-	FindClose(hFind);                  // close the file handle
-
-	return RemoveDirectory(sPath) != 0;     // remove the empty directory
-#else
-	dirent * buf, * ent;
-	DIR *dp;
-
-	dp = opendir(path.c_str());
-	if (!dp)
-	{
-		LogError("RemoveDirectoryRecursively: opendir failed");
-		return false;
-	}
-
-	buf = (dirent*) malloc(sizeof(dirent)+512);
-	while (readdir_r(dp, buf, &ent) == 0 && ent)
-	{
-
-		if (ent->d_name[0] == '.' && ent->d_name[1] == 0) continue;
-		if (ent->d_name[0] == '.' && ent->d_name[1] == '.' && ent->d_name[2] == 0) continue;
-
-		//LogMsg("Got %s. type %d", ent->d_name, int(ent->d_type));
-		if (ent->d_type == DT_REG) //regular file
-		{
-			string fName = path+string("/")+ent->d_name;
-			//LogMsg("Deleting %s", fName.c_str());
-			unlink( fName.c_str());
-		}
-
-		if (ent->d_type == DT_DIR) //regular file
-		{
-			string fName = path+string("/")+ent->d_name;
-			//LogMsg("Entering DIR %s",fName.c_str());
-			if (!RemoveDirectoryRecursively(fName.c_str()))
-			{
-				LogError("Error removing dir %s", fName.c_str());
-				break;
-			}
-		}
-	}
-
-	free (buf);
-	closedir(dp);
-
-	//delete the final dir as well
-	rmdir( path.c_str());
-	return true; //success
-#endif
-
+	return ProtonSafeDelete::RemoveTree(path);
 }
 
 

@@ -1,11 +1,12 @@
+@setlocal DisableDelayedExpansion
+cd /d "%~dp0" || exit /b 1
 REM Make fonts
 
 set PACK_EXE=..\..\.\shared\win\utils\RTPack.exe
 
 REM Delete all existing packed textures from this dir
-cd interface
-for /r %%f in (*.rttex) do del %%f
-cd ..
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\..\shared\win\utils\SafeRemove.ps1" -Root "%~dp0.." -RelativePath "media\interface\*.rttex" -Recurse -FilesOnly
+if errorlevel 1 exit /b 1
 
 for /r %%f in (font*.txt) do %PACK_EXE% -make_font %%f
 
@@ -16,13 +17,13 @@ REM -pvrtc4 for compressed, -pvrt4444 or -pvrt8888 (32 bit)  for uncompressed
 :Note:  You'd probably also want to add .jpg to below, but I don't because I want to test the .jpg loader, not turn it into an .rttex.
 
 
-cd game
+cd game || exit /b 1
 for /r %%f in (*.bmp *.png) do ..\%PACK_EXE%  -pvrt8888 -ultra_compress 90 %%f
-cd ..
+cd .. || exit /b 1
 
-cd interface
+cd interface || exit /b 1
 for /r %%f in (*.bmp *.png) do ..\%PACK_EXE%  -pvrt8888  -ultra_compress 90 %%f
-cd ..
+cd .. || exit /b 1
 
 REM Custom things that don't need preprocessing
 
@@ -31,11 +32,15 @@ REM Final compression
 for /r %%f in (*.rttex) do %PACK_EXE% %%f
 
 REM Delete things we don't want copied
-del interface\font_*.rttex
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\..\shared\win\utils\SafeRemove.ps1" -Root "%~dp0.." -RelativePath "media\interface\font_*.rttex" -FilesOnly
+if errorlevel 1 exit /b 1
 
-rmdir ..\bin\interface /S /Q
-rmdir ..\bin\audio /S /Q
-rmdir ..\bin\game /S /Q
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\..\shared\win\utils\SafeRemove.ps1" -Root "%~dp0.." -RelativePath "bin\interface" -Recurse
+if errorlevel 1 exit /b 1
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\..\shared\win\utils\SafeRemove.ps1" -Root "%~dp0.." -RelativePath "bin\audio" -Recurse
+if errorlevel 1 exit /b 1
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\..\shared\win\utils\SafeRemove.ps1" -Root "%~dp0.." -RelativePath "bin\game" -Recurse
+if errorlevel 1 exit /b 1
 
 REM copy the stuff we care about
 
