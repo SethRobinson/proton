@@ -87,7 +87,9 @@ REM **************************************** END SOURCE
 :The shader pipeline build: pure GLES2/WebGL1, no more emscripten LEGACY_GL_EMULATION.
 :FULL_ES2 provides client-side vertex array emulation (a streaming VBO in the engine
 :could replace it later as an optimization).
-SET CUSTOM_FLAGS=-DHAS_SOCKLEN_T -DBOOST_ALL_NO_LIB -DPLATFORM_HTML5 -DRT_USE_SDL_AUDIO -DRT_SHADER_PIPELINE_AVAILABLE -DRT_SHADER_PIPELINE_ONLY -s FULL_ES2=1 -sUSE_SDL=1 -s TOTAL_MEMORY=16MB -Wno-deprecated-builtins -Wno-c++11-compat-deprecated-writable-strings ^
+:STACK_SIZE: newer Emscriptens default to a 64KB stack (it used to be 5MB). An overflow isn't detected
+:in release builds, it silently corrupts memory and crashes later (often "null function"), see AGENTS.md
+SET CUSTOM_FLAGS=-DHAS_SOCKLEN_T -DBOOST_ALL_NO_LIB -DPLATFORM_HTML5 -DRT_USE_SDL_AUDIO -DRT_SHADER_PIPELINE_AVAILABLE -DRT_SHADER_PIPELINE_ONLY -s FULL_ES2=1 -sUSE_SDL=1 -s TOTAL_MEMORY=16MB -s STACK_SIZE=5MB -Wno-deprecated-builtins -Wno-c++11-compat-deprecated-writable-strings ^
 -Wno-shift-negative-value -Wno-deprecated-non-prototype -s ALLOW_MEMORY_GROWTH=1
 
 SET SECOND_CUSTOM_FLAGS=-

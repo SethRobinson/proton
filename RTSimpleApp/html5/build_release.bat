@@ -100,7 +100,9 @@ REM **************************************** END SOURCE
 
 :unused so far: -s USE_GLFW=3 -s NO_EXIT_RUNTIME=1 -s FORCE_ALIGNED_MEMORY=1 -s EMTERPRETIFY=1  -s EMTERPRETIFY_ASYNC=1 -DRT_EMTERPRETER_ENABLED
 :To skip font loading so it needs no resource files or zlib, add  -DC_NO_ZLIB
-SET CUSTOM_FLAGS= -DHAS_SOCKLEN_T -DBOOST_ALL_NO_LIB -DPLATFORM_HTML5 -DRT_USE_SDL_AUDIO -DRT_JPG_SUPPORT -DRT_SHADER_PIPELINE_AVAILABLE -DRT_SHADER_PIPELINE_ONLY -s FULL_ES2=1 -sUSE_SDL=1 -Wno-switch -s WASM=1 -s TOTAL_MEMORY=16MB -Wno-deprecated-builtins -Wno-c++11-compat-deprecated-writable-strings -Wno-shift-negative-value -Wno-deprecated-non-prototype -s ALLOW_MEMORY_GROWTH=1
+:STACK_SIZE: newer Emscriptens default to a 64KB stack (it used to be 5MB). An overflow isn't detected
+:in release builds, it silently corrupts memory and crashes later (often "null function"), see AGENTS.md
+SET CUSTOM_FLAGS= -DHAS_SOCKLEN_T -DBOOST_ALL_NO_LIB -DPLATFORM_HTML5 -DRT_USE_SDL_AUDIO -DRT_JPG_SUPPORT -DRT_SHADER_PIPELINE_AVAILABLE -DRT_SHADER_PIPELINE_ONLY -s FULL_ES2=1 -sUSE_SDL=1 -Wno-switch -s WASM=1 -s TOTAL_MEMORY=16MB -s STACK_SIZE=5MB -Wno-deprecated-builtins -Wno-c++11-compat-deprecated-writable-strings -Wno-shift-negative-value -Wno-deprecated-non-prototype -s ALLOW_MEMORY_GROWTH=1
 
 :unused:   -s FULL_ES2=1 --emrun
 
