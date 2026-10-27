@@ -132,6 +132,12 @@ Scope policy: this file holds cross-cutting rules, workflows, and gotchas that m
   saturates at `INT32_MAX` and never advances again rather than wrapping. That froze
   `GetSystemTimeTick()` permanently and hung the FPS limiter's wait loop (fixed in
   PR #50). Use `emscripten_get_now()` instead.
+- Emscripten's default wasm stack is only 64KB (it was 5MB before 3.1.27).
+  Release builds don't detect an overflow; it silently corrupts static data
+  and crashes later in unrelated code, typically "RuntimeError: null
+  function". Apps with deep recursion or big stack buffers need
+  `-s STACK_SIZE=...` (RTDink uses 5MB for its DinkC interpreter). Diagnose
+  with `--profiling-funcs -sSTACK_OVERFLOW_CHECK=2`.
 - When converting a large `double` to an integer on wasm, cast to `uint64` first if
   you want modulo wrap-around. A direct `double`->`unsigned int` cast saturates at
   `UINT32_MAX` (same trap as above) instead of wrapping.
